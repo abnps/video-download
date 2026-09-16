@@ -157,6 +157,16 @@ async function sendPlaying(tabId) {
 
   const request = { page_url: tab.url, page_title: tab.title || "", headers: { "User-Agent": navigator.userAgent } };
   let target = "stranica";
+  const feedSite = /(^|\.)(tiktok\.com|x\.com|twitter\.com|instagram\.com|facebook\.com)$/.test(new URL(tab.url).hostname);
+  if (best && !best.postUrl && !best.directSrc && feedSite) {
+    // Link feeda yt-dlp ne može preuzeti; bolje jasna poruka nego neuspio red u aplikaciji.
+    await flashBadge(tabId, false);
+    return {
+      ok: false,
+      error: "Nisam našao link ovog videa. Klikni na video da se otvori, pa pokušaj ponovo, "
+        + `ili kopiraj link desnim klikom. Dijagnostika: ${JSON.stringify(best.debug)}`,
+    };
+  }
   if (best?.postUrl) {
     request.page_url = best.postUrl;
     target = best.postUrl;

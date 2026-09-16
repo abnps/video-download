@@ -63,18 +63,42 @@ export function findPlayingVideo() {
 
   // TikTok feed nema link /video/: ID je u omotaču playera (xgwrapper-<n>-<ID>),
   // a autor je prvi /@ link u istoj objavi. Tako nastaje isti link kao „Kopiraj link".
+  let item = video;
+  for (let node = video.parentElement; node && node !== document.body; node = node.parentElement) {
+    if (node.querySelectorAll("video").length > 1) break;
+    item = node;
+  }
+  // Kartica objave može imati i drugi <video> (npr. zamućenu pozadinu), pa se traži i po oznaci.
+  const card = video.closest('article, [data-e2e="recommend-list-item-container"], [data-e2e*="item-container"]') || item;
+
+  // TikTok feed nema link /video/: ID je u omotaču playera (xgwrapper-<n>-<ID>) ili u
+  // drugom id/data atributu kartice, a autor je /@ link u istoj objavi.
   if (!found && /(^|\.)tiktok\.com$/.test(location.hostname)) {
     let videoId = null;
-    let item = video;
-    for (let node = video; node && node !== document.body; node = node.parentElement) {
+    for (let node = video; node && node !== card.parentElement; node = node.parentElement) {
       const match = /^xgwrapper-\d+-(\d{15,})$/.exec(node.id || "");
-      if (match && !videoId) videoId = match[1];
-      if (node.querySelectorAll("video").length > 1) break;
-      item = node;
+      if (match) {
+        videoId = match[1];
+        break;
+      }
+    }
+    if (!videoId) {
+      for (const element of [card, ...card.querySelectorAll("*")]) {
+        for (const attribute of element.attributes) {
+          const isIdAttribute = attribute.name === "id" || attribute.name.startsWith("data-");
+          const isVideoLink = attribute.name === "href" && attribute.value.includes("/video/");
+          const match = (isIdAttribute || isVideoLink) && /(?:^|\D)(7\d{18})(?:\D|$)/.exec(attribute.value);
+          if (match) {
+            videoId = match[1];
+            break;
+          }
+        }
+        if (videoId) break;
+      }
     }
     if (videoId) {
-      const author = [...item.querySelectorAll('a[href^="/@"]')]
-        .map((link) => /^\/@([\w.-]+)\/?$/.exec(link.getAttribute("href")))
+      const author = [...card.querySelectorAll('a[href*="/@"]')]
+        .map((link) => /\/@([\w.-]+)\/?(?:\?.*)?$/.exec(link.getAttribute("href")))
         .find(Boolean);
       found = `https://www.tiktok.com/@${author ? author[1] : ""}/video/${videoId}`;
     }
@@ -86,5 +110,14 @@ export function findPlayingVideo() {
     frameUrl: location.href,
     playing,
     area,
+    // Kratak opis stranice kad objava nije nađena, da se problem može popraviti.
+    debug: found ? null : {
+      videos: document.querySelectorAll("video").length,
+      card: `${card.tagName.toLowerCase()}#${card.id || ""}[${card.getAttribute("data-e2e") || ""}]`,
+      numbers: [...new Set([card, ...card.querySelectorAll("*")].flatMap((element) => [...element.attributes]
+        .filter((attribute) => /\d{15,}/.test(attribute.value))
+        .map((attribute) => `${attribute.name}=${attribute.value.slice(0, 60)}`)))].slice(0, 5),
+      links: [...card.querySelectorAll("a[href]")].map((link) => link.getAttribute("href").slice(0, 60)).slice(0, 6),
+    },
   };
 }
