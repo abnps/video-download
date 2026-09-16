@@ -160,13 +160,12 @@ async function sendPlaying(tabId) {
   const feedSite = /(^|\.)(tiktok\.com|x\.com|twitter\.com|instagram\.com|facebook\.com)$/.test(new URL(tab.url).hostname);
   const instagramStory = /(^|\.)instagram\.com$/.test(new URL(tab.url).hostname)
     && new URL(tab.url).pathname.startsWith("/stories/");
-  if (best && instagramStory && !best.directSrc) {
-    // yt-dlp stories preuzima samo uz prijavu (kolačiće), a dodatak ih ne šalje.
+  if (best && instagramStory && !(await chrome.permissions.contains({ permissions: ["cookies"] }))) {
+    // yt-dlp stories preuzima samo uz prijavu, a dozvola za kolačiće nije data.
     await flashBadge(tabId, false);
     return {
       ok: false,
-      error: "Instagram stories se mogu preuzeti samo uz prijavu (kolačiće), a to još nije uključeno. "
-        + `Dijagnostika: ${JSON.stringify(best.debug)}`,
+      error: "Instagram stories traže prijavu. Klikni ponovo i u prozoru browsera dozvoli pristup kolačićima.",
     };
   }
   if (best && !best.postUrl && !best.directSrc && feedSite) {
@@ -190,13 +189,42 @@ async function sendPlaying(tabId) {
     await flashBadge(tabId, false);
     return reply;
   }
+  request.cookies = await cookiesFor([tab.url, request.page_url, request.media?.url]);
   const reply = await sendNative({ action: "add", request });
   await flashBadge(tabId, reply.ok);
   return { ...reply, target };
 }
 
+// Kolačići prijave samo za sajtove sa kojih se preuzima, i samo ako je Ahmed u browseru
+// dao opcionu dozvolu „cookies". Aplikacija ih ne čuva.
+async function cookiesFor(urls) {
+  if (!(await chrome.permissions.contains({ permissions: ["cookies"] }))) return [];
+  const found = new Map();
+  for (const url of new Set(urls.filter((value) => /^https?:/.test(value || "")))) {
+    let cookies = [];
+    try {
+      cookies = await chrome.cookies.getAll({ url });
+    } catch {
+      continue;
+    }
+    for (const cookie of cookies) {
+      found.set(`${cookie.domain}|${cookie.path}|${cookie.name}`, {
+        name: cookie.name,
+        value: cookie.value,
+        domain: cookie.domain,
+        path: cookie.path,
+        secure: cookie.secure,
+        hostOnly: cookie.hostOnly,
+        expirationDate: cookie.expirationDate,
+      });
+    }
+  }
+  return [...found.values()];
+}
+
 async function sendToApp(tabId, mediaUrl) {
   const { request, error } = await buildRequest(tabId, mediaUrl);
+  if (request) request.cookies = await cookiesFor([request.page_url, request.media?.url]);
   const reply = error ? { ok: false, error } : await sendNative({ action: "add", request });
   await flashBadge(tabId, reply.ok);
   return reply;

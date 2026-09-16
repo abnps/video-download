@@ -13,7 +13,7 @@ from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QSettings  # noqa: E4
 from PySide6.QtGui import QColor, QImage  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from videodl.browser import BrowserRequest  # noqa: E402
+from videodl.browser import BrowserRequest, Cookie  # noqa: E402
 from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  # noqa: E402
 from videodl.gui import (  # noqa: E402
     MainWindow, apply_theme, extract_urls, format_eta, format_progress, format_speed,
@@ -297,6 +297,23 @@ class MainWindowTest(unittest.TestCase):
                                    and window._queue.items()[0].status == ItemStatus.DONE))
         self.assertEqual(seen, [("https://www.youtube.com/watch?v=x", {"User-Agent": "UA"})])
         self.assertEqual(self.extras, [{"http_headers": {"User-Agent": "UA"}, "filename_title": None}])
+
+    def test_browser_cookies_reach_probe_and_download(self):
+        seen = []
+
+        def probe_with_access(url, http_headers=None, cookies=()):
+            seen.append(cookies)
+            return ProbeResult("Storija", (Entry(url, "Storija"),), False)
+
+        window = self.make_window(self.quick_download, probe_fn=probe_with_access)
+        cookies = (Cookie(".instagram.com", "sessionid", "tajna", host_only=False),)
+        window.browser_request.emit(BrowserRequest("https://www.instagram.com/stories/nalog/1/", "Priče",
+                                                   headers={"User-Agent": "UA"}, cookies=cookies))
+        self.assertTrue(wait_until(lambda: window._queue.items()
+                                   and window._queue.items()[0].status == ItemStatus.DONE))
+        self.assertEqual(seen, [cookies])
+        self.assertEqual(self.extras[0]["cookies"], cookies)
+        self.assertNotIn("tajna", repr(window._queue.items()[0]))
 
     def test_thumbnail_and_duration_are_shown(self):
         fetched = []

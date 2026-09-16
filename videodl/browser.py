@@ -1,14 +1,35 @@
-"""Zahtjev iz browser ekstenzije: šta preuzeti i s kojim HTTP zaglavljima."""
+"""Zahtjev iz browser ekstenzije: šta preuzeti, s kojim HTTP zaglavljima i kolačićima prijave."""
 
+import contextlib
+import os
+import tempfile
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 MEDIA_KINDS = ("hls", "dash", "file")
 MAX_URL_LENGTH = 8000
 MAX_HEADER_LENGTH = 2000
+MAX_COOKIES = 300
+MAX_COOKIE_VALUE = 8000
 
 # Samo zaglavlja koja serveri tokova stvarno provjeravaju; ostala se ne prosljeđuju.
 _ALLOWED_HEADERS = {"referer": "Referer", "user-agent": "User-Agent", "origin": "Origin"}
+
+
+@dataclass(frozen=True)
+class Cookie:
+    domain: str  # host-only bez tačke na početku, za poddomene sa tačkom
+    name: str
+    value: str
+    path: str = "/"
+    secure: bool = False
+    expires: int = 0  # 0 = sesijski kolačić
+    host_only: bool = True
+
+    def __repr__(self) -> str:
+        # Vrijednost kolačića je tajna prijave i ne smije završiti u logu ili poruci greške.
+        return f"Cookie(domain={self.domain!r}, name={self.name!r}, value=***)"
 
 
 @dataclass(frozen=True)
@@ -18,6 +39,7 @@ class BrowserRequest:
     media_url: str | None = None  # None: preuzima se video sa stranice preko yt-dlp-a
     media_kind: str | None = None
     headers: dict[str, str] = field(default_factory=dict)
+    cookies: tuple[Cookie, ...] = ()
 
 
 def parse_browser_request(payload) -> BrowserRequest:
@@ -41,6 +63,7 @@ def parse_browser_request(payload) -> BrowserRequest:
         media_url=media_url,
         media_kind=media_kind,
         headers=_headers(payload.get("headers")),
+        cookies=_cookies(payload.get("cookies"), [page_url, media_url]),
     )
 
 
@@ -62,3 +85,73 @@ def _headers(raw) -> dict[str, str]:
                 and "\r" not in value and "\n" not in value):
             headers[name] = value
     return headers
+
+
+def _cookies(raw, urls: list[str | None]) -> tuple[Cookie, ...]:
+    if not isinstance(raw, list):
+        return ()
+    hosts = {urlsplit(url).hostname for url in urls if url}
+    cookies = []
+    for entry in raw[:MAX_COOKIES]:
+        cookie = _cookie(entry)
+        # Prihvataju se samo kolačići sajta sa kog se preuzima (stranica ili tok).
+        if cookie is not None and any(_domain_matches(host, cookie) for host in hosts):
+            cookies.append(cookie)
+    return tuple(cookies)
+
+
+def _cookie(entry) -> Cookie | None:
+    if not isinstance(entry, dict):
+        return None
+    name, value, domain = entry.get("name"), entry.get("value"), entry.get("domain")
+    path = entry.get("path") if isinstance(entry.get("path"), str) and entry.get("path").startswith("/") else "/"
+    if not (isinstance(name, str) and isinstance(value, str) and isinstance(domain, str)) or not name or not domain:
+        return None
+    if len(value) > MAX_COOKIE_VALUE or any(ch in text for text in (name, value, domain, path) for ch in "\t\r\n"):
+        return None
+    host_only = bool(entry.get("hostOnly", not domain.startswith(".")))
+    bare = domain.lstrip(".").lower()
+    expires = entry.get("expirationDate")
+    return Cookie(
+        domain=bare if host_only else f".{bare}",
+        name=name,
+        value=value,
+        path=path,
+        secure=bool(entry.get("secure")),
+        expires=int(expires) if isinstance(expires, (int, float)) and expires > 0 else 0,
+        host_only=host_only,
+    )
+
+
+def _domain_matches(host: str | None, cookie: Cookie) -> bool:
+    if not host:
+        return False
+    host = host.lower()
+    bare = cookie.domain.lstrip(".")
+    return host == bare or (not cookie.host_only and host.endswith(f".{bare}"))
+
+
+@contextlib.contextmanager
+def cookie_file(cookies: tuple[Cookie, ...] | list[Cookie] | None) -> Iterator[str | None]:
+    """Privremeni Netscape cookies fajl za yt-dlp; briše se čim se blok završi."""
+    if not cookies:
+        yield None
+        return
+    handle, path = tempfile.mkstemp(prefix="videodl-cookies-", suffix=".txt")
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8", newline="\n") as file:
+            file.write("# Netscape HTTP Cookie File\n")
+            for cookie in cookies:
+                file.write("\t".join((
+                    cookie.domain,
+                    "FALSE" if cookie.host_only else "TRUE",
+                    cookie.path,
+                    "TRUE" if cookie.secure else "FALSE",
+                    str(cookie.expires),
+                    cookie.name,
+                    cookie.value,
+                )) + "\n")
+        yield path
+    finally:
+        with contextlib.suppress(OSError):
+            os.remove(path)

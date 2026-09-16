@@ -32,9 +32,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `Host` zaglavlja). Nijednu od ovih provjera ne slabiti.
 - Promjena `key` u manifestu mijenja ID ekstenzije i prekida vezu.
 - Registracija piše samo u HKCU (`NativeMessagingHosts` za Chrome i Edge).
-- Kolačići/prijava: ekstenzija trenutno NEMA pristup kolačićima. Ahmed je odobrio
-  slanje kolačića samo za sajt sa kog se preuzima, ali ga je sigurnosni filter
-  blokirao; ne dodavati bez Ahmedove nove izričite potvrde.
+- Kolačići/prijava (Ahmed izričito potvrdio 17.9.2026, za Instagram stories i
+  sadržaj iza prijave): `cookies` je OPCIONA dozvola koju browser traži dijalogom.
+  Šalju se samo kolačići sajta sa kog se preuzima (aplikacija dodatno odbacuje tuđe
+  domene), drže se samo u memoriji, a yt-dlp ih dobija kroz privremeni fajl koji se
+  briše odmah poslije čitanja/preuzimanja. Vrijednosti kolačića nikad u log, poruke,
+  `repr`, podešavanja ili server log testa. Ne proširivati bez Ahmedove potvrde.
 - DRM se ne zaobilazi; ekstenzija ga samo prepoznaje i označava.
 
 ## Okruženje

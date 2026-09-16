@@ -87,10 +87,10 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 - Provjera/ažuriranje yt-dlp-a iz aplikacije (YouTube se često mijenja).
 - Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
 - Brži prekid u fazi čitanja informacija (prije početka preuzimanja).
-- Video iza prijave: kolačići samo za sajt sa kog se preuzima, samo za to preuzimanje
-  (privremeni cookies fajl za yt-dlp, briše se odmah). Ahmed je odobrio 16.9.2026,
-  ali čeka izričitu potvrdu zbog sigurnosnog filtera; prijedlog je da ekstenzija
-  pristup kolačićima traži tek na prvi takav klik (dijalog browsera).
+- [x] Video iza prijave (17.9.2026, Ahmed izričito potvrdio „Kolačići prijave"):
+  opciona dozvola `cookies` kroz dijalog browsera, samo kolačići tog sajta, privremeni
+  fajl za yt-dlp se briše odmah. E2E: stranica iza prijave preuzeta, 0× 403.
+  Instagram stories čekaju Ahmedovu provjeru na pravom nalogu.
 
 ## Faza 3 — Pakovanje
 

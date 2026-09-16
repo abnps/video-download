@@ -164,18 +164,19 @@ def apply_theme(app: QApplication) -> None:
 class ProbeJob(QObject):
     """Čita linkove u pozadinskoj niti. Signali se u glavnoj niti isporučuju redom."""
 
-    probed = Signal(object, str, object, bool)  # ProbeResult, output_dir, zaglavlja, odmah preuzmi
-    failed = Signal(str, str, str, object)  # link, poruka, output_dir, zaglavlja
+    # access: {"http_headers": ..., "cookies": ...} za sajt iz browsera, samo neprazni ključevi
+    probed = Signal(object, str, object, bool)  # ProbeResult, output_dir, access, odmah preuzmi
+    failed = Signal(str, str, str, object)  # link, poruka, output_dir, access
     finished = Signal(int)  # id posla
 
     def __init__(self, job_id: int, urls: list[str], output_dir: str, probe_fn,
-                 http_headers: dict[str, str] | None = None, auto_start: bool = False):
+                 access: dict | None = None, auto_start: bool = False):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
         self._output_dir = output_dir
         self._probe_fn = probe_fn
-        self._http_headers = dict(http_headers or {})
+        self._access = {key: value for key, value in (access or {}).items() if value}
         self._auto_start = auto_start
 
     def start(self) -> None:
@@ -185,10 +186,10 @@ class ProbeJob(QObject):
     def _run(self) -> None:
         for url in self._urls:
             try:
-                result = self._probe_fn(url, http_headers=self._http_headers)
-                self.probed.emit(result, self._output_dir, self._http_headers, self._auto_start)
+                result = self._probe_fn(url, **self._access)
+                self.probed.emit(result, self._output_dir, self._access, self._auto_start)
             except Exception as exc:  # granica radne niti
-                self.failed.emit(url, error_message(exc), self._output_dir, self._http_headers)
+                self.failed.emit(url, error_message(exc), self._output_dir, self._access)
         self.finished.emit(self.job_id)
 
 
@@ -201,6 +202,8 @@ class DownloadJob(QObject):
         self.item_id = item.id
         self._args = (item.url, get_preset(item.preset_key), item.output_dir, item.subfolder)
         self._extra = {"http_headers": dict(item.http_headers), "filename_title": item.filename_title}
+        if item.cookies:
+            self._extra["cookies"] = item.cookies
         self._download_fn = download_fn
         self._cancel = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
@@ -464,9 +467,8 @@ class MainWindow(QMainWindow):
         self.add_links_from_text(text, "Prevučeni sadržaj nije link.")
         event.acceptProposedAction()
 
-    def _start_probe(self, urls: list[str], http_headers: dict[str, str] | None = None,
-                     auto_start: bool = False) -> None:
-        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, http_headers, auto_start)
+    def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False) -> None:
+        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start)
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -479,12 +481,12 @@ class MainWindow(QMainWindow):
     @Slot(object)
     def _on_browser_request(self, request: BrowserRequest) -> None:
         # Klik u browseru znači „preuzmi ovo sada", bez čekanja na dugme Preuzmi.
+        access = {"http_headers": request.headers, "cookies": request.cookies}
         if request.media_url is None:
-            self._start_probe([request.page_url], request.headers, auto_start=True)
+            self._start_probe([request.page_url], access, auto_start=True)
             return
         item = self._queue.add(request.media_url, request.page_title, self.preset_combo.currentData(),
-                               self._output_dir, http_headers=request.headers,
-                               filename_title=request.page_title)
+                               self._output_dir, filename_title=request.page_title, **access)
         self._append_row(item)
         self._set_status(f"Iz browsera: {request.page_title}")
         self._manual.append(item.id)
@@ -499,8 +501,7 @@ class MainWindow(QMainWindow):
         self.activateWindow()
 
     @Slot(object, str, object, bool)
-    def _on_probed(self, result: ProbeResult, output_dir: str, http_headers: dict[str, str],
-                   auto_start: bool) -> None:
+    def _on_probed(self, result: ProbeResult, output_dir: str, access: dict, auto_start: bool) -> None:
         if not result.entries:
             self._set_status(f"Plejlista „{result.title}“ nema dostupnih videa.")
             return
@@ -508,7 +509,7 @@ class MainWindow(QMainWindow):
         preset_key = self.preset_combo.currentData()
         for entry in result.entries:
             item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
-                                   http_headers=http_headers, thumbnail=entry.thumbnail, duration=entry.duration)
+                                   thumbnail=entry.thumbnail, duration=entry.duration, **access)
             self._append_row(item)
             if auto_start:
                 self._manual.append(item.id)
@@ -521,9 +522,9 @@ class MainWindow(QMainWindow):
         self._start_next()
 
     @Slot(str, str, str, object)
-    def _on_probe_failed(self, url: str, message: str, output_dir: str, http_headers: dict[str, str]) -> None:
+    def _on_probe_failed(self, url: str, message: str, output_dir: str, access: dict) -> None:
         # Neuspio link ostaje vidljiv kao crveni red; „Pokušaj ponovo" ga daje yt-dlp-u direktno.
-        item = self._queue.add(url, url, self.preset_combo.currentData(), output_dir, http_headers=http_headers)
+        item = self._queue.add(url, url, self.preset_combo.currentData(), output_dir, **access)
         item.status = ItemStatus.FAILED
         item.message = message
         self._append_row(item)

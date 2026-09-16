@@ -3,6 +3,7 @@ import hashlib
 import http.client
 import io
 import json
+import os
 import tempfile
 import threading
 import unittest
@@ -10,7 +11,7 @@ from pathlib import Path
 
 from videodl import native_host
 from videodl.bridge import BridgeServer
-from videodl.browser import parse_browser_request
+from videodl.browser import cookie_file, parse_browser_request
 from videodl.native_messaging import EXTENSION_ID, PROJECT_ROOT, REGISTRY_PATHS, install_native_host
 
 
@@ -35,6 +36,42 @@ class ParseBrowserRequestTest(unittest.TestCase):
     def test_unknown_media_kind_becomes_file(self):
         request = parse_browser_request({"page_url": "https://a.ba", "media": {"url": "https://a.ba/v", "kind": "x"}})
         self.assertEqual(request.media_kind, "file")
+
+    def test_only_cookies_of_the_downloaded_site_are_accepted(self):
+        request = parse_browser_request({
+            "page_url": "https://www.instagram.com/stories/nalog/123/",
+            "cookies": [
+                {"name": "sessionid", "value": "tajna", "domain": ".instagram.com", "path": "/",
+                 "secure": True, "hostOnly": False, "expirationDate": 1893456000.5},
+                {"name": "csrftoken", "value": "x", "domain": "www.instagram.com", "hostOnly": True},
+                {"name": "tudji", "value": "y", "domain": ".google.com", "hostOnly": False},
+                {"name": "los", "value": "a\tb", "domain": ".instagram.com", "hostOnly": False},
+                "nije-kolacic",
+            ],
+        })
+        self.assertEqual([c.name for c in request.cookies], ["sessionid", "csrftoken"])
+        session = request.cookies[0]
+        self.assertEqual((session.domain, session.host_only, session.expires, session.secure),
+                         (".instagram.com", False, 1893456000, True))
+        self.assertNotIn("tajna", repr(request))
+
+    def test_cookie_file_is_read_by_yt_dlp_and_deleted(self):
+        from yt_dlp import YoutubeDL
+
+        request = parse_browser_request({
+            "page_url": "https://www.instagram.com/stories/nalog/",
+            "cookies": [{"name": "sessionid", "value": "tajna", "domain": ".instagram.com", "hostOnly": False},
+                        {"name": "ds_user_id", "value": "42", "domain": "www.instagram.com", "hostOnly": True}],
+        })
+        with cookie_file(request.cookies) as path:
+            self.assertTrue(os.path.isfile(path))
+            with YoutubeDL({"quiet": True, "cookiefile": path}) as ydl:
+                header = ydl.cookiejar.get_cookie_header("https://www.instagram.com/stories/nalog/")
+        self.assertIn("sessionid=tajna", header)
+        self.assertIn("ds_user_id=42", header)
+        self.assertFalse(os.path.exists(path))
+        with cookie_file(()) as nothing:
+            self.assertIsNone(nothing)
 
     def test_invalid_requests_are_rejected(self):
         for payload in ([], {"page_url": "file:///C:/tajno.txt"}, {"page_url": "javascript:alert(1)"},

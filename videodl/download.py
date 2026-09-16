@@ -11,6 +11,7 @@ from yt_dlp import YoutubeDL
 from yt_dlp.postprocessor import FFmpegExtractAudioPP, FFmpegMergerPP, PostProcessor
 from yt_dlp.utils import DownloadCancelled
 
+from .browser import Cookie, cookie_file
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options
 from .ytdl import YdlLogger, error_message
@@ -155,20 +156,23 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              on_progress: Callable[[Progress], None] | None = None,
              cancel_event: threading.Event | None = None, *,
              http_headers: dict[str, str] | None = None,
-             filename_title: str | None = None) -> DownloadResult:
+             filename_title: str | None = None,
+             cookies: tuple[Cookie, ...] = ()) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
-    opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
-                             filename_title=filename_title, source_url=url)
-    opts["progress_hooks"] = [attempt.progress_hook]
-    opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
     try:
-        with YoutubeDL(opts) as ydl:
-            ydl.add_post_processor(_PartsRecorderPP(attempt.record_parts), when="before_dl")
-            info = ydl.extract_info(url, download=True)
+        # Kolačići prijave postoje na disku samo dok radi ovo jedno preuzimanje.
+        with cookie_file(cookies) as cookiefile:
+            opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
+                                     filename_title=filename_title, source_url=url, cookiefile=cookiefile)
+            opts["progress_hooks"] = [attempt.progress_hook]
+            opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
+            with YoutubeDL(opts) as ydl:
+                ydl.add_post_processor(_PartsRecorderPP(attempt.record_parts), when="before_dl")
+                info = ydl.extract_info(url, download=True)
     except DownloadCancelled:
         attempt.cleanup()
         return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")

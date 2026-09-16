@@ -60,7 +60,10 @@ odmah se preuzima (bez klika na „Preuzmi").
 Ograničenja:
 - Video zaštićen DRM-om (Netflix, Disney+, Prime Video…) se ne može preuzeti;
   ekstenzija to označi sa „DRM".
-- Video koji se vidi samo uz prijavu na sajt još nije podržan (kolačići).
+- Video iza prijave (Instagram stories, privatni nalozi): pri prvom preuzimanju
+  browser pita za dozvolu pristupa kolačićima. Ako se popup pri tome zatvori, klikni
+  ponovo. Šalju se samo kolačići tog sajta, ne čuvaju se, a privremeni fajl za
+  yt-dlp se briše odmah. Dozvola se uklanja u `edge://extensions` → Detalji.
 
 Ako se projekat premjesti u drugi folder, pokreni aplikaciju ponovo (registracija
 se osvježi) i ponovo učitaj ekstenziju. Uklanjanje registracije:

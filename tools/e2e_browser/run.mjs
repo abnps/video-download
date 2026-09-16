@@ -4,13 +4,12 @@
 // Registruje native host (HKCU), pokreće lokalni test sajt, a na kraju gasi Edge, test sajt i
 // test instancu aplikacije. Preuzimanja i podešavanja idu u %TEMP%\videodl-e2e, ne u Videos.
 import { execFileSync, spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PROJECT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const EXTENSION = path.join(PROJECT, "extension");
 const EXT_ID = "jfgcekfmjipklibljeacchccmebppklp";
 const EDGE = [
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
@@ -21,6 +20,9 @@ const WORK = process.env.VIDEODL_E2E_DIR || path.join(os.tmpdir(), "videodl-e2e"
 const PROFILE = path.join(WORK, "edge-profile");
 const DATA = path.join(WORK, "data");
 const OUT = path.join(WORK, "out");
+// Kopija dodatka sa već datom dozvolom za kolačiće: dijalog browsera se u testu ne može kliknuti.
+// Isti "key" u manifestu daje isti ID, pa native host prihvata kopiju.
+const EXTENSION = path.join(WORK, "extension");
 const HEADLESS = !process.argv.includes("--headed");
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -95,6 +97,17 @@ function filesIn(folder) {
   return readdirSync(folder, { withFileTypes: true, recursive: true })
     .filter((entry) => entry.isFile())
     .map((entry) => path.join(entry.parentPath, entry.name));
+}
+
+// fs.cpSync u Node 24 ruši proces (0xC0000409) na putanji projekta sa ćirilicom u OneDrive-u.
+function copyTree(source, target) {
+  mkdirSync(target, { recursive: true });
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const from = path.join(source, entry.name);
+    const to = path.join(target, entry.name);
+    if (entry.isDirectory()) copyTree(from, to);
+    else copyFileSync(from, to);
+  }
 }
 
 function killTree(pid) {
@@ -184,7 +197,24 @@ async function run(cdp, report) {
   report.playingFile = path.relative(OUT, playingFile);
   log("Video koji se pušta:", report.playingReply, "->", report.playingFile);
 
-  // 6) DRM stranica
+  // 6) Iza prijave: objava i video bez kolačića sesije vraćaju 403
+  const { targetId: privateTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/privatno.html` });
+  const privateTab = await tabState(`${SITE}/privatno.html`, "() => true");
+  const beforePrivate = new Set(filesIn(OUT));
+  const privatePopup = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?tabId=${privateTab.tabId}`);
+  await waitFor(() => cdp.evaluate(privatePopup, `!document.getElementById("download-playing").disabled`), 10000, "popup privatno");
+  await cdp.send("Target.activateTarget", { targetId: privateTarget });
+  await sleep(2500);
+  await cdp.evaluate(privatePopup, `document.getElementById("download-playing").click()`);
+  report.privateReply = await popupResult(cdp, privatePopup, "");
+  const privateFile = await waitFor(() => filesIn(OUT).find((f) => !beforePrivate.has(f) && path.basename(f).startsWith("Privatna 333")), 90000, "fajl iza prijave");
+  report.privateFile = path.relative(OUT, privateFile);
+  const serverLog = readFileSync(path.join(WORK, "server.log"), "utf8");
+  report.privateForbidden = (serverLog.match(/"GET \/privatno\/[^"]*" 403/g) || []).length;
+  log("Iza prijave:", report.privateReply, "->", report.privateFile, "| 403:", report.privateForbidden);
+  if (report.privateForbidden) throw new Error("Server je odbio zahtjev bez kolačića sesije");
+
+  // 7) DRM stranica
   await cdp.send("Target.createTarget", { url: `${SITE}/drm.html` });
   const drm = await tabState(`${SITE}/drm.html`, "(s) => s.drm");
   report.drmBadge = drm.badge;
@@ -199,6 +229,13 @@ async function main() {
   rmSync(path.join(DATA, "bridge.json"), { force: true });
   mkdirSync(PROFILE, { recursive: true });
   mkdirSync(DATA, { recursive: true });
+  rmSync(EXTENSION, { recursive: true, force: true });
+  copyTree(path.join(PROJECT, "extension"), EXTENSION);
+  const manifestPath = path.join(EXTENSION, "manifest.json");
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  manifest.permissions.push("cookies");
+  delete manifest.optional_permissions;
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   writeFileSync(path.join(DATA, "settings.ini"),
     `[General]\r\noutput_dir=${OUT.replaceAll("\\", "\\\\")}\r\npreset_key=best\r\n`);
   execFileSync("python", ["-m", "videodl.native_messaging"], { cwd: PROJECT, stdio: "ignore" });

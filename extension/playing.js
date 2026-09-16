@@ -50,7 +50,11 @@ export function findPlayingVideo() {
   // Penje se od videa kroz roditelje dok je u njima samo taj jedan video (jedna
   // objava u feedu) i uzima link objave; link sa <time> je na X-u link same objave.
   let found = null;
-  for (let node = video.parentElement; node && node !== document.body; node = node.parentElement) {
+  // Instagram storija: link je sam tab (/stories/<nalog>/<id>/); okolni linkovi vode na tuđe storije.
+  if (/(^|\.)instagram\.com$/.test(location.hostname) && /^\/stories\/[^/]+\/\d+/.test(location.pathname)) {
+    found = location.origin + location.pathname;
+  }
+  for (let node = video.parentElement; !found && node && node !== document.body; node = node.parentElement) {
     if (node.querySelectorAll("video").length > 1) break;
     const links = [...node.querySelectorAll("a[href]")];
     const withTime = links.find((link) => link.querySelector("time") && postUrl(link.getAttribute("href")));

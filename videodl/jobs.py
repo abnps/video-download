@@ -30,6 +30,8 @@ class QueueItem:
     duration: float | None = None
     # Format izabran baš za ovu stavku; promjena glavnog formata ga ne mijenja.
     custom_format: bool = False
+    # Kolačići prijave iz browsera: samo u memoriji, nikad u podešavanjima ni na disku.
+    cookies: tuple = field(default=(), repr=False)
 
 
 class DownloadQueue:
@@ -40,10 +42,10 @@ class DownloadQueue:
     def add(self, url: str, title: str, preset_key: str, output_dir: str,
             subfolder: str | None = None, *, http_headers: dict[str, str] | None = None,
             filename_title: str | None = None, thumbnail: str | None = None,
-            duration: float | None = None) -> QueueItem:
+            duration: float | None = None, cookies: tuple = ()) -> QueueItem:
         item = QueueItem(self._next_id, url, title, preset_key, output_dir, subfolder,
                          http_headers=dict(http_headers or {}), filename_title=filename_title,
-                         thumbnail=thumbnail, duration=duration)
+                         thumbnail=thumbnail, duration=duration, cookies=tuple(cookies))
         self._next_id += 1
         self._items.append(item)
         return item

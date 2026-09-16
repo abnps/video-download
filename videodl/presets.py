@@ -60,7 +60,8 @@ def safe_folder_name(name: str, fallback: str = "Plejlista") -> str:
 
 def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = None,
                       logger=None, *, http_headers: dict[str, str] | None = None,
-                      filename_title: str | None = None, source_url: str | None = None) -> dict:
+                      filename_title: str | None = None, source_url: str | None = None,
+                      cookiefile: str | None = None) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
@@ -70,6 +71,8 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
     opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _output_name(filename_title, source_url)
     if http_headers:
         opts["http_headers"] = dict(http_headers)
+    if cookiefile:
+        opts["cookiefile"] = cookiefile
     if preset.format_sort:
         opts["format_sort"] = list(preset.format_sort)
     if preset.merge_output_format:

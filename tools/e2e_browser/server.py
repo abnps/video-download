@@ -32,6 +32,16 @@ FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Početna / Fee
 POST = """<!doctype html><html><head><meta charset="utf-8"><title>Objava 222</title></head><body>
 <video src="/media/clip.mp4" controls width="320"></video></body></html>"""
 
+# Sadržaj iza prijave: stranica postavi kolačić sesije; objava i njen video bez njega vraćaju 403.
+SESSION_COOKIE = "sesija=tajna-e2e"
+PRIVATE_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Privatni feed</title></head><body>
+<article><a href="/privatno/status/333"><time>3h</time></a>
+<video id="p" src="/media/clip.mp4" muted loop width="480" height="270"></video></article>
+<script>document.getElementById('p').play();</script></body></html>"""
+
+PRIVATE_POST = """<!doctype html><html><head><meta charset="utf-8"><title>Privatna 333</title></head><body>
+<video src="/privatno/clip.mp4" controls width="320"></video></body></html>"""
+
 DRM = """<!doctype html><html><head><meta charset="utf-8"><title>E2E DRM</title></head><body><script>
 (async () => {
   const config = [{initDataTypes: ['keyids'], videoCapabilities: [{contentType: 'video/mp4; codecs="avc1.42E01E"'}]}];
@@ -75,8 +85,10 @@ def serve(work: Path) -> None:
 
         def log_message(self, format, *args):
             with log_path.open("a", encoding="utf-8") as log:
+                # Bilježi se samo da li je kolačić sesije stigao, ne njegova vrijednost.
+                has_session = SESSION_COOKIE in (self.headers.get("Cookie") or "")
                 log.write(f"{datetime.datetime.now():%H:%M:%S} {format % args} "
-                          f"referer={self.headers.get('Referer', '-')}\n")
+                          f"referer={self.headers.get('Referer', '-')} sesija={has_session}\n")
 
         def do_GET(self):
             if self.path in ("/", "/index.html"):
@@ -87,14 +99,26 @@ def serve(work: Path) -> None:
                 return self._html(FEED)
             if self.path == "/korisnik/status/222":
                 return self._html(POST)
+            if self.path == "/privatno.html":
+                return self._html(PRIVATE_FEED, set_cookie=f"{SESSION_COOKIE}; Path=/; HttpOnly")
+            if self.path.startswith("/privatno/"):
+                if SESSION_COOKIE not in (self.headers.get("Cookie") or ""):
+                    self.send_error(403, "Login required")
+                    return
+                if self.path == "/privatno/status/333":
+                    return self._html(PRIVATE_POST)
+                if self.path == "/privatno/clip.mp4":
+                    self.path = "/media/clip.mp4"
             if self.path.startswith("/hls/") and not (self.headers.get("Referer") or "").startswith(ORIGIN):
                 self.send_error(403, "Referer required")
                 return
             return super().do_GET()
 
-        def _html(self, text):
+        def _html(self, text, set_cookie=None):
             body = text.encode("utf-8")
             self.send_response(200)
+            if set_cookie:
+                self.send_header("Set-Cookie", set_cookie)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()

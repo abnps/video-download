@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from yt_dlp import YoutubeDL
 
+from .browser import Cookie, cookie_file
 from .ytdl import base_options
 
 # Kanal -> tabovi (Videos, Shorts...) -> videi: dva nivoa ugnježdavanja su dovoljna.
@@ -31,8 +32,8 @@ class ProbeResult:
 
 
 def probe(url: str, extract: Extractor | None = None, logger=None,
-          http_headers: dict[str, str] | None = None) -> ProbeResult:
-    extract = extract or _make_extractor(logger, http_headers)
+          http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = ()) -> ProbeResult:
+    extract = extract or _make_extractor(logger, http_headers, cookies)
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
@@ -83,14 +84,17 @@ def pick_thumbnail(info: dict) -> str | None:
     return info.get("thumbnail")
 
 
-def _make_extractor(logger, http_headers: dict[str, str] | None) -> Extractor:
-    opts = base_options(logger)
-    opts["extract_flat"] = "in_playlist"
-    if http_headers:
-        opts["http_headers"] = dict(http_headers)
-
+def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[Cookie, ...]) -> Extractor:
     def extract(url: str) -> dict:
-        with YoutubeDL(opts) as ydl:
-            return ydl.extract_info(url, download=False)
+        opts = base_options(logger)
+        opts["extract_flat"] = "in_playlist"
+        if http_headers:
+            opts["http_headers"] = dict(http_headers)
+        # Kolačići prijave postoje na disku samo dok traje ovo jedno čitanje.
+        with cookie_file(cookies) as cookiefile:
+            if cookiefile:
+                opts["cookiefile"] = cookiefile
+            with YoutubeDL(opts) as ydl:
+                return ydl.extract_info(url, download=False)
 
     return extract

@@ -51,6 +51,9 @@ function setResult(text, kind) {
 }
 
 async function send(tabId, mediaUrl, type = "send") {
+  // Dozvola za kolačiće (video iza prijave) traži se kroz dijalog browsera, samo prvi put;
+  // mora biti prvi poziv u kliku. Odbijanje ne smeta: preuzimanje ide bez prijave.
+  await chrome.permissions.request({ permissions: ["cookies"] }).catch(() => false);
   setBusy(true);
   setResult("Šaljem u Video Download…");
   const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl });
