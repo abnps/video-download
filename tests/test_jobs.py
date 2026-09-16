@@ -32,6 +32,23 @@ class DownloadQueueTest(unittest.TestCase):
         self.second.status = ItemStatus.CANCELLED
         self.assertTrue(self.queue.retry(self.second.id))
 
+    def test_move_to_front(self):
+        self.assertTrue(self.queue.move_to_front(self.second.id))
+        self.assertIs(self.queue.next_waiting(), self.second)
+        self.assertFalse(self.queue.move_to_front(999))
+
+    def test_item_format_is_kept_when_main_format_changes(self):
+        self.assertTrue(self.queue.set_preset(self.first.id, "m4a"))
+        self.assertEqual(self.queue.apply_preset_to_waiting("720p"), [self.second.id])
+        self.assertEqual((self.first.preset_key, self.second.preset_key), ("m4a", "720p"))
+
+        self.second.status = ItemStatus.DONE
+        self.second.filepath = r"C:\d\x.mp4"
+        self.assertTrue(self.queue.set_preset(self.second.id, "mp3"))
+        self.assertEqual((self.second.status, self.second.filepath), (ItemStatus.WAITING, None))
+        self.first.status = ItemStatus.ACTIVE
+        self.assertFalse(self.queue.set_preset(self.first.id, "best"))
+
     def test_clear_finished_removes_only_done(self):
         self.first.status = ItemStatus.DONE
         self.second.status = ItemStatus.FAILED

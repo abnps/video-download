@@ -23,6 +23,15 @@ drugih sajtova koje podržava yt-dlp. Samo za ličnu upotrebu.
   Automatski sigurnosni filter Claude Code-a blokirao je ekstenziju sa pristupom
   kolačićima, pa ovaj dio čeka Ahmedovu izričitu potvrdu (vidi Faza 2).
 
+## Odluka (16.9.2026, Ahmed) — izgled
+
+- GUI po uzoru na DVDVideoSoft „Free YouTube to MP3 Converter": svijetao prozor,
+  meni, traka zeleno „Zalijepi" / izbor formata / plavo „Preuzmi", prazan ekran
+  „Prevuci link ovdje", redovi sa sličicom, trajanjem, linkom formata i dugmadima.
+  Preuzet je izgled i raspored, ne njihovo ime, logo ni grafika.
+- Ponašanje kao u uzoru: zalijepljeni linkovi čekaju na „Preuzmi"; klik u browseru
+  i dugme u redu odmah preuzimaju samo taj video.
+
 ## Van obima
 
 - Zaobilaženje DRM-a, plaćeni/zaštićeni sadržaj bez pristupa, piratski izvori.

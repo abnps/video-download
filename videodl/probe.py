@@ -19,6 +19,8 @@ Extractor = Callable[[str], dict]
 class Entry:
     url: str
     title: str
+    thumbnail: str | None = None
+    duration: float | None = None
 
 
 @dataclass(frozen=True)
@@ -34,8 +36,7 @@ def probe(url: str, extract: Extractor | None = None, logger=None,
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
-        entry = Entry(info.get("webpage_url") or url, title)
-        return ProbeResult(title, (entry,), is_playlist=False)
+        return ProbeResult(title, (_entry(info, info.get("webpage_url") or url),), is_playlist=False)
     return ProbeResult(title, tuple(_flatten(info, extract, depth=0)), is_playlist=True)
 
 
@@ -51,7 +52,7 @@ def _flatten(info: dict, extract: Extractor, depth: int) -> Iterator[Entry]:
             if nested.get("_type") in _PLAYLIST_TYPES:
                 yield from _flatten(nested, extract, depth + 1)
                 continue
-        yield Entry(entry_url, _title(entry, entry_url))
+        yield _entry(entry, entry_url)
 
 
 def _is_nested_playlist(entry: dict) -> bool:
@@ -63,6 +64,23 @@ def _is_nested_playlist(entry: dict) -> bool:
 
 def _title(info: dict, fallback: str) -> str:
     return info.get("title") or info.get("id") or fallback
+
+
+def _entry(info: dict, url: str) -> Entry:
+    duration = info.get("duration")
+    return Entry(url, _title(info, url), pick_thumbnail(info),
+                 float(duration) if isinstance(duration, (int, float)) and duration > 0 else None)
+
+
+def pick_thumbnail(info: dict) -> str | None:
+    """Najmanja sličica koja je još dovoljno oštra za red u listi (širine 160+ px)."""
+    thumbnails = [t for t in info.get("thumbnails") or () if isinstance(t, dict) and t.get("url")]
+    sized = [t for t in thumbnails if (t.get("width") or 0) >= 160]
+    if sized:
+        return min(sized, key=lambda t: t["width"])["url"]
+    if thumbnails:
+        return thumbnails[-1]["url"]  # yt-dlp ih ređa od najlošije ka najboljoj
+    return info.get("thumbnail")
 
 
 def _make_extractor(logger, http_headers: dict[str, str] | None) -> Extractor:

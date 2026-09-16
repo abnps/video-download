@@ -1,46 +1,87 @@
-"""Glavni prozor: unos linkova, izbor formata i foldera, red preuzimanja."""
+"""Glavni prozor: traka (Zalijepi / format / Preuzmi), red preuzimanja sa sličicama, meni."""
 
 import contextlib
 import os
+import queue
+import re
 import shutil
 import subprocess
 import sys
 import threading
+import urllib.request
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QSettings, Qt, QUrl, Signal, Slot
-from PySide6.QtGui import QColor, QDesktopServices, QIcon
+from PySide6.QtCore import QObject, QPoint, QSettings, QSize, Qt, QUrl, Signal, Slot
+from PySide6.QtGui import (
+    QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPalette, QPixmap,
+)
 from PySide6.QtWidgets import (
-    QAbstractItemView, QApplication, QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QMainWindow, QMessageBox, QProgressBar, QPushButton, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget,
+    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow,
+    QMenu, QMessageBox, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
+from .icons import icon
+from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
 from .native_messaging import PROJECT_ROOT, install_native_host
-from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
+from .widgets import LINK_COLOR, DropZone, QueueRow, set_state
 from .ytdl import JS_RUNTIMES, error_message
 
-COL_TITLE, COL_FORMAT, COL_STATUS, COL_PROGRESS = range(4)
-PROGRESS_MAX = 1000
+_URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
+MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
 
-STATUS_TEXT = {
-    ItemStatus.WAITING: "Čeka",
-    ItemStatus.ACTIVE: "Pokreće se…",
-    ItemStatus.DONE: "Završeno",
-    ItemStatus.FAILED: "Greška",
-    ItemStatus.CANCELLED: "Otkazano",
-}
-STATUS_COLOR = {
-    ItemStatus.DONE: QColor("#2e7d32"),
-    ItemStatus.FAILED: QColor("#c62828"),
-}
+STYLE = f"""
+QMainWindow, QWidget#central, QScrollArea, QWidget#rows, QWidget#dropZone {{ background: #ffffff; }}
+QMenuBar {{ background: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 2px 4px; }}
+QMenuBar::item {{ padding: 4px 10px; background: transparent; }}
+QMenuBar::item:selected {{ background: #eef3fb; }}
+QLabel#cornerLink {{ padding-right: 10px; }}
+QFrame#toolbar {{ background: #ffffff; border-bottom: 1px solid #e6e6e6; }}
+QPushButton#pasteButton, QPushButton#downloadButton {{
+    color: #ffffff; border: none; border-radius: 3px; padding: 0 18px; min-height: 32px; font-size: 10pt;
+}}
+QPushButton#pasteButton {{ background: #4caf50; }}
+QPushButton#pasteButton:hover {{ background: #43a047; }}
+QPushButton#pasteButton:pressed {{ background: #388e3c; }}
+QPushButton#downloadButton {{ background: #1e88e5; }}
+QPushButton#downloadButton:hover {{ background: #1976d2; }}
+QPushButton#downloadButton:pressed {{ background: #1565c0; }}
+QPushButton#downloadButton[state="stop"] {{ background: #e53935; }}
+QPushButton#downloadButton[state="stop"]:hover {{ background: #d32f2f; }}
+QPushButton#downloadButton:disabled {{ background: #a9cdf2; }}
+QComboBox#presetCombo {{
+    border: 1px solid #cfcfcf; border-radius: 3px; padding: 0 10px; min-height: 32px; background: #ffffff;
+    font-size: 10pt;
+}}
+QComboBox#presetCombo:hover {{ border-color: #9fbfe8; }}
+QComboBox#presetCombo::drop-down {{ border: none; width: 28px; }}
+QComboBox#presetCombo::down-arrow {{ image: url("{(Path(__file__).parent / 'assets' / 'chevron-down.svg').as_posix()}"); width: 12px; height: 12px; }}
+QComboBox#presetCombo QAbstractItemView {{ border: 1px solid #cfcfcf; selection-background-color: #e8f0fe; selection-color: #202124; }}
+QLabel#warning {{ background: #fff4e5; color: #8a5300; padding: 6px 12px; border-bottom: 1px solid #f3d9b1; }}
+QFrame#queueRow {{ background: #ffffff; border-bottom: 1px solid #ececec; }}
+QFrame#queueRow:hover {{ background: #f7faff; }}
+QLabel#rowTitle {{ color: #202124; font-size: 10pt; }}
+QLabel#rowStatus {{ color: #7a7a7a; }}
+QLabel#rowStatus[state="done"] {{ color: #2e7d32; }}
+QLabel#rowStatus[state="failed"] {{ color: #c62828; }}
+QProgressBar#rowProgress {{ background: #e3ecf8; border: none; border-radius: 2px; }}
+QProgressBar#rowProgress::chunk {{ background: #1e88e5; border-radius: 2px; }}
+QToolButton#rowAction {{ border: none; border-radius: 17px; background: transparent; }}
+QToolButton#rowAction:hover {{ background: #e8f0fe; }}
+QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transparent; }}
+QToolButton#rowRemove:hover {{ background: #eeeeee; }}
+QLabel#dropTitle {{ color: #5f6368; font-size: 10pt; }}
+QLabel#dropHint {{ color: #9aa0a6; }}
+QStatusBar {{ background: #fafafa; border-top: 1px solid #e6e6e6; color: #666666; }}
+QStatusBar QLabel {{ color: #666666; padding: 0 6px; }}
+QScrollArea {{ border: none; }}
+"""
 
 
 def default_output_dir() -> str:
@@ -79,6 +120,15 @@ def format_progress(progress: Progress) -> str:
     return " · ".join(parts)
 
 
+def extract_urls(text: str) -> list[str]:
+    urls = []
+    for match in _URL_PATTERN.findall(text or ""):
+        url = match.rstrip(".,;)")
+        if url not in urls:
+            urls.append(url)
+    return urls
+
+
 def missing_tools() -> list[str]:
     missing = []
     if not shutil.which("ffmpeg"):
@@ -88,22 +138,45 @@ def missing_tools() -> list[str]:
     return missing
 
 
+def fetch_thumbnail(url: str) -> bytes | None:
+    if not url.lower().startswith(("http://", "https://")):
+        return None
+    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        return response.read(MAX_THUMBNAIL_BYTES)
+
+
+def apply_theme(app: QApplication) -> None:
+    # Izgled je namjerno svijetao i isti bez obzira na temu Windowsa.
+    app.setStyle("Fusion")
+    app.setFont(QFont("Segoe UI", 9))
+    palette = QPalette()
+    for role, color in ((QPalette.ColorRole.Window, "#ffffff"), (QPalette.ColorRole.Base, "#ffffff"),
+                        (QPalette.ColorRole.AlternateBase, "#f5f5f5"), (QPalette.ColorRole.Text, "#202124"),
+                        (QPalette.ColorRole.WindowText, "#202124"), (QPalette.ColorRole.Button, "#f3f3f3"),
+                        (QPalette.ColorRole.ButtonText, "#202124"), (QPalette.ColorRole.Highlight, "#1e88e5"),
+                        (QPalette.ColorRole.HighlightedText, "#ffffff"), (QPalette.ColorRole.ToolTipBase, "#ffffff"),
+                        (QPalette.ColorRole.ToolTipText, "#202124"), (QPalette.ColorRole.Link, LINK_COLOR)):
+        palette.setColor(role, QColor(color))
+    app.setPalette(palette)
+
+
 class ProbeJob(QObject):
     """Čita linkove u pozadinskoj niti. Signali se u glavnoj niti isporučuju redom."""
 
-    probed = Signal(object, str, str, object)  # ProbeResult, preset_key, output_dir, zaglavlja
+    probed = Signal(object, str, object, bool)  # ProbeResult, output_dir, zaglavlja, odmah preuzmi
     failed = Signal(str, str)  # link, poruka
     finished = Signal(int)  # id posla
 
-    def __init__(self, job_id: int, urls: list[str], preset_key: str, output_dir: str, probe_fn,
-                 http_headers: dict[str, str] | None = None):
+    def __init__(self, job_id: int, urls: list[str], output_dir: str, probe_fn,
+                 http_headers: dict[str, str] | None = None, auto_start: bool = False):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
-        self._preset_key = preset_key
         self._output_dir = output_dir
         self._probe_fn = probe_fn
         self._http_headers = dict(http_headers or {})
+        self._auto_start = auto_start
 
     def start(self) -> None:
         # daemon: čitanje linka se ne može prekinuti, a ne smije držati program pri zatvaranju
@@ -113,7 +186,7 @@ class ProbeJob(QObject):
         for url in self._urls:
             try:
                 result = self._probe_fn(url, http_headers=self._http_headers)
-                self.probed.emit(result, self._preset_key, self._output_dir, self._http_headers)
+                self.probed.emit(result, self._output_dir, self._http_headers, self._auto_start)
             except Exception as exc:  # granica radne niti
                 self.failed.emit(url, error_message(exc))
         self.finished.emit(self.job_id)
@@ -153,12 +226,44 @@ class DownloadJob(QObject):
         self.progress.emit(self.item_id, progress)
 
 
+class ThumbnailLoader(QObject):
+    """Sličice se preuzimaju u nekoliko pozadinskih niti; QImage je bezbjedan van glavne niti."""
+
+    loaded = Signal(str, QImage)
+    WORKERS = 3
+
+    def __init__(self, fetch):
+        super().__init__()
+        self._fetch = fetch
+        self._requests: queue.Queue[str] = queue.Queue()
+        self._started = False
+
+    def request(self, url: str) -> None:
+        if not self._started:
+            self._started = True
+            for _ in range(self.WORKERS):
+                threading.Thread(target=self._work, daemon=True).start()
+        self._requests.put(url)
+
+    def _work(self) -> None:
+        while True:
+            url = self._requests.get()
+            try:
+                data = self._fetch(url)
+            except Exception:  # sličica nije bitna; bez nje ostaje zamjenska slika
+                continue
+            image = QImage()
+            if data and image.loadFromData(data):
+                self.loaded.emit(url, image)
+
+
 class MainWindow(QMainWindow):
     # Stižu iz niti lokalnog mosta; Qt ih isporučuje u glavnoj niti.
     browser_request = Signal(object)  # BrowserRequest
     focus_requested = Signal()
 
-    def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download):
+    def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download,
+                 thumbnail_fetch=fetch_thumbnail):
         super().__init__()
         self.browser_request.connect(self._on_browser_request)
         self.focus_requested.connect(self._bring_to_front)
@@ -166,148 +271,202 @@ class MainWindow(QMainWindow):
         self._probe_fn = probe_fn
         self._download_fn = download_fn
         self._queue = DownloadQueue()
-        self._paused = False
+        self._rows: dict[int, QueueRow] = {}
+        self._sizes: dict[int, int] = {}
+        self._running = False  # „Preuzmi" je pokrenut: red se obrađuje dok ima stavki koje čekaju
+        self._manual: list[int] = []  # pojedinačno pokrenute stavke (dugme u redu, browser)
+        self._remove_when_done: set[int] = set()
         self._download_job: DownloadJob | None = None
         self._probe_jobs: dict[int, ProbeJob] = {}
         self._next_probe_id = 1
+        self._output_dir = default_output_dir()
+        self._thumbnails = ThumbnailLoader(thumbnail_fetch)
+        self._thumbnails.loaded.connect(self._on_thumbnail)
+        self._thumbnail_cache: dict[str, QPixmap] = {}
+        self._thumbnail_waiters: dict[str, list[int]] = {}
 
         self.setWindowTitle(f"Video Download {__version__}")
-        self.resize(1000, 620)
+        self.setMinimumSize(640, 380)
+        self.resize(820, 520)
+        self.setAcceptDrops(True)
+        self.setStyleSheet(STYLE)
+        self._build_menu()
         self._build_ui()
         self._load_settings()
         self._update_controls()
 
     # ---------- izgled ----------
 
+    def _build_menu(self) -> None:
+        menu = self.menuBar()
+        file_menu = menu.addMenu("&Fajl")
+        self.paste_action = file_menu.addAction("Zalijepi link iz clipboarda", self._paste_from_clipboard)
+        self.paste_action.setShortcut(QKeySequence.StandardKey.Paste)
+        file_menu.addAction("Unesi linkove…", self._enter_links).setShortcut(QKeySequence("Ctrl+L"))
+        file_menu.addSeparator()
+        file_menu.addAction("Folder za preuzimanja…", self._choose_folder)
+        file_menu.addAction("Otvori folder za preuzimanja", self._open_folder)
+        file_menu.addSeparator()
+        file_menu.addAction("Izlaz", self.close).setShortcut(QKeySequence("Ctrl+Q"))
+
+        downloads = menu.addMenu("&Preuzimanja")
+        self.start_action = downloads.addAction("Preuzmi sve", self._start_all)
+        self.start_action.setShortcut(QKeySequence("F5"))
+        self.stop_action = downloads.addAction("Zaustavi", self._stop_all)
+        downloads.addSeparator()
+        self.retry_failed_action = downloads.addAction("Ponovi neuspjele", self._retry_failed)
+        self.clear_action = downloads.addAction("Očisti završene", self._clear_finished)
+        self.remove_all_action = downloads.addAction("Ukloni sve sa liste", self._remove_all)
+
+        help_menu = menu.addMenu("P&omoć")
+        help_menu.addAction("Preuzimanje iz browsera", self._show_browser_help)
+        help_menu.addAction("O programu", self._show_about)
+
+        # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
+        self.corner_link = QLabel(f'<a href="open" style="color:{LINK_COLOR}">Otvori folder</a>')
+        self.corner_link.setObjectName("cornerLink")
+        self.corner_link.linkActivated.connect(lambda _href: self._open_folder())
+        menu.setCornerWidget(self.corner_link, Qt.Corner.TopRightCorner)
+
     def _build_ui(self) -> None:
         central = QWidget()
+        central.setObjectName("central")
         layout = QVBoxLayout(central)
-        layout.setContentsMargins(12, 12, 12, 12)
-        layout.setSpacing(8)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-        url_row = QHBoxLayout()
-        self.url_edit = QLineEdit()
-        self.url_edit.setPlaceholderText("Zalijepi link videa ili plejliste (može i više linkova odjednom)")
-        self.url_edit.returnPressed.connect(self._add_urls)
-        self.add_button = QPushButton("Dodaj")
-        self.add_button.setDefault(True)
-        self.add_button.clicked.connect(self._add_urls)
-        url_row.addWidget(self.url_edit, 1)
-        url_row.addWidget(self.add_button)
-        layout.addLayout(url_row)
-
-        options = QGridLayout()
-        options.setColumnStretch(1, 1)
-        options.addWidget(QLabel("Format:"), 0, 0)
+        toolbar = QFrame()
+        toolbar.setObjectName("toolbar")
+        bar = QHBoxLayout(toolbar)
+        bar.setContentsMargins(14, 10, 14, 10)
+        bar.setSpacing(8)
+        self.paste_button = QPushButton("Zalijepi")
+        self.paste_button.setObjectName("pasteButton")
+        self.paste_button.setIcon(icon("plus"))
+        self.paste_button.setIconSize(QSize(14, 14))
+        self.paste_button.setToolTip("Dodaj link iz clipboarda (Ctrl+V)")
+        self.paste_button.clicked.connect(self._paste_from_clipboard)
+        bar.addWidget(self.paste_button)
         self.preset_combo = QComboBox()
+        self.preset_combo.setObjectName("presetCombo")
         for preset in PRESETS:
             self.preset_combo.addItem(preset.label, preset.key)
-        self.preset_combo.currentIndexChanged.connect(self._save_settings)
-        format_row = QHBoxLayout()
-        format_row.addWidget(self.preset_combo)
-        format_row.addStretch(1)
-        options.addLayout(format_row, 0, 1, 1, 3)
-        options.addWidget(QLabel("Folder:"), 1, 0)
-        self.folder_edit = QLineEdit()
-        self.folder_edit.setReadOnly(True)
-        options.addWidget(self.folder_edit, 1, 1)
-        self.folder_button = QPushButton("Promijeni…")
-        self.folder_button.clicked.connect(self._choose_folder)
-        options.addWidget(self.folder_button, 1, 2)
-        self.open_folder_button = QPushButton("Otvori folder")
-        self.open_folder_button.clicked.connect(self._open_folder)
-        options.addWidget(self.open_folder_button, 1, 3)
-        layout.addLayout(options)
+        self.preset_combo.currentIndexChanged.connect(self._on_preset_changed)
+        bar.addWidget(self.preset_combo, 1)
+        self.download_button = QPushButton()
+        self.download_button.setObjectName("downloadButton")
+        self.download_button.setIconSize(QSize(14, 14))
+        self.download_button.clicked.connect(self._toggle_running)
+        bar.addWidget(self.download_button)
+        layout.addWidget(toolbar)
 
-        self.warning_label = QLabel()
-        self.warning_label.setWordWrap(True)
-        self.warning_label.setStyleSheet("color: #c62828;")
         missing = missing_tools()
-        self.warning_label.setText("Nije pronađeno: " + "; ".join(missing))
+        self.warning_label = QLabel("Nije pronađeno: " + "; ".join(missing))
+        self.warning_label.setObjectName("warning")
+        self.warning_label.setWordWrap(True)
         self.warning_label.setVisible(bool(missing))
         layout.addWidget(self.warning_label)
 
-        self.table = QTableWidget(0, 4)
-        self.table.setHorizontalHeaderLabels(["Naziv", "Format", "Status", "Napredak"])
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(COL_TITLE, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(COL_FORMAT, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(COL_STATUS, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(COL_PROGRESS, QHeaderView.ResizeMode.Fixed)
-        self.table.setColumnWidth(COL_STATUS, 280)
-        self.table.setColumnWidth(COL_PROGRESS, 140)
-        self.table.verticalHeader().setVisible(False)
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setWordWrap(False)
-        self.table.itemSelectionChanged.connect(self._update_controls)
-        self.table.cellDoubleClicked.connect(self._reveal_row)
-        layout.addWidget(self.table, 1)
-
-        buttons_row = QHBoxLayout()
-        self.start_stop_button = QPushButton()
-        self.start_stop_button.clicked.connect(self._toggle_running)
-        self.retry_button = QPushButton("Ponovi")
-        self.retry_button.clicked.connect(self._retry_selected)
-        self.remove_button = QPushButton("Ukloni")
-        self.remove_button.clicked.connect(self._remove_selected)
-        self.clear_button = QPushButton("Očisti završene")
-        self.clear_button.clicked.connect(self._clear_finished)
-        for button in (self.start_stop_button, self.retry_button, self.remove_button, self.clear_button):
-            buttons_row.addWidget(button)
-        buttons_row.addSpacing(12)
-        self.summary_label = QLabel()
-        buttons_row.addWidget(self.summary_label, 1)
-        layout.addLayout(buttons_row)
+        self.stack = QStackedWidget()
+        self.drop_zone = DropZone()
+        self.drop_zone.paste_requested.connect(self._paste_from_clipboard)
+        self.stack.addWidget(self.drop_zone)
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        rows = QWidget()
+        rows.setObjectName("rows")
+        self.rows_layout = QVBoxLayout(rows)
+        self.rows_layout.setContentsMargins(0, 0, 0, 0)
+        self.rows_layout.setSpacing(0)
+        self.rows_layout.addStretch(1)
+        self.scroll.setWidget(rows)
+        self.stack.addWidget(self.scroll)
+        layout.addWidget(self.stack, 1)
+        self.setCentralWidget(central)
 
         self.status_label = QLabel()
-        self.status_label.setWordWrap(True)
-        layout.addWidget(self.status_label)
-
-        self.setCentralWidget(central)
+        self.statusBar().addWidget(self.status_label, 1)
+        self.summary_label = QLabel()
+        self.statusBar().addPermanentWidget(self.summary_label)
+        self.folder_label = QLabel()
+        self.folder_label.linkActivated.connect(lambda _href: self._choose_folder())
+        self.statusBar().addPermanentWidget(self.folder_label)
+        self.statusBar().setSizeGripEnabled(False)
 
     # ---------- podešavanja ----------
 
     def _load_settings(self) -> None:
-        output_dir = self._settings.value("output_dir", default_output_dir(), type=str)
-        self.folder_edit.setText(output_dir or default_output_dir())
+        self.set_output_dir(self._settings.value("output_dir", default_output_dir(), type=str) or default_output_dir(),
+                            save=False)
         preset_key = self._settings.value("preset_key", DEFAULT_PRESET_KEY, type=str)
-        index = self.preset_combo.findData(preset_key)
         self.preset_combo.blockSignals(True)
-        self.preset_combo.setCurrentIndex(max(index, 0))
+        self.preset_combo.setCurrentIndex(max(self.preset_combo.findData(preset_key), 0))
         self.preset_combo.blockSignals(False)
 
-    @Slot()
     def _save_settings(self) -> None:
-        self._settings.setValue("output_dir", self.folder_edit.text())
+        self._settings.setValue("output_dir", self._output_dir)
         self._settings.setValue("preset_key", self.preset_combo.currentData())
+
+    @property
+    def output_dir(self) -> str:
+        return self._output_dir
+
+    def set_output_dir(self, folder: str, save: bool = True) -> None:
+        self._output_dir = os.path.normpath(folder)
+        name = Path(self._output_dir).name or self._output_dir
+        self.folder_label.setText(f'Folder: <a href="change" style="color:{LINK_COLOR}">{name}</a>')
+        self.folder_label.setToolTip(f"{self._output_dir}\nKlikni za promjenu")
+        self.drop_zone.set_folder(self._output_dir)
+        if save:
+            self._save_settings()
 
     @Slot()
     def _choose_folder(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Izaberi folder za preuzimanja",
-                                                  self.folder_edit.text())
+        folder = QFileDialog.getExistingDirectory(self, "Izaberi folder za preuzimanja", self._output_dir)
         if folder:
-            self.folder_edit.setText(os.path.normpath(folder))
-            self._save_settings()
+            self.set_output_dir(folder)
+
+    @Slot(int)
+    def _on_preset_changed(self, _index: int) -> None:
+        self._save_settings()
+        # Kao kod „izaberi format pa Preuzmi": izbor važi i za sve što još čeka.
+        for item_id in self._queue.apply_preset_to_waiting(self.preset_combo.currentData()):
+            self._refresh_row(self._queue.get(item_id))
 
     # ---------- dodavanje linkova ----------
 
     @Slot()
-    def _add_urls(self) -> None:
-        urls = self.url_edit.text().split()
+    def _paste_from_clipboard(self) -> None:
+        self.add_links_from_text(QApplication.clipboard().text(), "U clipboardu nema linka. Kopiraj link videa pa klikni „Zalijepi“.")
+
+    @Slot()
+    def _enter_links(self) -> None:
+        text, ok = QInputDialog.getMultiLineText(self, "Unesi linkove", "Linkovi videa ili plejlista (jedan po redu):")
+        if ok:
+            self.add_links_from_text(text, "Nije unesen nijedan link.")
+
+    def add_links_from_text(self, text: str, empty_message: str = "Nema linka.") -> None:
+        urls = extract_urls(text)
         if not urls:
+            self._set_status(empty_message)
             return
-        invalid = [url for url in urls if not url.lower().startswith(("http://", "https://"))]
-        if invalid:
-            self._set_status(f"Ovo nije link: {invalid[0]}")
-            return
-        self.url_edit.clear()
         self._start_probe(urls)
 
-    def _start_probe(self, urls: list[str], http_headers: dict[str, str] | None = None) -> None:
-        job = ProbeJob(self._next_probe_id, urls, self.preset_combo.currentData(),
-                       self.folder_edit.text(), self._probe_fn, http_headers)
+    def dragEnterEvent(self, event) -> None:
+        mime = event.mimeData()
+        if mime.hasUrls() or mime.hasText():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event) -> None:
+        mime = event.mimeData()
+        text = "\n".join(url.toString() for url in mime.urls()) if mime.hasUrls() else mime.text()
+        self.add_links_from_text(text, "Prevučeni sadržaj nije link.")
+        event.acceptProposedAction()
+
+    def _start_probe(self, urls: list[str], http_headers: dict[str, str] | None = None,
+                     auto_start: bool = False) -> None:
+        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, http_headers, auto_start)
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -319,15 +478,16 @@ class MainWindow(QMainWindow):
 
     @Slot(object)
     def _on_browser_request(self, request: BrowserRequest) -> None:
+        # Klik u browseru znači „preuzmi ovo sada", bez čekanja na dugme Preuzmi.
         if request.media_url is None:
-            self._start_probe([request.page_url], request.headers)
+            self._start_probe([request.page_url], request.headers, auto_start=True)
             return
-        # Direktan tok (MP4/HLS/DASH) nema šta da se čita unaprijed: odmah ide u red.
         item = self._queue.add(request.media_url, request.page_title, self.preset_combo.currentData(),
-                               self.folder_edit.text(), http_headers=request.headers,
+                               self._output_dir, http_headers=request.headers,
                                filename_title=request.page_title)
         self._append_row(item)
         self._set_status(f"Iz browsera: {request.page_title}")
+        self._manual.append(item.id)
         self._start_next()
 
     @Slot()
@@ -338,20 +498,26 @@ class MainWindow(QMainWindow):
         self.raise_()
         self.activateWindow()
 
-    @Slot(object, str, str, object)
-    def _on_probed(self, result: ProbeResult, preset_key: str, output_dir: str,
-                   http_headers: dict[str, str]) -> None:
+    @Slot(object, str, object, bool)
+    def _on_probed(self, result: ProbeResult, output_dir: str, http_headers: dict[str, str],
+                   auto_start: bool) -> None:
         if not result.entries:
             self._set_status(f"Plejlista „{result.title}“ nema dostupnih videa.")
             return
         subfolder = result.title if result.is_playlist else None
+        preset_key = self.preset_combo.currentData()
         for entry in result.entries:
-            self._append_row(self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
-                                             http_headers=http_headers))
+            item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
+                                   http_headers=http_headers, thumbnail=entry.thumbnail, duration=entry.duration)
+            self._append_row(item)
+            if auto_start:
+                self._manual.append(item.id)
         if result.is_playlist:
             self._set_status(f"Dodana plejlista „{result.title}“: {len(result.entries)} videa.")
+        elif auto_start:
+            self._set_status(f"Iz browsera: {result.title}")
         else:
-            self._set_status(f"Dodano: {result.title}")
+            self._set_status(f"Dodano: {result.title}. Klikni „Preuzmi“.")
         self._start_next()
 
     @Slot(str, str)
@@ -367,13 +533,21 @@ class MainWindow(QMainWindow):
     # ---------- red preuzimanja ----------
 
     def _start_next(self) -> None:
-        if self._paused or self._download_job is not None:
+        if self._download_job is not None:
             self._update_controls()
             return
-        item = self._queue.next_waiting()
+        item = None
+        while self._manual and item is None:
+            candidate = self._queue.get(self._manual.pop(0))
+            if candidate is not None and candidate.status == ItemStatus.WAITING:
+                item = candidate
+        if item is None and self._running:
+            item = self._queue.next_waiting()
         if item is None:
+            self._running = False
             self._update_controls()
             return
+
         item.status = ItemStatus.ACTIVE
         item.message = ""
         self._refresh_row(item)
@@ -387,16 +561,10 @@ class MainWindow(QMainWindow):
     @Slot(int, object)
     def _on_download_progress(self, item_id: int, progress: Progress) -> None:
         item = self._queue.get(item_id)
-        row = self._row_of(item_id)
-        if item is None or item.status != ItemStatus.ACTIVE or row < 0:
+        row = self._rows.get(item_id)
+        if item is None or row is None or item.status != ItemStatus.ACTIVE:
             return
-        self.table.item(row, COL_STATUS).setText(format_progress(progress))
-        bar = self._bar(row)
-        if progress.fraction is None:
-            bar.setRange(0, 0)  # neodređeno trajanje (npr. ffmpeg obrada)
-        else:
-            bar.setRange(0, PROGRESS_MAX)
-            bar.setValue(round(progress.fraction * PROGRESS_MAX))
+        row.show_progress(format_progress(progress), progress.fraction)
 
     @Slot(int, object)
     def _on_download_finished(self, item_id: int, result: DownloadResult) -> None:
@@ -408,147 +576,227 @@ class MainWindow(QMainWindow):
             item.status = result.status
             item.filepath = result.filepath
             item.message = "Već postoji" if result.already_existed else result.message
-            self._refresh_row(item)
-        if self._paused:
-            self._set_status("")
+            if result.filepath and os.path.isfile(result.filepath):
+                self._sizes[item_id] = os.path.getsize(result.filepath)
+            if item_id in self._remove_when_done:
+                self._remove_when_done.discard(item_id)
+                self._remove_item(item_id)
+            else:
+                self._refresh_row(item)
         self._start_next()
 
     @Slot()
     def _toggle_running(self) -> None:
-        if self._paused:
-            self._paused = False
-            self._set_status("")
-            self._start_next()
+        if self._download_job is not None or self._running:
+            self._stop_all()
+        else:
+            self._start_all()
+
+    @Slot()
+    def _start_all(self) -> None:
+        if self._queue.next_waiting() is None:
+            self._set_status("Nema ništa za preuzimanje. Kopiraj link videa pa klikni „Zalijepi“.")
             return
-        self._paused = True
+        self._running = True
+        self._set_status("")
+        self._start_next()
+
+    @Slot()
+    def _stop_all(self) -> None:
+        self._running = False
+        self._manual.clear()
         if self._download_job is not None:
             self._download_job.cancel()
             self._set_status("Zaustavljam preuzimanje…")
         self._update_controls()
 
-    @Slot()
-    def _retry_selected(self) -> None:
-        for item_id in self._selected_ids():
-            if self._queue.retry(item_id):
-                self._refresh_row(self._queue.get(item_id))
+    @Slot(int)
+    def _on_row_action(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None:
+            return
+        if item.status == ItemStatus.ACTIVE:
+            self._download_job.cancel()
+            return
+        if item.status == ItemStatus.DONE:
+            reveal(item.filepath or _item_folder(item))
+            return
+        if item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED):
+            self._queue.retry(item_id)
+            self._refresh_row(item)
+        if self._running:
+            self._queue.move_to_front(item_id)
+        else:
+            self._manual.append(item_id)
         self._start_next()
 
+    @Slot(int)
+    def _on_row_remove(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None:
+            return
+        if item.status == ItemStatus.ACTIVE:
+            self._remove_when_done.add(item_id)
+            self._download_job.cancel()
+            return
+        self._remove_item(item_id)
+
+    @Slot(int, QPoint)
+    def _on_row_format(self, item_id: int, position: QPoint) -> None:
+        item = self._queue.get(item_id)
+        if item is None or item.status == ItemStatus.ACTIVE:
+            return
+        menu = QMenu(self)
+        group = QActionGroup(menu)
+        for preset in PRESETS:
+            action = QAction(preset.label, menu, checkable=True)
+            action.setChecked(preset.key == item.preset_key)
+            action.setData(preset.key)
+            group.addAction(action)
+            menu.addAction(action)
+        chosen = menu.exec(position)
+        if chosen is not None:
+            self.set_item_preset(item_id, chosen.data())
+
+    def set_item_preset(self, item_id: int, preset_key: str) -> None:
+        if self._queue.set_preset(item_id, preset_key):
+            self._sizes.pop(item_id, None)
+            self._refresh_row(self._queue.get(item_id))
+
     @Slot()
-    def _remove_selected(self) -> None:
-        for item_id in self._selected_ids():
-            if self._queue.remove(item_id):
-                self.table.removeRow(self._row_of(item_id))
-        self._update_controls()
+    def _retry_failed(self) -> None:
+        for item in self._queue.items():
+            if self._queue.retry(item.id):
+                self._refresh_row(item)
+                self._manual.append(item.id)
+        self._start_next()
 
     @Slot()
     def _clear_finished(self) -> None:
         for item_id in self._queue.clear_finished():
-            self.table.removeRow(self._row_of(item_id))
+            self._drop_row(item_id)
         self._update_controls()
 
-    # ---------- tabela ----------
+    @Slot()
+    def _remove_all(self) -> None:
+        for item in self._queue.items():
+            if item.status != ItemStatus.ACTIVE:
+                self._remove_item(item.id)
+
+    # ---------- redovi ----------
 
     def _append_row(self, item: QueueItem) -> None:
-        row = self.table.rowCount()
-        self.table.insertRow(row)
-        title = QTableWidgetItem(item.title)
-        title.setData(Qt.ItemDataRole.UserRole, item.id)
-        title.setToolTip(item.url)
-        self.table.setItem(row, COL_TITLE, title)
-        self.table.setItem(row, COL_FORMAT, QTableWidgetItem(get_preset(item.preset_key).short_label))
-        self.table.setItem(row, COL_STATUS, QTableWidgetItem())
-        bar = QProgressBar()
-        bar.setTextVisible(False)
-        bar.setRange(0, PROGRESS_MAX)
-        self.table.setCellWidget(row, COL_PROGRESS, bar)
-        self._refresh_row(item)
-
-    def _refresh_row(self, item: QueueItem) -> None:
-        row = self._row_of(item.id)
-        if row < 0:
-            return
-        status = self.table.item(row, COL_STATUS)
-        if item.status == ItemStatus.FAILED:
-            status.setText(f"Greška: {item.message}")
-        elif item.status == ItemStatus.DONE and item.message:
-            status.setText(item.message)
-        else:
-            status.setText(STATUS_TEXT[item.status])
-        status.setToolTip(item.filepath or item.message)
-        color = STATUS_COLOR.get(item.status)
-        status.setData(Qt.ItemDataRole.ForegroundRole, color)
-
-        bar = self._bar(row)
-        if item.status == ItemStatus.ACTIVE:
-            bar.setRange(0, 0)
-        else:
-            bar.setRange(0, PROGRESS_MAX)
-            bar.setValue(PROGRESS_MAX if item.status == ItemStatus.DONE else 0)
+        row = QueueRow(item)
+        row.action_clicked.connect(self._on_row_action)
+        row.remove_clicked.connect(self._on_row_remove)
+        row.format_clicked.connect(self._on_row_format)
+        self._rows[item.id] = row
+        self.rows_layout.insertWidget(self.rows_layout.count() - 1, row)
+        if item.thumbnail:
+            self._load_thumbnail(item.id, item.thumbnail)
         self._update_controls()
 
-    def _row_of(self, item_id: int) -> int:
-        for row in range(self.table.rowCount()):
-            if self.table.item(row, COL_TITLE).data(Qt.ItemDataRole.UserRole) == item_id:
-                return row
-        return -1
+    def _refresh_row(self, item: QueueItem | None) -> None:
+        if item is None:
+            return
+        row = self._rows.get(item.id)
+        if row is not None:
+            row.update_item(item, self._sizes.get(item.id))
+        self._update_controls()
 
-    def _bar(self, row: int) -> QProgressBar:
-        return self.table.cellWidget(row, COL_PROGRESS)
+    def _remove_item(self, item_id: int) -> None:
+        if self._queue.remove(item_id):
+            self._drop_row(item_id)
+        self._update_controls()
 
-    def _selected_ids(self) -> list[int]:
-        rows = sorted({index.row() for index in self.table.selectedIndexes()})
-        return [self.table.item(row, COL_TITLE).data(Qt.ItemDataRole.UserRole) for row in rows]
+    def _drop_row(self, item_id: int) -> None:
+        self._sizes.pop(item_id, None)
+        row = self._rows.pop(item_id, None)
+        if row is not None:
+            self.rows_layout.removeWidget(row)
+            row.deleteLater()
 
-    @Slot(int, int)
-    def _reveal_row(self, row: int, _column: int) -> None:
-        item = self._queue.get(self.table.item(row, COL_TITLE).data(Qt.ItemDataRole.UserRole))
-        if item is not None:
-            reveal(item.filepath or _item_folder(item))
+    def _load_thumbnail(self, item_id: int, url: str) -> None:
+        cached = self._thumbnail_cache.get(url)
+        if cached is not None:
+            self._rows[item_id].thumbnail.set_pixmap(cached)
+            return
+        waiters = self._thumbnail_waiters.setdefault(url, [])
+        waiters.append(item_id)
+        if len(waiters) == 1:
+            self._thumbnails.request(url)
+
+    @Slot(str, QImage)
+    def _on_thumbnail(self, url: str, image: QImage) -> None:
+        pixmap = QPixmap.fromImage(image.scaled(192, 108, Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                                                Qt.TransformationMode.SmoothTransformation))
+        self._thumbnail_cache[url] = pixmap
+        for item_id in self._thumbnail_waiters.pop(url, []):
+            row = self._rows.get(item_id)
+            if row is not None:
+                row.thumbnail.set_pixmap(pixmap)
 
     @Slot()
     def _open_folder(self) -> None:
-        folder = self.folder_edit.text()
-        os.makedirs(folder, exist_ok=True)
-        reveal(folder)
+        os.makedirs(self._output_dir, exist_ok=True)
+        reveal(self._output_dir)
 
-    # ---------- stanje dugmadi ----------
+    # ---------- stanje ----------
 
     def _update_controls(self) -> None:
         items = self._queue.items()
         waiting = sum(item.status == ItemStatus.WAITING for item in items)
         done = sum(item.status == ItemStatus.DONE for item in items)
         failed = sum(item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED) for item in items)
-        active = self._download_job is not None
+        busy = self._download_job is not None or self._running
 
-        if self._paused:
-            self.start_stop_button.setText("Nastavi")
-            self.start_stop_button.setEnabled(waiting > 0 and not active)
+        self.stack.setCurrentIndex(1 if items else 0)
+        if busy:
+            self.download_button.setText("Zaustavi")
+            self.download_button.setIcon(icon("stop"))
+            self.download_button.setEnabled(True)
+            set_state(self.download_button, "stop")
         else:
-            self.start_stop_button.setText("Zaustavi")
-            self.start_stop_button.setEnabled(active)
-
-        selected = [self._queue.get(item_id) for item_id in self._selected_ids()]
-        selected = [item for item in selected if item is not None]
-        self.retry_button.setEnabled(any(
-            item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED) for item in selected))
-        self.remove_button.setEnabled(any(item.status != ItemStatus.ACTIVE for item in selected))
-        self.clear_button.setEnabled(done > 0)
+            self.download_button.setText("Preuzmi")
+            self.download_button.setIcon(icon("download"))
+            self.download_button.setEnabled(waiting > 0)
+            set_state(self.download_button, "start")
+        self.start_action.setEnabled(not busy and waiting > 0)
+        self.stop_action.setEnabled(busy)
+        self.retry_failed_action.setEnabled(failed > 0)
+        self.clear_action.setEnabled(done > 0)
+        self.remove_all_action.setEnabled(any(item.status != ItemStatus.ACTIVE for item in items))
 
         parts = []
-        if active:
+        if self._download_job is not None:
             parts.append("preuzimanje u toku")
         if waiting:
             parts.append(f"čeka: {waiting}")
         if done:
             parts.append(f"završeno: {done}")
         if failed:
-            parts.append(f"neuspjelo/otkazano: {failed}")
-        if self._paused and not active:
-            parts.insert(0, "red je zaustavljen")
+            parts.append(f"neuspjelo: {failed}")
         self.summary_label.setText(" · ".join(parts))
 
     def _set_status(self, text: str) -> None:
         self.status_label.setText(text)
+
+    # ---------- pomoć ----------
+
+    @Slot()
+    def _show_browser_help(self) -> None:
+        QMessageBox.information(self, "Preuzimanje iz browsera", (
+            "1. Otvori edge://extensions (ili chrome://extensions).\n"
+            "2. Uključi „Developer mode“ i klikni „Load unpacked“.\n"
+            f"3. Izaberi folder:\n   {PROJECT_ROOT / 'extension'}\n\n"
+            "Na stranici pokreni video i klikni ikonu Video Download. "
+            "Ako aplikacija nije pokrenuta, klik je sam pokreće.\n\n"
+            "Video zaštićen DRM-om (Netflix, Disney+…) se ne može preuzeti."))
+
+    @Slot()
+    def _show_about(self) -> None:
+        QMessageBox.about(self, "O programu", f"Video Download {__version__}\n\n"
+                          "Lična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).")
 
     # ---------- zatvaranje ----------
 
@@ -560,7 +808,7 @@ class MainWindow(QMainWindow):
             if answer != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
-            self._paused = True
+            self._running = False
             self._download_job.cancel()
             # Kratko sačekaj da se obrišu privremeni fajlovi prekinutog preuzimanja.
             self._download_job.join(timeout=10)
@@ -603,6 +851,7 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("Video Download")
     app.setWindowIcon(QIcon(str(PROJECT_ROOT / "extension" / "icons" / "icon128.png")))
+    apply_theme(app)
     window = MainWindow(settings=_settings())
 
     problems = []

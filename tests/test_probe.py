@@ -1,6 +1,6 @@
 import unittest
 
-from videodl.probe import Entry, probe
+from videodl.probe import Entry, pick_thumbnail, probe
 
 
 def fake_extractor(pages: dict):
@@ -53,6 +53,20 @@ class ProbeTest(unittest.TestCase):
         })
         result = probe("https://v/@kanal", extract)
         self.assertEqual([e.title for e in result.entries], ["Video", "Short"])
+
+    def test_thumbnail_and_duration(self):
+        info = {"_type": "video", "title": "V", "duration": 189, "thumbnails": [
+            {"url": "https://i/small.jpg", "width": 120},
+            {"url": "https://i/mq.jpg", "width": 320},
+            {"url": "https://i/hq.jpg", "width": 480},
+            {"url": "https://i/nosize.webp"},
+        ]}
+        result = probe("https://v/1", fake_extractor({"https://v/1": info}))
+        self.assertEqual(result.entries[0].thumbnail, "https://i/mq.jpg")
+        self.assertEqual(result.entries[0].duration, 189.0)
+        self.assertEqual(pick_thumbnail({"thumbnails": [{"url": "https://i/a"}, {"url": "https://i/b"}]}), "https://i/b")
+        self.assertEqual(pick_thumbnail({"thumbnail": "https://i/c"}), "https://i/c")
+        self.assertIsNone(pick_thumbnail({}))
 
     def test_nesting_is_limited(self):
         pages = {}

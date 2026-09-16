@@ -1,4 +1,4 @@
-"""GUI test bez ekrana: pravi prozor i red, lažno čitanje linkova i preuzimanje."""
+"""GUI test bez ekrana: pravi prozor i red, lažno čitanje linkova, preuzimanje i sličice."""
 
 import os
 import tempfile
@@ -8,18 +8,21 @@ import unittest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtCore import QSettings  # noqa: E402
+from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QSettings  # noqa: E402
+from PySide6.QtGui import QColor, QImage  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from videodl.browser import BrowserRequest  # noqa: E402
 from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  # noqa: E402
 from videodl.gui import (  # noqa: E402
-    COL_STATUS, MainWindow, format_eta, format_progress, format_speed,
+    MainWindow, apply_theme, extract_urls, format_eta, format_progress, format_speed,
 )
 from videodl.jobs import ItemStatus  # noqa: E402
 from videodl.probe import Entry, ProbeResult  # noqa: E402
+from videodl.widgets import format_duration, format_size  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
+apply_theme(app)
 
 
 def wait_until(condition, timeout=5.0):
@@ -33,12 +36,24 @@ def wait_until(condition, timeout=5.0):
     return condition()
 
 
+def png_bytes() -> bytes:
+    image = QImage(64, 36, QImage.Format.Format_RGB32)
+    image.fill(QColor("#e53935"))
+    data = QByteArray()
+    buffer = QBuffer(data)
+    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+    image.save(buffer, "PNG")
+    return bytes(data)
+
+
 def fake_probe(url, http_headers=None):
     if "lista" in url:
-        return ProbeResult("Moja lista", (Entry("https://v/1", "Prvi"), Entry("https://v/2", "Drugi")), True)
+        return ProbeResult("Moja lista", (
+            Entry("https://v/1", "Major Lazer – Cold Water (Official Lyric Video)", "https://img/1.jpg", 189),
+            Entry("https://v/2", "Peace Is The Mission (Extended)", None, 1275)), True)
     if "lose" in url:
         raise RuntimeError("ERROR: Unsupported URL")
-    return ProbeResult("Jedan", (Entry(url, "Jedan"),), False)
+    return ProbeResult("Jedan", (Entry(url, "Jedan", None, 61),), False)
 
 
 class FormattingTest(unittest.TestCase):
@@ -51,6 +66,15 @@ class FormattingTest(unittest.TestCase):
         self.assertEqual(text, "Preuzimanje (video) · 46% · 2,0 KB/s · još 12 s")
         self.assertEqual(format_progress(Progress(PROCESSING, None, label="Konverzija zvuka")),
                          "Konverzija zvuka…")
+        self.assertEqual(format_duration(189), "3:09")
+        self.assertEqual(format_duration(3725), "1:02:05")
+        self.assertEqual(format_duration(None), "")
+        self.assertEqual(format_size(int(23.8 * 1024 * 1024)), "23,8 MB")
+
+    def test_extract_urls_from_mixed_text(self):
+        text = "Pogledaj https://youtu.be/abc, i (https://vimeo.com/1). Isto: https://youtu.be/abc\nnije-link"
+        self.assertEqual(extract_urls(text), ["https://youtu.be/abc", "https://vimeo.com/1"])
+        self.assertEqual(extract_urls("bez linka"), [])
 
 
 class MainWindowTest(unittest.TestCase):
@@ -65,9 +89,10 @@ class MainWindowTest(unittest.TestCase):
         self.release.set()
         self.tmp.cleanup()
 
-    def make_window(self, download_fn):
-        window = MainWindow(settings=self.settings, probe_fn=fake_probe, download_fn=download_fn)
-        window.folder_edit.setText(self.tmp.name)
+    def make_window(self, download_fn, probe_fn=fake_probe, thumbnail_fetch=lambda url: None):
+        window = MainWindow(settings=self.settings, probe_fn=probe_fn, download_fn=download_fn,
+                            thumbnail_fetch=thumbnail_fetch)
+        window.set_output_dir(self.tmp.name)
         self.addCleanup(window.deleteLater)
         return window
 
@@ -86,93 +111,140 @@ class MainWindowTest(unittest.TestCase):
             return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
         return DownloadResult(ItemStatus.DONE, filepath=url)
 
-    def test_playlist_is_expanded_and_downloaded_in_order(self):
-        window = self.make_window(self.quick_download)
-        window.preset_combo.setCurrentIndex(window.preset_combo.findData("mp3"))
-        window.url_edit.setText("https://v/lista")
-        window._add_urls()
+    def statuses(self, window):
+        return [item.status for item in window._queue.items()]
 
-        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2
-                                   and all(i.status == ItemStatus.DONE for i in window._queue.items())))
+    def test_pasted_links_wait_for_download_button(self):
+        window = self.make_window(self.quick_download)
+        self.assertEqual(window.stack.currentIndex(), 0)  # prazan ekran
+        self.assertFalse(window.download_button.isEnabled())
+        window.preset_combo.setCurrentIndex(window.preset_combo.findData("mp3"))
+        QApplication.clipboard().setText("https://v/lista")
+        window._paste_from_clipboard()
+
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        self.assertEqual(window.stack.currentIndex(), 1)
+        time.sleep(0.1)
+        app.processEvents()
+        self.assertEqual(self.calls, [])  # kao u uzoru: tek „Preuzmi" pokreće
+        self.assertEqual(window.download_button.text(), "Preuzmi")
+        self.assertTrue(window.download_button.isEnabled())
+
+        window.download_button.click()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE, ItemStatus.DONE]))
         self.assertEqual(self.calls, [
             ("https://v/1", "mp3", self.tmp.name, "Moja lista"),
             ("https://v/2", "mp3", self.tmp.name, "Moja lista"),
         ])
-        self.assertEqual(window.table.rowCount(), 2)
-        self.assertEqual(window.table.item(0, COL_STATUS).text(), "Završeno")
+        row = window._rows[window._queue.items()[0].id]
+        self.assertTrue(row.status_label.text().startswith("Završeno"))
+        self.assertEqual(row.action_button.property("kind"), "folder")
         self.assertIn("završeno: 2", window.summary_label.text())
+        self.assertEqual(window.download_button.text(), "Preuzmi")
         self.assertEqual(self.settings.value("preset_key"), "mp3")
 
         window._clear_finished()
-        self.assertEqual(window.table.rowCount(), 0)
+        self.assertEqual(window._rows, {})
+        self.assertEqual(window.stack.currentIndex(), 0)
 
-    def test_invalid_input_and_probe_error_are_reported(self):
+    def test_invalid_clipboard_and_probe_error_are_reported(self):
         window = self.make_window(self.quick_download)
-        window.url_edit.setText("nije-link")
-        window._add_urls()
-        self.assertIn("Ovo nije link", window.status_label.text())
-        self.assertEqual(window.url_edit.text(), "nije-link")
+        QApplication.clipboard().setText("nije link")
+        window._paste_from_clipboard()
+        self.assertIn("nema linka", window.status_label.text())
 
-        window.url_edit.setText("https://v/lose")
-        window._add_urls()
+        window.add_links_from_text("https://v/lose")
         self.assertTrue(wait_until(lambda: "Unsupported URL" in window.status_label.text()))
         self.assertNotIn("ERROR", window.status_label.text())
         self.assertTrue(wait_until(lambda: not window._probe_jobs))
 
-    def test_stop_cancels_current_and_keeps_rest_waiting(self):
+    def test_stop_then_row_retry_downloads_only_that_item(self):
         window = self.make_window(self.blocking_download)
-        window.url_edit.setText("https://v/a https://v/b")
-        window._add_urls()
-        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2
-                                   and window._download_job is not None))
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
         first, second = window._queue.items()
-        self.assertTrue(wait_until(lambda: "10%" in window.table.item(0, COL_STATUS).text()))
-        self.assertEqual(window.start_stop_button.text(), "Zaustavi")
+        window._start_all()
+        self.assertTrue(wait_until(lambda: "10%" in window._rows[first.id].status_label.text()))
+        self.assertEqual(window.download_button.text(), "Zaustavi")
+        self.assertEqual(window._rows[first.id].action_button.property("kind"), "stop")
 
-        window._toggle_running()
+        window.download_button.click()
         self.assertTrue(wait_until(lambda: first.status == ItemStatus.CANCELLED))
         self.assertEqual(second.status, ItemStatus.WAITING)
         self.assertIsNone(window._download_job)
-        self.assertEqual(window.start_stop_button.text(), "Nastavi")
-        self.assertTrue(window.start_stop_button.isEnabled())
-
-        window.table.selectRow(0)
-        self.assertTrue(window.retry_button.isEnabled())
-        window._retry_selected()
-        self.assertEqual(first.status, ItemStatus.WAITING)  # red je i dalje zaustavljen
+        self.assertEqual(window.download_button.text(), "Preuzmi")
+        self.assertEqual(window._rows[first.id].action_button.property("kind"), "retry")
 
         self.release.set()
-        window._toggle_running()
-        self.assertTrue(wait_until(lambda: first.status == ItemStatus.DONE
-                                   and second.status == ItemStatus.DONE))
+        window._rows[first.id].action_button.click()
+        self.assertTrue(wait_until(lambda: first.status == ItemStatus.DONE))
+        time.sleep(0.1)
+        app.processEvents()
+        self.assertEqual(second.status, ItemStatus.WAITING)  # pokrenut je samo taj red
+
+        window._start_all()
+        self.assertTrue(wait_until(lambda: second.status == ItemStatus.DONE))
         self.assertEqual([c[0] for c in self.calls], ["https://v/a", "https://v/a", "https://v/b"])
 
-    def test_browser_media_request_goes_straight_to_queue_with_headers(self):
+    def test_remove_active_row_cancels_and_removes(self):
+        window = self.make_window(self.blocking_download)
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        first, second = window._queue.items()
+        window._rows[second.id].remove_button.click()
+        self.assertEqual([i.id for i in window._queue.items()], [first.id])
+
+        window._rows[first.id].action_button.click()  # pojedinačno pokretanje
+        self.assertTrue(wait_until(lambda: first.status == ItemStatus.ACTIVE))
+        window._rows[first.id].remove_button.click()
+        self.assertTrue(wait_until(lambda: not window._queue.items()))
+        self.assertEqual(window._rows, {})
+        self.assertIsNone(window._download_job)
+
+    def test_format_change_applies_to_waiting_but_not_custom_items(self):
         window = self.make_window(self.quick_download)
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        first, second = window._queue.items()
+        window.set_item_preset(first.id, "m4a")
+        self.assertIn("M4A", window._rows[first.id].format_link.text())
+
+        window.preset_combo.setCurrentIndex(window.preset_combo.findData("720p"))
+        self.assertEqual((first.preset_key, second.preset_key), ("m4a", "720p"))
+        self.assertIn("MP4 720p", window._rows[second.id].format_link.text())
+
+        window._start_all()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE, ItemStatus.DONE]))
+        window.set_item_preset(first.id, "mp3")  # drugi format već preuzetog videa: ponovo u red
+        self.assertEqual(first.status, ItemStatus.WAITING)
+
+    def test_browser_media_request_starts_only_that_item_with_headers(self):
+        window = self.make_window(self.quick_download)
+        window.add_links_from_text("https://v/zalijepljen")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
         window.preset_combo.setCurrentIndex(window.preset_combo.findData("720p"))
         headers = {"Referer": "https://sajt.ba/lekcija", "User-Agent": "UA"}
         # Emit iz druge niti, kao što radi lokalni most.
         threading.Thread(target=window.browser_request.emit, args=(BrowserRequest(
             "https://sajt.ba/lekcija", "Lekcija 3", "https://cdn.sajt.ba/a/index.m3u8", "hls", headers),)).start()
 
-        self.assertTrue(wait_until(lambda: window._queue.items()
-                                   and window._queue.items()[0].status == ItemStatus.DONE))
-        item = window._queue.items()[0]
-        self.assertEqual(item.title, "Lekcija 3")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2
+                                   and window._queue.items()[1].status == ItemStatus.DONE))
+        pasted, browser_item = window._queue.items()
+        self.assertEqual(pasted.status, ItemStatus.WAITING)
+        self.assertEqual(browser_item.title, "Lekcija 3")
         self.assertEqual(self.calls, [("https://cdn.sajt.ba/a/index.m3u8", "720p", self.tmp.name, None)])
         self.assertEqual(self.extras, [{"http_headers": headers, "filename_title": "Lekcija 3"}])
         self.assertIn("Iz browsera", window.status_label.text())
 
-    def test_browser_page_request_is_probed_with_headers(self):
+    def test_browser_page_request_is_probed_with_headers_and_started(self):
         seen = []
 
         def probe_with_headers(url, http_headers=None):
             seen.append((url, http_headers))
             return ProbeResult("Video", (Entry(url, "Video"),), False)
 
-        window = MainWindow(settings=self.settings, probe_fn=probe_with_headers, download_fn=self.quick_download)
-        self.addCleanup(window.deleteLater)
-        window.folder_edit.setText(self.tmp.name)
+        window = self.make_window(self.quick_download, probe_fn=probe_with_headers)
         window.browser_request.emit(BrowserRequest("https://www.youtube.com/watch?v=x", "YT", headers={"User-Agent": "UA"}))
 
         self.assertTrue(wait_until(lambda: window._queue.items()
@@ -180,27 +252,53 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(seen, [("https://www.youtube.com/watch?v=x", {"User-Agent": "UA"})])
         self.assertEqual(self.extras, [{"http_headers": {"User-Agent": "UA"}, "filename_title": None}])
 
+    def test_thumbnail_and_duration_are_shown(self):
+        fetched = []
+
+        def fetch(url):
+            fetched.append(url)
+            return png_bytes()
+
+        window = self.make_window(self.quick_download, thumbnail_fetch=fetch)
+        window.add_links_from_text("https://v/lista")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        first, second = window._queue.items()
+        self.assertTrue(wait_until(lambda: window._rows[first.id].thumbnail.has_pixmap()))
+        self.assertFalse(window._rows[second.id].thumbnail.has_pixmap())  # nema sličice: zamjenska
+        self.assertEqual(window._rows[second.id].thumbnail._duration, "21:15")
+        self.assertEqual(fetched, ["https://img/1.jpg"])
+
     def test_settings_are_restored(self):
         self.settings.setValue("output_dir", r"D:\Filmovi")
         self.settings.setValue("preset_key", "720p")
-        window = MainWindow(settings=self.settings, probe_fn=fake_probe, download_fn=self.quick_download)
+        window = MainWindow(settings=self.settings, probe_fn=fake_probe, download_fn=self.quick_download,
+                            thumbnail_fetch=lambda url: None)
         self.addCleanup(window.deleteLater)
-        self.assertEqual(window.folder_edit.text(), r"D:\Filmovi")
+        self.assertEqual(window.output_dir, r"D:\Filmovi")
+        self.assertIn("Filmovi", window.folder_label.text())
         self.assertEqual(window.preset_combo.currentData(), "720p")
 
-    def test_screenshot_renders(self):
-        window = self.make_window(self.blocking_download)
-        window.url_edit.setText("https://v/lista")
-        window._add_urls()
-        self.assertTrue(wait_until(lambda: window._download_job is not None))
+    def test_screenshots_render(self):
+        target = os.environ.get("VIDEODL_SCREENSHOT")
+        window = self.make_window(self.blocking_download, thumbnail_fetch=lambda url: png_bytes())
+        window.resize(820, 440)
         window.show()
         wait_until(lambda: False, timeout=0.2)
-        pixmap = window.grab()
-        self.assertFalse(pixmap.isNull())
-        target = os.environ.get("VIDEODL_SCREENSHOT")
+        empty = window.grab()
+        self.assertFalse(empty.isNull())
         if target:
-            pixmap.save(target)
-        window._toggle_running()
+            empty.save(target.replace(".png", "-prazno.png"))
+
+        window.add_links_from_text("https://v/lista https://v/jedan")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 3))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: window._download_job is not None))
+        wait_until(lambda: False, timeout=0.3)
+        full = window.grab()
+        self.assertFalse(full.isNull())
+        if target:
+            full.save(target)
+        window._stop_all()
         self.assertTrue(wait_until(lambda: window._download_job is None))
 
 

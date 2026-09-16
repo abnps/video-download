@@ -5,12 +5,15 @@ preko linka ili direktno iz browsera (Edge/Chrome). Samo za ličnu upotrebu.
 
 ## Mogućnosti
 
-- Jedan ili više linkova odjednom; plejliste i kanali se razvijaju u red čekanja
-  (svaka plejlista dobija svoj podfolder).
+- Kopiraj link pa klikni zeleno **„Zalijepi"** (ili Ctrl+V, ili prevuci link u
+  prozor), izaberi format i klikni plavo **„Preuzmi"**.
+- Plejliste i kanali se razvijaju u listu (svaka plejlista dobija svoj podfolder).
+- Svaki red ima sličicu i trajanje; plavi link formata mijenja format samo tog
+  videa, strelica preuzima samo taj video, × ga uklanja.
 - Formati: MP4 najbolji / do 1080p / 720p / 480p, samo zvuk MP3 ili M4A.
 - Ukupan napredak, brzina i preostalo vrijeme; „Zaustavi" prekida preuzimanje i
-  briše samo privremene fajlove tog pokušaja; „Ponovi" za neuspjele stavke.
-- Dvoklik na završenu stavku otvara fajl u Exploreru.
+  briše samo privremene fajlove tog pokušaja; neuspjeli red ima dugme „Pokušaj ponovo".
+- Završen red ima dugme koje otvara fajl u Exploreru.
 - Ekstenzija za Edge/Chrome: prepoznaje video koji stranica pušta (MP4/WebM,
   HLS, DASH) i šalje ga aplikaciji; ako aplikacija nije pokrenuta, pokreće je.
 
@@ -46,7 +49,8 @@ Druga instanca se ne otvara: samo se podigne prozor već pokrenute.
    - „Preuzmi video sa stranice" za YouTube i sajtove koje yt-dlp poznaje;
    - „Preuzmi" pored pronađenog toka za ostale sajtove.
 
-Video ide u red sa formatom i folderom koji su trenutno izabrani u aplikaciji.
+Video ide u red sa formatom i folderom koji su trenutno izabrani u aplikaciji i
+odmah se preuzima (bez klika na „Preuzmi").
 
 Ograničenja:
 - Video zaštićen DRM-om (Netflix, Disney+, Prime Video…) se ne može preuzeti;
@@ -77,7 +81,8 @@ izlaz u `%TEMP%\videodl-e2e`); pokreće i gasi test instancu aplikacije.
 - `videodl/probe.py` — čitanje linka (video, plejlista, kanal)
 - `videodl/download.py` — preuzimanje, napredak, prekid, čišćenje
 - `videodl/jobs.py` — red čekanja
-- `videodl/gui.py` — glavni prozor
+- `videodl/gui.py` — glavni prozor (meni, traka, red, tema)
+- `videodl/widgets.py`, `videodl/icons.py` — red sa sličicom, prazan ekran, ikone
 - `videodl/browser.py` — provjera zahtjeva iz browsera
 - `videodl/bridge.py` — lokalni most u aplikaciji (127.0.0.1 + token)
 - `videodl/native_host.py` — native messaging host (browser ↔ aplikacija)
