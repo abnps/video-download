@@ -41,6 +41,13 @@ def base_options(logger=None) -> dict:
     }
 
 
+DRM_MESSAGE = "Video je zaštićen DRM-om (npr. Netflix, Apple TV+, Disney+) i ne može se preuzeti."
+
+
 def error_message(exc: BaseException) -> str:
     text = str(exc).strip() or exc.__class__.__name__
-    return _ERROR_PREFIX.sub("", text)
+    # yt-dlp za DRM sajtove vraća dugačku englesku poruku sa savjetima za prijavu greške.
+    if "[DRM]" in text or "DRM protection" in text:
+        return DRM_MESSAGE
+    # Jedan red: poruka stoji u redu liste i u statusnoj traci.
+    return " ".join(_ERROR_PREFIX.sub("", text).split())

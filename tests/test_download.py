@@ -116,6 +116,16 @@ class AttemptTest(unittest.TestCase):
             self.assertTrue(self.attempt.real_download)
 
 
+class ErrorMessageTest(unittest.TestCase):
+    def test_drm_error_becomes_short_message(self):
+        from videodl.ytdl import DRM_MESSAGE, error_message
+
+        drm = RuntimeError("ERROR: [DRM] The requested site is known to use DRM protection. "
+                           "It will NOT be supported.\n Please DO NOT open an issue, unless ...")
+        self.assertEqual(error_message(drm), DRM_MESSAGE)
+        self.assertEqual(error_message(RuntimeError("ERROR: prvi red\n  drugi red")), "prvi red drugi red")
+
+
 class DownloadErrorsTest(unittest.TestCase):
     def test_cancel_before_start(self):
         cancel = threading.Event()
