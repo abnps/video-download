@@ -56,13 +56,16 @@ async function send(tabId, mediaUrl, type = "send") {
   const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl });
   setBusy(false);
   if (reply?.ok) {
-    setResult(reply.launched ? "Aplikacija je pokrenuta i video je dodan u red." : "Dodano u red za preuzimanje.", "ok");
+    const sent = reply.target && /^https?:/.test(reply.target) ? ` Poslano: ${reply.target}` : "";
+    setResult((reply.launched ? "Aplikacija je pokrenuta i video je dodan u red." : "Dodano u red za preuzimanje.") + sent, "ok");
   } else {
     setResult(reply?.error || "Slanje nije uspjelo.", "error");
   }
 }
 
 async function main() {
+  // Verzija u zaglavlju: odmah se vidi da li je poslije izmjene urađen „Reload".
+  document.getElementById("version").textContent = `v${chrome.runtime.getManifest().version}`;
   const tab = await currentTab();
   if (!tab) return;
   document.getElementById("page-title").textContent = tab.title || tab.url || "";

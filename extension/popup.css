@@ -58,6 +58,11 @@ h2 {
   letter-spacing: 0.04em;
 }
 
+.version {
+  font-size: 11px;
+  color: var(--muted);
+}
+
 .app-status {
   margin-left: auto;
   font-size: 11px;
@@ -168,6 +173,7 @@ button.secondary {
 
 .result {
   min-height: 1.4em;
+  overflow-wrap: anywhere;
   margin: 12px 0 0;
 }
 

@@ -158,6 +158,16 @@ class MainWindowTest(unittest.TestCase):
         self.assertNotIn("ERROR", window.status_label.text())
         self.assertTrue(wait_until(lambda: not window._probe_jobs))
 
+        # Neuspio link je vidljiv crveni red, a „Pokušaj ponovo" ga daje yt-dlp-u direktno.
+        [failed] = window._queue.items()
+        row = window._rows[failed.id]
+        self.assertEqual(failed.status, ItemStatus.FAILED)
+        self.assertIn("Unsupported URL", row.status_label.text())
+        self.assertEqual(row.action_button.property("kind"), "retry")
+        row.action_button.click()
+        self.assertTrue(wait_until(lambda: failed.status == ItemStatus.DONE))
+        self.assertEqual(self.calls[0][0], "https://v/lose")
+
     def test_stop_then_row_retry_downloads_only_that_item(self):
         window = self.make_window(self.blocking_download)
         window.add_links_from_text("https://v/a https://v/b")

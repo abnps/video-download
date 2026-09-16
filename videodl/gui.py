@@ -165,7 +165,7 @@ class ProbeJob(QObject):
     """Čita linkove u pozadinskoj niti. Signali se u glavnoj niti isporučuju redom."""
 
     probed = Signal(object, str, object, bool)  # ProbeResult, output_dir, zaglavlja, odmah preuzmi
-    failed = Signal(str, str)  # link, poruka
+    failed = Signal(str, str, str, object)  # link, poruka, output_dir, zaglavlja
     finished = Signal(int)  # id posla
 
     def __init__(self, job_id: int, urls: list[str], output_dir: str, probe_fn,
@@ -188,7 +188,7 @@ class ProbeJob(QObject):
                 result = self._probe_fn(url, http_headers=self._http_headers)
                 self.probed.emit(result, self._output_dir, self._http_headers, self._auto_start)
             except Exception as exc:  # granica radne niti
-                self.failed.emit(url, error_message(exc))
+                self.failed.emit(url, error_message(exc), self._output_dir, self._http_headers)
         self.finished.emit(self.job_id)
 
 
@@ -520,9 +520,15 @@ class MainWindow(QMainWindow):
             self._set_status(f"Dodano: {result.title}. Klikni „Preuzmi“.")
         self._start_next()
 
-    @Slot(str, str)
-    def _on_probe_failed(self, url: str, message: str) -> None:
-        self._set_status(f"Link nije moguće učitati ({url}): {message}")
+    @Slot(str, str, str, object)
+    def _on_probe_failed(self, url: str, message: str, output_dir: str, http_headers: dict[str, str]) -> None:
+        # Neuspio link ostaje vidljiv kao crveni red; „Pokušaj ponovo" ga daje yt-dlp-u direktno.
+        item = self._queue.add(url, url, self.preset_combo.currentData(), output_dir, http_headers=http_headers)
+        item.status = ItemStatus.FAILED
+        item.message = message
+        self._append_row(item)
+        self._refresh_row(item)
+        self._set_status(f"Link nije moguće učitati: {message}")
 
     @Slot(int)
     def _on_probe_finished(self, job_id: int) -> None:
