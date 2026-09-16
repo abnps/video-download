@@ -61,6 +61,25 @@ export function findPlayingVideo() {
     }
   }
 
+  // TikTok feed nema link /video/: ID je u omotaču playera (xgwrapper-<n>-<ID>),
+  // a autor je prvi /@ link u istoj objavi. Tako nastaje isti link kao „Kopiraj link".
+  if (!found && /(^|\.)tiktok\.com$/.test(location.hostname)) {
+    let videoId = null;
+    let item = video;
+    for (let node = video; node && node !== document.body; node = node.parentElement) {
+      const match = /^xgwrapper-\d+-(\d{15,})$/.exec(node.id || "");
+      if (match && !videoId) videoId = match[1];
+      if (node.querySelectorAll("video").length > 1) break;
+      item = node;
+    }
+    if (videoId) {
+      const author = [...item.querySelectorAll('a[href^="/@"]')]
+        .map((link) => /^\/@([\w.-]+)\/?$/.exec(link.getAttribute("href")))
+        .find(Boolean);
+      found = `https://www.tiktok.com/@${author ? author[1] : ""}/video/${videoId}`;
+    }
+  }
+
   return {
     postUrl: found || postUrl(location.href),
     directSrc: /^https?:/.test(video.currentSrc) ? video.currentSrc : null,
