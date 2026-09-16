@@ -207,7 +207,7 @@ async function run(cdp, report) {
   await sleep(2500);
   await cdp.evaluate(igPopup, `document.getElementById("download-playing").click()`);
   report.reelReply = await popupResult(cdp, igPopup, "");
-  if (report.reelReply.includes("/reels/audio/")) throw new Error(`Poslan link muzike: ${report.reelReply}`);
+  if (/\/reels\/audio\/|\/reel\/hashtag\//.test(report.reelReply)) throw new Error(`Poslan link muzike ili hashtaga: ${report.reelReply}`);
   const reelFile = await waitFor(() => filesIn(OUT).find((f) => !beforeIg.has(f) && path.basename(f).startsWith("Reel C1a2")), 90000, "fajl reela");
   report.reelFile = path.relative(OUT, reelFile);
   log("Reel:", report.reelReply, "->", report.reelFile);

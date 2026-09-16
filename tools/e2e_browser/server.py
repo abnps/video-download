@@ -34,7 +34,8 @@ POST = """<!doctype html><html><head><meta charset="utf-8"><title>Objava 222</ti
 
 # Feed nalik Instagramu: prvi link u objavi je muzika (/reels/audio/), tek drugi je sam reel.
 IG_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Instagram feed</title></head><body>
-<article><a href="/reels/audio/1277456000520564/">Original audio</a><a href="/reel/C1a2B3c4D5e/">reel</a>
+<article><a href="/reels/audio/1277456000520564/">Original audio</a>
+<a href="/reel/hashtag/?q=%23reelsvideo">#reelsvideo</a><a href="/reel/C1a2B3c4D5e/">reel</a>
 <video id="r" src="/media/clip.mp4" muted loop width="360" height="640"></video></article>
 <script>document.getElementById('r').play();</script></body></html>"""
 

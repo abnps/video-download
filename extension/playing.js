@@ -4,9 +4,10 @@ export function findPlayingVideo() {
   const POST_PATTERNS = [
     /\/status(?:es)?\/\d+/, // X / Twitter
     /\/video\/\d+/, // TikTok
-    // Instagram, Facebook: /reels/audio/… je stranica muzike, ne video (isto isključuje i yt-dlp)
-    /\/(?:reels?|p|tv)\/(?!audio\/)[\w-]{5,}/,
-    /\/videos?\/[\w.-]+/, // Facebook, Vimeo i slični
+    // Instagram, Facebook: /reels/audio/, /reel/hashtag/… i slično nisu video, nego
+    // stranice muzike, hashtaga ili pretrage (yt-dlp ih isto ne prihvata)
+    /\/(?:reels?|p|tv)\/(?!(?:audio|hashtag|search|explore|create|tags?)(?:\/|\?|$))[\w-]{5,}(?:\/|\?|$)/,
+    /\/videos?\/(?!(?:search|hashtag)(?:\/|\?|$))[\w.-]+/, // Facebook, Vimeo i slični
     /\/shorts\/[\w-]+/, // YouTube Shorts
     /\/watch\?(?:.*&)?v=[\w-]+/, // YouTube
   ];
@@ -56,6 +57,15 @@ export function findPlayingVideo() {
   if (/(^|\.)instagram\.com$/.test(location.hostname)
       && /^\/(?:stories\/[^/]+(?:\/\d+)?|(?:[^/]+\/)?(?:reels?|p|tv)\/(?!audio\/)[\w-]{5,})\/?$/.test(location.pathname)) {
     found = location.origin + location.pathname;
+  }
+  // Facebook: otvoren reel ili video je sam tab; u opisu su linkovi hashtaga i profila.
+  if (!found && /(^|\.)facebook\.com$/.test(location.hostname)) {
+    if (/^\/(?:reel\/\d+|(?:[^/]+\/)?videos\/(?:[^/]+\/)?\d+)\/?$/.test(location.pathname)) {
+      found = location.origin + location.pathname;
+    } else if (location.pathname === "/watch/" || location.pathname === "/watch") {
+      const id = new URLSearchParams(location.search).get("v");
+      if (/^\d+$/.test(id || "")) found = `${location.origin}/watch/?v=${id}`;
+    }
   }
   for (let node = video.parentElement; !found && node && node !== document.body; node = node.parentElement) {
     if (node.querySelectorAll("video").length > 1) break;
