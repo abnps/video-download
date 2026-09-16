@@ -132,8 +132,10 @@ async function startServer() {
 
 async function popupResult(cdp, popup, previous) {
   return waitFor(async () => {
-    const text = await cdp.evaluate(popup, `document.getElementById("result").textContent`);
-    return text && text !== previous && !text.startsWith("Šaljem") ? text : null;
+    // Završen odgovor ima klasu ok/error; tekst „šaljem…" je bez nje, na bilo kom jeziku.
+    const { text, done } = await cdp.evaluate(popup, `(() => { const r = document.getElementById("result");
+      return { text: r.textContent, done: r.classList.contains("ok") || r.classList.contains("error") }; })()`);
+    return done && text !== previous ? text : null;
   }, 60000, "odgovor popupa");
 }
 
@@ -267,7 +269,7 @@ async function main() {
   delete manifest.optional_permissions;
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   writeFileSync(path.join(DATA, "settings.ini"),
-    `[General]\r\noutput_dir=${OUT.replaceAll("\\", "\\\\")}\r\npreset_key=best\r\n`);
+    `[General]\r\noutput_dir=${OUT.replaceAll("\\", "\\\\")}\r\npreset_key=best\r\nlanguage=bs\r\n`);
   execFileSync("python", ["-m", "videodl.native_messaging"], { cwd: PROJECT, stdio: "ignore" });
 
   const server = await startServer();

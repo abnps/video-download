@@ -64,7 +64,7 @@ class AttemptTest(unittest.TestCase):
         self.assertEqual([e.phase for e in self.events], [DOWNLOADING, DOWNLOADING, PROCESSING])
         self.assertAlmostEqual(self.events[1].fraction, 0.3)
         self.assertEqual(self.events[1].speed, 2048)
-        self.assertEqual(self.events[2].label, "Spajanje videa i zvuka")
+        self.assertEqual(self.events[2].label, "pp.merge")
 
     def test_recorder_and_non_start_events_are_ignored(self):
         self.attempt.postprocessor_hook({"status": "started", "postprocessor": _PartsRecorderPP.pp_key()})
@@ -83,7 +83,7 @@ class AttemptTest(unittest.TestCase):
         ]})
         self.hook(status="downloading", downloaded_bytes=1, total_bytes=1,
                   info_dict={"format_id": "140", "vcodec": "none", "acodec": "mp4a"})
-        self.assertEqual(self.events[-1].label, "zvuk")
+        self.assertEqual(self.events[-1].label, "progress.audio")
         self.assertAlmostEqual(self.events[-1].fraction, 0.25)
 
     def test_cancel_raises_in_hooks(self):
@@ -118,11 +118,12 @@ class AttemptTest(unittest.TestCase):
 
 class ErrorMessageTest(unittest.TestCase):
     def test_drm_error_becomes_short_message(self):
-        from videodl.ytdl import DRM_MESSAGE, error_message
+        from videodl.i18n import MESSAGE_DRM
+        from videodl.ytdl import error_message
 
         drm = RuntimeError("ERROR: [DRM] The requested site is known to use DRM protection. "
                            "It will NOT be supported.\n Please DO NOT open an issue, unless ...")
-        self.assertEqual(error_message(drm), DRM_MESSAGE)
+        self.assertEqual(error_message(drm), MESSAGE_DRM)
         self.assertEqual(error_message(RuntimeError("ERROR: prvi red\n  drugi red")), "prvi red drugi red")
 
 

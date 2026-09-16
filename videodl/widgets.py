@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QProgressBar, QSizePolicy, QToolButton, QVBoxLayout, QWidget,
 )
 
+from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, tr
 from .icons import icon
 from .jobs import ItemStatus, QueueItem
 from .presets import get_preset
@@ -34,6 +35,15 @@ def format_size(size: int | None) -> str:
             return (f"{value:.0f} {unit}" if unit in ("B", "KB") else f"{value:.1f} {unit}").replace(".", ",")
         value /= 1024
     raise AssertionError("nedostižno")
+
+
+def display_message(message: str) -> str:
+    """Poruka stavke za prikaz: posebne vrijednosti se prevode, greške yt-dlp-a ostaju kakve jesu."""
+    if message == MESSAGE_DRM:
+        return tr("error.drm")
+    if message == MESSAGE_EXISTS:
+        return tr("row.exists")
+    return message
 
 
 def set_state(widget: QWidget, state: str) -> None:
@@ -130,11 +140,11 @@ class DropZone(QWidget):
         self.box = _DashedBox()
         layout.addWidget(self.box, 0, Qt.AlignmentFlag.AlignHCenter)
         layout.addSpacing(10)
-        title = QLabel("Prevuci link ovdje")
+        self.title = title = QLabel()
         title.setObjectName("dropTitle")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
-        self.paste_link = QLabel(f'<a href="paste" style="color:{LINK_COLOR}">ili ga zalijepi iz clipboarda</a>')
+        self.paste_link = QLabel()
         self.paste_link.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.paste_link.linkActivated.connect(lambda _href: self.paste_requested.emit())
         layout.addWidget(self.paste_link)
@@ -144,8 +154,17 @@ class DropZone(QWidget):
         layout.addSpacing(14)
         layout.addWidget(self.folder_hint)
 
+        self._folder = ""
+        self.retranslate()
+
+    def retranslate(self) -> None:
+        self.title.setText(tr("drop.title"))
+        self.paste_link.setText(f'<a href="paste" style="color:{LINK_COLOR}">{tr("drop.paste")}</a>')
+        self.folder_hint.setText(tr("drop.folder", folder=self._folder))
+
     def set_folder(self, folder: str) -> None:
-        self.folder_hint.setText(f"Preuzimanja idu u: {folder}")
+        self._folder = folder
+        self.folder_hint.setText(tr("drop.folder", folder=folder))
 
 
 class _DashedBox(QWidget):
@@ -198,7 +217,6 @@ class QueueRow(QFrame):
         detail.setSpacing(8)
         self.format_link = QLabel()
         self.format_link.setObjectName("rowLink")
-        self.format_link.setToolTip("Promijeni format za ovaj video")
         self.format_link.linkActivated.connect(self._on_format_link)
         detail.addWidget(self.format_link)
         self.status_label = ElidedLabel()
@@ -220,7 +238,6 @@ class QueueRow(QFrame):
         self.play_button.setIcon(icon("play", "#5f6368"))
         self.play_button.setIconSize(QSize(20, 20))
         self.play_button.setFixedSize(34, 34)
-        self.play_button.setToolTip("Pusti video")
         self.play_button.clicked.connect(lambda: self.play_clicked.emit(self.item_id))
         self.play_button.hide()
         layout.addWidget(self.play_button, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -254,32 +271,33 @@ class QueueRow(QFrame):
         else:
             self.format_link.setText(f'<a href="format" style="color:{LINK_COLOR}">{preset}</a>')
 
+        self.format_link.setToolTip(tr("row.format_tip"))
         if item.status == ItemStatus.WAITING:
-            self._set_status("Čeka" if item.message == "" else item.message, "muted")
-            self._set_action("download-solid", "#5f6368", "Preuzmi ovaj video")
+            self._set_status(tr("row.waiting"), "muted")
+            self._set_action("download-solid", "#5f6368", tr("row.download_tip"))
         elif active:
-            self._set_status("Pokreće se…", "muted")
-            self._set_action("stop", "#5f6368", "Zaustavi ovaj video")
+            self._set_status(tr("row.starting"), "muted")
+            self._set_action("stop", "#5f6368", tr("row.stop_tip"))
             self.progress.setRange(0, 0)
         elif item.status == ItemStatus.DONE:
-            text = item.message or "Završeno"
+            text = tr("row.exists") if item.message == MESSAGE_EXISTS else tr("row.done")
             if size:
                 text += f" · {format_size(size)}"
             self._set_status(text, "done")
-            self._set_action("folder", "#5f6368", "Prikaži u folderu")
+            self._set_action("folder", "#5f6368", tr("row.reveal_tip"))
         elif item.status == ItemStatus.FAILED:
-            self._set_status(f"Greška: {item.message}", "failed")
-            self._set_action("retry", "#5f6368", "Pokušaj ponovo")
+            self._set_status(tr("row.failed", message=display_message(item.message)), "failed")
+            self._set_action("retry", "#5f6368", tr("row.retry_tip"))
         else:
-            self._set_status("Otkazano", "muted")
-            self._set_action("retry", "#5f6368", "Pokušaj ponovo")
+            self._set_status(tr("row.cancelled"), "muted")
+            self._set_action("retry", "#5f6368", tr("row.retry_tip"))
 
         self.progress.setVisible(active)
         can_play = item.status == ItemStatus.DONE and bool(item.filepath) and os.path.isfile(item.filepath)
         self.play_button.setVisible(can_play)
-        self.play_button.setToolTip("Pusti zvuk" if can_play and get_preset(item.preset_key).is_audio else "Pusti video")
-        self.remove_button.setToolTip("Prekini i ukloni" if active else "Ukloni sa liste")
-        self.status_label.setToolTip(item.filepath or item.message)
+        self.play_button.setToolTip(tr("row.play_audio") if get_preset(item.preset_key).is_audio else tr("row.play_video"))
+        self.remove_button.setToolTip(tr("row.cancel_remove_tip") if active else tr("row.remove_tip"))
+        self.status_label.setToolTip(item.filepath or display_message(item.message))
 
     def show_progress(self, text: str, fraction: float | None) -> None:
         self._set_status(text, "muted")

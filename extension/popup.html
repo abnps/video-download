@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="bs">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Video Download</title>
@@ -15,19 +15,17 @@
 
   <p id="page-title" class="page-title"></p>
 
-  <p id="drm" class="notice danger" hidden>
-    Ova stranica koristi DRM zaštitu (Netflix, Disney+, Prime Video i slično). Takav video se ne može preuzeti.
-  </p>
+  <p id="drm" class="notice danger" data-i18n="popup.drm" hidden></p>
 
-  <button id="download-playing" class="primary" type="button">Preuzmi video koji se pušta</button>
-  <p class="hint">YouTube, X, TikTok, Instagram, Facebook i oko 1.800 drugih sajtova. U feedu pokreni video koji želiš, pa klikni.</p>
-  <button id="download-page" class="secondary" type="button">Preuzmi link ove stranice</button>
-  <p class="hint">Ako ništa ne uspije, izaberi pronađeni tok ispod.</p>
+  <button id="download-playing" class="primary" type="button" data-i18n="popup.playing"></button>
+  <p class="hint" data-i18n="popup.playing_hint"></p>
+  <button id="download-page" class="secondary" type="button" data-i18n="popup.page"></button>
+  <p class="hint" data-i18n="popup.page_hint"></p>
 
   <section>
-    <h2>Pronađeni video tokovi</h2>
+    <h2 data-i18n="popup.streams"></h2>
     <ul id="media-list" class="media-list"></ul>
-    <p id="media-empty" class="hint">Još ništa. Pokreni video na stranici, pa ponovo otvori ovaj prozor.</p>
+    <p id="media-empty" class="hint" data-i18n="popup.streams_empty"></p>
   </section>
 
   <p id="result" class="result" role="status"></p>

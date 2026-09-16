@@ -11,6 +11,7 @@ from pathlib import Path
 
 from . import __version__
 from .browser import BrowserRequest, parse_browser_request
+from .i18n import get_language
 from .native_host import TOKEN_HEADER, bridge_path
 
 MAX_BODY_BYTES = 1024 * 1024
@@ -65,7 +66,7 @@ def _make_handler(bridge: BridgeServer):
             if not self._authorized():
                 return
             if self.path == "/ping":
-                self._reply(200, {"app": "videodl", "version": __version__})
+                self._reply(200, {"app": "videodl", "version": __version__, "language": get_language()})
             else:
                 self._reply(404, {"error": "Nepoznata putanja."})
 

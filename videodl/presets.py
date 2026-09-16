@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 
 from yt_dlp.utils import sanitize_filename
 
+from .i18n import tr
 from .ytdl import base_options
 
 # .150B ograničava naslov na 150 bajtova da putanja ne pređe Windows limit.
@@ -20,8 +21,6 @@ _COMPATIBLE = ("fps", "vcodec:h264", "acodec:aac")
 @dataclass(frozen=True)
 class Preset:
     key: str
-    label: str
-    short_label: str
     format: str
     format_sort: tuple[str, ...] = ()
     merge_output_format: str | None = None
@@ -32,15 +31,22 @@ class Preset:
     def is_audio(self) -> bool:
         return self.audio_codec is not None
 
+    @property
+    def label(self) -> str:
+        return tr(f"preset.{self.key}")
+
+    @property
+    def short_label(self) -> str:
+        return tr(f"preset.{self.key}.short")
+
 
 PRESETS: tuple[Preset, ...] = (
-    Preset("best", "Video – najbolji kvalitet (MP4)", "MP4 najbolji", "bv*+ba/b",
-           ("res", *_COMPATIBLE), "mp4"),
-    Preset("1080p", "Video – do 1080p (MP4)", "MP4 1080p", "bv*+ba/b", ("res:1080", *_COMPATIBLE), "mp4"),
-    Preset("720p", "Video – do 720p (MP4)", "MP4 720p", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mp4"),
-    Preset("480p", "Video – do 480p (MP4)", "MP4 480p", "bv*+ba/b", ("res:480", *_COMPATIBLE), "mp4"),
-    Preset("mp3", "Samo zvuk – MP3", "MP3", "ba/b", audio_codec="mp3", audio_quality="192"),
-    Preset("m4a", "Samo zvuk – M4A", "M4A", "ba/b", ("acodec:aac",), audio_codec="m4a"),
+    Preset("best", "bv*+ba/b", ("res", *_COMPATIBLE), "mp4"),
+    Preset("1080p", "bv*+ba/b", ("res:1080", *_COMPATIBLE), "mp4"),
+    Preset("720p", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mp4"),
+    Preset("480p", "bv*+ba/b", ("res:480", *_COMPATIBLE), "mp4"),
+    Preset("mp3", "ba/b", audio_codec="mp3", audio_quality="192"),
+    Preset("m4a", "ba/b", ("acodec:aac",), audio_codec="m4a"),
 )
 
 DEFAULT_PRESET_KEY = "best"

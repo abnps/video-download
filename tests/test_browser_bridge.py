@@ -152,6 +152,9 @@ class NativeHostTest(unittest.TestCase):
             native_host.read_message(stream)
 
     def test_add_goes_to_running_app_without_launch(self):
+        from videodl.i18n import set_language
+
+        set_language("bs")  # popup dodatka dobija jezik aplikacije preko statusa
         with tempfile.TemporaryDirectory() as tmp:
             bridge_file = Path(tmp) / "bridge.json"
             added = []
@@ -167,7 +170,7 @@ class NativeHostTest(unittest.TestCase):
         self.assertEqual(reply, {"ok": True, "launched": False})
         self.assertEqual(launches, [])
         self.assertEqual(added[0].page_url, "https://a.ba/v")
-        self.assertEqual(status, {"ok": True, "running": True})
+        self.assertEqual((status["ok"], status["running"], status["language"]), (True, True, "bs"))
 
     def test_add_launches_app_and_waits_for_bridge(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -201,7 +204,7 @@ class NativeHostTest(unittest.TestCase):
                                        clock=lambda: now[0], launch_timeout=1)
             unknown = native_host.handle({"action": "obrisi"}, {}, bridge_file=bridge_file)
         self.assertFalse(reply["ok"])
-        self.assertIn("nije javila", reply["error"])
+        self.assertEqual(reply["code"], "app-timeout")
         self.assertFalse(unknown["ok"])
 
 

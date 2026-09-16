@@ -21,9 +21,10 @@ PROCESSING = "processing"
 
 # Duži ffmpeg koraci; prije njihovog početka prekid još ne ostavlja polovičan izlaz.
 # Ključ uzimamo iz klase jer yt-dlp skraćuje ime (FFmpegMergerPP -> "Merger").
+# Oznake su ključevi prevoda (i18n); prevode se tek pri prikazu u glavnoj niti.
 _PP_LABELS = {
-    FFmpegMergerPP.pp_key(): "Spajanje videa i zvuka",
-    FFmpegExtractAudioPP.pp_key(): "Konverzija zvuka",
+    FFmpegMergerPP.pp_key(): "pp.merge",
+    FFmpegExtractAudioPP.pp_key(): "pp.extract_audio",
 }
 
 
@@ -78,9 +79,9 @@ def _part_weights(formats: list[dict]) -> list[float]:
 
 def _part_label(info: dict) -> str:
     if info.get("vcodec") == "none":
-        return "zvuk"
+        return "progress.audio"
     if info.get("acodec") == "none":
-        return "video"
+        return "progress.video"
     return ""
 
 
@@ -129,7 +130,7 @@ class _Attempt:
             return
         if key in _PP_LABELS:
             self._check_cancel()
-        self._emit(Progress(PROCESSING, None, label=_PP_LABELS.get(key, "Obrada")), force=True)
+        self._emit(Progress(PROCESSING, None, label=_PP_LABELS.get(key, "pp.processing")), force=True)
 
     def cleanup(self) -> None:
         for path in self.touched:
@@ -160,7 +161,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              cookies: tuple[Cookie, ...] = ()) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
-        return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
+        return DownloadResult(ItemStatus.CANCELLED)
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     try:
@@ -175,12 +176,12 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                 info = ydl.extract_info(url, download=True)
     except DownloadCancelled:
         attempt.cleanup()
-        return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
+        return DownloadResult(ItemStatus.CANCELLED)
     except Exception as exc:  # granica radne niti: svaka greška postaje status stavke
         attempt.cleanup()
         # yt-dlp ponekad umota prekid u DownloadError; bitno je šta je korisnik tražio.
         if cancel_event.is_set():
-            return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
+            return DownloadResult(ItemStatus.CANCELLED)
         return DownloadResult(ItemStatus.FAILED, message=error_message(exc))
 
     return DownloadResult(ItemStatus.DONE, _final_path(info),

@@ -18,12 +18,14 @@ from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  
 from videodl.gui import (  # noqa: E402
     MainWindow, apply_theme, extract_urls, format_eta, format_progress, format_speed,
 )
+from videodl.i18n import get_language, set_language  # noqa: E402
 from videodl.jobs import ItemStatus  # noqa: E402
 from videodl.probe import Entry, ProbeResult  # noqa: E402
 from videodl.widgets import format_duration, format_size  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 apply_theme(app)
+set_language("bs")
 
 
 def wait_until(condition, timeout=5.0):
@@ -82,6 +84,7 @@ class MainWindowTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.settings = QSettings(os.path.join(self.tmp.name, "settings.ini"), QSettings.Format.IniFormat)
+        self.settings.setValue("language", "bs")
         self.release = threading.Event()
         self.calls = []
         self.extras = []

@@ -7,30 +7,34 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
+import time
 import urllib.request
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QPoint, QSettings, QSize, Qt, QUrl, Signal, Slot
+from PySide6.QtCore import QLocale, QObject, QPoint, QSettings, QSize, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import (
     QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow,
-    QMenu, QMessageBox, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
+    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
+from .i18n import LANGUAGES, MESSAGE_EXISTS, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
 from .native_messaging import PROJECT_ROOT, install_native_host
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
-from .widgets import LINK_COLOR, DropZone, QueueRow, set_state
+from . import updater
+from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, set_state
 from .ytdl import JS_RUNTIMES, error_message
 
 _URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
@@ -109,14 +113,14 @@ def format_eta(seconds: int) -> str:
 
 def format_progress(progress: Progress) -> str:
     if progress.phase == PROCESSING:
-        return f"{progress.label}…"
-    parts = ["Preuzimanje" + (f" ({progress.label})" if progress.label else "")]
+        return f"{tr(progress.label)}…"
+    parts = [tr("progress.downloading") + (f" ({tr(progress.label)})" if progress.label else "")]
     if progress.fraction is not None:
         parts.append(f"{progress.fraction:.0%}")
     if progress.speed:
         parts.append(format_speed(progress.speed))
     if progress.eta is not None:
-        parts.append(f"još {format_eta(progress.eta)}")
+        parts.append(tr("progress.eta", time=format_eta(progress.eta)))
     return " · ".join(parts)
 
 
@@ -132,9 +136,9 @@ def extract_urls(text: str) -> list[str]:
 def missing_tools() -> list[str]:
     missing = []
     if not shutil.which("ffmpeg"):
-        missing.append("ffmpeg (bez njega nema spajanja videa i zvuka ni MP3/M4A)")
+        missing.append("missing.ffmpeg")
     if not any(shutil.which(name) for name in JS_RUNTIMES):
-        missing.append("Node.js ili Deno (YouTube bez njih često ne radi)")
+        missing.append("missing.js")
     return missing
 
 
@@ -260,13 +264,72 @@ class ThumbnailLoader(QObject):
                 self.loaded.emit(url, image)
 
 
+class UpdateCheckJob(QObject):
+    finished = Signal(object, object, bool)  # Release | None, greška | None, ručna provjera
+
+    def __init__(self, fetch, manual: bool):
+        super().__init__()
+        self._fetch = fetch
+        self._manual = manual
+
+    def start(self) -> None:
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _run(self) -> None:
+        try:
+            self.finished.emit(self._fetch(), None, self._manual)
+        except Exception as exc:  # granica radne niti
+            self.finished.emit(None, exc, self._manual)
+
+
+class UpdateDownloadJob(QObject):
+    progress = Signal(int, int)  # preuzeto, ukupno (bajtova)
+    finished = Signal(object, object)  # Path | None, greška | None
+
+    def __init__(self, release, target_dir: Path, download_fn=None):
+        super().__init__()
+        self._release = release
+        self._target_dir = target_dir
+        self._download_fn = download_fn or updater.download_installer
+        self._cancel = threading.Event()
+
+    @property
+    def cancelled(self) -> bool:
+        return self._cancel.is_set()
+
+    def cancel(self) -> None:
+        self._cancel.set()
+
+    def start(self) -> None:
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _run(self) -> None:
+        try:
+            path = self._download_fn(self._release, self._target_dir, on_progress=self.progress.emit, cancel=self._cancel)
+            self.finished.emit(path, None)
+        except Exception as exc:  # granica radne niti
+            self.finished.emit(None, exc)
+
+
+def update_error_text(error: BaseException) -> str:
+    key = getattr(error, "key", None)
+    return tr(key) if key else error_message(error)
+
+
+def extension_dir() -> Path:
+    """Folder dodatka za „Load unpacked": pored .exe-a u instaliranoj verziji, u projektu inače."""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent / "extension"
+    return PROJECT_ROOT / "extension"
+
+
 class MainWindow(QMainWindow):
     # Stižu iz niti lokalnog mosta; Qt ih isporučuje u glavnoj niti.
     browser_request = Signal(object)  # BrowserRequest
     focus_requested = Signal()
 
     def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download,
-                 thumbnail_fetch=fetch_thumbnail):
+                 thumbnail_fetch=fetch_thumbnail, update_fetch=None, check_updates_on_start: bool = False):
         super().__init__()
         self.browser_request.connect(self._on_browser_request)
         self.focus_requested.connect(self._bring_to_front)
@@ -288,48 +351,110 @@ class MainWindow(QMainWindow):
         self._thumbnail_cache: dict[str, QPixmap] = {}
         self._thumbnail_waiters: dict[str, list[int]] = {}
 
+        set_language(self._settings.value("language", "", type=str) or pick_language(QLocale.system().name()))
         self.setWindowTitle(f"Video Download {__version__}")
         self.setMinimumSize(640, 380)
         self.resize(820, 520)
         self.setAcceptDrops(True)
         self.setStyleSheet(STYLE)
+        self._update_fetch = update_fetch
+        self._update_check_job = None
         self._build_menu()
         self._build_ui()
         self._load_settings()
-        self._update_controls()
+        self.retranslate_ui()
+        if check_updates_on_start:
+            QTimer.singleShot(4000, lambda: self.check_for_updates(manual=False))
 
     # ---------- izgled ----------
 
     def _build_menu(self) -> None:
         menu = self.menuBar()
-        file_menu = menu.addMenu("&Fajl")
-        self.paste_action = file_menu.addAction("Zalijepi link iz clipboarda", self._paste_from_clipboard)
+        self.file_menu = menu.addMenu("")
+        self.paste_action = self.file_menu.addAction("", self._paste_from_clipboard)
         self.paste_action.setShortcut(QKeySequence.StandardKey.Paste)
-        file_menu.addAction("Unesi linkove…", self._enter_links).setShortcut(QKeySequence("Ctrl+L"))
-        file_menu.addSeparator()
-        file_menu.addAction("Folder za preuzimanja…", self._choose_folder)
-        file_menu.addAction("Otvori folder za preuzimanja", self._open_folder)
-        file_menu.addSeparator()
-        file_menu.addAction("Izlaz", self.close).setShortcut(QKeySequence("Ctrl+Q"))
+        self.enter_links_action = self.file_menu.addAction("", self._enter_links)
+        self.enter_links_action.setShortcut(QKeySequence("Ctrl+L"))
+        self.file_menu.addSeparator()
+        self.choose_folder_action = self.file_menu.addAction("", self._choose_folder)
+        self.open_folder_action = self.file_menu.addAction("", self._open_folder)
+        self.file_menu.addSeparator()
+        self.exit_action = self.file_menu.addAction("", self.close)
+        self.exit_action.setShortcut(QKeySequence("Ctrl+Q"))
 
-        downloads = menu.addMenu("&Preuzimanja")
-        self.start_action = downloads.addAction("Preuzmi sve", self._start_all)
+        self.downloads_menu = menu.addMenu("")
+        self.start_action = self.downloads_menu.addAction("", self._start_all)
         self.start_action.setShortcut(QKeySequence("F5"))
-        self.stop_action = downloads.addAction("Zaustavi", self._stop_all)
-        downloads.addSeparator()
-        self.retry_failed_action = downloads.addAction("Ponovi neuspjele", self._retry_failed)
-        self.clear_action = downloads.addAction("Očisti završene", self._clear_finished)
-        self.remove_all_action = downloads.addAction("Ukloni sve sa liste", self._remove_all)
+        self.stop_action = self.downloads_menu.addAction("", self._stop_all)
+        self.downloads_menu.addSeparator()
+        self.retry_failed_action = self.downloads_menu.addAction("", self._retry_failed)
+        self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
+        self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
 
-        help_menu = menu.addMenu("P&omoć")
-        help_menu.addAction("Preuzimanje iz browsera", self._show_browser_help)
-        help_menu.addAction("O programu", self._show_about)
+        self.help_menu = menu.addMenu("")
+        self.check_updates_action = self.help_menu.addAction("", lambda: self.check_for_updates(manual=True))
+        self.language_menu = self.help_menu.addMenu("")
+        self.language_actions = QActionGroup(self)
+        for code, name in LANGUAGES.items():
+            action = QAction(name, self, checkable=True)
+            action.setData(code)
+            action.triggered.connect(lambda _checked=False, code=code: self.change_language(code))
+            self.language_actions.addAction(action)
+            self.language_menu.addAction(action)
+        self.help_menu.addSeparator()
+        self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
+        self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
-        self.corner_link = QLabel(f'<a href="open" style="color:{LINK_COLOR}">Otvori folder</a>')
+        self.corner_link = QLabel()
         self.corner_link.setObjectName("cornerLink")
         self.corner_link.linkActivated.connect(lambda _href: self._open_folder())
         menu.setCornerWidget(self.corner_link, Qt.Corner.TopRightCorner)
+
+    def retranslate_ui(self) -> None:
+        """Svi stalni tekstovi prozora; poziva se pri pokretanju i pri promjeni jezika."""
+        self.file_menu.setTitle(tr("menu.file"))
+        self.paste_action.setText(tr("menu.paste"))
+        self.enter_links_action.setText(tr("menu.enter_links"))
+        self.choose_folder_action.setText(tr("menu.choose_folder"))
+        self.open_folder_action.setText(tr("menu.open_folder"))
+        self.exit_action.setText(tr("menu.exit"))
+        self.downloads_menu.setTitle(tr("menu.downloads"))
+        self.start_action.setText(tr("menu.start_all"))
+        self.stop_action.setText(tr("menu.stop"))
+        self.retry_failed_action.setText(tr("menu.retry_failed"))
+        self.clear_action.setText(tr("menu.clear_finished"))
+        self.remove_all_action.setText(tr("menu.remove_all"))
+        self.help_menu.setTitle(tr("menu.help"))
+        self.check_updates_action.setText(tr("menu.check_updates"))
+        self.language_menu.setTitle(tr("menu.language"))
+        for action in self.language_actions.actions():
+            action.setChecked(action.data() == get_language())
+        self.browser_help_action.setText(tr("menu.browser_help"))
+        self.about_action.setText(tr("menu.about"))
+        self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
+
+        self.paste_button.setText(tr("toolbar.paste"))
+        self.paste_button.setToolTip(tr("toolbar.paste_tip"))
+        current = self.preset_combo.currentData()
+        self.preset_combo.blockSignals(True)
+        for index in range(self.preset_combo.count()):
+            self.preset_combo.setItemText(index, get_preset(self.preset_combo.itemData(index)).label)
+        self.preset_combo.setCurrentIndex(max(self.preset_combo.findData(current), 0))
+        self.preset_combo.blockSignals(False)
+        missing = missing_tools()
+        self.warning_label.setText(tr("warning.missing", items="; ".join(tr(key) for key in missing)))
+        self.warning_label.setVisible(bool(missing))
+        self.drop_zone.retranslate()
+        self._update_folder_label()
+        for item in self._queue.items():
+            self._refresh_row(item)
+        self._update_controls()
+
+    def change_language(self, code: str) -> None:
+        set_language(code)
+        self._settings.setValue("language", get_language())
+        self.retranslate_ui()
 
     def _build_ui(self) -> None:
         central = QWidget()
@@ -343,17 +468,16 @@ class MainWindow(QMainWindow):
         bar = QHBoxLayout(toolbar)
         bar.setContentsMargins(14, 10, 14, 10)
         bar.setSpacing(8)
-        self.paste_button = QPushButton("Zalijepi")
+        self.paste_button = QPushButton()
         self.paste_button.setObjectName("pasteButton")
         self.paste_button.setIcon(icon("plus"))
         self.paste_button.setIconSize(QSize(14, 14))
-        self.paste_button.setToolTip("Dodaj link iz clipboarda (Ctrl+V)")
         self.paste_button.clicked.connect(self._paste_from_clipboard)
         bar.addWidget(self.paste_button)
         self.preset_combo = QComboBox()
         self.preset_combo.setObjectName("presetCombo")
         for preset in PRESETS:
-            self.preset_combo.addItem(preset.label, preset.key)
+            self.preset_combo.addItem("", preset.key)
         self.preset_combo.currentIndexChanged.connect(self._on_preset_changed)
         bar.addWidget(self.preset_combo, 1)
         self.download_button = QPushButton()
@@ -363,11 +487,9 @@ class MainWindow(QMainWindow):
         bar.addWidget(self.download_button)
         layout.addWidget(toolbar)
 
-        missing = missing_tools()
-        self.warning_label = QLabel("Nije pronađeno: " + "; ".join(missing))
+        self.warning_label = QLabel()
         self.warning_label.setObjectName("warning")
         self.warning_label.setWordWrap(True)
-        self.warning_label.setVisible(bool(missing))
         layout.addWidget(self.warning_label)
 
         self.stack = QStackedWidget()
@@ -417,16 +539,19 @@ class MainWindow(QMainWindow):
 
     def set_output_dir(self, folder: str, save: bool = True) -> None:
         self._output_dir = os.path.normpath(folder)
-        name = Path(self._output_dir).name or self._output_dir
-        self.folder_label.setText(f'Folder: <a href="change" style="color:{LINK_COLOR}">{name}</a>')
-        self.folder_label.setToolTip(f"{self._output_dir}\nKlikni za promjenu")
+        self._update_folder_label()
         self.drop_zone.set_folder(self._output_dir)
         if save:
             self._save_settings()
 
+    def _update_folder_label(self) -> None:
+        name = Path(self._output_dir).name or self._output_dir
+        self.folder_label.setText(f'{tr("folder.label")} <a href="change" style="color:{LINK_COLOR}">{name}</a>')
+        self.folder_label.setToolTip(tr("folder.tip", path=self._output_dir))
+
     @Slot()
     def _choose_folder(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Izaberi folder za preuzimanja", self._output_dir)
+        folder = QFileDialog.getExistingDirectory(self, tr("dialog.choose_folder"), self._output_dir)
         if folder:
             self.set_output_dir(folder)
 
@@ -441,18 +566,18 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _paste_from_clipboard(self) -> None:
-        self.add_links_from_text(QApplication.clipboard().text(), "U clipboardu nema linka. Kopiraj link videa pa klikni „Zalijepi“.")
+        self.add_links_from_text(QApplication.clipboard().text(), tr("status.clipboard_empty"))
 
     @Slot()
     def _enter_links(self) -> None:
-        text, ok = QInputDialog.getMultiLineText(self, "Unesi linkove", "Linkovi videa ili plejlista (jedan po redu):")
+        text, ok = QInputDialog.getMultiLineText(self, tr("dialog.enter_links_title"), tr("dialog.enter_links_label"))
         if ok:
-            self.add_links_from_text(text, "Nije unesen nijedan link.")
+            self.add_links_from_text(text, tr("status.no_links_entered"))
 
-    def add_links_from_text(self, text: str, empty_message: str = "Nema linka.") -> None:
+    def add_links_from_text(self, text: str, empty_message: str | None = None) -> None:
         urls = extract_urls(text)
         if not urls:
-            self._set_status(empty_message)
+            self._set_status(empty_message or tr("status.no_link"))
             return
         self._start_probe(urls)
 
@@ -464,7 +589,7 @@ class MainWindow(QMainWindow):
     def dropEvent(self, event) -> None:
         mime = event.mimeData()
         text = "\n".join(url.toString() for url in mime.urls()) if mime.hasUrls() else mime.text()
-        self.add_links_from_text(text, "Prevučeni sadržaj nije link.")
+        self.add_links_from_text(text, tr("status.drop_not_link"))
         event.acceptProposedAction()
 
     def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False) -> None:
@@ -474,8 +599,7 @@ class MainWindow(QMainWindow):
         job.failed.connect(self._on_probe_failed)
         job.finished.connect(self._on_probe_finished)
         self._probe_jobs[job.job_id] = job
-        self._set_status("Učitavam informacije o linku…" if len(urls) == 1
-                         else f"Učitavam informacije o {len(urls)} linka…")
+        self._set_status(tr("status.loading_one") if len(urls) == 1 else tr("status.loading_many", count=len(urls)))
         job.start()
 
     @Slot(object)
@@ -488,7 +612,7 @@ class MainWindow(QMainWindow):
         item = self._queue.add(request.media_url, request.page_title, self.preset_combo.currentData(),
                                self._output_dir, filename_title=request.page_title, **access)
         self._append_row(item)
-        self._set_status(f"Iz browsera: {request.page_title}")
+        self._set_status(tr("status.from_browser", title=request.page_title))
         self._manual.append(item.id)
         self._start_next()
 
@@ -503,7 +627,7 @@ class MainWindow(QMainWindow):
     @Slot(object, str, object, bool)
     def _on_probed(self, result: ProbeResult, output_dir: str, access: dict, auto_start: bool) -> None:
         if not result.entries:
-            self._set_status(f"Plejlista „{result.title}“ nema dostupnih videa.")
+            self._set_status(tr("status.playlist_empty", title=result.title))
             return
         subfolder = result.title if result.is_playlist else None
         preset_key = self.preset_combo.currentData()
@@ -514,11 +638,11 @@ class MainWindow(QMainWindow):
             if auto_start:
                 self._manual.append(item.id)
         if result.is_playlist:
-            self._set_status(f"Dodana plejlista „{result.title}“: {len(result.entries)} videa.")
+            self._set_status(tr("status.playlist_added", title=result.title, count=len(result.entries)))
         elif auto_start:
-            self._set_status(f"Iz browsera: {result.title}")
+            self._set_status(tr("status.from_browser", title=result.title))
         else:
-            self._set_status(f"Dodano: {result.title}. Klikni „Preuzmi“.")
+            self._set_status(tr("status.added", title=result.title))
         self._start_next()
 
     @Slot(str, str, str, object)
@@ -529,7 +653,7 @@ class MainWindow(QMainWindow):
         item.message = message
         self._append_row(item)
         self._refresh_row(item)
-        self._set_status(f"Link nije moguće učitati: {message}")
+        self._set_status(tr("status.link_failed", message=display_message(message)))
 
     @Slot(int)
     def _on_probe_finished(self, job_id: int) -> None:
@@ -582,7 +706,7 @@ class MainWindow(QMainWindow):
         if item is not None:
             item.status = result.status
             item.filepath = result.filepath
-            item.message = "Već postoji" if result.already_existed else result.message
+            item.message = MESSAGE_EXISTS if result.already_existed else result.message
             if result.filepath and os.path.isfile(result.filepath):
                 self._sizes[item_id] = os.path.getsize(result.filepath)
             if item_id in self._remove_when_done:
@@ -602,7 +726,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def _start_all(self) -> None:
         if self._queue.next_waiting() is None:
-            self._set_status("Nema ništa za preuzimanje. Kopiraj link videa pa klikni „Zalijepi“.")
+            self._set_status(tr("status.nothing_to_download"))
             return
         self._running = True
         self._set_status("")
@@ -614,7 +738,7 @@ class MainWindow(QMainWindow):
         self._manual.clear()
         if self._download_job is not None:
             self._download_job.cancel()
-            self._set_status("Zaustavljam preuzimanje…")
+            self._set_status(tr("status.stopping"))
         self._update_controls()
 
     @Slot(int)
@@ -641,7 +765,7 @@ class MainWindow(QMainWindow):
     def _on_row_play(self, item_id: int) -> None:
         item = self._queue.get(item_id)
         if item is None or not item.filepath or not os.path.isfile(item.filepath):
-            self._set_status("Fajl više ne postoji na disku.")
+            self._set_status(tr("status.file_missing"))
             return
         play_file(item.filepath)
 
@@ -768,12 +892,12 @@ class MainWindow(QMainWindow):
 
         self.stack.setCurrentIndex(1 if items else 0)
         if busy:
-            self.download_button.setText("Zaustavi")
+            self.download_button.setText(tr("toolbar.stop"))
             self.download_button.setIcon(icon("stop"))
             self.download_button.setEnabled(True)
             set_state(self.download_button, "stop")
         else:
-            self.download_button.setText("Preuzmi")
+            self.download_button.setText(tr("toolbar.download"))
             self.download_button.setIcon(icon("download"))
             self.download_button.setEnabled(waiting > 0)
             set_state(self.download_button, "start")
@@ -785,13 +909,13 @@ class MainWindow(QMainWindow):
 
         parts = []
         if self._download_job is not None:
-            parts.append("preuzimanje u toku")
+            parts.append(tr("summary.active"))
         if waiting:
-            parts.append(f"čeka: {waiting}")
+            parts.append(tr("summary.waiting", count=waiting))
         if done:
-            parts.append(f"završeno: {done}")
+            parts.append(tr("summary.done", count=done))
         if failed:
-            parts.append(f"neuspjelo: {failed}")
+            parts.append(tr("summary.failed", count=failed))
         self.summary_label.setText(" · ".join(parts))
 
     def _set_status(self, text: str) -> None:
@@ -801,26 +925,78 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _show_browser_help(self) -> None:
-        QMessageBox.information(self, "Preuzimanje iz browsera", (
-            "1. Otvori edge://extensions (ili chrome://extensions).\n"
-            "2. Uključi „Developer mode“ i klikni „Load unpacked“.\n"
-            f"3. Izaberi folder:\n   {PROJECT_ROOT / 'extension'}\n\n"
-            "Na stranici pokreni video i klikni ikonu Video Download. "
-            "Ako aplikacija nije pokrenuta, klik je sam pokreće.\n\n"
-            "Video zaštićen DRM-om (Netflix, Disney+…) se ne može preuzeti."))
+        QMessageBox.information(self, tr("menu.browser_help"), tr("help.browser_text", folder=str(extension_dir())))
 
     @Slot()
     def _show_about(self) -> None:
-        QMessageBox.about(self, "O programu", f"Video Download {__version__}\n\n"
-                          "Lična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).")
+        QMessageBox.about(self, tr("menu.about"), tr("about.text", version=__version__))
+
+    # ---------- ažuriranje ----------
+
+    def check_for_updates(self, manual: bool) -> None:
+        if self._update_check_job is not None:
+            return
+        if not manual:
+            last = self._settings.value("last_update_check", 0.0, type=float)
+            if time.time() - last < updater.CHECK_INTERVAL_SECONDS:
+                return
+        self._settings.setValue("last_update_check", time.time())
+        job = UpdateCheckJob(self._update_fetch or updater.fetch_latest, manual)
+        job.finished.connect(self._on_update_checked)
+        self._update_check_job = job
+        job.start()
+
+    @Slot(object, object, bool)
+    def _on_update_checked(self, release, error, manual: bool) -> None:
+        self._update_check_job = None
+        if error is not None:
+            if manual:
+                QMessageBox.warning(self, tr("menu.check_updates"), tr("update.failed", error=update_error_text(error)))
+            return
+        if release is None or not updater.is_newer(release.version):
+            if manual:
+                QMessageBox.information(self, tr("menu.check_updates"), tr("update.latest", version=__version__))
+            return
+        answer = QMessageBox.question(self, tr("update.available_title"), tr(
+            "update.available_text", new=release.version, current=__version__, notes=release.notes or "—"))
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+        if not updater.is_installed_app():
+            QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
+            return
+        if self._download_job is not None:
+            QMessageBox.information(self, tr("update.available_title"), tr("update.busy"))
+            return
+        self._install_update(release)
+
+    def _install_update(self, release) -> None:
+        dialog = QProgressDialog(tr("update.downloading"), tr("update.cancel"), 0, 100, self)
+        dialog.setWindowTitle(tr("update.available_title"))
+        dialog.setMinimumDuration(0)
+        job = UpdateDownloadJob(release, Path(tempfile.gettempdir()) / "VideoDownload-update")
+        dialog.canceled.connect(job.cancel)
+        job.progress.connect(lambda done, total: dialog.setValue(int(done * 100 / total)) if total else None)
+
+        def finished(path, error):
+            dialog.close()
+            job.deleteLater()
+            if error is not None:
+                if not job.cancelled:
+                    QMessageBox.warning(self, tr("update.available_title"), tr("update.failed", error=update_error_text(error)))
+                return
+            updater.launch_installer(path, get_language())
+            QApplication.quit()
+
+        job.finished.connect(finished)
+        self._update_download_job = job
+        job.start()
 
     # ---------- zatvaranje ----------
 
     def closeEvent(self, event) -> None:
         if self._download_job is not None:
             answer = QMessageBox.question(
-                self, "Preuzimanje u toku",
-                "Preuzimanje je u toku. Prekinuti ga i zatvoriti program?")
+                self, tr("close.title"), tr("close.text"))
             if answer != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
@@ -873,20 +1049,20 @@ def main() -> int:
     app.setApplicationName("Video Download")
     app.setWindowIcon(QIcon(str(PROJECT_ROOT / "extension" / "icons" / "icon128.png")))
     apply_theme(app)
-    window = MainWindow(settings=_settings())
+    window = MainWindow(settings=_settings(), check_updates_on_start=updater.is_installed_app())
 
     problems = []
     bridge = BridgeServer(window.browser_request.emit, window.focus_requested.emit)
     try:
         bridge.start()
     except OSError as exc:
-        problems.append(f"veza sa browserom ne radi ({exc})")
+        problems.append(tr("startup.bridge", error=exc))
     try:
         install_native_host()
     except OSError as exc:
-        problems.append(f"registracija za browser nije uspjela ({exc})")
+        problems.append(tr("startup.register", error=exc))
     if problems:
-        window._set_status("Upozorenje: " + "; ".join(problems))
+        window._set_status(tr("startup.warning", problems="; ".join(problems)))
 
     window.show()
     try:

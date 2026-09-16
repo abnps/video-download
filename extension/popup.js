@@ -1,9 +1,15 @@
 import { formatSize, kindLabel } from "./detect.js";
+import { pickLanguage, translate } from "./i18n.js";
 
 const pageButton = document.getElementById("download-page");
 const playingButton = document.getElementById("download-playing");
 const resultLine = document.getElementById("result");
 let pageSupported = false;
+// Jezik browsera dok aplikacija ne javi svoj (isti kao u aplikaciji).
+let language = pickLanguage(navigator.language);
+let lastResult = null;
+
+const t = (key, values) => translate(language, key, values);
 
 async function currentTab() {
   // ?tabId= služi za testiranje prozora otvorenog kao obična stranica.
@@ -11,6 +17,15 @@ async function currentTab() {
   if (forced) return chrome.tabs.get(forced);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
+}
+
+function applyTexts() {
+  document.documentElement.lang = language;
+  for (const element of document.querySelectorAll("[data-i18n]")) {
+    element.textContent = t(element.dataset.i18n);
+  }
+  for (const button of document.querySelectorAll("#media-list button")) button.textContent = t("popup.download");
+  if (lastResult) showReply(lastResult);
 }
 
 function renderMedia(tab, state) {
@@ -30,7 +45,7 @@ function renderMedia(tab, state) {
     size.textContent = formatSize(media.size);
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Preuzmi";
+    button.textContent = t("popup.download");
     button.addEventListener("click", () => send(tab.id, media.url));
     row.append(kind, label, size, button);
     list.append(row);
@@ -50,25 +65,34 @@ function setResult(text, kind) {
   resultLine.className = `result ${kind || ""}`.trim();
 }
 
+function showReply(reply) {
+  lastResult = reply;
+  if (reply?.ok) {
+    const sent = reply.target && /^https?:/.test(reply.target) ? ` ${t("popup.sent", { url: reply.target })}` : "";
+    setResult(t(reply.launched ? "popup.launched" : "popup.added") + sent, "ok");
+  } else if (reply?.code) {
+    setResult(t(`error.${reply.code}`, { detail: reply.detail || "" }), "error");
+  } else {
+    setResult(reply?.error || t("popup.failed"), "error");
+  }
+}
+
 async function send(tabId, mediaUrl, type = "send") {
   // Dozvola za kolačiće (video iza prijave) traži se kroz dijalog browsera, samo prvi put;
   // mora biti prvi poziv u kliku. Odbijanje ne smeta: preuzimanje ide bez prijave.
   await chrome.permissions.request({ permissions: ["cookies"] }).catch(() => false);
   setBusy(true);
-  setResult("Šaljem u Video Download…");
+  lastResult = null;
+  setResult(t("popup.sending"));
   const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl });
   setBusy(false);
-  if (reply?.ok) {
-    const sent = reply.target && /^https?:/.test(reply.target) ? ` Poslano: ${reply.target}` : "";
-    setResult((reply.launched ? "Aplikacija je pokrenuta i video je dodan u red." : "Dodano u red za preuzimanje.") + sent, "ok");
-  } else {
-    setResult(reply?.error || "Slanje nije uspjelo.", "error");
-  }
+  showReply(reply);
 }
 
 async function main() {
   // Verzija u zaglavlju: odmah se vidi da li je poslije izmjene urađen „Reload".
   document.getElementById("version").textContent = `v${chrome.runtime.getManifest().version}`;
+  applyTexts();
   const tab = await currentTab();
   if (!tab) return;
   document.getElementById("page-title").textContent = tab.title || tab.url || "";
@@ -83,11 +107,15 @@ async function main() {
 
   const status = await chrome.runtime.sendMessage({ type: "app-status" });
   const statusLine = document.getElementById("app-status");
+  if (status?.language) {
+    language = pickLanguage(status.language);
+    applyTexts();
+  }
   if (status?.ok) {
-    statusLine.textContent = status.running ? "aplikacija radi" : "pokreće se na klik";
+    statusLine.textContent = t(status.running ? "status.running" : "status.idle");
   } else {
-    statusLine.textContent = "nije povezano";
-    statusLine.title = status?.error || "";
+    statusLine.textContent = t("status.offline");
+    statusLine.title = status?.code ? t(`error.${status.code}`, { detail: status.detail || "" }) : "";
   }
 }
 

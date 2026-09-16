@@ -1,0 +1,289 @@
+"""Prevodi aplikacije: bosanski, engleski, njemački, španski, francuski (jednostavan dict, bez Qt Linguista)."""
+
+LANGUAGES = {"bs": "Bosanski", "en": "English", "de": "Deutsch", "es": "Español", "fr": "Français"}
+_ORDER = ("bs", "en", "de", "es", "fr")
+FALLBACK = "en"
+
+# Posebne vrijednosti poruka u redu (prevode se tek pri prikazu).
+MESSAGE_EXISTS = "@exists"
+MESSAGE_DRM = "@drm"
+
+_current = FALLBACK
+
+# ključ: (bs, en, de, es, fr)
+TEXTS: dict[str, tuple[str, str, str, str, str]] = {
+    # meni
+    "menu.file": ("&Fajl", "&File", "&Datei", "&Archivo", "&Fichier"),
+    "menu.paste": ("Zalijepi link iz clipboarda", "Paste link from clipboard", "Link aus Zwischenablage einfügen",
+                   "Pegar enlace del portapapeles", "Coller le lien du presse-papiers"),
+    "menu.enter_links": ("Unesi linkove…", "Enter links…", "Links eingeben…", "Introducir enlaces…", "Saisir des liens…"),
+    "menu.choose_folder": ("Folder za preuzimanja…", "Download folder…", "Download-Ordner…", "Carpeta de descargas…",
+                           "Dossier de téléchargement…"),
+    "menu.open_folder": ("Otvori folder za preuzimanja", "Open download folder", "Download-Ordner öffnen",
+                         "Abrir carpeta de descargas", "Ouvrir le dossier de téléchargement"),
+    "menu.exit": ("Izlaz", "Exit", "Beenden", "Salir", "Quitter"),
+    "menu.downloads": ("&Preuzimanja", "&Downloads", "&Downloads", "&Descargas", "&Téléchargements"),
+    "menu.start_all": ("Preuzmi sve", "Download all", "Alle herunterladen", "Descargar todo", "Tout télécharger"),
+    "menu.stop": ("Zaustavi", "Stop", "Stoppen", "Detener", "Arrêter"),
+    "menu.retry_failed": ("Ponovi neuspjele", "Retry failed", "Fehlgeschlagene wiederholen", "Reintentar fallidos",
+                          "Relancer les échecs"),
+    "menu.clear_finished": ("Očisti završene", "Clear finished", "Fertige entfernen", "Quitar terminados",
+                            "Effacer les terminés"),
+    "menu.remove_all": ("Ukloni sve sa liste", "Remove all from list", "Alle aus der Liste entfernen",
+                        "Quitar todo de la lista", "Tout retirer de la liste"),
+    "menu.help": ("P&omoć", "&Help", "&Hilfe", "A&yuda", "&Aide"),
+    "menu.language": ("Jezik", "Language", "Sprache", "Idioma", "Langue"),
+    "menu.check_updates": ("Provjeri ažuriranje", "Check for updates", "Nach Updates suchen", "Buscar actualizaciones",
+                           "Rechercher des mises à jour"),
+    "menu.browser_help": ("Preuzimanje iz browsera", "Downloading from the browser", "Aus dem Browser herunterladen",
+                          "Descargar desde el navegador", "Télécharger depuis le navigateur"),
+    "menu.about": ("O programu", "About", "Über", "Acerca de", "À propos"),
+    "corner.open_folder": ("Otvori folder", "Open folder", "Ordner öffnen", "Abrir carpeta", "Ouvrir le dossier"),
+
+    # traka
+    "toolbar.paste": ("Zalijepi", "Paste", "Einfügen", "Pegar", "Coller"),
+    "toolbar.paste_tip": ("Dodaj link iz clipboarda (Ctrl+V)", "Add link from clipboard (Ctrl+V)",
+                          "Link aus der Zwischenablage hinzufügen (Strg+V)", "Añadir enlace del portapapeles (Ctrl+V)",
+                          "Ajouter le lien du presse-papiers (Ctrl+V)"),
+    "toolbar.download": ("Preuzmi", "Download", "Herunterladen", "Descargar", "Télécharger"),
+    "toolbar.stop": ("Zaustavi", "Stop", "Stoppen", "Detener", "Arrêter"),
+    "warning.missing": ("Nije pronađeno: {items}", "Not found: {items}", "Nicht gefunden: {items}",
+                        "No encontrado: {items}", "Introuvable : {items}"),
+    "missing.ffmpeg": ("ffmpeg (bez njega nema spajanja videa i zvuka ni MP3/M4A)",
+                       "ffmpeg (needed to merge video and audio and for MP3/M4A)",
+                       "ffmpeg (nötig zum Zusammenführen von Video und Ton sowie für MP3/M4A)",
+                       "ffmpeg (necesario para unir vídeo y audio y para MP3/M4A)",
+                       "ffmpeg (nécessaire pour fusionner vidéo et son et pour MP3/M4A)"),
+    "missing.js": ("Node.js ili Deno (YouTube bez njih često ne radi)",
+                   "Node.js or Deno (YouTube often fails without them)",
+                   "Node.js oder Deno (YouTube funktioniert ohne sie oft nicht)",
+                   "Node.js o Deno (YouTube a menudo falla sin ellos)",
+                   "Node.js ou Deno (YouTube échoue souvent sans eux)"),
+
+    # folder
+    "folder.label": ("Folder:", "Folder:", "Ordner:", "Carpeta:", "Dossier :"),
+    "folder.tip": ("{path}\nKlikni za promjenu", "{path}\nClick to change", "{path}\nKlicken zum Ändern",
+                   "{path}\nHaz clic para cambiar", "{path}\nCliquez pour modifier"),
+    "dialog.choose_folder": ("Izaberi folder za preuzimanja", "Choose download folder", "Download-Ordner wählen",
+                             "Elegir carpeta de descargas", "Choisir le dossier de téléchargement"),
+
+    # dodavanje linkova
+    "status.clipboard_empty": ("U clipboardu nema linka. Kopiraj link videa pa klikni „Zalijepi“.",
+                               "No link in the clipboard. Copy a video link, then click “Paste”.",
+                               "Kein Link in der Zwischenablage. Videolink kopieren und dann „Einfügen“ klicken.",
+                               "No hay ningún enlace en el portapapeles. Copia el enlace del vídeo y pulsa «Pegar».",
+                               "Aucun lien dans le presse-papiers. Copiez le lien de la vidéo puis cliquez sur « Coller »."),
+    "dialog.enter_links_title": ("Unesi linkove", "Enter links", "Links eingeben", "Introducir enlaces", "Saisir des liens"),
+    "dialog.enter_links_label": ("Linkovi videa ili plejlista (jedan po redu):", "Video or playlist links (one per line):",
+                                 "Video- oder Playlist-Links (einer pro Zeile):",
+                                 "Enlaces de vídeos o listas (uno por línea):",
+                                 "Liens de vidéos ou de playlists (un par ligne) :"),
+    "status.no_links_entered": ("Nije unesen nijedan link.", "No link entered.", "Kein Link eingegeben.",
+                                "No se ha introducido ningún enlace.", "Aucun lien saisi."),
+    "status.no_link": ("Nema linka.", "No link.", "Kein Link.", "No hay enlace.", "Aucun lien."),
+    "status.drop_not_link": ("Prevučeni sadržaj nije link.", "The dropped content is not a link.",
+                             "Der abgelegte Inhalt ist kein Link.", "El contenido soltado no es un enlace.",
+                             "Le contenu déposé n'est pas un lien."),
+    "status.loading_one": ("Učitavam informacije o linku…", "Loading link information…", "Lade Link-Informationen…",
+                           "Cargando información del enlace…", "Chargement des informations du lien…"),
+    "status.loading_many": ("Učitavam informacije o {count} linka…", "Loading information for {count} links…",
+                            "Lade Informationen zu {count} Links…", "Cargando información de {count} enlaces…",
+                            "Chargement des informations de {count} liens…"),
+    "status.from_browser": ("Iz browsera: {title}", "From browser: {title}", "Aus dem Browser: {title}",
+                            "Desde el navegador: {title}", "Depuis le navigateur : {title}"),
+    "status.playlist_empty": ("Plejlista „{title}“ nema dostupnih videa.", "Playlist “{title}” has no available videos.",
+                              "Playlist „{title}“ enthält keine verfügbaren Videos.",
+                              "La lista «{title}» no tiene vídeos disponibles.",
+                              "La playlist « {title} » ne contient aucune vidéo disponible."),
+    "status.playlist_added": ("Dodana plejlista „{title}“: {count} videa.", "Added playlist “{title}”: {count} videos.",
+                              "Playlist „{title}“ hinzugefügt: {count} Videos.",
+                              "Lista «{title}» añadida: {count} vídeos.",
+                              "Playlist « {title} » ajoutée : {count} vidéos."),
+    "status.added": ("Dodano: {title}. Klikni „Preuzmi“.", "Added: {title}. Click “Download”.",
+                     "Hinzugefügt: {title}. Klicke auf „Herunterladen“.", "Añadido: {title}. Pulsa «Descargar».",
+                     "Ajouté : {title}. Cliquez sur « Télécharger »."),
+    "status.link_failed": ("Link nije moguće učitati: {message}", "Could not load the link: {message}",
+                           "Link konnte nicht geladen werden: {message}", "No se pudo cargar el enlace: {message}",
+                           "Impossible de charger le lien : {message}"),
+    "status.nothing_to_download": ("Nema ništa za preuzimanje. Kopiraj link videa pa klikni „Zalijepi“.",
+                                   "Nothing to download. Copy a video link, then click “Paste”.",
+                                   "Nichts herunterzuladen. Videolink kopieren und dann „Einfügen“ klicken.",
+                                   "No hay nada que descargar. Copia el enlace del vídeo y pulsa «Pegar».",
+                                   "Rien à télécharger. Copiez le lien de la vidéo puis cliquez sur « Coller »."),
+    "status.stopping": ("Zaustavljam preuzimanje…", "Stopping download…", "Download wird gestoppt…",
+                        "Deteniendo la descarga…", "Arrêt du téléchargement…"),
+    "status.file_missing": ("Fajl više ne postoji na disku.", "The file no longer exists on disk.",
+                            "Die Datei existiert nicht mehr.", "El archivo ya no existe en el disco.",
+                            "Le fichier n'existe plus sur le disque."),
+    "summary.active": ("preuzimanje u toku", "downloading", "Download läuft", "descargando", "téléchargement en cours"),
+    "summary.waiting": ("čeka: {count}", "waiting: {count}", "wartend: {count}", "en espera: {count}",
+                        "en attente : {count}"),
+    "summary.done": ("završeno: {count}", "finished: {count}", "fertig: {count}", "terminados: {count}",
+                     "terminés : {count}"),
+    "summary.failed": ("neuspjelo: {count}", "failed: {count}", "fehlgeschlagen: {count}", "fallidos: {count}",
+                       "échecs : {count}"),
+
+    # pomoć i zatvaranje
+    "help.browser_text": (
+        "1. Otvori edge://extensions (ili chrome://extensions).\n2. Uključi „Developer mode“ i klikni „Load unpacked“.\n"
+        "3. Izaberi folder:\n   {folder}\n\nNa stranici pokreni video i klikni ikonu Video Download. "
+        "Ako aplikacija nije pokrenuta, klik je sam pokreće.\n\nVideo zaštićen DRM-om (Netflix, Disney+…) se ne može preuzeti.",
+        "1. Open edge://extensions (or chrome://extensions).\n2. Turn on “Developer mode” and click “Load unpacked”.\n"
+        "3. Choose the folder:\n   {folder}\n\nPlay a video on the page and click the Video Download icon. "
+        "If the app is not running, the click starts it.\n\nDRM-protected video (Netflix, Disney+…) cannot be downloaded.",
+        "1. edge://extensions (oder chrome://extensions) öffnen.\n2. „Entwicklermodus“ einschalten und „Entpackt laden“ klicken.\n"
+        "3. Ordner wählen:\n   {folder}\n\nVideo auf der Seite abspielen und auf das Symbol Video Download klicken. "
+        "Läuft die App nicht, wird sie durch den Klick gestartet.\n\nDRM-geschützte Videos (Netflix, Disney+…) können nicht heruntergeladen werden.",
+        "1. Abre edge://extensions (o chrome://extensions).\n2. Activa «Modo de desarrollador» y pulsa «Cargar desempaquetada».\n"
+        "3. Elige la carpeta:\n   {folder}\n\nReproduce un vídeo en la página y pulsa el icono de Video Download. "
+        "Si la aplicación no está abierta, el clic la inicia.\n\nLos vídeos con DRM (Netflix, Disney+…) no se pueden descargar.",
+        "1. Ouvrez edge://extensions (ou chrome://extensions).\n2. Activez « Mode développeur » et cliquez sur « Charger l'extension non empaquetée ».\n"
+        "3. Choisissez le dossier :\n   {folder}\n\nLancez une vidéo sur la page et cliquez sur l'icône Video Download. "
+        "Si l'application n'est pas ouverte, le clic la démarre.\n\nLes vidéos protégées par DRM (Netflix, Disney+…) ne peuvent pas être téléchargées.",
+    ),
+    "about.text": ("Video Download {version}\n\nLična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).",
+                   "Video Download {version}\n\nPersonal app for downloading video and audio (yt-dlp, ffmpeg).",
+                   "Video Download {version}\n\nPersönliche App zum Herunterladen von Video und Audio (yt-dlp, ffmpeg).",
+                   "Video Download {version}\n\nAplicación personal para descargar vídeo y audio (yt-dlp, ffmpeg).",
+                   "Video Download {version}\n\nApplication personnelle pour télécharger vidéo et audio (yt-dlp, ffmpeg)."),
+    "close.title": ("Preuzimanje u toku", "Download in progress", "Download läuft", "Descarga en curso",
+                    "Téléchargement en cours"),
+    "close.text": ("Preuzimanje je u toku. Prekinuti ga i zatvoriti program?",
+                   "A download is in progress. Stop it and close the app?",
+                   "Ein Download läuft. Abbrechen und die App schließen?",
+                   "Hay una descarga en curso. ¿Detenerla y cerrar la aplicación?",
+                   "Un téléchargement est en cours. L'arrêter et fermer l'application ?"),
+    "startup.warning": ("Upozorenje: {problems}", "Warning: {problems}", "Warnung: {problems}", "Aviso: {problems}",
+                        "Avertissement : {problems}"),
+    "startup.bridge": ("veza sa browserom ne radi ({error})", "browser connection is not working ({error})",
+                       "Browser-Verbindung funktioniert nicht ({error})", "la conexión con el navegador no funciona ({error})",
+                       "la connexion au navigateur ne fonctionne pas ({error})"),
+    "startup.register": ("registracija za browser nije uspjela ({error})", "browser registration failed ({error})",
+                         "Browser-Registrierung fehlgeschlagen ({error})", "falló el registro en el navegador ({error})",
+                         "l'enregistrement auprès du navigateur a échoué ({error})"),
+
+    # napredak
+    "progress.downloading": ("Preuzimanje", "Downloading", "Herunterladen", "Descargando", "Téléchargement"),
+    "progress.video": ("video", "video", "Video", "vídeo", "vidéo"),
+    "progress.audio": ("zvuk", "audio", "Ton", "audio", "son"),
+    "progress.eta": ("još {time}", "{time} left", "noch {time}", "quedan {time}", "encore {time}"),
+    "pp.merge": ("Spajanje videa i zvuka", "Merging video and audio", "Video und Ton werden zusammengeführt",
+                 "Uniendo vídeo y audio", "Fusion de la vidéo et du son"),
+    "pp.extract_audio": ("Konverzija zvuka", "Converting audio", "Ton wird konvertiert", "Convirtiendo audio",
+                         "Conversion du son"),
+    "pp.processing": ("Obrada", "Processing", "Verarbeitung", "Procesando", "Traitement"),
+
+    # red
+    "row.waiting": ("Čeka", "Waiting", "Wartet", "En espera", "En attente"),
+    "row.starting": ("Pokreće se…", "Starting…", "Startet…", "Iniciando…", "Démarrage…"),
+    "row.done": ("Završeno", "Finished", "Fertig", "Terminado", "Terminé"),
+    "row.exists": ("Već postoji", "Already exists", "Bereits vorhanden", "Ya existe", "Existe déjà"),
+    "row.failed": ("Greška: {message}", "Error: {message}", "Fehler: {message}", "Error: {message}", "Erreur : {message}"),
+    "row.cancelled": ("Otkazano", "Cancelled", "Abgebrochen", "Cancelado", "Annulé"),
+    "row.download_tip": ("Preuzmi ovaj video", "Download this video", "Dieses Video herunterladen",
+                         "Descargar este vídeo", "Télécharger cette vidéo"),
+    "row.stop_tip": ("Zaustavi ovaj video", "Stop this video", "Dieses Video stoppen", "Detener este vídeo",
+                     "Arrêter cette vidéo"),
+    "row.reveal_tip": ("Prikaži u folderu", "Show in folder", "Im Ordner anzeigen", "Mostrar en la carpeta",
+                       "Afficher dans le dossier"),
+    "row.retry_tip": ("Pokušaj ponovo", "Try again", "Erneut versuchen", "Reintentar", "Réessayer"),
+    "row.play_video": ("Pusti video", "Play video", "Video abspielen", "Reproducir vídeo", "Lire la vidéo"),
+    "row.play_audio": ("Pusti zvuk", "Play audio", "Audio abspielen", "Reproducir audio", "Lire le son"),
+    "row.remove_tip": ("Ukloni sa liste", "Remove from list", "Aus der Liste entfernen", "Quitar de la lista",
+                       "Retirer de la liste"),
+    "row.cancel_remove_tip": ("Prekini i ukloni", "Stop and remove", "Abbrechen und entfernen", "Detener y quitar",
+                              "Arrêter et retirer"),
+    "row.format_tip": ("Promijeni format za ovaj video", "Change the format for this video",
+                       "Format für dieses Video ändern", "Cambiar el formato de este vídeo",
+                       "Changer le format de cette vidéo"),
+    "drop.title": ("Prevuci link ovdje", "Drop a link here", "Link hier ablegen", "Suelta un enlace aquí",
+                   "Déposez un lien ici"),
+    "drop.paste": ("ili ga zalijepi iz clipboarda", "or paste it from the clipboard", "oder aus der Zwischenablage einfügen",
+                   "o pégalo desde el portapapeles", "ou collez-le depuis le presse-papiers"),
+    "drop.folder": ("Preuzimanja idu u: {folder}", "Downloads go to: {folder}", "Downloads werden gespeichert in: {folder}",
+                    "Las descargas se guardan en: {folder}", "Les téléchargements vont dans : {folder}"),
+
+    # formati
+    "preset.best": ("Video – najbolji kvalitet (MP4)", "Video – best quality (MP4)", "Video – beste Qualität (MP4)",
+                    "Vídeo – mejor calidad (MP4)", "Vidéo – meilleure qualité (MP4)"),
+    "preset.best.short": ("MP4 najbolji", "MP4 best", "MP4 beste", "MP4 mejor", "MP4 meilleure"),
+    "preset.1080p": ("Video – do 1080p (MP4)", "Video – up to 1080p (MP4)", "Video – bis 1080p (MP4)",
+                     "Vídeo – hasta 1080p (MP4)", "Vidéo – jusqu'à 1080p (MP4)"),
+    "preset.1080p.short": ("MP4 1080p", "MP4 1080p", "MP4 1080p", "MP4 1080p", "MP4 1080p"),
+    "preset.720p": ("Video – do 720p (MP4)", "Video – up to 720p (MP4)", "Video – bis 720p (MP4)",
+                    "Vídeo – hasta 720p (MP4)", "Vidéo – jusqu'à 720p (MP4)"),
+    "preset.720p.short": ("MP4 720p", "MP4 720p", "MP4 720p", "MP4 720p", "MP4 720p"),
+    "preset.480p": ("Video – do 480p (MP4)", "Video – up to 480p (MP4)", "Video – bis 480p (MP4)",
+                    "Vídeo – hasta 480p (MP4)", "Vidéo – jusqu'à 480p (MP4)"),
+    "preset.480p.short": ("MP4 480p", "MP4 480p", "MP4 480p", "MP4 480p", "MP4 480p"),
+    "preset.mp3": ("Samo zvuk – MP3", "Audio only – MP3", "Nur Ton – MP3", "Solo audio – MP3", "Son uniquement – MP3"),
+    "preset.mp3.short": ("MP3", "MP3", "MP3", "MP3", "MP3"),
+    "preset.m4a": ("Samo zvuk – M4A", "Audio only – M4A", "Nur Ton – M4A", "Solo audio – M4A", "Son uniquement – M4A"),
+    "preset.m4a.short": ("M4A", "M4A", "M4A", "M4A", "M4A"),
+
+    "error.drm": ("Video je zaštićen DRM-om (npr. Netflix, Apple TV+, Disney+) i ne može se preuzeti.",
+                  "The video is DRM-protected (e.g. Netflix, Apple TV+, Disney+) and cannot be downloaded.",
+                  "Das Video ist DRM-geschützt (z. B. Netflix, Apple TV+, Disney+) und kann nicht heruntergeladen werden.",
+                  "El vídeo está protegido con DRM (p. ej. Netflix, Apple TV+, Disney+) y no se puede descargar.",
+                  "La vidéo est protégée par DRM (p. ex. Netflix, Apple TV+, Disney+) et ne peut pas être téléchargée."),
+
+    # ažuriranje
+    "update.latest": ("Imaš najnoviju verziju ({version}).", "You have the latest version ({version}).",
+                      "Du hast die neueste Version ({version}).", "Tienes la versión más reciente ({version}).",
+                      "Vous avez la dernière version ({version})."),
+    "update.available_title": ("Nova verzija", "New version", "Neue Version", "Nueva versión", "Nouvelle version"),
+    "update.available_text": ("Dostupna je verzija {new} (imaš {current}).\n\n{notes}\n\nPreuzeti i instalirati sada?",
+                              "Version {new} is available (you have {current}).\n\n{notes}\n\nDownload and install now?",
+                              "Version {new} ist verfügbar (installiert: {current}).\n\n{notes}\n\nJetzt herunterladen und installieren?",
+                              "La versión {new} está disponible (tienes {current}).\n\n{notes}\n\n¿Descargar e instalar ahora?",
+                              "La version {new} est disponible (vous avez {current}).\n\n{notes}\n\nTélécharger et installer maintenant ?"),
+    "update.downloading": ("Preuzimam ažuriranje…", "Downloading update…", "Update wird heruntergeladen…",
+                           "Descargando actualización…", "Téléchargement de la mise à jour…"),
+    "update.cancel": ("Otkaži", "Cancel", "Abbrechen", "Cancelar", "Annuler"),
+    "update.failed": ("Ažuriranje nije uspjelo: {error}", "Update failed: {error}", "Update fehlgeschlagen: {error}",
+                      "La actualización falló: {error}", "La mise à jour a échoué : {error}"),
+    "update.dev_only": ("Dostupna je verzija {new}. Automatska instalacija radi samo u instaliranoj aplikaciji.",
+                        "Version {new} is available. Automatic installation only works in the installed app.",
+                        "Version {new} ist verfügbar. Die automatische Installation funktioniert nur in der installierten App.",
+                        "La versión {new} está disponible. La instalación automática solo funciona en la aplicación instalada.",
+                        "La version {new} est disponible. L'installation automatique ne fonctionne que dans l'application installée."),
+    "update.checksum": ("Preuzeti fajl nije ispravan (SHA-256 se ne poklapa).",
+                        "The downloaded file is not valid (SHA-256 mismatch).",
+                        "Die heruntergeladene Datei ist ungültig (SHA-256 stimmt nicht überein).",
+                        "El archivo descargado no es válido (el SHA-256 no coincide).",
+                        "Le fichier téléchargé n'est pas valide (SHA-256 différent)."),
+    "update.no_asset": ("Izdanje nema instalacioni fajl.", "The release has no installer file.",
+                        "Das Release enthält keine Installationsdatei.", "La versión no tiene archivo de instalación.",
+                        "La version ne contient pas de fichier d'installation."),
+    "update.busy": ("Sačekaj da se završi preuzimanje, pa pokušaj ponovo.",
+                    "Wait for the download to finish, then try again.",
+                    "Warte, bis der Download fertig ist, und versuche es dann erneut.",
+                    "Espera a que termine la descarga y vuelve a intentarlo.",
+                    "Attendez la fin du téléchargement, puis réessayez."),
+}
+
+
+def pick_language(locale_name: str | None) -> str:
+    """Jezik iz oznake kao „sr_Latn_RS", „de-AT" ili „bs"; bosanski/srpski/hrvatski idu na bosanski."""
+    code = (locale_name or "").replace("-", "_").split("_")[0].lower()
+    if code in ("bs", "sr", "hr", "sh", "cnr"):
+        return "bs"
+    return code if code in LANGUAGES else FALLBACK
+
+
+def set_language(code: str) -> str:
+    global _current
+    _current = code if code in LANGUAGES else FALLBACK
+    return _current
+
+
+def get_language() -> str:
+    return _current
+
+
+def tr(key: str, **values) -> str:
+    texts = TEXTS.get(key)
+    if texts is None:
+        return key
+    text = texts[_ORDER.index(_current)]
+    return text.format(**values) if values else text

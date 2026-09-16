@@ -100,6 +100,28 @@ def find_running_app(path: Path | None = None) -> dict | None:
     return bridge if status == 200 and data.get("app") == "videodl" else None
 
 
+def saved_language() -> str | None:
+    """Jezik iz podešavanja aplikacije kad ona nije pokrenuta (za popup dodatka)."""
+    if os.environ.get("VIDEODL_DATA_DIR"):
+        try:
+            for line in (data_dir() / "settings.ini").read_text(encoding="utf-8").splitlines():
+                if line.startswith("language="):
+                    return line.split("=", 1)[1].strip() or None
+        except OSError:
+            return None
+        return None
+    if sys.platform != "win32":
+        return None
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\VideoDownload\VideoDownload") as key:
+            value, _ = winreg.QueryValueEx(key, "language")
+            return str(value) or None
+    except OSError:
+        return None
+
+
 def launch_app(command: list[str]) -> None:
     options = {"stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL,
                "stderr": subprocess.DEVNULL, "close_fds": True}
@@ -120,9 +142,15 @@ def handle(message: dict, config: dict, *, bridge_file: Path | None = None, laun
     action = message.get("action") if isinstance(message, dict) else None
     bridge = find_running_app(bridge_file)
     if action == "status":
-        return {"ok": True, "running": bridge is not None}
+        language = None
+        if bridge is not None:
+            try:
+                language = call_app(bridge, "GET", "/ping", timeout=2.0)[1].get("language")
+            except OSError:
+                pass
+        return {"ok": True, "running": bridge is not None, "language": language or saved_language()}
     if action != "add":
-        return {"ok": False, "error": f"Nepoznata radnja: {action}"}
+        return {"ok": False, "code": "connection", "detail": f"unknown action: {action}"}
 
     launched = False
     if bridge is None:
@@ -133,14 +161,14 @@ def handle(message: dict, config: dict, *, bridge_file: Path | None = None, laun
             sleep(0.25)
             bridge = find_running_app(bridge_file)
         if bridge is None:
-            return {"ok": False, "launched": True, "error": "Aplikacija se nije javila na vrijeme."}
+            return {"ok": False, "launched": True, "code": "app-timeout"}
 
     try:
         status, data = call_app(bridge, "POST", "/add", message.get("request"))
     except OSError as exc:
-        return {"ok": False, "launched": launched, "error": f"Veza sa aplikacijom nije uspjela: {exc}"}
+        return {"ok": False, "launched": launched, "code": "connection", "detail": str(exc)}
     if status != 200:
-        return {"ok": False, "launched": launched, "error": data.get("error") or f"Greška aplikacije ({status})."}
+        return {"ok": False, "launched": launched, "code": "connection", "detail": data.get("error") or f"HTTP {status}"}
     return {"ok": True, "launched": launched}
 
 
@@ -155,7 +183,7 @@ def main() -> int:
             return 0
         reply = handle(message, load_config(Path(__file__).resolve().parent))
     except Exception as exc:  # ekstenzija mora dobiti odgovor i kad nešto pukne
-        reply = {"ok": False, "error": f"Greška hosta: {exc}"}
+        reply = {"ok": False, "code": "connection", "detail": f"host: {exc}"}
     write_message(sys.stdout.buffer, reply)
     return 0
 
