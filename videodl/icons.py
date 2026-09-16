@@ -38,6 +38,15 @@ def _download_solid(p: QPainter, color: QColor) -> None:
     p.fillPath(path, color)
 
 
+def _play(p: QPainter, color: QColor) -> None:
+    path = QPainterPath()
+    path.moveTo(8, 5.5)
+    path.lineTo(18.5, 12)
+    path.lineTo(8, 18.5)
+    path.closeSubpath()
+    p.fillPath(path, color)
+
+
 def _stop(p: QPainter, color: QColor) -> None:
     path = QPainterPath()
     path.addRoundedRect(QRectF(6.5, 6.5, 11, 11), 1.5, 1.5)
@@ -70,6 +79,7 @@ _DRAW = {
     "plus": _plus,
     "download": _download,
     "download-solid": _download_solid,
+    "play": _play,
     "stop": _stop,
     "folder": _folder,
     "retry": _retry,

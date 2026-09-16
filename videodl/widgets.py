@@ -1,5 +1,7 @@
 """Widgeti glavnog prozora: prazan ekran za lijepljenje linka i red preuzimanja."""
 
+import os
+
 from PySide6.QtCore import QPoint, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
@@ -169,6 +171,7 @@ class _DashedBox(QWidget):
 
 class QueueRow(QFrame):
     action_clicked = Signal(int)
+    play_clicked = Signal(int)
     remove_clicked = Signal(int)
     format_clicked = Signal(int, QPoint)
 
@@ -211,6 +214,16 @@ class QueueRow(QFrame):
         self.progress.hide()
         text.addWidget(self.progress)
         layout.addLayout(text, 1)
+
+        self.play_button = QToolButton()
+        self.play_button.setObjectName("rowAction")
+        self.play_button.setIcon(icon("play", "#5f6368"))
+        self.play_button.setIconSize(QSize(20, 20))
+        self.play_button.setFixedSize(34, 34)
+        self.play_button.setToolTip("Pusti video")
+        self.play_button.clicked.connect(lambda: self.play_clicked.emit(self.item_id))
+        self.play_button.hide()
+        layout.addWidget(self.play_button, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.action_button = QToolButton()
         self.action_button.setObjectName("rowAction")
@@ -262,6 +275,9 @@ class QueueRow(QFrame):
             self._set_action("retry", "#5f6368", "Pokušaj ponovo")
 
         self.progress.setVisible(active)
+        can_play = item.status == ItemStatus.DONE and bool(item.filepath) and os.path.isfile(item.filepath)
+        self.play_button.setVisible(can_play)
+        self.play_button.setToolTip("Pusti zvuk" if can_play and get_preset(item.preset_key).is_audio else "Pusti video")
         self.remove_button.setToolTip("Prekini i ukloni" if active else "Ukloni sa liste")
         self.status_label.setToolTip(item.filepath or item.message)
 

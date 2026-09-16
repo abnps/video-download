@@ -5,6 +5,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
@@ -146,6 +147,41 @@ class MainWindowTest(unittest.TestCase):
         window._clear_finished()
         self.assertEqual(window._rows, {})
         self.assertEqual(window.stack.currentIndex(), 0)
+
+    def test_play_button_opens_downloaded_file(self):
+        target = os.path.join(self.tmp.name, "a.mp4")
+
+        def download_real_file(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            with open(target, "wb") as file:
+                file.write(b"x" * 2048)
+            return DownloadResult(ItemStatus.DONE, filepath=target)
+
+        window = self.make_window(download_real_file)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        row = window._rows[item.id]
+        self.assertTrue(row.play_button.isHidden())  # nema šta da se pusti prije preuzimanja
+
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        self.assertFalse(row.play_button.isHidden())
+        self.assertEqual(row.play_button.toolTip(), "Pusti video")
+        self.assertIn("2 KB", row.status_label.text())
+        if os.environ.get("VIDEODL_SCREENSHOT"):
+            window.resize(820, 200)
+            window.show()
+            wait_until(lambda: False, timeout=0.2)
+            window.grab().save(os.environ["VIDEODL_SCREENSHOT"].replace(".png", "-pusti.png"))
+        with mock.patch("videodl.gui.play_file") as play:
+            row.play_button.click()
+        play.assert_called_once_with(target)
+
+        os.remove(target)
+        with mock.patch("videodl.gui.play_file") as play:
+            row.play_button.click()
+        play.assert_not_called()
+        self.assertIn("ne postoji", window.status_label.text())
 
     def test_invalid_clipboard_and_probe_error_are_reported(self):
         window = self.make_window(self.quick_download)

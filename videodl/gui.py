@@ -637,6 +637,14 @@ class MainWindow(QMainWindow):
         self._start_next()
 
     @Slot(int)
+    def _on_row_play(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None or not item.filepath or not os.path.isfile(item.filepath):
+            self._set_status("Fajl više ne postoji na disku.")
+            return
+        play_file(item.filepath)
+
+    @Slot(int)
     def _on_row_remove(self, item_id: int) -> None:
         item = self._queue.get(item_id)
         if item is None:
@@ -694,6 +702,7 @@ class MainWindow(QMainWindow):
     def _append_row(self, item: QueueItem) -> None:
         row = QueueRow(item)
         row.action_clicked.connect(self._on_row_action)
+        row.play_clicked.connect(self._on_row_play)
         row.remove_clicked.connect(self._on_row_remove)
         row.format_clicked.connect(self._on_row_format)
         self._rows[item.id] = row
@@ -836,6 +845,11 @@ def reveal(path: str) -> None:
     if sys.platform == "win32" and os.path.isfile(path):
         subprocess.Popen(f'explorer /select,"{os.path.normpath(path)}"')
         return
+    QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
+
+def play_file(path: str) -> None:
+    """Otvara preuzeti fajl u podrazumijevanom playeru (Filmovi i TV, VLC…)."""
     QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
 
