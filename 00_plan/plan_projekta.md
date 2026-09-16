@@ -74,6 +74,8 @@ Exit gate:
 - [x] E2E „video koji se pušta" u feedu (lokalna stranica nalik X-u): uzeta
       objava videa koji se pušta, ne link taba ni prvi video.
 - [ ] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa YouTube-a, X-a i TikToka.
+      17.9.2026: X potvrđen; TikTok potvrđen preko „Preuzmi video koji se pušta"
+      (dodatak v0.3.2). YouTube preko dodatka još nije potvrđen.
 
 Poznato ograničenje: prekid dok yt-dlp još čita informacije o videu (prije prvog
 bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
