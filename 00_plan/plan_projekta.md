@@ -90,7 +90,8 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 - [x] Video iza prijave (17.9.2026, Ahmed izričito potvrdio „Kolačići prijave"):
   opciona dozvola `cookies` kroz dijalog browsera, samo kolačići tog sajta, privremeni
   fajl za yt-dlp se briše odmah. E2E: stranica iza prijave preuzeta, 0× 403.
-  Instagram stories čekaju Ahmedovu provjeru na pravom nalogu.
+  17.9.2026 Ahmed potvrdio: Instagram radi (dodatak v0.4.1, poslije popravke linka
+  muzike /reels/audio/).
 
 ## Faza 3 — Pakovanje
 
