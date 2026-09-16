@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="bs">
+<head>
+  <meta charset="utf-8">
+  <title>Video Download</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" alt="" width="20" height="20">
+    <h1>Video Download</h1>
+    <span id="app-status" class="app-status"></span>
+  </header>
+
+  <p id="page-title" class="page-title"></p>
+
+  <p id="drm" class="notice danger" hidden>
+    Ova stranica koristi DRM zaštitu (Netflix, Disney+, Prime Video i slično). Takav video se ne može preuzeti.
+  </p>
+
+  <button id="download-page" class="primary" type="button">Preuzmi video sa stranice</button>
+  <p class="hint">Radi za YouTube i oko 1.800 poznatih sajtova. Ako ne uspije, izaberi pronađeni tok ispod.</p>
+
+  <section>
+    <h2>Pronađeni video tokovi</h2>
+    <ul id="media-list" class="media-list"></ul>
+    <p id="media-empty" class="hint">Još ništa. Pokreni video na stranici, pa ponovo otvori ovaj prozor.</p>
+  </section>
+
+  <p id="result" class="result" role="status"></p>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

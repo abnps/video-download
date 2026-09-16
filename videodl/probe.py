@@ -28,8 +28,9 @@ class ProbeResult:
     is_playlist: bool
 
 
-def probe(url: str, extract: Extractor | None = None, logger=None) -> ProbeResult:
-    extract = extract or _make_extractor(logger)
+def probe(url: str, extract: Extractor | None = None, logger=None,
+          http_headers: dict[str, str] | None = None) -> ProbeResult:
+    extract = extract or _make_extractor(logger, http_headers)
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
@@ -64,9 +65,11 @@ def _title(info: dict, fallback: str) -> str:
     return info.get("title") or info.get("id") or fallback
 
 
-def _make_extractor(logger) -> Extractor:
+def _make_extractor(logger, http_headers: dict[str, str] | None) -> Extractor:
     opts = base_options(logger)
     opts["extract_flat"] = "in_playlist"
+    if http_headers:
+        opts["http_headers"] = dict(http_headers)
 
     def extract(url: str) -> dict:
         with YoutubeDL(opts) as ydl:

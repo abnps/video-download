@@ -11,6 +11,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QSettings  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
+from videodl.browser import BrowserRequest  # noqa: E402
 from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  # noqa: E402
 from videodl.gui import (  # noqa: E402
     COL_STATUS, MainWindow, format_eta, format_progress, format_speed,
@@ -32,7 +33,7 @@ def wait_until(condition, timeout=5.0):
     return condition()
 
 
-def fake_probe(url):
+def fake_probe(url, http_headers=None):
     if "lista" in url:
         return ProbeResult("Moja lista", (Entry("https://v/1", "Prvi"), Entry("https://v/2", "Drugi")), True)
     if "lose" in url:
@@ -58,6 +59,7 @@ class MainWindowTest(unittest.TestCase):
         self.settings = QSettings(os.path.join(self.tmp.name, "settings.ini"), QSettings.Format.IniFormat)
         self.release = threading.Event()
         self.calls = []
+        self.extras = []
 
     def tearDown(self):
         self.release.set()
@@ -69,12 +71,13 @@ class MainWindowTest(unittest.TestCase):
         self.addCleanup(window.deleteLater)
         return window
 
-    def quick_download(self, url, preset, output_dir, subfolder, on_progress, cancel_event):
+    def quick_download(self, url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
         self.calls.append((url, preset.key, output_dir, subfolder))
+        self.extras.append(extra)
         on_progress(Progress(DOWNLOADING, 0.5, 1024, 3))
         return DownloadResult(ItemStatus.DONE, filepath=os.path.join(output_dir, f"{url[-1]}.mp4"))
 
-    def blocking_download(self, url, preset, output_dir, subfolder, on_progress, cancel_event):
+    def blocking_download(self, url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
         self.calls.append((url, preset.key, output_dir, subfolder))
         on_progress(Progress(DOWNLOADING, 0.1, None, None))
         while not cancel_event.is_set() and not self.release.is_set():
@@ -143,6 +146,39 @@ class MainWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: first.status == ItemStatus.DONE
                                    and second.status == ItemStatus.DONE))
         self.assertEqual([c[0] for c in self.calls], ["https://v/a", "https://v/a", "https://v/b"])
+
+    def test_browser_media_request_goes_straight_to_queue_with_headers(self):
+        window = self.make_window(self.quick_download)
+        window.preset_combo.setCurrentIndex(window.preset_combo.findData("720p"))
+        headers = {"Referer": "https://sajt.ba/lekcija", "User-Agent": "UA"}
+        # Emit iz druge niti, kao što radi lokalni most.
+        threading.Thread(target=window.browser_request.emit, args=(BrowserRequest(
+            "https://sajt.ba/lekcija", "Lekcija 3", "https://cdn.sajt.ba/a/index.m3u8", "hls", headers),)).start()
+
+        self.assertTrue(wait_until(lambda: window._queue.items()
+                                   and window._queue.items()[0].status == ItemStatus.DONE))
+        item = window._queue.items()[0]
+        self.assertEqual(item.title, "Lekcija 3")
+        self.assertEqual(self.calls, [("https://cdn.sajt.ba/a/index.m3u8", "720p", self.tmp.name, None)])
+        self.assertEqual(self.extras, [{"http_headers": headers, "filename_title": "Lekcija 3"}])
+        self.assertIn("Iz browsera", window.status_label.text())
+
+    def test_browser_page_request_is_probed_with_headers(self):
+        seen = []
+
+        def probe_with_headers(url, http_headers=None):
+            seen.append((url, http_headers))
+            return ProbeResult("Video", (Entry(url, "Video"),), False)
+
+        window = MainWindow(settings=self.settings, probe_fn=probe_with_headers, download_fn=self.quick_download)
+        self.addCleanup(window.deleteLater)
+        window.folder_edit.setText(self.tmp.name)
+        window.browser_request.emit(BrowserRequest("https://www.youtube.com/watch?v=x", "YT", headers={"User-Agent": "UA"}))
+
+        self.assertTrue(wait_until(lambda: window._queue.items()
+                                   and window._queue.items()[0].status == ItemStatus.DONE))
+        self.assertEqual(seen, [("https://www.youtube.com/watch?v=x", {"User-Agent": "UA"})])
+        self.assertEqual(self.extras, [{"http_headers": {"User-Agent": "UA"}, "filename_title": None}])
 
     def test_settings_are_restored(self):
         self.settings.setValue("output_dir", r"D:\Filmovi")

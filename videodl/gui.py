@@ -1,5 +1,6 @@
 """Glavni prozor: unos linkova, izbor formata i foldera, red preuzimanja."""
 
+import contextlib
 import os
 import shutil
 import subprocess
@@ -8,7 +9,7 @@ import threading
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QSettings, Qt, QUrl, Signal, Slot
-from PySide6.QtGui import QColor, QDesktopServices
+from PySide6.QtGui import QColor, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QHeaderView,
     QLabel, QLineEdit, QMainWindow, QMessageBox, QProgressBar, QPushButton, QTableWidget,
@@ -16,7 +17,11 @@ from PySide6.QtWidgets import (
 )
 
 from . import __version__
+from .bridge import BridgeServer
+from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
+from .native_host import call_app, data_dir, find_running_app
+from .native_messaging import PROJECT_ROOT, install_native_host
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
@@ -86,17 +91,19 @@ def missing_tools() -> list[str]:
 class ProbeJob(QObject):
     """Čita linkove u pozadinskoj niti. Signali se u glavnoj niti isporučuju redom."""
 
-    probed = Signal(object, str, str)  # ProbeResult, preset_key, output_dir
+    probed = Signal(object, str, str, object)  # ProbeResult, preset_key, output_dir, zaglavlja
     failed = Signal(str, str)  # link, poruka
     finished = Signal(int)  # id posla
 
-    def __init__(self, job_id: int, urls: list[str], preset_key: str, output_dir: str, probe_fn):
+    def __init__(self, job_id: int, urls: list[str], preset_key: str, output_dir: str, probe_fn,
+                 http_headers: dict[str, str] | None = None):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
         self._preset_key = preset_key
         self._output_dir = output_dir
         self._probe_fn = probe_fn
+        self._http_headers = dict(http_headers or {})
 
     def start(self) -> None:
         # daemon: čitanje linka se ne može prekinuti, a ne smije držati program pri zatvaranju
@@ -105,7 +112,8 @@ class ProbeJob(QObject):
     def _run(self) -> None:
         for url in self._urls:
             try:
-                self.probed.emit(self._probe_fn(url), self._preset_key, self._output_dir)
+                result = self._probe_fn(url, http_headers=self._http_headers)
+                self.probed.emit(result, self._preset_key, self._output_dir, self._http_headers)
             except Exception as exc:  # granica radne niti
                 self.failed.emit(url, error_message(exc))
         self.finished.emit(self.job_id)
@@ -119,6 +127,7 @@ class DownloadJob(QObject):
         super().__init__()
         self.item_id = item.id
         self._args = (item.url, get_preset(item.preset_key), item.output_dir, item.subfolder)
+        self._extra = {"http_headers": dict(item.http_headers), "filename_title": item.filename_title}
         self._download_fn = download_fn
         self._cancel = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
@@ -135,7 +144,7 @@ class DownloadJob(QObject):
     def _run(self) -> None:
         try:
             result = self._download_fn(*self._args, on_progress=self._report,
-                                       cancel_event=self._cancel)
+                                       cancel_event=self._cancel, **self._extra)
         except Exception as exc:  # granica radne niti
             result = DownloadResult(ItemStatus.FAILED, message=error_message(exc))
         self.finished.emit(self.item_id, result)
@@ -145,8 +154,14 @@ class DownloadJob(QObject):
 
 
 class MainWindow(QMainWindow):
+    # Stižu iz niti lokalnog mosta; Qt ih isporučuje u glavnoj niti.
+    browser_request = Signal(object)  # BrowserRequest
+    focus_requested = Signal()
+
     def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download):
         super().__init__()
+        self.browser_request.connect(self._on_browser_request)
+        self.focus_requested.connect(self._bring_to_front)
         self._settings = settings if settings is not None else QSettings("VideoDownload", "VideoDownload")
         self._probe_fn = probe_fn
         self._download_fn = download_fn
@@ -288,8 +303,11 @@ class MainWindow(QMainWindow):
             self._set_status(f"Ovo nije link: {invalid[0]}")
             return
         self.url_edit.clear()
+        self._start_probe(urls)
+
+    def _start_probe(self, urls: list[str], http_headers: dict[str, str] | None = None) -> None:
         job = ProbeJob(self._next_probe_id, urls, self.preset_combo.currentData(),
-                       self.folder_edit.text(), self._probe_fn)
+                       self.folder_edit.text(), self._probe_fn, http_headers)
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -299,14 +317,37 @@ class MainWindow(QMainWindow):
                          else f"Učitavam informacije o {len(urls)} linka…")
         job.start()
 
-    @Slot(object, str, str)
-    def _on_probed(self, result: ProbeResult, preset_key: str, output_dir: str) -> None:
+    @Slot(object)
+    def _on_browser_request(self, request: BrowserRequest) -> None:
+        if request.media_url is None:
+            self._start_probe([request.page_url], request.headers)
+            return
+        # Direktan tok (MP4/HLS/DASH) nema šta da se čita unaprijed: odmah ide u red.
+        item = self._queue.add(request.media_url, request.page_title, self.preset_combo.currentData(),
+                               self.folder_edit.text(), http_headers=request.headers,
+                               filename_title=request.page_title)
+        self._append_row(item)
+        self._set_status(f"Iz browsera: {request.page_title}")
+        self._start_next()
+
+    @Slot()
+    def _bring_to_front(self) -> None:
+        if self.isMinimized():
+            self.showNormal()
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
+    @Slot(object, str, str, object)
+    def _on_probed(self, result: ProbeResult, preset_key: str, output_dir: str,
+                   http_headers: dict[str, str]) -> None:
         if not result.entries:
             self._set_status(f"Plejlista „{result.title}“ nema dostupnih videa.")
             return
         subfolder = result.title if result.is_playlist else None
         for entry in result.entries:
-            self._append_row(self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder))
+            self._append_row(self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
+                                             http_headers=http_headers))
         if result.is_playlist:
             self._set_status(f"Dodana plejlista „{result.title}“: {len(result.entries)} videa.")
         else:
@@ -544,9 +585,41 @@ def reveal(path: str) -> None:
     QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
 
+def _settings() -> QSettings:
+    # VIDEODL_DATA_DIR odvaja podešavanja (npr. za testove) od korisnikovih u registry-ju.
+    if os.environ.get("VIDEODL_DATA_DIR"):
+        return QSettings(str(data_dir() / "settings.ini"), QSettings.Format.IniFormat)
+    return QSettings("VideoDownload", "VideoDownload")
+
+
 def main() -> int:
+    # Druga instanca samo podigne prozor prve (npr. dvoklik na pokreni.bat dok aplikacija radi).
+    running = find_running_app()
+    if running is not None:
+        with contextlib.suppress(OSError):
+            call_app(running, "POST", "/focus")
+        return 0
+
     app = QApplication(sys.argv)
     app.setApplicationName("Video Download")
-    window = MainWindow()
+    app.setWindowIcon(QIcon(str(PROJECT_ROOT / "extension" / "icons" / "icon128.png")))
+    window = MainWindow(settings=_settings())
+
+    problems = []
+    bridge = BridgeServer(window.browser_request.emit, window.focus_requested.emit)
+    try:
+        bridge.start()
+    except OSError as exc:
+        problems.append(f"veza sa browserom ne radi ({exc})")
+    try:
+        install_native_host()
+    except OSError as exc:
+        problems.append(f"registracija za browser nije uspjela ({exc})")
+    if problems:
+        window._set_status("Upozorenje: " + "; ".join(problems))
+
     window.show()
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        bridge.stop()

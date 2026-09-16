@@ -1,3 +1,2 @@
 @echo off
-cd /d "%~dp0"
-start "" pythonw -m videodl
+start "" pythonw "%~dp0pokreni.pyw"

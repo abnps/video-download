@@ -1,0 +1,174 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --text: #1f1f24;
+  --muted: #6b6b76;
+  --border: #e2e2e8;
+  --accent: #6c4ce0;
+  --accent-text: #ffffff;
+  --ok: #2e7d32;
+  --danger: #c62828;
+  --danger-bg: #fdecec;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c21;
+    --text: #ececf1;
+    --muted: #a0a0ab;
+    --border: #33333b;
+    --accent: #7c5cff;
+    --ok: #66bb6a;
+    --danger: #ef5350;
+    --danger-bg: #3a1f22;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  margin: 0;
+  padding: 12px 14px 14px;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+h2 {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-status {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.page-title {
+  margin: 8px 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+button {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.primary {
+  width: 100%;
+  padding: 8px 10px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.notice {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+.notice.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.media-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.media-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+
+.media-list li:first-child {
+  border-top: none;
+}
+
+.kind {
+  flex: none;
+  min-width: 42px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.size {
+  flex: none;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.media-list button {
+  flex: none;
+  padding: 3px 8px;
+}
+
+.result {
+  min-height: 1.4em;
+  margin: 12px 0 0;
+}
+
+.result.ok {
+  color: var(--ok);
+}
+
+.result.error {
+  color: var(--danger);
+}

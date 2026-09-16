@@ -24,6 +24,19 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Prekid preuzimanja briše samo privremene fajlove tog pokušaja, nikad ranije
   preuzete fajlove.
 
+## Browser integracija — sigurnosna pravila
+
+- Put: ekstenzija → native host (browser dozvoljava samo `EXTENSION_ID` iz
+  `native_messaging.py`, koji proizlazi iz `key` u `extension/manifest.json`) →
+  lokalni most u aplikaciji (samo 127.0.0.1, tajni token iz `bridge.json`, provjera
+  `Host` zaglavlja). Nijednu od ovih provjera ne slabiti.
+- Promjena `key` u manifestu mijenja ID ekstenzije i prekida vezu.
+- Registracija piše samo u HKCU (`NativeMessagingHosts` za Chrome i Edge).
+- Kolačići/prijava: ekstenzija trenutno NEMA pristup kolačićima. Ahmed je odobrio
+  slanje kolačića samo za sajt sa kog se preuzima, ali ga je sigurnosni filter
+  blokirao; ne dodavati bez Ahmedove nove izričite potvrde.
+- DRM se ne zaobilazi; ekstenzija ga samo prepoznaje i označava.
+
 ## Okruženje
 
 - Globalni Python 3.14 (paketi iz `requirements.txt`). Ne praviti `.venv` u ovom
@@ -35,6 +48,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 ## Rad
 
-- Testovi: `python -m unittest discover -s tests` (GUI testovi rade offscreen).
+- Testovi: `python -m unittest discover -s tests` (GUI testovi rade offscreen) i
+  `node --test "tests/extension/*.test.mjs"`.
+- Poslije izmjene ekstenzije, hosta ili mosta: `node tools/e2e_browser/run.mjs`
+  (pravi Edge sa privremenim profilom i `--load-extension`; ne dira Ahmedov profil).
 - Najmanja izmjena koja rješava zahtjev; bez refaktorisanja nepovezanog koda.
 - Commit samo poslije zelenih testova; push na `origin/main` privatnog repoa.

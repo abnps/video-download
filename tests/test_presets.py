@@ -33,6 +33,26 @@ class PresetOptionsTest(unittest.TestCase):
         for forbidden in '/:?':
             self.assertNotIn(forbidden, subfolder)
 
+    def test_browser_stream_uses_page_title_and_headers(self):
+        preset = get_preset("best")
+        opts = build_ydl_options(preset, r"C:\d", http_headers={"Referer": "https://a.ba/"},
+                                 filename_title="Lekcija: 100% <uvod>",
+                                 source_url="https://cdn.a.ba/x/index.m3u8?token=1")
+        name = opts["outtmpl"].rsplit(os.sep, 1)[1]
+        self.assertTrue(name.endswith("].%(ext)s"))
+        self.assertIn("100%%", name)
+        for forbidden in ':<>':
+            self.assertNotIn(forbidden, name)
+        self.assertEqual(opts["http_headers"], {"Referer": "https://a.ba/"})
+
+        # Potpis u linku se mijenja, putanja toka ne: ime fajla ostaje isto.
+        same = build_ydl_options(preset, r"C:\d", filename_title="Lekcija: 100% <uvod>",
+                                 source_url="https://cdn.a.ba/x/index.m3u8?token=2")
+        other = build_ydl_options(preset, r"C:\d", filename_title="Lekcija: 100% <uvod>",
+                                  source_url="https://cdn.a.ba/y/index.m3u8")
+        self.assertEqual(opts["outtmpl"], same["outtmpl"])
+        self.assertNotEqual(opts["outtmpl"], other["outtmpl"])
+
     def test_js_runtimes_include_node(self):
         opts = build_ydl_options(get_preset("best"), r"C:\Preuzimanja")
         self.assertIn("node", opts["js_runtimes"])

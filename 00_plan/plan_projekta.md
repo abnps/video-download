@@ -14,6 +14,15 @@ drugih sajtova koje podržava yt-dlp. Samo za ličnu upotrebu.
 - Git: lokalni repo + privatni GitHub repo.
 - Titlovi i thumbnail: nisu u prvoj verziji.
 
+## Odluke (16.9.2026, Ahmed) — preuzimanje iz browsera
+
+- Aplikacija preuzima svaki video pokrenut u browseru ili zadat URL-om (osim DRM).
+- Edge/Chrome ekstenzija; kad aplikacija nije pokrenuta, klik je automatski pokreće
+  (registracija samo za trenutnog korisnika, HKCU).
+- Video iza prijave: Ahmed je odobrio slanje kolačića samo za taj sajt, bez čuvanja.
+  Automatski sigurnosni filter Claude Code-a blokirao je ekstenziju sa pristupom
+  kolačićima, pa ovaj dio čeka Ahmedovu izričitu potvrdu (vidi Faza 2).
+
 ## Van obima
 
 - Zaobilaženje DRM-a, plaćeni/zaštićeni sadržaj bez pristupa, piratski izvori.
@@ -26,14 +35,24 @@ formati MP4 (najbolji / 1080p / 720p / 480p) i MP3/M4A, ukupan napredak
 (video + zvuk), zaustavljanje sa čišćenjem privremenih fajlova, ponavljanje
 neuspjelih stavki, izbor foldera, pamćenje podešavanja.
 
+Browser integracija: Edge/Chrome ekstenzija prepoznaje tokove (MP4/WebM, HLS,
+DASH) i DRM, šalje stranicu ili izabrani tok aplikaciji preko native messaging
+hosta (dozvoljen samo ID naše ekstenzije) i lokalnog mosta sa tokenom; prosljeđuje
+Referer i User-Agent; pokreće aplikaciju ako nije pokrenuta.
+
 Exit gate:
 - [x] Automatski testovi prolaze (logika, red, GUI offscreen) — 33 testa, 16.9.2026.
+- [x] Browser dio: 52 Python + 7 JS testova; E2E u pravom Edge-u
+      (`node tools/e2e_browser/run.mjs`, 16.9.2026): tokovi prepoznati, klik je
+      pokrenuo ugašenu aplikaciju, HLS koji traži Referer preuzet (0 odgovora 403),
+      stranica preuzeta preko yt-dlp-a, DRM stranica označena; fajlovi H.264 + AAC.
 - [x] Živi test na pravom linku (16.9.2026, „Me at the zoo", jNQXAC9IVRw):
       MP4 najbolji = H.264 + AAC, 19 s (ffprobe); ponovno pokretanje prepoznaje
       postojeći fajl; MP3 192 kbps; plejlista i kanal (@jawed) se čitaju;
       prekid usred preuzimanja i tokom drugog dijela (zvuk) reaguje odmah i ne
       ostavlja nijedan fajl. Napredak je monoton za video + zvuk.
 - [ ] Ahmed pokrenuo `pokreni.bat` i potvrdio da prozor i preuzimanje rade.
+- [ ] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa prave stranice.
 
 Poznato ograničenje: prekid dok yt-dlp još čita informacije o videu (prije prvog
 bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
@@ -45,7 +64,10 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 - Provjera/ažuriranje yt-dlp-a iz aplikacije (YouTube se često mijenja).
 - Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
 - Brži prekid u fazi čitanja informacija (prije početka preuzimanja).
-- Kolačići iz browsera za sadržaj koji traži prijavu (samo Ahmedov nalog).
+- Video iza prijave: kolačići samo za sajt sa kog se preuzima, samo za to preuzimanje
+  (privremeni cookies fajl za yt-dlp, briše se odmah). Ahmed je odobrio 16.9.2026,
+  ali čeka izričitu potvrdu zbog sigurnosnog filtera; prijedlog je da ekstenzija
+  pristup kolačićima traži tek na prvi takav klik (dijalog browsera).
 
 ## Faza 3 — Pakovanje
 

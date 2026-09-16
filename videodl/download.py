@@ -153,13 +153,16 @@ class _Attempt:
 
 def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = None,
              on_progress: Callable[[Progress], None] | None = None,
-             cancel_event: threading.Event | None = None) -> DownloadResult:
+             cancel_event: threading.Event | None = None, *,
+             http_headers: dict[str, str] | None = None,
+             filename_title: str | None = None) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED, message="Otkazano")
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
-    opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger())
+    opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
+                             filename_title=filename_title, source_url=url)
     opts["progress_hooks"] = [attempt.progress_hook]
     opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
     try:

@@ -1,8 +1,10 @@
 """Predefinisani formati preuzimanja i pretvaranje u yt-dlp opcije."""
 
+import hashlib
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from yt_dlp.utils import sanitize_filename
 
@@ -57,16 +59,17 @@ def safe_folder_name(name: str, fallback: str = "Plejlista") -> str:
 
 
 def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = None,
-                      logger=None) -> dict:
+                      logger=None, *, http_headers: dict[str, str] | None = None,
+                      filename_title: str | None = None, source_url: str | None = None) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
-    # '%' u imenu foldera yt-dlp bi čitao kao dio šablona.
-    escaped_dir = str(target_dir).replace("%", "%%")
 
     opts = base_options(logger)
     opts["format"] = preset.format
-    opts["outtmpl"] = escaped_dir + os.sep + OUTPUT_NAME
+    opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _output_name(filename_title, source_url)
+    if http_headers:
+        opts["http_headers"] = dict(http_headers)
     if preset.format_sort:
         opts["format_sort"] = list(preset.format_sort)
     if preset.merge_output_format:
@@ -79,3 +82,19 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo.
         opts["final_ext"] = preset.audio_codec
     return opts
+
+
+def _escape(text: str) -> str:
+    # '%' u putanji ili naslovu yt-dlp bi čitao kao dio šablona.
+    return text.replace("%", "%%")
+
+
+def _output_name(filename_title: str | None, source_url: str | None) -> str:
+    if not filename_title:
+        return OUTPUT_NAME
+    # Direktan tok (npr. index.m3u8) nema smislen naslov ni id, pa ime daje naslov
+    # stranice, a kratki otisak putanje toka razlikuje različite videe istog naslova.
+    title = sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"
+    parts = urlsplit(source_url or "")
+    fingerprint = hashlib.sha1(f"{parts.netloc}{parts.path}".encode("utf-8")).hexdigest()[:8]
+    return f"{_escape(title)} [{fingerprint}].%(ext)s"

@@ -1,6 +1,6 @@
 """Red čekanja preuzimanja, bez zavisnosti od GUI-ja."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 
 
@@ -23,6 +23,9 @@ class QueueItem:
     status: ItemStatus = ItemStatus.WAITING
     message: str = ""
     filepath: str | None = None
+    # Stavke iz browsera: zaglavlja koja server toka traži i naslov stranice za ime fajla.
+    http_headers: dict[str, str] = field(default_factory=dict)
+    filename_title: str | None = None
 
 
 class DownloadQueue:
@@ -31,8 +34,10 @@ class DownloadQueue:
         self._next_id = 1
 
     def add(self, url: str, title: str, preset_key: str, output_dir: str,
-            subfolder: str | None = None) -> QueueItem:
-        item = QueueItem(self._next_id, url, title, preset_key, output_dir, subfolder)
+            subfolder: str | None = None, *, http_headers: dict[str, str] | None = None,
+            filename_title: str | None = None) -> QueueItem:
+        item = QueueItem(self._next_id, url, title, preset_key, output_dir, subfolder,
+                         http_headers=dict(http_headers or {}), filename_title=filename_title)
         self._next_id += 1
         self._items.append(item)
         return item
