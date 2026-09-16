@@ -9,7 +9,7 @@ export function findPlayingVideo() {
     /\/(?:reels?|p|tv)\/(?!(?:audio|hashtag|search|explore|create|tags?)(?:\/|\?|$))[\w-]{5,}(?:\/|\?|$)/,
     /\/videos?\/(?!(?:search|hashtag)(?:\/|\?|$))[\w.-]+/, // Facebook, Vimeo i slični
     /\/shorts\/[\w-]+/, // YouTube Shorts
-    /\/watch\?(?:.*&)?v=[\w-]+/, // YouTube
+    /\/watch\/?\?(?:.*&)?v=[\w-]+/, // YouTube /watch?v=, Facebook /watch/?v=
   ];
 
   function postUrl(href) {
@@ -25,6 +25,10 @@ export function findPlayingVideo() {
     // X: /status/123/photo/1, /analytics i slično vode na istu objavu.
     const status = /^(.*\/status(?:es)?\/\d+)/.exec(url.pathname);
     if (status) return url.origin + status[1];
+    // watch?v=: zadrži samo ID videa; Facebook dodaje parametre praćenja (__cft__, __tn__).
+    if (/\/watch\/?$/.test(url.pathname) && url.searchParams.get("v")) {
+      return `${url.origin}${url.pathname}?v=${encodeURIComponent(url.searchParams.get("v"))}`;
+    }
     url.hash = "";
     return url.href;
   }
@@ -87,6 +91,13 @@ export function findPlayingVideo() {
   }
   // Kartica objave može imati i drugi <video> (npr. zamućenu pozadinu), pa se traži i po oznaci.
   const card = video.closest('article, [data-e2e="recommend-list-item-container"], [data-e2e*="item-container"]') || item;
+
+  // Facebook feed bez linka objave: ID videa stoji u data-video-id kartice.
+  if (!found && /(^|\.)facebook\.com$/.test(location.hostname)) {
+    const holder = card.querySelector("[data-video-id]") || video.closest("[data-video-id]");
+    const id = holder && holder.getAttribute("data-video-id");
+    if (/^\d+$/.test(id || "")) found = `${location.origin}/watch/?v=${id}`;
+  }
 
   // TikTok feed nema link /video/: ID je u omotaču playera (xgwrapper-<n>-<ID>) ili u
   // drugom id/data atributu kartice, a autor je /@ link u istoj objavi.

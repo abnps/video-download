@@ -42,6 +42,16 @@ IG_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Instagram f
 IG_REEL = """<!doctype html><html><head><meta charset="utf-8"><title>Reel C1a2</title></head><body>
 <video src="/media/clip.mp4" controls width="320"></video></body></html>"""
 
+# Feed nalik Facebooku: profilni linkovi, zatim /watch/?v=<ID> sa parametrima praćenja.
+FB_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Facebook feed</title></head><body>
+<div><a href="/profile.php?id=61592126996949&__cft__[0]=abc">Stranica</a>
+<a href="/watch/?v=4367297626856076&__cft__[0]=AZh&__tn__=%2CO%2CP-R">video</a>
+<video id="f" src="/media/clip.mp4" muted loop width="480" height="270"></video></div>
+<script>document.getElementById('f').play();</script></body></html>"""
+
+FB_WATCH = """<!doctype html><html><head><meta charset="utf-8"><title>Watch 4367</title></head><body>
+<video src="/media/clip.mp4" controls width="320"></video></body></html>"""
+
 # Sadržaj iza prijave: stranica postavi kolačić sesije; objava i njen video bez njega vraćaju 403.
 SESSION_COOKIE = "sesija=tajna-e2e"
 PRIVATE_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Privatni feed</title></head><body>
@@ -109,6 +119,10 @@ def serve(work: Path) -> None:
                 return self._html(FEED)
             if self.path == "/korisnik/status/222":
                 return self._html(POST)
+            if self.path == "/fb-feed.html":
+                return self._html(FB_FEED)
+            if self.path == "/watch/?v=4367297626856076":
+                return self._html(FB_WATCH)
             if self.path == "/ig-feed.html":
                 return self._html(IG_FEED)
             if self.path == "/reel/C1a2B3c4D5e/":

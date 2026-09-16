@@ -212,6 +212,21 @@ async function run(cdp, report) {
   report.reelFile = path.relative(OUT, reelFile);
   log("Reel:", report.reelReply, "->", report.reelFile);
 
+  // 5c) Feed nalik Facebooku: /watch/?v=<ID> se prepozna, parametri praćenja se uklone
+  const { targetId: fbTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/fb-feed.html` });
+  const fbTab = await tabState(`${SITE}/fb-feed.html`, "() => true");
+  const beforeFb = new Set(filesIn(OUT));
+  const fbPopup = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?tabId=${fbTab.tabId}`);
+  await waitFor(() => cdp.evaluate(fbPopup, `!document.getElementById("download-playing").disabled`), 10000, "popup facebook");
+  await cdp.send("Target.activateTarget", { targetId: fbTarget });
+  await sleep(2500);
+  await cdp.evaluate(fbPopup, `document.getElementById("download-playing").click()`);
+  report.watchReply = await popupResult(cdp, fbPopup, "");
+  if (!report.watchReply.endsWith("/watch/?v=4367297626856076")) throw new Error(`Pogrešan Facebook link: ${report.watchReply}`);
+  const watchFile = await waitFor(() => filesIn(OUT).find((f) => !beforeFb.has(f) && path.basename(f).startsWith("Watch 4367")), 90000, "fajl facebook videa");
+  report.watchFile = path.relative(OUT, watchFile);
+  log("Facebook watch:", report.watchReply, "->", report.watchFile);
+
   // 6) Iza prijave: objava i video bez kolačića sesije vraćaju 403
   const { targetId: privateTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/privatno.html` });
   const privateTab = await tabState(`${SITE}/privatno.html`, "() => true");
