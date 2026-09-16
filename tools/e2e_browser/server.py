@@ -32,6 +32,15 @@ FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Početna / Fee
 POST = """<!doctype html><html><head><meta charset="utf-8"><title>Objava 222</title></head><body>
 <video src="/media/clip.mp4" controls width="320"></video></body></html>"""
 
+# Feed nalik Instagramu: prvi link u objavi je muzika (/reels/audio/), tek drugi je sam reel.
+IG_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Instagram feed</title></head><body>
+<article><a href="/reels/audio/1277456000520564/">Original audio</a><a href="/reel/C1a2B3c4D5e/">reel</a>
+<video id="r" src="/media/clip.mp4" muted loop width="360" height="640"></video></article>
+<script>document.getElementById('r').play();</script></body></html>"""
+
+IG_REEL = """<!doctype html><html><head><meta charset="utf-8"><title>Reel C1a2</title></head><body>
+<video src="/media/clip.mp4" controls width="320"></video></body></html>"""
+
 # Sadržaj iza prijave: stranica postavi kolačić sesije; objava i njen video bez njega vraćaju 403.
 SESSION_COOKIE = "sesija=tajna-e2e"
 PRIVATE_FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Privatni feed</title></head><body>
@@ -99,6 +108,10 @@ def serve(work: Path) -> None:
                 return self._html(FEED)
             if self.path == "/korisnik/status/222":
                 return self._html(POST)
+            if self.path == "/ig-feed.html":
+                return self._html(IG_FEED)
+            if self.path == "/reel/C1a2B3c4D5e/":
+                return self._html(IG_REEL)
             if self.path == "/privatno.html":
                 return self._html(PRIVATE_FEED, set_cookie=f"{SESSION_COOKIE}; Path=/; HttpOnly")
             if self.path.startswith("/privatno/"):

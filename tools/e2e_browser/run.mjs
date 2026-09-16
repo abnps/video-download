@@ -197,6 +197,21 @@ async function run(cdp, report) {
   report.playingFile = path.relative(OUT, playingFile);
   log("Video koji se pušta:", report.playingReply, "->", report.playingFile);
 
+  // 5b) Feed nalik Instagramu: link muzike (/reels/audio/) ne smije biti uzet kao video
+  const { targetId: igTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/ig-feed.html` });
+  const igTab = await tabState(`${SITE}/ig-feed.html`, "() => true");
+  const beforeIg = new Set(filesIn(OUT));
+  const igPopup = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?tabId=${igTab.tabId}`);
+  await waitFor(() => cdp.evaluate(igPopup, `!document.getElementById("download-playing").disabled`), 10000, "popup instagram");
+  await cdp.send("Target.activateTarget", { targetId: igTarget });
+  await sleep(2500);
+  await cdp.evaluate(igPopup, `document.getElementById("download-playing").click()`);
+  report.reelReply = await popupResult(cdp, igPopup, "");
+  if (report.reelReply.includes("/reels/audio/")) throw new Error(`Poslan link muzike: ${report.reelReply}`);
+  const reelFile = await waitFor(() => filesIn(OUT).find((f) => !beforeIg.has(f) && path.basename(f).startsWith("Reel C1a2")), 90000, "fajl reela");
+  report.reelFile = path.relative(OUT, reelFile);
+  log("Reel:", report.reelReply, "->", report.reelFile);
+
   // 6) Iza prijave: objava i video bez kolačića sesije vraćaju 403
   const { targetId: privateTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/privatno.html` });
   const privateTab = await tabState(`${SITE}/privatno.html`, "() => true");

@@ -4,7 +4,8 @@ export function findPlayingVideo() {
   const POST_PATTERNS = [
     /\/status(?:es)?\/\d+/, // X / Twitter
     /\/video\/\d+/, // TikTok
-    /\/(?:reel|reels|p|tv)\/[\w-]+/, // Instagram, Facebook
+    // Instagram, Facebook: /reels/audio/… je stranica muzike, ne video (isto isključuje i yt-dlp)
+    /\/(?:reels?|p|tv)\/(?!audio\/)[\w-]{5,}/,
     /\/videos?\/[\w.-]+/, // Facebook, Vimeo i slični
     /\/shorts\/[\w-]+/, // YouTube Shorts
     /\/watch\?(?:.*&)?v=[\w-]+/, // YouTube
@@ -50,8 +51,10 @@ export function findPlayingVideo() {
   // Penje se od videa kroz roditelje dok je u njima samo taj jedan video (jedna
   // objava u feedu) i uzima link objave; link sa <time> je na X-u link same objave.
   let found = null;
-  // Instagram storija: link je sam tab (/stories/<nalog>/<id>/); okolni linkovi vode na tuđe storije.
-  if (/(^|\.)instagram\.com$/.test(location.hostname) && /^\/stories\/[^/]+\/\d+/.test(location.pathname)) {
+  // Instagram storija ili otvoren reel: link je sam tab; okolni linkovi vode na tuđe
+  // storije, muziku (/reels/audio/) ili druge reelove.
+  if (/(^|\.)instagram\.com$/.test(location.hostname)
+      && /^\/(?:stories\/[^/]+(?:\/\d+)?|(?:[^/]+\/)?(?:reels?|p|tv)\/(?!audio\/)[\w-]{5,})\/?$/.test(location.pathname)) {
     found = location.origin + location.pathname;
   }
   for (let node = video.parentElement; !found && node && node !== document.body; node = node.parentElement) {
