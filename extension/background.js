@@ -158,6 +158,17 @@ async function sendPlaying(tabId) {
   const request = { page_url: tab.url, page_title: tab.title || "", headers: { "User-Agent": navigator.userAgent } };
   let target = "stranica";
   const feedSite = /(^|\.)(tiktok\.com|x\.com|twitter\.com|instagram\.com|facebook\.com)$/.test(new URL(tab.url).hostname);
+  const instagramStory = /(^|\.)instagram\.com$/.test(new URL(tab.url).hostname)
+    && new URL(tab.url).pathname.startsWith("/stories/");
+  if (best && instagramStory && !best.directSrc) {
+    // yt-dlp stories preuzima samo uz prijavu (kolačiće), a dodatak ih ne šalje.
+    await flashBadge(tabId, false);
+    return {
+      ok: false,
+      error: "Instagram stories se mogu preuzeti samo uz prijavu (kolačiće), a to još nije uključeno. "
+        + `Dijagnostika: ${JSON.stringify(best.debug)}`,
+    };
+  }
   if (best && !best.postUrl && !best.directSrc && feedSite) {
     // Link feeda yt-dlp ne može preuzeti; bolje jasna poruka nego neuspio red u aplikaciji.
     await flashBadge(tabId, false);
