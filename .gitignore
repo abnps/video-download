@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build
+build/
+dist/
+*.log
+
+# Preuzeti mediji ne pripadaju repozitorijumu
+*.mp4
+*.mkv
+*.webm
+*.m4a
+*.mp3
+*.part
+*.ytdl
+
+# Editor/OS
+.idea/
+.vscode/
+Thumbs.db
