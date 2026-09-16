@@ -23,6 +23,16 @@ drugih sajtova koje podržava yt-dlp. Samo za ličnu upotrebu.
   Automatski sigurnosni filter Claude Code-a blokirao je ekstenziju sa pristupom
   kolačićima, pa ovaj dio čeka Ahmedovu izričitu potvrdu (vidi Faza 2).
 
+## Zahtjev (Ahmed) — X, TikTok, YouTube i svi ostali
+
+- „Preuzmi video koji se pušta": ekstenzija nalazi video koji se pušta i link
+  njegove objave (feed na X/TikTok/Instagram/Facebook), yt-dlp preuzima objavu.
+- yt-dlp sa `curl-cffi` (predstavljanje kao browser). X javne objave rade bez
+  prijave (provjereno: HLS 720p). TikTok stari primjeri iz yt-dlp testova vraćaju
+  „IP blocked" za ovu mrežu; aktuelni TikTok nije moguće automatski provjeriti jer
+  TikTok i X automatizovanom Edge-u daju captcha/403 → potrebna Ahmedova ručna provjera.
+- Video iza prijave (privatni nalozi, neki TikTok/X/Instagram) i dalje čeka odluku o kolačićima.
+
 ## Odluka (16.9.2026, Ahmed) — izgled
 
 - GUI po uzoru na DVDVideoSoft „Free YouTube to MP3 Converter": svijetao prozor,
@@ -61,7 +71,9 @@ Exit gate:
       prekid usred preuzimanja i tokom drugog dijela (zvuk) reaguje odmah i ne
       ostavlja nijedan fajl. Napredak je monoton za video + zvuk.
 - [ ] Ahmed pokrenuo `pokreni.bat` i potvrdio da prozor i preuzimanje rade.
-- [ ] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa prave stranice.
+- [x] E2E „video koji se pušta" u feedu (lokalna stranica nalik X-u): uzeta
+      objava videa koji se pušta, ne link taba ni prvi video.
+- [ ] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa YouTube-a, X-a i TikToka.
 
 Poznato ograničenje: prekid dok yt-dlp još čita informacije o videu (prije prvog
 bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.

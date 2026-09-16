@@ -1,6 +1,7 @@
 import { formatSize, kindLabel } from "./detect.js";
 
 const pageButton = document.getElementById("download-page");
+const playingButton = document.getElementById("download-playing");
 const resultLine = document.getElementById("result");
 let pageSupported = false;
 
@@ -41,6 +42,7 @@ function renderMedia(tab, state) {
 function setBusy(busy) {
   for (const button of document.querySelectorAll("button")) button.disabled = busy;
   pageButton.disabled = busy || !pageSupported;
+  playingButton.disabled = busy || !pageSupported;
 }
 
 function setResult(text, kind) {
@@ -48,10 +50,10 @@ function setResult(text, kind) {
   resultLine.className = `result ${kind || ""}`.trim();
 }
 
-async function send(tabId, mediaUrl) {
+async function send(tabId, mediaUrl, type = "send") {
   setBusy(true);
   setResult("Šaljem u Video Download…");
-  const reply = await chrome.runtime.sendMessage({ type: "send", tabId, mediaUrl });
+  const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl });
   setBusy(false);
   if (reply?.ok) {
     setResult(reply.launched ? "Aplikacija je pokrenuta i video je dodan u red." : "Dodano u red za preuzimanje.", "ok");
@@ -66,7 +68,9 @@ async function main() {
   document.getElementById("page-title").textContent = tab.title || tab.url || "";
   pageSupported = /^https?:/.test(tab.url || "");
   pageButton.disabled = !pageSupported;
+  playingButton.disabled = !pageSupported;
   pageButton.addEventListener("click", () => send(tab.id, null));
+  playingButton.addEventListener("click", () => send(tab.id, null, "send-playing"));
 
   const state = await chrome.runtime.sendMessage({ type: "get-state", tabId: tab.id });
   renderMedia(tab, state);

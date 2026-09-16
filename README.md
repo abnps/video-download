@@ -45,9 +45,14 @@ Druga instanca se ne otvara: samo se podigne prozor već pokrenute.
 2. Edge: otvori `edge://extensions`, uključi „Developer mode", klikni
    „Load unpacked" i izaberi folder `extension` iz ovog projekta.
    Chrome: isto preko `chrome://extensions`.
-3. Na stranici sa videom pokreni video i klikni ikonu Video Download:
-   - „Preuzmi video sa stranice" za YouTube i sajtove koje yt-dlp poznaje;
-   - „Preuzmi" pored pronađenog toka za ostale sajtove.
+3. Pokreni video (i u feedu: X, TikTok, Instagram, Facebook, YouTube) i klikni
+   ikonu Video Download:
+   - **„Preuzmi video koji se pušta"** nađe video koji se pušta i link njegove
+     objave (npr. `/status/…` na X-u, `/video/…` na TikToku), pa preuzme baš njega;
+   - „Preuzmi link ove stranice" šalje link taba;
+   - „Preuzmi" pored pronađenog toka (MP4/HLS/DASH) za sajtove koje yt-dlp ne poznaje.
+
+Poslije izmjene ekstenzije klikni „Reload" kod nje u `edge://extensions`.
 
 Video ide u red sa formatom i folderom koji su trenutno izabrani u aplikaciji i
 odmah se preuzima (bez klika na „Preuzmi").

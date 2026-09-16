@@ -5,7 +5,7 @@
   "description": "Šalje video sa stranice u desktop aplikaciju Video Download (lična upotreba).",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAueeAw0acO5pG/JP9qm6uwp0rCwDNHpLixcaoVDv5zBTQOMJ11RmN/LyYeutikueKppztwO43/+1ydeEcZLrnQwpGG86ArMCGmH1dX9pgXGkMAh/X9mVMYTiBQ7dj4cPo5TLEc7uKm5psZ+4u+qNWvbtVNSAMaoP7JjQTJq5k4mQgwhtpKxPfEdWAjJuYF9b4cw3Wi+40xkuFBg4BwKaA3/dLyaqn0VuHPDWRDbd8ycgZpMZDF/EG/5x0LSYdO34X/T92JEk6Ef3mP1U33N+IlHAH1BY9FISYlwgUHbDXTUJXOdYqicSllOgddxrsdQ1zZX73E6od3VpXCWj4RIkIHQIDAQAB",
   "minimum_chrome_version": "116",
-  "permissions": ["webRequest", "storage", "nativeMessaging"],
+  "permissions": ["webRequest", "storage", "nativeMessaging", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js",

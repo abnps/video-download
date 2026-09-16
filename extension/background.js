@@ -1,4 +1,5 @@
 import { addMedia, classifyResponse, headerValue } from "./detect.js";
+import { findPlayingVideo } from "./playing.js";
 
 const NATIVE_HOST = "com.videodl.bridge";
 const WATCHED_TYPES = ["main_frame", "sub_frame", "media", "xmlhttprequest", "object", "other"];
@@ -116,6 +117,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendToApp(message.tabId, message.mediaUrl).then(sendResponse);
     return true;
   }
+  if (message?.type === "send-playing") {
+    sendPlaying(message.tabId).then(sendResponse);
+    return true;
+  }
   return false;
 });
 
@@ -134,6 +139,39 @@ async function buildRequest(tabId, mediaUrl) {
     request.headers.Referer = media.referer || tab.url;
   }
   return { request };
+}
+
+// Feed (X, TikTok, Instagram…): link taba nije link videa, pa se traži objava videa koji se pušta.
+async function sendPlaying(tabId) {
+  const tab = await chrome.tabs.get(tabId);
+  let frames = [];
+  try {
+    frames = await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: findPlayingVideo });
+  } catch {
+    // stranica ne dozvoljava skripte (npr. prodavnica ekstenzija); ide se na link taba
+  }
+  const best = frames
+    .map((frame) => frame.result)
+    .filter(Boolean)
+    .sort((a, b) => Number(b.playing) - Number(a.playing) || b.area - a.area)[0];
+
+  const request = { page_url: tab.url, page_title: tab.title || "", headers: { "User-Agent": navigator.userAgent } };
+  let target = "stranica";
+  if (best?.postUrl) {
+    request.page_url = best.postUrl;
+    target = best.postUrl;
+  } else if (best?.directSrc) {
+    request.media = { url: best.directSrc, kind: "file" };
+    request.headers.Referer = best.frameUrl;
+    target = best.directSrc;
+  } else if (!best) {
+    const reply = { ok: false, error: "Na stranici nema videa. Pokreni video pa pokušaj ponovo." };
+    await flashBadge(tabId, false);
+    return reply;
+  }
+  const reply = await sendNative({ action: "add", request });
+  await flashBadge(tabId, reply.ok);
+  return { ...reply, target };
 }
 
 async function sendToApp(tabId, mediaUrl) {

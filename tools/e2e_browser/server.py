@@ -19,6 +19,19 @@ PAGE = """<!doctype html><html><head><meta charset="utf-8"><title>E2E Lekcija 1<
 <script>fetch('/hls/index.m3u8').then(r => r.text());</script>
 </body></html>"""
 
+# Feed nalik X-u: dvije objave, pušta se samo druga; link objave nosi <time>.
+FEED = """<!doctype html><html><head><meta charset="utf-8"><title>Početna / Feed</title></head><body>
+<article><a href="/korisnik/status/111/photo/1">foto</a><a href="/korisnik/status/111"><time>1h</time></a>
+<video id="v1" src="/media/clip.mp4" muted width="480" height="270"></video></article>
+<article><a href="/korisnik"><span>@korisnik</span></a><a href="/korisnik/status/222/analytics">stat</a>
+<a href="/korisnik/status/222"><time>2h</time></a>
+<video id="v2" src="/media/clip.mp4" muted loop width="480" height="270"></video></article>
+<script>document.getElementById('v2').play();</script>
+</body></html>"""
+
+POST = """<!doctype html><html><head><meta charset="utf-8"><title>Objava 222</title></head><body>
+<video src="/media/clip.mp4" controls width="320"></video></body></html>"""
+
 DRM = """<!doctype html><html><head><meta charset="utf-8"><title>E2E DRM</title></head><body><script>
 (async () => {
   const config = [{initDataTypes: ['keyids'], videoCapabilities: [{contentType: 'video/mp4; codecs="avc1.42E01E"'}]}];
@@ -70,6 +83,10 @@ def serve(work: Path) -> None:
                 return self._html(PAGE)
             if self.path == "/drm.html":
                 return self._html(DRM)
+            if self.path == "/feed.html":
+                return self._html(FEED)
+            if self.path == "/korisnik/status/222":
+                return self._html(POST)
             if self.path.startswith("/hls/") and not (self.headers.get("Referer") or "").startswith(ORIGIN):
                 self.send_error(403, "Referer required")
                 return

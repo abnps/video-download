@@ -1,2 +1,3 @@
 PySide6>=6.11
-yt-dlp[default]>=2026.8.19
+# curl-cffi: yt-dlp se serveru predstavlja kao pravi browser (TikTok i slični sajtovi to traže)
+yt-dlp[default,curl-cffi]>=2026.8.19

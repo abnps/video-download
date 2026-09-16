@@ -169,7 +169,22 @@ async function run(cdp, report) {
   report.pageFile = path.relative(OUT, pageFile);
   log("Stranica:", report.pageReply, "->", report.pageFile);
 
-  // 5) DRM stranica
+  // 5) Feed: „Preuzmi video koji se pušta" mora uzeti objavu videa koji se pušta (222), ne link taba
+  const { targetId: feedTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/feed.html` });
+  const feed = await tabState(`${SITE}/feed.html`, "() => true");
+  const before = new Set(filesIn(OUT));
+  const feedPopup = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?tabId=${feed.tabId}`);
+  await waitFor(() => cdp.evaluate(feedPopup, `!document.getElementById("download-playing").disabled`), 10000, "dugme za video koji se pušta");
+  // Pravi popup stoji iznad vidljive stranice; skriveni tab ne pušta video.
+  await cdp.send("Target.activateTarget", { targetId: feedTarget });
+  await sleep(2500);
+  await cdp.evaluate(feedPopup, `document.getElementById("download-playing").click()`);
+  report.playingReply = await popupResult(cdp, feedPopup, "");
+  const playingFile = await waitFor(() => filesIn(OUT).find((f) => !before.has(f) && path.basename(f).startsWith("Objava 222")), 90000, "fajl objave 222");
+  report.playingFile = path.relative(OUT, playingFile);
+  log("Video koji se pušta:", report.playingReply, "->", report.playingFile);
+
+  // 6) DRM stranica
   await cdp.send("Target.createTarget", { url: `${SITE}/drm.html` });
   const drm = await tabState(`${SITE}/drm.html`, "(s) => s.drm");
   report.drmBadge = drm.badge;
