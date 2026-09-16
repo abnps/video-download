@@ -176,12 +176,19 @@ def load_config(folder: Path) -> dict:
     return json.loads((folder / "host-config.json").read_text(encoding="utf-8"))
 
 
+def current_config() -> dict:
+    if getattr(sys, "frozen", False):
+        # Instalirana verzija: videodl-host.exe stoji pored VideoDownload.exe.
+        return {"launch": [str(Path(sys.executable).resolve().with_name("VideoDownload.exe"))]}
+    return load_config(Path(__file__).resolve().parent)
+
+
 def main() -> int:
     try:
         message = read_message(sys.stdin.buffer)
         if message is None:
             return 0
-        reply = handle(message, load_config(Path(__file__).resolve().parent))
+        reply = handle(message, current_config())
     except Exception as exc:  # ekstenzija mora dobiti odgovor i kad nešto pukne
         reply = {"ok": False, "code": "connection", "detail": f"host: {exc}"}
     write_message(sys.stdout.buffer, reply)

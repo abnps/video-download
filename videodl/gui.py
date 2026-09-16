@@ -30,7 +30,8 @@ from .i18n import LANGUAGES, MESSAGE_EXISTS, get_language, pick_language, set_la
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
-from .native_messaging import PROJECT_ROOT, install_native_host
+from .native_messaging import install_native_host, uninstall_native_host
+from .runtime import extension_dir, find_tool, mark_running
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
 from . import updater
@@ -135,9 +136,9 @@ def extract_urls(text: str) -> list[str]:
 
 def missing_tools() -> list[str]:
     missing = []
-    if not shutil.which("ffmpeg"):
+    if not find_tool("ffmpeg"):
         missing.append("missing.ffmpeg")
-    if not any(shutil.which(name) for name in JS_RUNTIMES):
+    if not any(find_tool(name) for name in JS_RUNTIMES):
         missing.append("missing.js")
     return missing
 
@@ -314,13 +315,6 @@ class UpdateDownloadJob(QObject):
 def update_error_text(error: BaseException) -> str:
     key = getattr(error, "key", None)
     return tr(key) if key else error_message(error)
-
-
-def extension_dir() -> Path:
-    """Folder dodatka za „Load unpacked": pored .exe-a u instaliranoj verziji, u projektu inače."""
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent / "extension"
-    return PROJECT_ROOT / "extension"
 
 
 class MainWindow(QMainWindow):
@@ -1037,7 +1031,39 @@ def _settings() -> QSettings:
     return QSettings("VideoDownload", "VideoDownload")
 
 
+def self_test(report_path: str) -> int:
+    """Provjera paketa bez prozora: uvozi, alati i yt-dlp dodaci. Rezultat ide u JSON fajl."""
+    import importlib.util
+    import json
+
+    import yt_dlp
+
+    checks = {
+        "version": __version__,
+        "yt_dlp": yt_dlp.version.__version__,
+        "ffmpeg": find_tool("ffmpeg"),
+        "ffprobe": find_tool("ffprobe"),
+        "node": find_tool("node"),
+        "yt_dlp_ejs": importlib.util.find_spec("yt_dlp_ejs") is not None,
+        "curl_cffi": importlib.util.find_spec("curl_cffi") is not None,
+        "extension_manifest": (extension_dir() / "manifest.json").is_file(),
+        "languages": sorted(LANGUAGES),
+    }
+    ok = all(checks[key] for key in ("ffmpeg", "ffprobe", "node", "yt_dlp_ejs", "curl_cffi", "extension_manifest"))
+    checks["ok"] = ok
+    Path(report_path).write_text(json.dumps(checks, indent=2), encoding="utf-8")
+    return 0 if ok else 1
+
+
 def main() -> int:
+    args = sys.argv[1:]
+    if args[:1] == ["--self-test"] and len(args) == 2:
+        return self_test(args[1])
+    if args[:1] == ["--uninstall-browser"]:
+        # Deinstaler: ukloni registraciju za Chrome/Edge (HKCU) i generisane fajlove hosta.
+        uninstall_native_host()
+        return 0
+
     # Druga instanca samo podigne prozor prve (npr. dvoklik na pokreni.bat dok aplikacija radi).
     running = find_running_app()
     if running is not None:
@@ -1045,9 +1071,10 @@ def main() -> int:
             call_app(running, "POST", "/focus")
         return 0
 
+    mark_running()
     app = QApplication(sys.argv)
     app.setApplicationName("Video Download")
-    app.setWindowIcon(QIcon(str(PROJECT_ROOT / "extension" / "icons" / "icon128.png")))
+    app.setWindowIcon(QIcon(str(extension_dir() / "icons" / "icon128.png")))
     apply_theme(app)
     window = MainWindow(settings=_settings(), check_updates_on_start=updater.is_installed_app())
 

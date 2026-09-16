@@ -49,6 +49,20 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Preuzeti mediji nikad ne idu u ovaj folder (OneDrive). Živi testovi preuzimaju
   u privremeni folder van OneDrive-a.
 
+## Jezici, instaler i ažuriranje
+
+- 5 jezika (bs, en, de, es, fr): svaki novi tekst ide u `videodl/i18n.py` i, za popup,
+  u `extension/i18n.js`, na svih 5 jezika; testovi padaju ako prevod fali.
+  Tekstovi iz radnih niti su ključevi prevoda, prevode se tek pri prikazu.
+- Instaler: `python tools/build_release.py` (PyInstaller + Inno Setup, build van
+  OneDrive-a). `installer/Bosnian.isl` i `.iss` moraju ostati UTF-8 sa BOM-om.
+- Aplikacija ostaje LIČNA (Ahmedova odluka 17.9.2026): nema javnog repoa, sajta ni
+  prodaje bez nove odluke i pravne provjere (§95a UrhG, LG Hamburg/Uberspace).
+- Ažuriranje čita izdanja privatnog repoa `npgamy/video-download` preko `gh` prijave
+  (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
+- Instalirana verzija koristi alate iz `tools/` pored `.exe`-a (ffmpeg, ffprobe, node);
+  razvoj koristi PATH (`videodl/runtime.py`).
+
 ## Rad
 
 - Testovi: `python -m unittest discover -s tests` (GUI testovi rade offscreen) i

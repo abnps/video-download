@@ -42,6 +42,14 @@ drugih sajtova koje podržava yt-dlp. Samo za ličnu upotrebu.
 - Ponašanje kao u uzoru: zalijepljeni linkovi čekaju na „Preuzmi"; klik u browseru
   i dugme u redu odmah preuzimaju samo taj video.
 
+## Odluke (17.9.2026, Ahmed) — instaler, jezici, auto update
+
+- Instaler i aplikacija na 5 jezika: bosanski/srpski, engleski, njemački, španski, francuski.
+- ~~Javni repo izdanja~~ → 17.9.2026 Ahmed: aplikacija ostaje lična (bez sajta/prodaje/javne
+  distribucije). Izdanja u privatnom repou `npgamy/video-download`, ažuriranje preko `gh` prijave.
+- Auto update: tiho pri pokretanju (najviše jednom dnevno) + Pomoć → Provjeri ažuriranje;
+  instalira tek poslije pitanja i SHA-256 provjere.
+
 ## Van obima
 
 - Zaobilaženje DRM-a, plaćeni/zaštićeni sadržaj bez pristupa, piratski izvori.
@@ -93,7 +101,18 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
   17.9.2026 Ahmed potvrdio: Instagram radi (dodatak v0.4.1, poslije popravke linka
   muzike /reels/audio/).
 
-## Faza 3 — Pakovanje
+## Faza 3 — Pakovanje (u toku od 17.9.2026)
+
+- [x] Aplikacija i popup na 5 jezika, promjena jezika uživo; testovi provjeravaju sve prevode.
+- [x] Auto update (provjera, SHA-256, tiha instalacija) — unit testovi.
+- [ ] Instaler v0.5.0 napravljen, self-test spakovane aplikacije prošao.
+- [ ] Instalacija/deinstalacija instalera provjerena na ovom računaru.
+- [x] Instalacija/deinstalacija i tiho ažuriranje 0.5.0 → 0.5.1 provjereni lokalno (instaler
+      čeka gašenje aplikacije preko mutexa i ponovo je pokreće).
+- [ ] Prvo izdanje v0.5.0 u privatnom repou `npgamy/video-download`.
+- [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
+
+Prvobitne stavke:
 
 - PyInstaller `.exe` + bundlovan ffmpeg (vault: „PyInstaller - bundlovanje
   eksternog CLI alata (ffmpeg) uz Python app").

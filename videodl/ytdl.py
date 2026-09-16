@@ -31,14 +31,20 @@ class YdlLogger:
 
 
 def base_options(logger=None) -> dict:
-    return {
+    from .runtime import ffmpeg_location, js_runtimes
+
+    options = {
         "quiet": True,
         "noprogress": True,
         "color": "no_color",
         "noplaylist": True,
-        "js_runtimes": {name: {} for name in JS_RUNTIMES},
+        "js_runtimes": js_runtimes(),
         "logger": logger or YdlLogger(),
     }
+    location = ffmpeg_location()
+    if location:
+        options["ffmpeg_location"] = location  # ffmpeg/ffprobe iz instaliranog paketa
+    return options
 
 
 def error_message(exc: BaseException) -> str:

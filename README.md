@@ -17,7 +17,33 @@ preko linka ili direktno iz browsera (Edge/Chrome). Samo za ličnu upotrebu.
 - Ekstenzija za Edge/Chrome: prepoznaje video koji stranica pušta (MP4/WebM,
   HLS, DASH) i šalje ga aplikaciji; ako aplikacija nije pokrenuta, pokreće je.
 
-## Zahtjevi
+## Instalacija (instaler)
+
+Aplikacija je za ličnu upotrebu. Instaler `VideoDownload-Setup-<verzija>.exe` je u
+izdanjima privatnog repoa `npgamy/video-download` (GitHub → Releases).
+
+- Instaler je na 5 jezika: bosanski, engleski, njemački, španski, francuski.
+  Izabrani jezik postaje i jezik aplikacije (mijenja se u **Pomoć → Jezik**).
+- Instalira se samo za tvog korisnika (`%LOCALAPPDATA%\Programs\Video Download`),
+  bez administratorskih prava. Python, ffmpeg i Node su u paketu.
+- **Pomoć → Provjeri ažuriranje** ili tiha provjera pri pokretanju (najviše jednom
+  dnevno): nova verzija se preuzme preko GitHub CLI (`gh`) prijave na tom računaru,
+  provjeri SHA-256 i instalira preko postojeće. Bez `gh` prijave ažuriranje javlja grešku.
+- Instaler nije digitalno potpisan, pa Windows SmartScreen može pitati
+  „Više informacija → Ipak pokreni".
+
+## Izdavanje nove verzije
+
+1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
+2. `python tools/build_release.py` (build van OneDrive-a u `%LOCALAPPDATA%\VideoDownload-build`;
+   uključuje self-test spakovane aplikacije).
+3. Objavi instaler i `.sha256` kao izdanje u privatnom repou:
+
+```
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes "<šta je novo>"
+```
+
+## Zahtjevi (razvoj)
 
 - Python 3.14
 - `ffmpeg` na PATH-u (spajanje videa i zvuka, MP3/M4A, HLS)
@@ -95,6 +121,10 @@ izlaz u `%TEMP%\videodl-e2e`); pokreće i gasi test instancu aplikacije.
 - `videodl/bridge.py` — lokalni most u aplikaciji (127.0.0.1 + token)
 - `videodl/native_host.py` — native messaging host (browser ↔ aplikacija)
 - `videodl/native_messaging.py` — registracija hosta za Chrome/Edge
+- `videodl/i18n.py`, `extension/i18n.js` — prevodi (BS, EN, DE, ES, FR)
+- `videodl/updater.py` — provjera i instalacija nove verzije
+- `videodl/runtime.py` — putanje u razvoju i u instaliranoj verziji
 - `extension/` — Edge/Chrome ekstenzija (Manifest V3)
-- `tools/` — ikone i browser E2E
+- `installer/` — Inno Setup skripta i bosanski prevod instalera
+- `tools/` — ikone, build instalera i browser E2E
 - `00_plan/plan_projekta.md` — faze i exit gate-ovi

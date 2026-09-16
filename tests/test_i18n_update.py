@@ -21,6 +21,7 @@ from videodl.gui import MainWindow  # noqa: E402
 from videodl.i18n import LANGUAGES, TEXTS, get_language, pick_language, set_language, tr  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
+LATEST = "https://example.test/releases/latest"
 
 
 class TranslationsTest(unittest.TestCase):
@@ -116,24 +117,24 @@ class UpdaterTest(unittest.TestCase):
         self.assertFalse(updater.is_newer("0.4.0", "0.4.1"))
 
     def test_fetch_latest_finds_installer_and_checksum(self):
-        pages = {updater.LATEST_RELEASE_API: self.release_json()}
-        release = updater.fetch_latest(opener=self.opener(pages))
+        pages = {LATEST: self.release_json()}
+        release = updater.fetch_latest(url=LATEST, opener=self.opener(pages))
         self.assertEqual(release.version, "9.9.9")
         self.assertTrue(release.installer_url.endswith("VideoDownload-Setup-9.9.9.exe"))
         self.assertTrue(release.checksum_url.endswith(".sha256"))
         self.assertIn("nešto", release.notes)
 
     def test_prerelease_is_ignored_and_missing_installer_is_an_error(self):
-        pages = {updater.LATEST_RELEASE_API: self.release_json(prerelease=True)}
-        self.assertIsNone(updater.fetch_latest(opener=self.opener(pages)))
-        pages = {updater.LATEST_RELEASE_API: json.dumps({"tag_name": "v9", "assets": []}).encode()}
+        pages = {LATEST: self.release_json(prerelease=True)}
+        self.assertIsNone(updater.fetch_latest(url=LATEST, opener=self.opener(pages)))
+        pages = {LATEST: json.dumps({"tag_name": "v9", "assets": []}).encode()}
         with self.assertRaises(updater.UpdateError) as caught:
-            updater.fetch_latest(opener=self.opener(pages))
+            updater.fetch_latest(url=LATEST, opener=self.opener(pages))
         self.assertEqual(caught.exception.key, "update.no_asset")
 
     def test_download_verifies_sha256(self):
-        pages = {updater.LATEST_RELEASE_API: self.release_json()}
-        release = updater.fetch_latest(opener=self.opener(pages))
+        pages = {LATEST: self.release_json()}
+        release = updater.fetch_latest(url=LATEST, opener=self.opener(pages))
         with tempfile.TemporaryDirectory() as tmp:
             good = {release.checksum_url: f"{self.digest}  x.exe\n".encode(), release.installer_url: self.installer}
             progress = []
@@ -152,6 +153,51 @@ class UpdaterTest(unittest.TestCase):
         with self.assertRaises(updater.UpdateError):
             updater.fetch_latest(url="http://primjer.com/latest", opener=self.opener({}))
         self.assertEqual(self.urls, [])
+
+    def test_gh_mode_reads_private_release_and_downloads_with_gh(self):
+        release_data = json.loads(self.release_json(version="9.9.9"))
+        for asset in release_data["assets"]:
+            asset.pop("browser_download_url")  # privatni repo: preuzima se preko gh, ne preko linka
+        calls = []
+
+        def runner(args, **kwargs):
+            calls.append(args)
+            return mock.Mock(returncode=0, stdout=json.dumps(release_data), stderr="")
+
+        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}), mock.patch("videodl.updater.gh_path", return_value="gh.exe"):
+            release = updater.fetch_latest(runner=runner)
+            self.assertEqual((release.version, release.tag, release.installer_url), ("9.9.9", "v9.9.9", ""))
+            self.assertEqual(calls[0], ["gh.exe", "api", "repos/npgamy/video-download/releases/latest"])
+
+            with tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                installer = self.installer
+
+                class FakeGh:
+                    def __init__(self, args, **kwargs):
+                        self.args = args
+                        self.returncode = 0
+                        self.stderr = io.StringIO("")
+                        (target / release.installer_name).write_bytes(installer)
+                        digest = hashlib.sha256(installer).hexdigest()
+                        (target / f"{release.installer_name}.sha256").write_text(f"{digest}  x\n")
+
+                    def poll(self):
+                        return 0
+
+                path = updater.download_installer(release, target, popen=FakeGh)
+                self.assertEqual(path.read_bytes(), self.installer)
+                self.assertFalse((target / f"{release.installer_name}.sha256").exists())
+
+            not_found = lambda args, **kwargs: mock.Mock(returncode=1, stdout="", stderr="HTTP 404: Not Found")  # noqa: E731
+            self.assertIsNone(updater.fetch_latest(runner=not_found))
+
+    def test_missing_gh_is_a_translated_error(self):
+        missing = {"VIDEODL_UPDATE_URL": "", "ProgramFiles": r"Z:\nema", "LOCALAPPDATA": r"Z:\nema"}
+        with mock.patch.dict(os.environ, missing), mock.patch("shutil.which", return_value=None):
+            with self.assertRaises(updater.UpdateError) as caught:
+                updater.fetch_latest()
+        self.assertEqual(caught.exception.key, "update.no_gh")
 
     def test_installer_gets_silent_flags_and_language(self):
         with mock.patch("subprocess.Popen") as popen:

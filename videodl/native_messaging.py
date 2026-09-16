@@ -10,10 +10,10 @@ import sys
 from pathlib import Path
 
 from . import native_host
+from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
 EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REGISTRY_PATHS = (
     rf"Software\Google\Chrome\NativeMessagingHosts\{native_host.HOST_NAME}",
     rf"Software\Microsoft\Edge\NativeMessagingHosts\{native_host.HOST_NAME}",
@@ -27,18 +27,25 @@ def default_install_dir() -> Path:
 
 
 def install_native_host(install_dir: Path | None = None, python_exe: str | None = None,
-                        launch_command: list[str] | None = None, set_registry=None) -> Path:
+                        launch_command: list[str] | None = None, set_registry=None,
+                        frozen_app_dir: Path | None = None) -> Path:
     install_dir = Path(install_dir or default_install_dir())
-    python_exe = python_exe or _sibling_exe("python.exe")
-    launch_command = launch_command or [_sibling_exe("pythonw.exe"), str(PROJECT_ROOT / "pokreni.pyw")]
-
     install_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(native_host.__file__, install_dir / "host.py")
-    (install_dir / "host-config.json").write_text(
-        json.dumps({"launch": launch_command}, ensure_ascii=False, indent=2), encoding="utf-8")
-    # .bat se čita u OEM kodnoj stranici: u njemu smije biti samo ASCII putanja.
-    script = install_dir / "host.bat"
-    script.write_bytes(f'@echo off\r\n"{_ascii_path(python_exe)}" "%~dp0host.py" %*\r\n'.encode("ascii"))
+    if frozen_app_dir is None and is_frozen():
+        frozen_app_dir = app_dir()
+
+    if frozen_app_dir is not None:
+        # Instalirana verzija: host je poseban .exe pored aplikacije i sam zna gdje je aplikacija.
+        script = Path(frozen_app_dir) / HOST_EXE
+    else:
+        python_exe = python_exe or _sibling_exe("python.exe")
+        launch_command = launch_command or [_sibling_exe("pythonw.exe"), str(PROJECT_ROOT / "pokreni.pyw")]
+        shutil.copyfile(native_host.__file__, install_dir / "host.py")
+        (install_dir / "host-config.json").write_text(
+            json.dumps({"launch": launch_command}, ensure_ascii=False, indent=2), encoding="utf-8")
+        # .bat se čita u OEM kodnoj stranici: u njemu smije biti samo ASCII putanja.
+        script = install_dir / "host.bat"
+        script.write_bytes(f'@echo off\r\n"{_ascii_path(python_exe)}" "%~dp0host.py" %*\r\n'.encode("ascii"))
 
     manifest = install_dir / f"{native_host.HOST_NAME}.json"
     manifest.write_text(json.dumps({
