@@ -105,11 +105,11 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 
 - [x] Aplikacija i popup na 5 jezika, promjena jezika uživo; testovi provjeravaju sve prevode.
 - [x] Auto update (provjera, SHA-256, tiha instalacija) — unit testovi.
-- [ ] Instaler v0.5.0 napravljen, self-test spakovane aplikacije prošao.
-- [ ] Instalacija/deinstalacija instalera provjerena na ovom računaru.
+- [x] Instaler napravljen, self-test spakovane aplikacije prošao (v0.5.1, 17.9.2026).
 - [x] Instalacija/deinstalacija i tiho ažuriranje 0.5.0 → 0.5.1 provjereni lokalno (instaler
       čeka gašenje aplikacije preko mutexa i ponovo je pokreće).
-- [ ] Prvo izdanje v0.5.0 u privatnom repou `npgamy/video-download`.
+- [x] Izdanje v0.5.1 u privatnom repou `npgamy/video-download` (17.9.2026); aplikacija ga
+      čita preko `gh`. v0.5.0 označeno „NE KORISTITI" (u gh načinu pokušavala HTTP → 404).
 - [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
 
 Prvobitne stavke:
