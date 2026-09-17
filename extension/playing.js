@@ -138,6 +138,8 @@ export function findPlayingVideo() {
     frameUrl: location.href,
     playing,
     area,
+    // Prenos uživo nema kraj (duration = Infinity); takav se ne šalje u aplikaciju.
+    live: video.readyState > 0 && video.duration === Infinity,
     // Kratak opis stranice kad objava nije nađena, da se problem može popraviti.
     debug: found ? null : {
       videos: document.querySelectorAll("video").length,

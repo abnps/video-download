@@ -170,6 +170,10 @@ async function sendPlaying(tabId) {
     await flashBadge(tabId, false);
     return { ok: false, code: "feed-no-post", detail: JSON.stringify(best.debug) };
   }
+  if (best?.live) {
+    await flashBadge(tabId, false);
+    return { ok: false, code: "live" };
+  }
   if (best?.postUrl) {
     request.page_url = best.postUrl;
     target = best.postUrl;

@@ -71,6 +71,23 @@ DRM = """<!doctype html><html><head><meta charset="utf-8"><title>E2E DRM</title>
 })();
 </script></body></html>"""
 
+# Prenos uživo: MediaSource sa trajanjem Infinity (kao HLS/DASH player u toku prenosa).
+LIVE = """<!doctype html><html><head><meta charset="utf-8"><title>E2E Uživo</title></head><body>
+<article><a href="/korisnik/status/444"><time>uživo</time></a>
+<video id="live" muted width="480" height="270"></video></article><script>
+(async () => {
+  const video = document.getElementById('live');
+  const source = new MediaSource();
+  video.src = URL.createObjectURL(source);
+  await new Promise((resolve) => source.addEventListener('sourceopen', resolve, { once: true }));
+  const buffer = source.addSourceBuffer('video/mp4; codecs="avc1.64001e"');
+  buffer.appendBuffer(await (await fetch('/media/live.mp4')).arrayBuffer());
+  await new Promise((resolve) => buffer.addEventListener('updateend', resolve, { once: true }));
+  source.duration = Infinity;
+  video.play();
+})();
+</script></body></html>"""
+
 
 def make_media(site: Path) -> None:
     (site / "media").mkdir(parents=True, exist_ok=True)
@@ -82,6 +99,12 @@ def make_media(site: Path) -> None:
                         "-f", "lavfi", "-i", "sine=frequency=440", "-t", "8", "-c:v", "libx264", "-b:v", "2M",
                         "-pix_fmt", "yuv420p", "-c:a", "aac", "-movflags", "+faststart",
                         str(site / "media" / "clip.mp4")], check=True)
+    if not (site / "media" / "live.mp4").exists():
+        # Fragmentisan MP4 za MediaSource (samo slika).
+        subprocess.run([*quiet, "-f", "lavfi", "-i", "testsrc=size=640x360:rate=25", "-t", "8", "-c:v", "libx264",
+                        "-profile:v", "high", "-level", "3.0", "-pix_fmt", "yuv420p", "-an",
+                        "-movflags", "frag_keyframe+empty_moov+default_base_moof",
+                        str(site / "media" / "live.mp4")], check=True)
     if not (site / "hls" / "index.m3u8").exists():
         subprocess.run([*quiet, "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=25", "-f", "lavfi",
                         "-i", "sine=frequency=660", "-t", "8", "-c:v", "libx264", "-g", "50", "-b:v", "1M",
@@ -113,6 +136,8 @@ def serve(work: Path) -> None:
         def do_GET(self):
             if self.path in ("/", "/index.html"):
                 return self._html(PAGE)
+            if self.path == "/live.html":
+                return self._html(LIVE)
             if self.path == "/drm.html":
                 return self._html(DRM)
             if self.path == "/feed.html":

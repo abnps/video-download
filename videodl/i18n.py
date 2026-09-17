@@ -7,6 +7,7 @@ FALLBACK = "en"
 # Posebne vrijednosti poruka u redu (prevode se tek pri prikazu).
 MESSAGE_EXISTS = "@exists"
 MESSAGE_DRM = "@drm"
+MESSAGE_LIVE = "@live"
 
 _current = FALLBACK
 
@@ -226,6 +227,11 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                   "Das Video ist DRM-geschützt (z. B. Netflix, Apple TV+, Disney+) und kann nicht heruntergeladen werden.",
                   "El vídeo está protegido con DRM (p. ej. Netflix, Apple TV+, Disney+) y no se puede descargar.",
                   "La vidéo est protégée par DRM (p. ex. Netflix, Apple TV+, Disney+) et ne peut pas être téléchargée."),
+    "error.live": ("Ovo je prenos uživo (LIVE) i ne preuzima se. Preuzmi ga kad se prenos završi i snimak bude objavljen.",
+                   "This is a live stream and is not downloaded. Download it after the stream ends and the recording is published.",
+                   "Das ist ein Livestream und wird nicht heruntergeladen. Nach dem Ende laden, wenn die Aufzeichnung veröffentlicht ist.",
+                   "Es una transmisión en directo y no se descarga. Descárgala cuando termine y se publique la grabación.",
+                   "C'est un direct : il n'est pas téléchargé. Téléchargez-le quand le direct est terminé et l'enregistrement publié."),
 
     # ažuriranje
     "update.latest": ("Imaš najnoviju verziju ({version}).", "You have the latest version ({version}).",

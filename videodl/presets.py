@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 from yt_dlp.utils import sanitize_filename
 
 from .i18n import tr
-from .ytdl import base_options
+from .ytdl import base_options, reject_live
 
 # .150B ograničava naslov na 150 bajtova da putanja ne pređe Windows limit.
 OUTPUT_NAME = "%(title).150B [%(id)s].%(ext)s"
@@ -75,6 +75,7 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
     opts = base_options(logger)
     opts["format"] = preset.format
     opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _output_name(filename_title, source_url)
+    opts["match_filter"] = reject_live
     if http_headers:
         opts["http_headers"] = dict(http_headers)
     if cookiefile:

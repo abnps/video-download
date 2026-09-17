@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from yt_dlp import YoutubeDL
 
 from .browser import Cookie, cookie_file
-from .ytdl import base_options
+from .ytdl import LiveStreamError, base_options, is_live
 
 # Kanal -> tabovi (Videos, Shorts...) -> videi: dva nivoa ugnježdavanja su dovoljna.
 MAX_NESTING = 2
@@ -37,13 +37,22 @@ def probe(url: str, extract: Extractor | None = None, logger=None,
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
+        if is_live(info):
+            raise LiveStreamError("Live stream")
         return ProbeResult(title, (_entry(info, info.get("webpage_url") or url),), is_playlist=False)
-    return ProbeResult(title, tuple(_flatten(info, extract, depth=0)), is_playlist=True)
+    skipped = []
+    entries = tuple(_flatten(info, extract, depth=0, skipped=skipped))
+    if skipped and not entries:
+        raise LiveStreamError("Live stream")  # npr. tab „Live" kanala: sve stavke su prenosi uživo
+    return ProbeResult(title, entries, is_playlist=True)
 
 
-def _flatten(info: dict, extract: Extractor, depth: int) -> Iterator[Entry]:
+def _flatten(info: dict, extract: Extractor, depth: int, skipped: list) -> Iterator[Entry]:
     for entry in info.get("entries") or ():
         if not entry:
+            continue
+        if is_live(entry):
+            skipped.append(entry)  # prenos uživo u plejlisti ili kanalu se preskače
             continue
         entry_url = entry.get("url") or entry.get("webpage_url")
         if not entry_url:
@@ -51,7 +60,7 @@ def _flatten(info: dict, extract: Extractor, depth: int) -> Iterator[Entry]:
         if _is_nested_playlist(entry) and depth < MAX_NESTING:
             nested = extract(entry_url)
             if nested.get("_type") in _PLAYLIST_TYPES:
-                yield from _flatten(nested, extract, depth + 1)
+                yield from _flatten(nested, extract, depth + 1, skipped)
                 continue
         yield _entry(entry, entry_url)
 

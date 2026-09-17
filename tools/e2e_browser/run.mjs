@@ -246,6 +246,21 @@ async function run(cdp, report) {
   log("Iza prijave:", report.privateReply, "->", report.privateFile, "| 403:", report.privateForbidden);
   if (report.privateForbidden) throw new Error("Server je odbio zahtjev bez kolačića sesije");
 
+  // 6b) Prenos uživo: dodatak ga ne šalje, aplikacija ne dobija ništa
+  const { targetId: liveTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/live.html` });
+  const liveTab = await tabState(`${SITE}/live.html`, "() => true");
+  const beforeLive = new Set(filesIn(OUT));
+  const livePopup = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?tabId=${liveTab.tabId}`);
+  await waitFor(() => cdp.evaluate(livePopup, `!document.getElementById("download-playing").disabled`), 10000, "popup uživo");
+  await cdp.send("Target.activateTarget", { targetId: liveTarget });
+  await sleep(2500);
+  await cdp.evaluate(livePopup, `document.getElementById("download-playing").click()`);
+  report.liveReply = await popupResult(cdp, livePopup, "");
+  await sleep(3000);
+  report.liveNewFiles = filesIn(OUT).filter((f) => !beforeLive.has(f)).length;
+  log("Uživo:", report.liveReply, "| novih fajlova:", report.liveNewFiles);
+  if (!/uživo/i.test(report.liveReply) || report.liveNewFiles) throw new Error(`Prenos uživo nije odbijen: ${report.liveReply}`);
+
   // 7) DRM stranica
   await cdp.send("Target.createTarget", { url: `${SITE}/drm.html` });
   const drm = await tabState(`${SITE}/drm.html`, "(s) => s.drm");
