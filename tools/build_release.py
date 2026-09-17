@@ -4,6 +4,7 @@ Pokretanje iz foldera projekta:  python tools/build_release.py
 Izlaz ide van OneDrive-a: %LOCALAPPDATA%\\VideoDownload-build (ili VIDEODL_BUILD_DIR).
 """
 
+import filecmp
 import hashlib
 import json
 import os
@@ -90,6 +91,23 @@ Licence se odnose na navedene komponente; FFmpeg i Qt se mogu zamijeniti drugim 
 """, encoding="utf-8")
 
 
+def verify_package() -> None:
+    """Prekinut build je jednom ostavio male fajlove pune nula (ikone dodatka, DRM skripte)."""
+    problems = []
+    for root, target in ((PROJECT / "extension", APP / "extension"),
+                         (PROJECT / "videodl" / "assets", APP / "_internal" / "videodl" / "assets")):
+        for source in root.rglob("*"):
+            if source.is_file() and source.name != "package.json":
+                copy = target / source.relative_to(root)
+                if not copy.is_file() or not filecmp.cmp(source, copy, shallow=False):
+                    problems.append(str(copy.relative_to(APP)))
+    for path in APP.rglob("*"):
+        if path.is_file() and 0 < path.stat().st_size <= 64 * 1024 and not path.read_bytes().strip(b"\0"):
+            problems.append(str(path.relative_to(APP)))
+    if problems:
+        raise SystemExit("Paket je oštećen (razlika ili same nule): " + ", ".join(sorted(set(problems))))
+
+
 def main() -> int:
     if not ISCC.is_file():
         raise SystemExit(f"Inno Setup nije pronađen: {ISCC}")
@@ -111,6 +129,7 @@ def main() -> int:
     for tool in ("ffmpeg", "ffprobe", "node"):
         copy_tool(tool)
     write_notices()
+    verify_package()
 
     report = BUILD / "self-test.json"
     report.unlink(missing_ok=True)
