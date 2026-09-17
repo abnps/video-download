@@ -8,6 +8,7 @@ FALLBACK = "en"
 MESSAGE_EXISTS = "@exists"
 MESSAGE_DRM = "@drm"
 MESSAGE_LIVE = "@live"
+MESSAGE_RETRY = "@retry"
 
 _current = FALLBACK
 
@@ -116,7 +117,10 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
     "status.file_missing": ("Fajl više ne postoji na disku.", "The file no longer exists on disk.",
                             "Die Datei existiert nicht mehr.", "El archivo ya no existe en el disco.",
                             "Le fichier n'existe plus sur le disque."),
-    "summary.active": ("preuzimanje u toku", "downloading", "Download läuft", "descargando", "téléchargement en cours"),
+    "summary.active": ("u toku: {count}", "downloading: {count}", "läuft: {count}", "en curso: {count}",
+                       "en cours : {count}"),
+    "menu.parallel": ("Istovremenih preuzimanja", "Simultaneous downloads", "Gleichzeitige Downloads",
+                      "Descargas simultáneas", "Téléchargements simultanés"),
     "summary.waiting": ("čeka: {count}", "waiting: {count}", "wartend: {count}", "en espera: {count}",
                         "en attente : {count}"),
     "summary.done": ("završeno: {count}", "finished: {count}", "fertig: {count}", "terminados: {count}",
@@ -227,6 +231,9 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                   "Das Video ist DRM-geschützt (z. B. Netflix, Apple TV+, Disney+) und kann nicht heruntergeladen werden.",
                   "El vídeo está protegido con DRM (p. ej. Netflix, Apple TV+, Disney+) y no se puede descargar.",
                   "La vidéo est protégée par DRM (p. ex. Netflix, Apple TV+, Disney+) et ne peut pas être téléchargée."),
+    "row.retrying": ("Veza je pukla; pokušavam ponovo…", "The connection dropped; retrying…",
+                     "Verbindung abgebrochen; neuer Versuch…", "Se cortó la conexión; reintentando…",
+                     "Connexion interrompue ; nouvelle tentative…"),
     "error.live": ("Ovo je prenos uživo (LIVE) i ne preuzima se. Preuzmi ga kad se prenos završi i snimak bude objavljen.",
                    "This is a live stream and is not downloaded. Download it after the stream ends and the recording is published.",
                    "Das ist ein Livestream und wird nicht heruntergeladen. Nach dem Ende laden, wenn die Aufzeichnung veröffentlicht ist.",

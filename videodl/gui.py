@@ -26,7 +26,7 @@ from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
-from .i18n import LANGUAGES, MESSAGE_EXISTS, get_language, pick_language, set_language, tr
+from .i18n import LANGUAGES, MESSAGE_EXISTS, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
@@ -36,10 +36,18 @@ from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, set_state
-from .ytdl import JS_RUNTIMES, error_message
+from .ytdl import JS_RUNTIMES, error_message, is_network_error
 
 _URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
 MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
+
+# Pucanje veze: koliko puta aplikacija sama ponavlja i koliko čeka između pokušaja.
+MAX_AUTO_RETRIES = 3
+AUTO_RETRY_DELAY_MS = 5000
+
+# Koliko preuzimanja može ići istovremeno (Preuzimanja → Istovremeno).
+PARALLEL_CHOICES = (1, 2, 3, 4)
+DEFAULT_PARALLEL = 2
 
 STYLE = f"""
 QMainWindow, QWidget#central, QScrollArea, QWidget#rows, QWidget#dropZone {{ background: #ffffff; }}
@@ -371,7 +379,7 @@ class MainWindow(QMainWindow):
         self._running = False  # „Preuzmi" je pokrenut: red se obrađuje dok ima stavki koje čekaju
         self._manual: list[int] = []  # pojedinačno pokrenute stavke (dugme u redu, browser)
         self._remove_when_done: set[int] = set()
-        self._download_job: DownloadJob | None = None
+        self._download_jobs: dict[int, DownloadJob] = {}  # stavka -> posao u toku
         self._probe_jobs: dict[int, ProbeJob] = {}
         self._next_probe_id = 1
         self._output_dir = default_output_dir()
@@ -386,6 +394,7 @@ class MainWindow(QMainWindow):
         self.resize(820, 520)
         self.setAcceptDrops(True)
         self.setStyleSheet(STYLE)
+        self._parallel = DEFAULT_PARALLEL
         self._update_fetch = update_fetch
         self._update_check_job = None
         self._ytdlp_job = None
@@ -422,6 +431,16 @@ class MainWindow(QMainWindow):
         self.retry_failed_action = self.downloads_menu.addAction("", self._retry_failed)
         self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
         self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
+        self.downloads_menu.addSeparator()
+        self.parallel_menu = self.downloads_menu.addMenu("")
+        self.parallel_actions = QActionGroup(self)
+        self.parallel_actions.setExclusive(True)
+        for count in PARALLEL_CHOICES:
+            action = self.parallel_menu.addAction(str(count))
+            action.setCheckable(True)
+            action.setData(count)
+            action.triggered.connect(lambda _checked, value=count: self.set_parallel(value))
+            self.parallel_actions.addAction(action)
 
         self.help_menu = menu.addMenu("")
         self.check_updates_action = self.help_menu.addAction("", lambda: self.check_for_updates(manual=True))
@@ -458,6 +477,9 @@ class MainWindow(QMainWindow):
         self.retry_failed_action.setText(tr("menu.retry_failed"))
         self.clear_action.setText(tr("menu.clear_finished"))
         self.remove_all_action.setText(tr("menu.remove_all"))
+        self.parallel_menu.setTitle(tr("menu.parallel"))
+        for action in self.parallel_actions.actions():
+            action.setChecked(action.data() == self._parallel)
         self.help_menu.setTitle(tr("menu.help"))
         self.check_updates_action.setText(tr("menu.check_updates"))
         self.update_ytdlp_action.setText(tr("menu.update_ytdlp"))
@@ -558,6 +580,8 @@ class MainWindow(QMainWindow):
     def _load_settings(self) -> None:
         self.set_output_dir(self._settings.value("output_dir", default_output_dir(), type=str) or default_output_dir(),
                             save=False)
+        parallel = self._settings.value("parallel", DEFAULT_PARALLEL, type=int)
+        self._parallel = parallel if parallel in PARALLEL_CHOICES else DEFAULT_PARALLEL
         preset_key = self._settings.value("preset_key", DEFAULT_PRESET_KEY, type=str)
         self.preset_combo.blockSignals(True)
         self.preset_combo.setCurrentIndex(max(self.preset_combo.findData(preset_key), 0))
@@ -566,6 +590,16 @@ class MainWindow(QMainWindow):
     def _save_settings(self) -> None:
         self._settings.setValue("output_dir", self._output_dir)
         self._settings.setValue("preset_key", self.preset_combo.currentData())
+        self._settings.setValue("parallel", self._parallel)
+
+    def set_parallel(self, count: int) -> None:
+        """Koliko preuzimanja ide istovremeno; veći broj ne znači uvijek brže (dijeli se veza)."""
+        self._parallel = count if count in PARALLEL_CHOICES else DEFAULT_PARALLEL
+        for action in self.parallel_actions.actions():
+            action.setChecked(action.data() == self._parallel)
+        self._save_settings()
+        if self._running:
+            self._start_next()
 
     @property
     def output_dir(self) -> str:
@@ -700,30 +734,31 @@ class MainWindow(QMainWindow):
     # ---------- red preuzimanja ----------
 
     def _start_next(self) -> None:
-        if self._download_job is not None:
-            self._update_controls()
-            return
-        item = None
-        while self._manual and item is None:
-            candidate = self._queue.get(self._manual.pop(0))
-            if candidate is not None and candidate.status == ItemStatus.WAITING:
-                item = candidate
-        if item is None and self._running:
-            item = self._queue.next_waiting()
-        if item is None:
-            self._running = False
-            self._update_controls()
-            return
-
-        item.status = ItemStatus.ACTIVE
-        item.message = ""
-        self._refresh_row(item)
-        job = DownloadJob(item, self._download_fn)
-        job.progress.connect(self._on_download_progress)
-        job.finished.connect(self._on_download_finished)
-        self._download_job = job
+        """Pokreće stavke dok ih u toku ne bude onoliko koliko je izabrano (Preuzimanja → Istovremeno)."""
+        started = []
+        while len(self._download_jobs) < self._parallel:
+            item = None
+            while self._manual and item is None:
+                candidate = self._queue.get(self._manual.pop(0))
+                if candidate is not None and candidate.status == ItemStatus.WAITING:
+                    item = candidate
+            if item is None and self._running:
+                item = self._queue.next_waiting()
+            if item is None:
+                if not self._download_jobs:
+                    self._running = False
+                break
+            item.status = ItemStatus.ACTIVE
+            item.message = ""
+            self._refresh_row(item)
+            job = DownloadJob(item, self._download_fn)
+            job.progress.connect(self._on_download_progress)
+            job.finished.connect(self._on_download_finished)
+            self._download_jobs[item.id] = job
+            started.append(job)
         self._update_controls()
-        job.start()
+        for job in started:
+            job.start()
 
     @Slot(int, object)
     def _on_download_progress(self, item_id: int, progress: Progress) -> None:
@@ -735,10 +770,12 @@ class MainWindow(QMainWindow):
 
     @Slot(int, object)
     def _on_download_finished(self, item_id: int, result: DownloadResult) -> None:
-        if self._download_job is not None and self._download_job.item_id == item_id:
-            self._download_job.deleteLater()
-            self._download_job = None
+        job = self._download_jobs.pop(item_id, None)
+        if job is not None:
+            job.deleteLater()
         item = self._queue.get(item_id)
+        if item is not None and self._auto_retry(item, result):
+            return
         if item is not None:
             item.status = result.status
             item.filepath = result.filepath
@@ -754,7 +791,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _toggle_running(self) -> None:
-        if self._download_job is not None or self._running or self._probe_jobs:
+        if self._download_jobs or self._running or self._probe_jobs:
             self._stop_all()
         else:
             self._start_all()
@@ -768,33 +805,62 @@ class MainWindow(QMainWindow):
         self._set_status("")
         self._start_next()
 
-    def _cancel_active(self) -> bool:
-        """Prekida tekuće preuzimanje. Vraća True kad je posao napušten (stao je odmah)."""
-        job = self._download_job
-        if job is None:
-            return False
-        job.cancel()
-        if job.started:
-            return False  # preuzimanje je počelo: nit sama prekida i briše svoje fajlove
-        # Još se čitaju informacije o videu; na to se ne može uticati, pa se posao napušta.
-        for signal in (job.progress, job.finished):
-            with contextlib.suppress(RuntimeError):
-                signal.disconnect()
-        self._download_job = None
-        self._on_download_finished(job.item_id, DownloadResult(ItemStatus.CANCELLED))
-        return True
+    def _cancel_active(self, item_id: int | None = None) -> bool:
+        """Prekida jedno preuzimanje (ili sva). True kad je posao napušten jer još nije počeo."""
+        jobs = [self._download_jobs[item_id]] if item_id in self._download_jobs else \
+            (list(self._download_jobs.values()) if item_id is None else [])
+        abandoned = False
+        for job in jobs:
+            job.cancel()
+            if job.started:
+                continue  # preuzimanje je počelo: nit sama prekida i briše svoje fajlove
+            # Još se čitaju informacije o videu; na to se ne može uticati, pa se posao napušta.
+            for signal in (job.progress, job.finished):
+                with contextlib.suppress(RuntimeError):
+                    signal.disconnect()
+            self._download_jobs.pop(job.item_id, None)
+            self._on_download_finished(job.item_id, DownloadResult(ItemStatus.CANCELLED))
+            abandoned = True
+        return abandoned
 
     def _cancel_probes(self) -> None:
         for job in list(self._probe_jobs.values()):
             job.cancel()
         self._probe_jobs.clear()
 
+    def _auto_retry(self, item: QueueItem, result: DownloadResult) -> bool:
+        """Veza pukne usred preuzimanja češće nego što se misli; stavka se sama vraća u red."""
+        if result.status != ItemStatus.FAILED or not is_network_error(result.message or ""):
+            return False
+        if item.auto_retries >= MAX_AUTO_RETRIES or item.id in self._remove_when_done:
+            return False
+        item.auto_retries += 1
+        item.status = ItemStatus.WAITING
+        item.message = MESSAGE_RETRY
+        self._refresh_row(item)
+        self._set_status(tr("row.retrying"))
+        QTimer.singleShot(AUTO_RETRY_DELAY_MS, lambda: self._retry_after_drop(item.id))
+        self._update_controls()
+        return True
+
+    def _retry_after_drop(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None or item.status != ItemStatus.WAITING or item.message != MESSAGE_RETRY:
+            return  # u međuvremenu obrisano, ručno pokrenuto ili zaustavljeno
+        self._manual.append(item_id)
+        self._start_next()
+
     @Slot()
     def _stop_all(self) -> None:
         self._running = False
         self._manual.clear()
+        for item in self._queue.items():
+            if item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY:
+                item.message = ""
+                item.auto_retries = MAX_AUTO_RETRIES  # zaustavljeno ručno: bez daljeg ponavljanja
+                self._refresh_row(item)
         self._cancel_probes()
-        if self._download_job is not None:
+        if self._download_jobs:
             self._set_status(tr("status.stopping"))
             self._cancel_active()
         self._update_controls()
@@ -805,7 +871,7 @@ class MainWindow(QMainWindow):
         if item is None:
             return
         if item.status == ItemStatus.ACTIVE:
-            self._cancel_active()
+            self._cancel_active(item_id)
             return
         if item.status == ItemStatus.DONE:
             reveal(item.filepath or _item_folder(item))
@@ -834,7 +900,7 @@ class MainWindow(QMainWindow):
             return
         if item.status == ItemStatus.ACTIVE:
             self._remove_when_done.add(item_id)
-            self._cancel_active()
+            self._cancel_active(item_id)
             return
         self._remove_item(item_id)
 
@@ -947,7 +1013,7 @@ class MainWindow(QMainWindow):
         done = sum(item.status == ItemStatus.DONE for item in items)
         failed = sum(item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED) for item in items)
         # Čitanje linkova je takođe posao u toku: dugme mora nuditi „Zaustavi".
-        busy = self._download_job is not None or self._running or bool(self._probe_jobs)
+        busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
 
         self.stack.setCurrentIndex(1 if items else 0)
         if busy:
@@ -967,8 +1033,8 @@ class MainWindow(QMainWindow):
         self.remove_all_action.setEnabled(any(item.status != ItemStatus.ACTIVE for item in items))
 
         parts = []
-        if self._download_job is not None:
-            parts.append(tr("summary.active"))
+        if self._download_jobs:
+            parts.append(tr("summary.active", count=len(self._download_jobs)))
         if waiting:
             parts.append(tr("summary.waiting", count=waiting))
         if done:
@@ -1062,7 +1128,7 @@ class MainWindow(QMainWindow):
         if not updater.is_installed_app():
             QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
             return
-        if self._download_job is not None:
+        if self._download_jobs:
             QMessageBox.information(self, tr("update.available_title"), tr("update.busy"))
             return
         self._install_update(release)
@@ -1092,17 +1158,19 @@ class MainWindow(QMainWindow):
     # ---------- zatvaranje ----------
 
     def closeEvent(self, event) -> None:
-        if self._download_job is not None:
+        if self._download_jobs:
             answer = QMessageBox.question(
                 self, tr("close.title"), tr("close.text"))
             if answer != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
             self._running = False
-            job = self._download_job
-            job.cancel()
-            # Kratko sačekaj da se obrišu privremeni fajlovi prekinutog preuzimanja.
-            job.join(timeout=10)
+            jobs = list(self._download_jobs.values())
+            for job in jobs:
+                job.cancel()
+            # Kratko sačekaj da se obrišu privremeni fajlovi prekinutih preuzimanja.
+            for job in jobs:
+                job.join(timeout=10)
         self._save_settings()
         event.accept()
 

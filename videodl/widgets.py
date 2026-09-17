@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QProgressBar, QSizePolicy, QToolButton, QVBoxLayout, QWidget,
 )
 
-from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, tr
+from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_RETRY, tr
 from .icons import icon
 from .jobs import ItemStatus, QueueItem
 from .presets import get_preset
@@ -43,6 +43,8 @@ def display_message(message: str) -> str:
         return tr("error.drm")
     if message == MESSAGE_LIVE:
         return tr("error.live")
+    if message == MESSAGE_RETRY:
+        return tr("row.retrying")
     if message == MESSAGE_EXISTS:
         return tr("row.exists")
     return message

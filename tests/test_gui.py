@@ -93,10 +93,11 @@ class MainWindowTest(unittest.TestCase):
         self.release.set()
         self.tmp.cleanup()
 
-    def make_window(self, download_fn, probe_fn=fake_probe, thumbnail_fetch=lambda url: None):
+    def make_window(self, download_fn, probe_fn=fake_probe, thumbnail_fetch=lambda url: None, parallel=1):
         window = MainWindow(settings=self.settings, probe_fn=probe_fn, download_fn=download_fn,
                             thumbnail_fetch=thumbnail_fetch)
         window.set_output_dir(self.tmp.name)
+        window.set_parallel(parallel)
         self.addCleanup(window.deleteLater)
         return window
 
@@ -220,7 +221,7 @@ class MainWindowTest(unittest.TestCase):
         window.download_button.click()
         self.assertTrue(wait_until(lambda: first.status == ItemStatus.CANCELLED))
         self.assertEqual(second.status, ItemStatus.WAITING)
-        self.assertIsNone(window._download_job)
+        self.assertEqual(window._download_jobs, {})
         self.assertEqual(window.download_button.text(), "Preuzmi")
         self.assertEqual(window._rows[first.id].action_button.property("kind"), "retry")
 
@@ -254,7 +255,7 @@ class MainWindowTest(unittest.TestCase):
 
         window.download_button.click()  # nit još visi na čitanju linka
         self.assertEqual(item.status, ItemStatus.CANCELLED)  # bez čekanja
-        self.assertIsNone(window._download_job)
+        self.assertEqual(window._download_jobs, {})
         self.assertEqual(window.download_button.text(), "Preuzmi")
 
         # Kasni odgovor napuštene niti ne smije pregaziti novi pokušaj.
@@ -281,6 +282,64 @@ class MainWindowTest(unittest.TestCase):
         app.processEvents()
         self.assertEqual(window._queue.items(), [])  # rezultat se više ne koristi
 
+    def test_two_downloads_run_at_once_when_allowed(self):
+        window = self.make_window(self.blocking_download, parallel=2)
+        window.add_links_from_text("https://v/a https://v/b https://v/c")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 3))
+        first, second, third = window._queue.items()
+        window._start_all()
+        self.assertTrue(wait_until(lambda: len(window._download_jobs) == 2))
+        self.assertEqual([first.status, second.status, third.status],
+                         [ItemStatus.ACTIVE, ItemStatus.ACTIVE, ItemStatus.WAITING])
+        self.assertIn("2", window.summary_label.text())
+
+        self.release.set()  # oba završavaju, treći kreće sam
+        self.assertTrue(wait_until(lambda: third.status == ItemStatus.DONE))
+        self.assertEqual(window._download_jobs, {})
+
+    def test_stop_cancels_every_running_download(self):
+        window = self.make_window(self.blocking_download, parallel=2)
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: len(window._download_jobs) == 2))
+        window.download_button.click()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.CANCELLED, ItemStatus.CANCELLED]))
+        self.assertEqual(window._download_jobs, {})
+
+    def test_broken_connection_retries_by_itself(self):
+        attempts = []
+
+        def flaky(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            attempts.append(url)
+            if len(attempts) < 3:
+                return DownloadResult(ItemStatus.FAILED, message="Unable to download video data: Connection reset")
+            return DownloadResult(ItemStatus.DONE, filepath=os.path.join(output_dir, "a.mp4"))
+
+        window = self.make_window(flaky)
+        with mock.patch("videodl.gui.AUTO_RETRY_DELAY_MS", 10):
+            window.add_links_from_text("https://v/a")
+            self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+            item = window._queue.items()[0]
+            window._start_all()
+            self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE, timeout=10))
+        self.assertEqual((len(attempts), item.auto_retries), (3, 2))
+
+    def test_other_errors_are_not_retried(self):
+        def refused(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            self.calls.append(url)
+            return DownloadResult(ItemStatus.FAILED, message="Unsupported URL: https://v/a")
+
+        window = self.make_window(refused)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.FAILED))
+        time.sleep(0.2)
+        app.processEvents()
+        self.assertEqual((len(self.calls), item.auto_retries), (1, 0))
+
     def test_remove_active_row_cancels_and_removes(self):
         window = self.make_window(self.blocking_download)
         window.add_links_from_text("https://v/a https://v/b")
@@ -294,7 +353,7 @@ class MainWindowTest(unittest.TestCase):
         window._rows[first.id].remove_button.click()
         self.assertTrue(wait_until(lambda: not window._queue.items()))
         self.assertEqual(window._rows, {})
-        self.assertIsNone(window._download_job)
+        self.assertEqual(window._download_jobs, {})
 
     def test_format_change_applies_to_waiting_but_not_custom_items(self):
         window = self.make_window(self.quick_download)
@@ -404,14 +463,14 @@ class MainWindowTest(unittest.TestCase):
         window.add_links_from_text("https://v/lista https://v/jedan")
         self.assertTrue(wait_until(lambda: len(window._queue.items()) == 3))
         window._start_all()
-        self.assertTrue(wait_until(lambda: window._download_job is not None))
+        self.assertTrue(wait_until(lambda: bool(window._download_jobs)))
         wait_until(lambda: False, timeout=0.3)
         full = window.grab()
         self.assertFalse(full.isNull())
         if target:
             full.save(target)
         window._stop_all()
-        self.assertTrue(wait_until(lambda: window._download_job is None))
+        self.assertTrue(wait_until(lambda: not window._download_jobs))
 
 
 if __name__ == "__main__":

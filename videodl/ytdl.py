@@ -55,6 +55,12 @@ def base_options(logger=None) -> dict:
         "noprogress": True,
         "color": "no_color",
         "noplaylist": True,
+        # Kratak prekid veze ne smije oboriti preuzimanje: yt-dlp sam ponavlja i nastavlja .part fajl.
+        "retries": 10,
+        "fragment_retries": 10,
+        "extractor_retries": 3,
+        "socket_timeout": 30,
+        "continuedl": True,
         "js_runtimes": js_runtimes(),
         "logger": logger or YdlLogger(),
     }
@@ -62,6 +68,25 @@ def base_options(logger=None) -> dict:
     if location:
         options["ffmpeg_location"] = location  # ffmpeg/ffprobe iz instaliranog paketa
     return options
+
+
+# Poruke koje znače „veza je pukla ili server trenutno ne odgovara" (vrijedi pokušati ponovo).
+_NETWORK_ERROR = re.compile(
+    r"unable to download|timed out|timeout|connection|connection reset|network is unreachable|"
+    r"remote end closed|temporary failure|name or service not known|getaddrinfo|"
+    r"winerror 1005[1-4]|http error 5\d\d|read operation|incomplete|broken pipe",
+    re.IGNORECASE)
+
+
+def is_network_error(message: str) -> bool:
+    """Greška zbog veze (vrijedi ponovo), za razliku od DRM-a, nepodržanog sajta ili 404."""
+    from .i18n import MESSAGE_DRM, MESSAGE_LIVE
+
+    if message in (MESSAGE_DRM, MESSAGE_LIVE):
+        return False
+    if re.search(r"http error 4\d\d|unsupported url|private|members[- ]only|sign in|age", message, re.IGNORECASE):
+        return False
+    return bool(_NETWORK_ERROR.search(message or ""))
 
 
 def error_message(exc: BaseException) -> str:

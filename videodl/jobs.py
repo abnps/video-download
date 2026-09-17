@@ -30,6 +30,8 @@ class QueueItem:
     duration: float | None = None
     # Format izabran baš za ovu stavku; promjena glavnog formata ga ne mijenja.
     custom_format: bool = False
+    # Koliko puta je aplikacija sama ponovila pokušaj poslije pucanja veze.
+    auto_retries: int = 0
     # Kolačići prijave iz browsera: samo u memoriji, nikad u podešavanjima ni na disku.
     cookies: tuple = field(default=(), repr=False)
 

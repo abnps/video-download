@@ -127,6 +127,20 @@ class ErrorMessageTest(unittest.TestCase):
         self.assertEqual(error_message(RuntimeError("ERROR: prvi red\n  drugi red")), "prvi red drugi red")
 
 
+class NetworkErrorTest(unittest.TestCase):
+    def test_only_connection_problems_are_worth_repeating(self):
+        from videodl.i18n import MESSAGE_DRM, MESSAGE_LIVE
+        from videodl.ytdl import is_network_error
+
+        for message in ("Unable to download video data: Connection reset by peer",
+                        "[Errno 10054] An existing connection was forcibly closed",
+                        "The read operation timed out", "HTTP Error 503: Service Unavailable"):
+            self.assertTrue(is_network_error(message), message)
+        for message in (MESSAGE_DRM, MESSAGE_LIVE, "Unsupported URL: https://x", "HTTP Error 404: Not Found",
+                        "Private video. Sign in if you've been granted access", ""):
+            self.assertFalse(is_network_error(message), message)
+
+
 class DownloadErrorsTest(unittest.TestCase):
     def test_cancel_before_start(self):
         cancel = threading.Event()
