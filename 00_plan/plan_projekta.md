@@ -113,6 +113,11 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 - [x] v0.5.2 (17.9.2026): u 0.5.1 je prekinut build ostavio 5 malih fajlova punih nula (ikonice i
       DRM skripte dodatka, strelica menija); build sada poredi paket sa izvorom prije instalera.
       Slanje na GitHub jednom palo sa HTTP 500, drugi pokušaj prošao.
+- [x] v0.5.3 (17.9.2026): prenos uživo (LIVE) se ne preuzima — dodatak (v0.4.4) ga ne šalje
+      (video bez kraja, `duration = Infinity`), probe ga odbija, `match_filter` ga zaustavlja i
+      prije preuzimanja, a stavke uživo u plejlisti/kanalu se preskaču. Testovi 82 + 10, E2E
+      sa MediaSource „live" stranicom u Edge-u: dodatak odbio, nijedan fajl.
+- [ ] Ahmed potvrdio ažuriranje preko `gh` sa objavljene verzije (0.5.2 → 0.5.3) i LIVE na pravom sajtu.
 - [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
 
 Prvobitne stavke:
