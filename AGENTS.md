@@ -60,6 +60,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   prodaje bez nove odluke i pravne provjere (§95a UrhG, LG Hamburg/Uberspace).
 - Ažuriranje čita izdanja privatnog repoa `npgamy/video-download` preko `gh` prijave
   (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
+- yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
+  SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz
+  `pokreni.pyw` mora ostati PRIJE prvog `import yt_dlp` (inače radi verzija iz paketa).
 - Instalirana verzija koristi alate iz `tools/` pored `.exe`-a (ffmpeg, ffprobe, node);
   razvoj koristi PATH (`videodl/runtime.py`).
 

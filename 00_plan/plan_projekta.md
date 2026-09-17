@@ -92,7 +92,10 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 
 - Titlovi i thumbnail (opciono uz video).
 - Lijepljenje linka iz clipboarda jednim klikom.
-- Provjera/ažuriranje yt-dlp-a iz aplikacije (YouTube se često mijenja).
+- [x] Ažuriranje yt-dlp-a iz aplikacije (17.9.2026, v0.5.4): Pomoć → „Ažuriraj čitač sajtova",
+  plus tiha provjera jednom dnevno. Wheel sa PyPI-ja, SHA-256, raspakivanje u folder podataka
+  korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
+  paket se briše i ostaje onaj iz paketa. Živa provjera na PyPI-ju prošla.
 - Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
 - Brži prekid u fazi čitanja informacija (prije početka preuzimanja).
 - [x] Video iza prijave (17.9.2026, Ahmed izričito potvrdio „Kolačići prijave"):

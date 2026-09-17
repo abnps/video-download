@@ -34,7 +34,7 @@ from .native_messaging import install_native_host, uninstall_native_host
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
-from . import updater
+from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, set_state
 from .ytdl import JS_RUNTIMES, error_message
 
@@ -283,6 +283,28 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
+class YtdlpUpdateJob(QObject):
+    """Provjera i preuzimanje yt-dlp-a u pozadinskoj niti (mreža ne smije blokirati prozor)."""
+
+    finished = Signal(object, object, bool)  # verzija | None, greška | None, ručna provjera
+
+    def __init__(self, manual: bool, fetch=None, install=None):
+        super().__init__()
+        self._manual = manual
+        self._fetch = fetch or ytdlp_update.fetch_latest
+        self._install = install or ytdlp_update.install
+
+    def start(self) -> None:
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _run(self) -> None:
+        try:
+            release = self._fetch()
+            self.finished.emit(self._install(release) if release else None, None, self._manual)
+        except Exception as exc:  # granica radne niti
+            self.finished.emit(None, exc, self._manual)
+
+
 class UpdateDownloadJob(QObject):
     progress = Signal(int, int)  # preuzeto, ukupno (bajtova)
     finished = Signal(object, object)  # Path | None, greška | None
@@ -353,12 +375,15 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(STYLE)
         self._update_fetch = update_fetch
         self._update_check_job = None
+        self._ytdlp_job = None
         self._build_menu()
         self._build_ui()
         self._load_settings()
         self.retranslate_ui()
         if check_updates_on_start:
             QTimer.singleShot(4000, lambda: self.check_for_updates(manual=False))
+            # yt-dlp se mijenja češće od aplikacije; tiha provjera najviše jednom dnevno.
+            QTimer.singleShot(9000, lambda: self.update_ytdlp(manual=False))
 
     # ---------- izgled ----------
 
@@ -387,6 +412,7 @@ class MainWindow(QMainWindow):
 
         self.help_menu = menu.addMenu("")
         self.check_updates_action = self.help_menu.addAction("", lambda: self.check_for_updates(manual=True))
+        self.update_ytdlp_action = self.help_menu.addAction("", lambda: self.update_ytdlp(manual=True))
         self.language_menu = self.help_menu.addMenu("")
         self.language_actions = QActionGroup(self)
         for code, name in LANGUAGES.items():
@@ -421,6 +447,7 @@ class MainWindow(QMainWindow):
         self.remove_all_action.setText(tr("menu.remove_all"))
         self.help_menu.setTitle(tr("menu.help"))
         self.check_updates_action.setText(tr("menu.check_updates"))
+        self.update_ytdlp_action.setText(tr("menu.update_ytdlp"))
         self.language_menu.setTitle(tr("menu.language"))
         for action in self.language_actions.actions():
             action.setChecked(action.data() == get_language())
@@ -923,7 +950,46 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _show_about(self) -> None:
-        QMessageBox.about(self, tr("menu.about"), tr("about.text", version=__version__))
+        pending = ytdlp_update.pending_version()
+        ytdlp = f"{ytdlp_update.active_version()} → {pending}" if pending else ytdlp_update.active_version()
+        QMessageBox.about(self, tr("menu.about"), tr("about.text", version=__version__, ytdlp=ytdlp))
+
+    # ---------- ažuriranje yt-dlp-a ----------
+
+    def update_ytdlp(self, manual: bool) -> None:
+        """Novi yt-dlp radi od sljedećeg pokretanja; tekući uvoz se ne može zamijeniti u hodu."""
+        if self._ytdlp_job is not None:
+            return
+        if not manual:
+            last = self._settings.value("last_ytdlp_check", 0.0, type=float)
+            if time.time() - last < ytdlp_update.CHECK_INTERVAL_SECONDS:
+                return
+        self._settings.setValue("last_ytdlp_check", time.time())
+        if manual:
+            self._set_status(tr("ytdlp.checking"))
+        job = YtdlpUpdateJob(manual)
+        job.finished.connect(self._on_ytdlp_updated)
+        self._ytdlp_job = job
+        job.start()
+
+    @Slot(object, object, bool)
+    def _on_ytdlp_updated(self, version, error, manual: bool) -> None:
+        self._ytdlp_job = None
+        if error is not None:
+            text = tr("ytdlp.failed", error=update_error_text(error))
+            self._set_status(text)
+            if manual:
+                QMessageBox.warning(self, tr("menu.update_ytdlp"), text)
+            return
+        if version is None:
+            if manual:
+                QMessageBox.information(self, tr("menu.update_ytdlp"),
+                                        tr("ytdlp.latest", version=ytdlp_update.active_version()))
+            return
+        text = tr("ytdlp.updated", version=version)
+        self._set_status(text)
+        if manual:
+            QMessageBox.information(self, tr("menu.update_ytdlp"), text)
 
     # ---------- ažuriranje ----------
 
@@ -1041,6 +1107,7 @@ def self_test(report_path: str) -> int:
     checks = {
         "version": __version__,
         "yt_dlp": yt_dlp.version.__version__,
+        "yt_dlp_store": str(ytdlp_update.store_dir()),
         "ffmpeg": find_tool("ffmpeg"),
         "ffprobe": find_tool("ffprobe"),
         "node": find_tool("node"),
