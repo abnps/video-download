@@ -155,9 +155,8 @@ class UpdaterTest(unittest.TestCase):
         self.assertEqual(self.urls, [])
 
     def test_gh_mode_reads_private_release_and_downloads_with_gh(self):
+        # Pravi oblik odgovora: GitHub i za privatni repo šalje browser_download_url (bez prijave 404).
         release_data = json.loads(self.release_json(version="9.9.9"))
-        for asset in release_data["assets"]:
-            asset.pop("browser_download_url")  # privatni repo: preuzima se preko gh, ne preko linka
         calls = []
 
         def runner(args, **kwargs):

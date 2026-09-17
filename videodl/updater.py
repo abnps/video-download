@@ -7,6 +7,7 @@ aplikaciji nema tokena. Izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i
 VIDEODL_UPDATE_URL (testovi) zamjenjuje gh lokalnim HTTP serverom sa istim JSON-om.
 """
 
+import dataclasses
 import hashlib
 import json
 import os
@@ -98,7 +99,10 @@ def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, runner=s
         if "Not Found" in (result.stderr or ""):
             return None  # još nema nijednog izdanja
         raise UpdateError(_gh_error(result.stderr))
-    return parse_release(json.loads(result.stdout))
+    release = parse_release(json.loads(result.stdout))
+    # GitHub i za privatni repo vraća browser_download_url, ali bez prijave daje 404:
+    # u gh načinu se preuzima isključivo preko gh.
+    return dataclasses.replace(release, installer_url="", checksum_url="") if release else None
 
 
 def download_installer(release: Release, target_dir: Path, on_progress: Callable[[int, int], None] | None = None,
