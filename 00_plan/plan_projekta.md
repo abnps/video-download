@@ -101,6 +101,11 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
   paket se briše i ostaje onaj iz paketa. Živa provjera na PyPI-ju prošla.
 - Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
+- [x] Više istovremenih preuzimanja (17.9.2026, v0.5.7): Preuzimanja → „Istovremenih preuzimanja"
+  (1–4, podrazumijevano 2); izbor se pamti. Prekid i zatvaranje rade nad svim poslovima u toku.
+- [x] Automatsko ponavljanje kad veza pukne (17.9.2026, v0.5.7): yt-dlp sam ponavlja i nastavlja
+  `.part`, a aplikacija stavku vraća u red do 3 puta (5 s pauze). DRM, LIVE, 404 i nepodržan
+  sajt se ne ponavljaju. „Zaustavi" poništava zakazano ponavljanje.
 - [x] Brži prekid u fazi čitanja informacija (17.9.2026, v0.5.6): „Zaustavi" radi i dok se
   čitaju linkovi (ProbeJob.cancel), a preuzimanje koje još nije počelo se napušta odmah.
 - [x] Video iza prijave (17.9.2026, Ahmed izričito potvrdio „Kolačići prijave"):
