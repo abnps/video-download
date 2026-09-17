@@ -183,6 +183,11 @@ class ProbeJob(QObject):
         self._probe_fn = probe_fn
         self._access = {key: value for key, value in (access or {}).items() if value}
         self._auto_start = auto_start
+        self._cancel = threading.Event()
+
+    def cancel(self) -> None:
+        """Čitanje linka se ne može prekinuti usred posla, ali se rezultat više ne koristi."""
+        self._cancel.set()
 
     def start(self) -> None:
         # daemon: čitanje linka se ne može prekinuti, a ne smije držati program pri zatvaranju
@@ -190,11 +195,15 @@ class ProbeJob(QObject):
 
     def _run(self) -> None:
         for url in self._urls:
+            if self._cancel.is_set():
+                break
             try:
                 result = self._probe_fn(url, **self._access)
-                self.probed.emit(result, self._output_dir, self._access, self._auto_start)
+                if not self._cancel.is_set():
+                    self.probed.emit(result, self._output_dir, self._access, self._auto_start)
             except Exception as exc:  # granica radne niti
-                self.failed.emit(url, error_message(exc), self._output_dir, self._access)
+                if not self._cancel.is_set():
+                    self.failed.emit(url, error_message(exc), self._output_dir, self._access)
         self.finished.emit(self.job_id)
 
 
@@ -212,6 +221,9 @@ class DownloadJob(QObject):
         self._download_fn = download_fn
         self._cancel = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
+        # Dok yt-dlp čita informacije o videu (prije prvog bajta) prekid ne djeluje,
+        # pa se takav posao napušta: nijedan fajl još ne postoji.
+        self.started = False
 
     def start(self) -> None:
         self._thread.start()
@@ -231,6 +243,7 @@ class DownloadJob(QObject):
         self.finished.emit(self.item_id, result)
 
     def _report(self, progress: Progress) -> None:
+        self.started = True
         self.progress.emit(self.item_id, progress)
 
 
@@ -621,6 +634,7 @@ class MainWindow(QMainWindow):
         job.finished.connect(self._on_probe_finished)
         self._probe_jobs[job.job_id] = job
         self._set_status(tr("status.loading_one") if len(urls) == 1 else tr("status.loading_many", count=len(urls)))
+        self._update_controls()  # dugme postaje „Zaustavi" i dok traje čitanje linkova
         job.start()
 
     @Slot(object)
@@ -681,6 +695,7 @@ class MainWindow(QMainWindow):
         job = self._probe_jobs.pop(job_id, None)
         if job is not None:
             job.deleteLater()
+        self._update_controls()
 
     # ---------- red preuzimanja ----------
 
@@ -739,7 +754,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _toggle_running(self) -> None:
-        if self._download_job is not None or self._running:
+        if self._download_job is not None or self._running or self._probe_jobs:
             self._stop_all()
         else:
             self._start_all()
@@ -753,13 +768,35 @@ class MainWindow(QMainWindow):
         self._set_status("")
         self._start_next()
 
+    def _cancel_active(self) -> bool:
+        """Prekida tekuće preuzimanje. Vraća True kad je posao napušten (stao je odmah)."""
+        job = self._download_job
+        if job is None:
+            return False
+        job.cancel()
+        if job.started:
+            return False  # preuzimanje je počelo: nit sama prekida i briše svoje fajlove
+        # Još se čitaju informacije o videu; na to se ne može uticati, pa se posao napušta.
+        for signal in (job.progress, job.finished):
+            with contextlib.suppress(RuntimeError):
+                signal.disconnect()
+        self._download_job = None
+        self._on_download_finished(job.item_id, DownloadResult(ItemStatus.CANCELLED))
+        return True
+
+    def _cancel_probes(self) -> None:
+        for job in list(self._probe_jobs.values()):
+            job.cancel()
+        self._probe_jobs.clear()
+
     @Slot()
     def _stop_all(self) -> None:
         self._running = False
         self._manual.clear()
+        self._cancel_probes()
         if self._download_job is not None:
-            self._download_job.cancel()
             self._set_status(tr("status.stopping"))
+            self._cancel_active()
         self._update_controls()
 
     @Slot(int)
@@ -768,7 +805,7 @@ class MainWindow(QMainWindow):
         if item is None:
             return
         if item.status == ItemStatus.ACTIVE:
-            self._download_job.cancel()
+            self._cancel_active()
             return
         if item.status == ItemStatus.DONE:
             reveal(item.filepath or _item_folder(item))
@@ -797,7 +834,7 @@ class MainWindow(QMainWindow):
             return
         if item.status == ItemStatus.ACTIVE:
             self._remove_when_done.add(item_id)
-            self._download_job.cancel()
+            self._cancel_active()
             return
         self._remove_item(item_id)
 
@@ -909,7 +946,8 @@ class MainWindow(QMainWindow):
         waiting = sum(item.status == ItemStatus.WAITING for item in items)
         done = sum(item.status == ItemStatus.DONE for item in items)
         failed = sum(item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED) for item in items)
-        busy = self._download_job is not None or self._running
+        # Čitanje linkova je takođe posao u toku: dugme mora nuditi „Zaustavi".
+        busy = self._download_job is not None or self._running or bool(self._probe_jobs)
 
         self.stack.setCurrentIndex(1 if items else 0)
         if busy:
@@ -1061,9 +1099,10 @@ class MainWindow(QMainWindow):
                 event.ignore()
                 return
             self._running = False
-            self._download_job.cancel()
+            job = self._download_job
+            job.cancel()
             # Kratko sačekaj da se obrišu privremeni fajlovi prekinutog preuzimanja.
-            self._download_job.join(timeout=10)
+            job.join(timeout=10)
         self._save_settings()
         event.accept()
 

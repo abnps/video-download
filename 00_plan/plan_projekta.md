@@ -85,8 +85,9 @@ Exit gate:
       17.9.2026: X potvrđen; TikTok potvrđen preko „Preuzmi video koji se pušta"
       (dodatak v0.3.2). YouTube preko dodatka još nije potvrđen.
 
-Poznato ograničenje: prekid dok yt-dlp još čita informacije o videu (prije prvog
-bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
+Prekid dok yt-dlp još čita informacije o videu (prije prvog bajta, na YouTube-u ponekad
+10+ s): od v0.5.6 stavka odmah dobija stanje „prekinuto", a posao se napušta (nijedan
+fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli odgovor se ne koristi.
 
 ## Faza 2 — Dorada
 
@@ -100,7 +101,8 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
   korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
   paket se briše i ostaje onaj iz paketa. Živa provjera na PyPI-ju prošla.
 - Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
-- Brži prekid u fazi čitanja informacija (prije početka preuzimanja).
+- [x] Brži prekid u fazi čitanja informacija (17.9.2026, v0.5.6): „Zaustavi" radi i dok se
+  čitaju linkovi (ProbeJob.cancel), a preuzimanje koje još nije počelo se napušta odmah.
 - [x] Video iza prijave (17.9.2026, Ahmed izričito potvrdio „Kolačići prijave"):
   opciona dozvola `cookies` kroz dijalog browsera, samo kolačići tog sajta, privremeni
   fajl za yt-dlp se briše odmah. E2E: stranica iza prijave preuzeta, 0× 403.

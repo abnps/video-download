@@ -235,6 +235,52 @@ class MainWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: second.status == ItemStatus.DONE))
         self.assertEqual([c[0] for c in self.calls], ["https://v/a", "https://v/a", "https://v/b"])
 
+    def reading_download(self, url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+        """Yt-dlp još čita informacije o videu: napredak se ne javlja i prekid tu ne djeluje."""
+        self.calls.append((url, preset.key, output_dir, subfolder))
+        while not self.release.is_set():
+            time.sleep(0.01)
+        if cancel_event.is_set():
+            return DownloadResult(ItemStatus.CANCELLED)
+        return DownloadResult(ItemStatus.DONE, filepath=url)
+
+    def test_stop_while_reading_link_reacts_at_once(self):
+        window = self.make_window(self.reading_download)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.ACTIVE))
+
+        window.download_button.click()  # nit još visi na čitanju linka
+        self.assertEqual(item.status, ItemStatus.CANCELLED)  # bez čekanja
+        self.assertIsNone(window._download_job)
+        self.assertEqual(window.download_button.text(), "Preuzmi")
+
+        # Kasni odgovor napuštene niti ne smije pregaziti novi pokušaj.
+        self.release.set()
+        time.sleep(0.2)
+        app.processEvents()
+        window._rows[item.id].action_button.click()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+
+    def test_stop_while_reading_links_drops_pending_results(self):
+        started = threading.Event()
+
+        def slow_probe(url, **access):
+            started.set()
+            self.release.wait(5)
+            return ProbeResult("Kasni", (Entry(url, "Kasni"),), is_playlist=False)
+
+        window = self.make_window(self.quick_download, probe_fn=slow_probe)
+        window.add_links_from_text("https://v/sporo")
+        self.assertTrue(wait_until(started.is_set))
+        window.download_button.click()  # „Zaustavi" dok traje čitanje
+        self.release.set()
+        time.sleep(0.3)
+        app.processEvents()
+        self.assertEqual(window._queue.items(), [])  # rezultat se više ne koristi
+
     def test_remove_active_row_cancels_and_removes(self):
         window = self.make_window(self.blocking_download)
         window.add_links_from_text("https://v/a https://v/b")
