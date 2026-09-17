@@ -110,6 +110,9 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
       čeka gašenje aplikacije preko mutexa i ponovo je pokreće).
 - [x] Izdanje v0.5.1 u privatnom repou `npgamy/video-download` (17.9.2026); aplikacija ga
       čita preko `gh`. v0.5.0 označeno „NE KORISTITI" (u gh načinu pokušavala HTTP → 404).
+- [x] v0.5.2 (17.9.2026): u 0.5.1 je prekinut build ostavio 5 malih fajlova punih nula (ikonice i
+      DRM skripte dodatka, strelica menija); build sada poredi paket sa izvorom prije instalera.
+      Slanje na GitHub jednom palo sa HTTP 500, drugi pokušaj prošao.
 - [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
 
 Prvobitne stavke:
