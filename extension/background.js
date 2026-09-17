@@ -1,4 +1,6 @@
 import { addMedia, classifyResponse, headerValue } from "./detect.js";
+import { pickLanguage, translate } from "./i18n.js";
+import { MENU_ITEMS, menuTarget } from "./menus.js";
 import { findPlayingVideo } from "./playing.js";
 
 const NATIVE_HOST = "com.videodl.bridge";
@@ -123,6 +125,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return false;
 });
+
+// Meni desnog klika: radi i kad prepoznavanje toka zataji i bez otvaranja prozora dodatka.
+async function setupMenus() {
+  const status = await sendNative({ action: "status" }).catch(() => null);
+  const language = pickLanguage(status?.language || navigator.language);
+  await chrome.contextMenus.removeAll();
+  for (const item of MENU_ITEMS) {
+    chrome.contextMenus.create({ id: item.id, title: translate(language, item.key), contexts: item.contexts });
+  }
+}
+
+chrome.runtime.onInstalled.addListener(setupMenus);
+chrome.runtime.onStartup.addListener(setupMenus);
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (tab && tab.id >= 0) sendFromMenu(info, tab.id);
+});
+
+async function sendFromMenu(info, tabId) {
+  const target = menuTarget(info);
+  if (!target) return;
+  if (target.kind === "playing") {
+    await sendPlaying(tabId);
+    return;
+  }
+  const tab = await chrome.tabs.get(tabId);
+  const request = {
+    page_url: target.kind === "url" ? target.url : tab.url,
+    page_title: tab.title || "",
+    headers: { "User-Agent": navigator.userAgent },
+  };
+  if (target.kind === "media") {
+    request.media = { url: target.url, kind: "file" };
+    request.headers.Referer = info.frameUrl || tab.url;
+  }
+  // Kolačići samo ako je dozvola već data kroz prozor dodatka; meni je ne može tražiti.
+  request.cookies = await cookiesFor([tab.url, request.page_url, request.media?.url]);
+  const reply = await sendNative({ action: "add", request });
+  await flashBadge(tabId, reply.ok);
+}
 
 async function buildRequest(tabId, mediaUrl) {
   const tab = await chrome.tabs.get(tabId);

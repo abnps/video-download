@@ -246,6 +246,20 @@ async function run(cdp, report) {
   log("Iza prijave:", report.privateReply, "->", report.privateFile, "| 403:", report.privateForbidden);
   if (report.privateForbidden) throw new Error("Server je odbio zahtjev bez kolačića sesije");
 
+  // 6a) Stavke menija desnog klika postoje (update uspijeva samo za stvarno napravljenu stavku)
+  report.menuItems = await waitFor(() => cdp.evaluate(helper, `(async () => {
+    const ids = ["videodl-link", "videodl-video", "videodl-page"];
+    const titles = [];
+    for (const id of ids) {
+      const title = await new Promise((resolve) => chrome.contextMenus.update(id, {}, () =>
+        resolve(chrome.runtime.lastError ? null : id)));
+      if (!title) return null;
+      titles.push(title);
+    }
+    return titles;
+  })()`), 15000, "stavke menija desnog klika");
+  log("Meni desnog klika:", report.menuItems.join(", "));
+
   // 6b) Prenos uživo: dodatak ga ne šalje, aplikacija ne dobija ništa
   const { targetId: liveTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/live.html` });
   const liveTab = await tabState(`${SITE}/live.html`, "() => true");

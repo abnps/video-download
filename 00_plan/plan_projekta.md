@@ -92,6 +92,9 @@ bajta, na YouTube-u ponekad 10+ s) djeluje tek kad preuzimanje krene.
 
 - Titlovi i thumbnail (opciono uz video).
 - Lijepljenje linka iz clipboarda jednim klikom.
+- [x] Desni klik u browseru (17.9.2026, dodatak v0.4.5): stavke „Preuzmi ovaj link / ovaj video /
+  video koji se pušta". Direktan tok ide odmah, blob/MSE traži objavu. Kolačići samo ako je dozvola
+  već data (meni je ne može tražiti). E2E provjerava da stavke postoje; pravi desni klik čeka Ahmeda.
 - [x] Ažuriranje yt-dlp-a iz aplikacije (17.9.2026, v0.5.4): Pomoć → „Ažuriraj čitač sajtova",
   plus tiha provjera jednom dnevno. Wheel sa PyPI-ja, SHA-256, raspakivanje u folder podataka
   korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
