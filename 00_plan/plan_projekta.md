@@ -92,7 +92,12 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 ## Faza 2 — Dorada
 
 - Titlovi i thumbnail (opciono uz video).
-- Lijepljenje linka iz clipboarda jednim klikom.
+- [x] Hvatanje kopiranog linka (18.9.2026, v0.6.0): Fajl → „Hvataj kopirane linkove" (uključeno
+  po podrazumijevanom); kopiran link ulazi u red, preuzimanje i dalje kreće na „Preuzmi".
+- [x] Red i istorija se pamte (v0.6.0): `videodl/store.py` upisuje `queue.json` i `history.json` u
+  folder podataka; kolačići se nikad ne upisuju. Preuzimanja → „Istorija preuzimanja…".
+- [x] Izvještaj o problemu (v0.6.0): Pomoć → „Sačuvaj izvještaj o problemu…"; linkovi se skraćuju
+  na ime sajta, ime korisnika i tajne se sakrivaju (`videodl/diagnostics.py`).
 - [x] Desni klik u browseru (17.9.2026, dodatak v0.4.5): stavke „Preuzmi ovaj link / ovaj video /
   video koji se pušta". Direktan tok ide odmah, blob/MSE traži objavu. Kolačići samo ako je dozvola
   već data (meni je ne može tražiti). E2E provjerava da stavke postoje; pravi desni klik čeka Ahmeda.

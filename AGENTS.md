@@ -63,6 +63,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
   SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz
   `pokreni.pyw` mora ostati PRIJE prvog `import yt_dlp` (inače radi verzija iz paketa).
+- Red i istorija (`videodl/store.py`) se upisuju u folder podataka; u te fajlove NIKAD ne smiju
+  ući kolačići. Izvještaj o problemu (`videodl/diagnostics.py`) skraćuje linkove na ime sajta.
 - Instalirana verzija koristi alate iz `tools/` pored `.exe`-a (ffmpeg, ffprobe, node);
   razvoj koristi PATH (`videodl/runtime.py`).
 

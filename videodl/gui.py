@@ -1,6 +1,7 @@
 """Glavni prozor: traka (Zalijepi / format / Preuzmi), red preuzimanja sa sličicama, meni."""
 
 import contextlib
+import datetime
 import os
 import queue
 import re
@@ -18,7 +19,8 @@ from PySide6.QtGui import (
     QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow,
+    QApplication, QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QListWidget,
+    QListWidgetItem, QMainWindow,
     QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
 )
 
@@ -34,8 +36,9 @@ from .native_messaging import install_native_host, uninstall_native_host
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
 from .probe import ProbeResult, probe
+from . import diagnostics, store
 from . import updater, ytdlp_update
-from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, set_state
+from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error
 
 _URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
@@ -187,6 +190,7 @@ class ProbeJob(QObject):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
+        self.urls = tuple(urls)
         self._output_dir = output_dir
         self._probe_fn = probe_fn
         self._access = {key: value for key, value in (access or {}).items() if value}
@@ -304,6 +308,60 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
+class HistoryDialog(QDialog):
+    """Šta je i kada preuzeto; fajl se može otvoriti u folderu i kad je red odavno obrisan."""
+
+    def __init__(self, path: Path, parent=None):
+        super().__init__(parent)
+        self._path = path
+        self.setWindowTitle(tr("history.title"))
+        self.resize(640, 420)
+        layout = QVBoxLayout(self)
+        self.list = QListWidget()
+        self.list.itemDoubleClicked.connect(self._open_selected)
+        layout.addWidget(self.list)
+        buttons = QHBoxLayout()
+        self.open_button = QPushButton(tr("history.open"))
+        self.open_button.clicked.connect(self._open_selected)
+        self.clear_button = QPushButton(tr("history.clear"))
+        self.clear_button.clicked.connect(self._clear)
+        close_button = QPushButton(tr("history.close"))
+        close_button.clicked.connect(self.accept)
+        buttons.addWidget(self.open_button)
+        buttons.addWidget(self.clear_button)
+        buttons.addStretch(1)
+        buttons.addWidget(close_button)
+        layout.addLayout(buttons)
+        self._fill()
+
+    def _fill(self) -> None:
+        self.list.clear()
+        entries = store.load_history(self._path)
+        for entry in entries:
+            when = datetime.datetime.fromtimestamp(entry.finished_at).strftime("%d.%m.%Y %H:%M")
+            size = format_size(entry.size) if entry.size else ""
+            note = "" if entry.exists else f" — {tr('history.missing')}"
+            row = QListWidgetItem(f"{when}   {entry.title}   {size}{note}")
+            row.setData(Qt.ItemDataRole.UserRole, entry.filepath)
+            row.setToolTip(entry.filepath or entry.url)
+            self.list.addItem(row)
+        self.list.setEnabled(bool(entries))
+        self.open_button.setEnabled(bool(entries))
+        self.clear_button.setEnabled(bool(entries))
+        if not entries:
+            self.list.addItem(tr("history.empty"))
+
+    def _open_selected(self) -> None:
+        row = self.list.currentItem()
+        path = row.data(Qt.ItemDataRole.UserRole) if row else None
+        if path:
+            reveal(path)
+
+    def _clear(self) -> None:
+        store.clear_history(self._path)
+        self._fill()
+
+
 class YtdlpUpdateJob(QObject):
     """Provjera i preuzimanje yt-dlp-a u pozadinskoj niti (mreža ne smije blokirati prozor)."""
 
@@ -366,7 +424,8 @@ class MainWindow(QMainWindow):
     focus_requested = Signal()
 
     def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download,
-                 thumbnail_fetch=fetch_thumbnail, update_fetch=None, check_updates_on_start: bool = False):
+                 thumbnail_fetch=fetch_thumbnail, update_fetch=None, check_updates_on_start: bool = False,
+                 data_dir_path: Path | None = None):
         super().__init__()
         self.browser_request.connect(self._on_browser_request)
         self.focus_requested.connect(self._bring_to_front)
@@ -395,6 +454,12 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.setStyleSheet(STYLE)
         self._parallel = DEFAULT_PARALLEL
+        self._probing: set[str] = set()  # linkovi koji se upravo čitaju
+        self._errors: list[str] = []  # posljednje greške za izvještaj o problemu
+        self._data_dir = Path(data_dir_path) if data_dir_path else data_dir()
+        self._watch_clipboard = False
+        # Tekst koji je clipboard već imao pri paljenju ne treba hvatati.
+        self._last_clipboard = QApplication.clipboard().text() if QApplication.instance() else ""
         self._update_fetch = update_fetch
         self._update_check_job = None
         self._ytdlp_job = None
@@ -402,6 +467,7 @@ class MainWindow(QMainWindow):
         self._build_ui()
         self._load_settings()
         self.retranslate_ui()
+        self._restore_queue()
         if check_updates_on_start:
             QTimer.singleShot(4000, lambda: self.check_for_updates(manual=False))
             # yt-dlp se mijenja češće od aplikacije; tiha provjera najviše jednom dnevno.
@@ -414,6 +480,8 @@ class MainWindow(QMainWindow):
         self.file_menu = menu.addMenu("")
         self.paste_action = self.file_menu.addAction("", self._paste_from_clipboard)
         self.paste_action.setShortcut(QKeySequence.StandardKey.Paste)
+        self.watch_clipboard_action = self.file_menu.addAction("", self.set_watch_clipboard)
+        self.watch_clipboard_action.setCheckable(True)
         self.enter_links_action = self.file_menu.addAction("", self._enter_links)
         self.enter_links_action.setShortcut(QKeySequence("Ctrl+L"))
         self.file_menu.addSeparator()
@@ -431,6 +499,7 @@ class MainWindow(QMainWindow):
         self.retry_failed_action = self.downloads_menu.addAction("", self._retry_failed)
         self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
         self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
+        self.history_action = self.downloads_menu.addAction("", self._show_history)
         self.downloads_menu.addSeparator()
         self.parallel_menu = self.downloads_menu.addMenu("")
         self.parallel_actions = QActionGroup(self)
@@ -455,6 +524,7 @@ class MainWindow(QMainWindow):
             self.language_menu.addAction(action)
         self.help_menu.addSeparator()
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
+        self.report_action = self.help_menu.addAction("", self._save_report)
         self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
@@ -467,6 +537,8 @@ class MainWindow(QMainWindow):
         """Svi stalni tekstovi prozora; poziva se pri pokretanju i pri promjeni jezika."""
         self.file_menu.setTitle(tr("menu.file"))
         self.paste_action.setText(tr("menu.paste"))
+        self.watch_clipboard_action.setText(tr("menu.watch_clipboard"))
+        self.watch_clipboard_action.setChecked(self._watch_clipboard)
         self.enter_links_action.setText(tr("menu.enter_links"))
         self.choose_folder_action.setText(tr("menu.choose_folder"))
         self.open_folder_action.setText(tr("menu.open_folder"))
@@ -477,6 +549,7 @@ class MainWindow(QMainWindow):
         self.retry_failed_action.setText(tr("menu.retry_failed"))
         self.clear_action.setText(tr("menu.clear_finished"))
         self.remove_all_action.setText(tr("menu.remove_all"))
+        self.history_action.setText(tr("menu.history"))
         self.parallel_menu.setTitle(tr("menu.parallel"))
         for action in self.parallel_actions.actions():
             action.setChecked(action.data() == self._parallel)
@@ -487,6 +560,7 @@ class MainWindow(QMainWindow):
         for action in self.language_actions.actions():
             action.setChecked(action.data() == get_language())
         self.browser_help_action.setText(tr("menu.browser_help"))
+        self.report_action.setText(tr("menu.report"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
 
@@ -580,6 +654,7 @@ class MainWindow(QMainWindow):
     def _load_settings(self) -> None:
         self.set_output_dir(self._settings.value("output_dir", default_output_dir(), type=str) or default_output_dir(),
                             save=False)
+        self.set_watch_clipboard(self._settings.value("watch_clipboard", True, type=bool), save=False)
         parallel = self._settings.value("parallel", DEFAULT_PARALLEL, type=int)
         self._parallel = parallel if parallel in PARALLEL_CHOICES else DEFAULT_PARALLEL
         preset_key = self._settings.value("preset_key", DEFAULT_PRESET_KEY, type=str)
@@ -591,6 +666,62 @@ class MainWindow(QMainWindow):
         self._settings.setValue("output_dir", self._output_dir)
         self._settings.setValue("preset_key", self.preset_combo.currentData())
         self._settings.setValue("parallel", self._parallel)
+        self._settings.setValue("watch_clipboard", self._watch_clipboard)
+
+    def _restore_queue(self) -> None:
+        """Stavke koje su čekale pri zatvaranju (ili padu) vraćaju se u red, bez kolačića."""
+        rows = store.load_queue(store.queue_path(self._data_dir))
+        restored = 0
+        for row in rows:
+            item = self._queue.add(row["url"], row.get("title") or row["url"],
+                                   row.get("preset_key") or DEFAULT_PRESET_KEY,
+                                   row.get("output_dir") or self._output_dir, row.get("subfolder"),
+                                   http_headers=row.get("http_headers") or {},
+                                   filename_title=row.get("filename_title"), thumbnail=row.get("thumbnail"),
+                                   duration=row.get("duration"))
+            item.custom_format = bool(row.get("custom_format"))
+            self._append_row(item)
+            restored += 1
+        if restored:
+            self._set_status(tr("status.queue_restored", count=restored))
+        self._update_controls()
+
+    def _save_queue(self) -> None:
+        store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
+
+    @Slot()
+    def _show_history(self) -> None:
+        dialog = HistoryDialog(store.history_path(self._data_dir), self)
+        dialog.exec()
+
+    def set_watch_clipboard(self, enabled: bool, save: bool = True) -> None:
+        """Kopiran link (Ctrl+C u browseru) sam ulazi u red; preuzimanje i dalje kreće na „Preuzmi"."""
+        self._watch_clipboard = bool(enabled)
+        self.watch_clipboard_action.setChecked(self._watch_clipboard)
+        clipboard = QApplication.clipboard()
+        if self._watch_clipboard:
+            self._last_clipboard = clipboard.text()
+            clipboard.dataChanged.connect(self._on_clipboard_change, Qt.ConnectionType.UniqueConnection)
+        else:
+            with contextlib.suppress(RuntimeError):
+                clipboard.dataChanged.disconnect(self._on_clipboard_change)
+        if save:
+            self._save_settings()
+
+    @Slot()
+    def _on_clipboard_change(self) -> None:
+        if not self._watch_clipboard:
+            return
+        text = QApplication.clipboard().text()
+        if not text or text == self._last_clipboard:
+            return
+        self._last_clipboard = text
+        known = {item.url for item in self._queue.items()}
+        urls = [url for url in extract_urls(text) if url not in known]
+        if not urls:
+            return
+        self._set_status(tr("status.clipboard_added", title=urls[0]))
+        self._start_probe(urls)
 
     def set_parallel(self, count: int) -> None:
         """Koliko preuzimanja ide istovremeno; veći broj ne znači uvijek brže (dijeli se veza)."""
@@ -661,6 +792,11 @@ class MainWindow(QMainWindow):
         event.acceptProposedAction()
 
     def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False) -> None:
+        # Isti link koji se upravo čita ne treba čitati dvaput (npr. hvatanje clipboarda pa „Zalijepi").
+        urls = [url for url in urls if url not in self._probing]
+        if not urls:
+            return
+        self._probing.update(urls)
         job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start)
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
@@ -722,12 +858,14 @@ class MainWindow(QMainWindow):
         item.message = message
         self._append_row(item)
         self._refresh_row(item)
+        self._note_error(message)
         self._set_status(tr("status.link_failed", message=display_message(message)))
 
     @Slot(int)
     def _on_probe_finished(self, job_id: int) -> None:
         job = self._probe_jobs.pop(job_id, None)
         if job is not None:
+            self._probing.difference_update(job.urls)
             job.deleteLater()
         self._update_controls()
 
@@ -780,13 +918,18 @@ class MainWindow(QMainWindow):
             item.status = result.status
             item.filepath = result.filepath
             item.message = MESSAGE_EXISTS if result.already_existed else result.message
+            if result.status == ItemStatus.FAILED:
+                self._note_error(result.message or "")
             if result.filepath and os.path.isfile(result.filepath):
                 self._sizes[item_id] = os.path.getsize(result.filepath)
+            if result.status == ItemStatus.DONE and result.filepath:
+                store.append_history(item, store.history_path(self._data_dir), self._sizes.get(item_id))
             if item_id in self._remove_when_done:
                 self._remove_when_done.discard(item_id)
                 self._remove_item(item_id)
             else:
                 self._refresh_row(item)
+        self._save_queue()
         self._start_next()
 
     @Slot()
@@ -1052,6 +1195,34 @@ class MainWindow(QMainWindow):
     def _show_browser_help(self) -> None:
         QMessageBox.information(self, tr("menu.browser_help"), tr("help.browser_text", folder=str(extension_dir())))
 
+    def _note_error(self, message: str) -> None:
+        if message:
+            self._errors.append(f"{datetime.datetime.now():%H:%M:%S} {display_message(message)}")
+            del self._errors[:-diagnostics.MAX_ERRORS]
+
+    @Slot()
+    def _save_report(self) -> None:
+        """Jedan tekstualni fajl koji se može poslati: verzije, alati i posljednje greške."""
+        suggestion = diagnostics.default_report_path(self._output_dir)
+        chosen, _ = QFileDialog.getSaveFileName(self, tr("menu.report"), str(suggestion), "*.txt")
+        if not chosen:
+            return
+        settings = {
+            "jezik": get_language(),
+            "folder": self._output_dir,
+            "format": self.preset_combo.currentData(),
+            "istovremeno": self._parallel,
+            "hvatanje clipboarda": self._watch_clipboard,
+            "stavki u redu": len(self._queue.items()),
+        }
+        try:
+            Path(chosen).write_text(diagnostics.build_report(self._errors, settings), encoding="utf-8")
+        except OSError as exc:
+            self._set_status(tr("report.failed", error=exc))
+            return
+        self._set_status(tr("report.saved", path=chosen))
+        reveal(chosen)
+
     @Slot()
     def _show_about(self) -> None:
         pending = ytdlp_update.pending_version()
@@ -1172,6 +1343,7 @@ class MainWindow(QMainWindow):
             for job in jobs:
                 job.join(timeout=10)
         self._save_settings()
+        self._save_queue()
         event.accept()
 
 

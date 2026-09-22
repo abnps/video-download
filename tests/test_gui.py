@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+from pathlib import Path
 import threading
 import time
 import unittest
@@ -95,7 +96,7 @@ class MainWindowTest(unittest.TestCase):
 
     def make_window(self, download_fn, probe_fn=fake_probe, thumbnail_fetch=lambda url: None, parallel=1):
         window = MainWindow(settings=self.settings, probe_fn=probe_fn, download_fn=download_fn,
-                            thumbnail_fetch=thumbnail_fetch)
+                            thumbnail_fetch=thumbnail_fetch, data_dir_path=self.tmp.name)
         window.set_output_dir(self.tmp.name)
         window.set_parallel(parallel)
         self.addCleanup(window.deleteLater)
@@ -339,6 +340,52 @@ class MainWindowTest(unittest.TestCase):
         time.sleep(0.2)
         app.processEvents()
         self.assertEqual((len(self.calls), item.auto_retries), (1, 0))
+
+    def test_copied_link_is_caught_from_clipboard(self):
+        window = self.make_window(self.quick_download)
+        QApplication.clipboard().setText("https://v/kopirano")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        self.assertEqual(self.calls, [])  # samo u redu, preuzimanje čeka „Preuzmi"
+
+        # Isti tekst po drugi put ne dodaje ništa novo.
+        window._on_clipboard_change()
+        time.sleep(0.1)
+        app.processEvents()
+        self.assertEqual(len(window._queue.items()), 1)
+
+        # Isključeno hvatanje: kopiran link se ignoriše.
+        window.set_watch_clipboard(False)
+        QApplication.clipboard().setText("https://v/drugi")
+        time.sleep(0.2)
+        app.processEvents()
+        self.assertEqual(len(window._queue.items()), 1)
+        self.assertEqual(self.settings.value("watch_clipboard"), False)
+
+    def test_text_without_link_in_clipboard_is_ignored(self):
+        window = self.make_window(self.quick_download)
+        QApplication.clipboard().setText("obična bilješka bez linka")
+        time.sleep(0.2)
+        app.processEvents()
+        self.assertEqual(window._queue.items(), [])
+
+    def test_queue_survives_restart_and_history_is_written(self):
+        window = self.make_window(self.quick_download)
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        first = window._queue.items()[0]
+        window._rows[first.id].action_button.click()  # preuzmi samo prvi
+        self.assertTrue(wait_until(lambda: first.status == ItemStatus.DONE))
+        window.close()
+
+        # Novi prozor sa istim folderom podataka: nedovršeno se vraća, gotovo ne.
+        again = self.make_window(self.quick_download)
+        urls = [item.url for item in again._queue.items()]
+        self.assertEqual(urls, ["https://v/b"])
+        self.assertEqual(again._queue.items()[0].status, ItemStatus.WAITING)
+
+        from videodl import store
+        history = store.load_history(store.history_path(Path(self.tmp.name)))
+        self.assertEqual([entry.url for entry in history], ["https://v/a"])
 
     def test_remove_active_row_cancels_and_removes(self):
         window = self.make_window(self.blocking_download)
