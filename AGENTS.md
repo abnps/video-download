@@ -17,8 +17,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 ## Obim i upotreba
 
-- Samo lična upotreba. Bez zaobilaženja DRM-a, bez piratskih izvora, bez javne
-  distribucije ili prodaje prije pravne provjere.
+- Bez zaobilaženja DRM-a i bez piratskih izvora. Prodaja i sajt traže pravnu provjeru;
+  repo i izdanja su javni od 22.9.2026.
 - yt-dlp logika ostaje u `videodl/presets.py`, `probe.py`, `download.py` i
   `jobs.py`, bez Qt-a. `gui.py` samo prikazuje stanje i pokreće poslove.
 - Prekid preuzimanja briše samo privremene fajlove tog pokušaja, nikad ranije
@@ -56,9 +56,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   Tekstovi iz radnih niti su ključevi prevoda, prevode se tek pri prikazu.
 - Instaler: `python tools/build_release.py` (PyInstaller + Inno Setup, build van
   OneDrive-a). `installer/Bosnian.isl` i `.iss` moraju ostati UTF-8 sa BOM-om.
-- Aplikacija ostaje LIČNA (Ahmedova odluka 17.9.2026): nema javnog repoa, sajta ni
-  prodaje bez nove odluke i pravne provjere (§95a UrhG, LG Hamburg/Uberspace).
-- Ažuriranje čita izdanja privatnog repoa `npgamy/video-download` preko `gh` prijave
+- Repo je JAVAN (Ahmedova odluka 22.9.2026, mijenja odluku od 17.9.2026): kod i izdanja su
+  javno dostupni. Sajt i prodaja i dalje traže novu odluku i pravnu provjeru
+  (§95a UrhG, LG Hamburg/Uberspace). Program se ne prilagođava piratskim izvorima ni DRM-u.
+- Javna distribucija instalera nosi GPL obavezu za ffmpeg: uz izdanje mora stajati link na
+  izvorni kod tog builda (vidi THIRD-PARTY-NOTICES u `tools/build_release.py`).
+- Ažuriranje čita izdanja repoa `npgamy/video-download` preko `gh` prijave
   (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
   SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz
@@ -75,4 +78,4 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Poslije izmjene ekstenzije, hosta ili mosta: `node tools/e2e_browser/run.mjs`
   (pravi Edge sa privremenim profilom i `--load-extension`; ne dira Ahmedov profil).
 - Najmanja izmjena koja rješava zahtjev; bez refaktorisanja nepovezanog koda.
-- Commit samo poslije zelenih testova; push na `origin/main` privatnog repoa.
+- Commit samo poslije zelenih testova; push na `origin/main`.

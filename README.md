@@ -20,7 +20,7 @@ preko linka ili direktno iz browsera (Edge/Chrome). Samo za ličnu upotrebu.
 ## Instalacija (instaler)
 
 Aplikacija je za ličnu upotrebu. Instaler `VideoDownload-Setup-<verzija>.exe` je u
-izdanjima privatnog repoa `npgamy/video-download` (GitHub → Releases).
+izdanjima repoa `npgamy/video-download` (GitHub → Releases).
 
 - Instaler je na 5 jezika: bosanski, engleski, njemački, španski, francuski.
   Izabrani jezik postaje i jezik aplikacije (mijenja se u **Pomoć → Jezik**).
@@ -37,7 +37,7 @@ izdanjima privatnog repoa `npgamy/video-download` (GitHub → Releases).
 1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
 2. `python tools/build_release.py` (build van OneDrive-a u `%LOCALAPPDATA%\VideoDownload-build`;
    uključuje self-test spakovane aplikacije).
-3. Objavi instaler i `.sha256` kao izdanje u privatnom repou:
+3. Objavi instaler i `.sha256` kao izdanje:
 
 ```
 gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes "<šta je novo>"

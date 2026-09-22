@@ -83,6 +83,8 @@ def write_notices() -> None:
 - yt-dlp-ejs (Unlicense/MIT) — https://github.com/yt-dlp/ejs
 - Qt for Python / PySide6 (LGPLv3) — https://doc.qt.io/qtforpython/ ; izvorni kod: https://code.qt.io/
 - FFmpeg (GPLv3 build) — https://ffmpeg.org/ ; izvorni kod i build: https://www.gyan.dev/ffmpeg/builds/
+  Izvorni kod korišćenog ffmpeg builda dostupan je na https://www.gyan.dev/ffmpeg/builds/ (odjeljak
+  „source code"), u skladu sa GPLv3. Na zahtjev se može dostaviti i kopija tog izvornog koda.
 - Node.js (MIT i licence zavisnosti) — https://nodejs.org/ ; licence: https://github.com/nodejs/node/blob/main/LICENSE
 - curl_cffi (MIT) — https://github.com/lexiforest/curl_cffi
 - Python (PSF License) — https://www.python.org/

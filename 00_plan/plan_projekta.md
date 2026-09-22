@@ -47,6 +47,9 @@ drugih sajtova koje podržava yt-dlp. Samo za ličnu upotrebu.
 - Instaler i aplikacija na 5 jezika: bosanski/srpski, engleski, njemački, španski, francuski.
 - ~~Javni repo izdanja~~ → 17.9.2026 Ahmed: aplikacija ostaje lična (bez sajta/prodaje/javne
   distribucije). Izdanja u privatnom repou `npgamy/video-download`, ažuriranje preko `gh` prijave.
+- 22.9.2026 Ahmed: repo `npgamy/video-download` je PREBAČEN U JAVNI, sa svim izdanjima
+  (izabrao „Javno sa svim izdanjima" uz objašnjene posljedice: javna distribucija instalera,
+  GPL obaveza za ffmpeg, lično ime u dokumentaciji, nepovratnost). Sajt i prodaja i dalje nisu u obimu.
 - Auto update: tiho pri pokretanju (najviše jednom dnevno) + Pomoć → Provjeri ažuriranje;
   instalira tek poslije pitanja i SHA-256 provjere.
 
