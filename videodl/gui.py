@@ -1344,6 +1344,9 @@ class MainWindow(QMainWindow):
                 job.join(timeout=10)
         self._save_settings()
         self._save_queue()
+        # Prozor se gasi: signal clipboarda više ne smije stizati.
+        with contextlib.suppress(RuntimeError):
+            QApplication.clipboard().dataChanged.disconnect(self._on_clipboard_change)
         event.accept()
 
 
