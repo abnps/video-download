@@ -181,12 +181,13 @@ class ProbeJob(QObject):
     """Čita linkove u pozadinskoj niti. Signali se u glavnoj niti isporučuju redom."""
 
     # access: {"http_headers": ..., "cookies": ...} za sajt iz browsera, samo neprazni ključevi
-    probed = Signal(object, str, object, bool)  # ProbeResult, output_dir, access, odmah preuzmi
-    failed = Signal(str, str, str, object)  # link, poruka, output_dir, access
+    # preset: format koji je dodatak izričito tražio (dugme „Preuzmi kao MP3"), inače None
+    probed = Signal(object, str, object, bool, object)  # ProbeResult, output_dir, access, odmah preuzmi, preset
+    failed = Signal(str, str, str, object, object)  # link, poruka, output_dir, access, preset
     finished = Signal(int)  # id posla
 
     def __init__(self, job_id: int, urls: list[str], output_dir: str, probe_fn,
-                 access: dict | None = None, auto_start: bool = False):
+                 access: dict | None = None, auto_start: bool = False, preset: str | None = None):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
@@ -195,6 +196,7 @@ class ProbeJob(QObject):
         self._probe_fn = probe_fn
         self._access = {key: value for key, value in (access or {}).items() if value}
         self._auto_start = auto_start
+        self._preset = preset
         self._cancel = threading.Event()
 
     def cancel(self) -> None:
@@ -212,10 +214,10 @@ class ProbeJob(QObject):
             try:
                 result = self._probe_fn(url, **self._access)
                 if not self._cancel.is_set():
-                    self.probed.emit(result, self._output_dir, self._access, self._auto_start)
+                    self.probed.emit(result, self._output_dir, self._access, self._auto_start, self._preset)
             except Exception as exc:  # granica radne niti
                 if not self._cancel.is_set():
-                    self.failed.emit(url, error_message(exc), self._output_dir, self._access)
+                    self.failed.emit(url, error_message(exc), self._output_dir, self._access, self._preset)
         self.finished.emit(self.job_id)
 
 
@@ -791,13 +793,14 @@ class MainWindow(QMainWindow):
         self.add_links_from_text(text, tr("status.drop_not_link"))
         event.acceptProposedAction()
 
-    def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False) -> None:
+    def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False,
+                     preset: str | None = None) -> None:
         # Isti link koji se upravo čita ne treba čitati dvaput (npr. hvatanje clipboarda pa „Zalijepi").
         urls = [url for url in urls if url not in self._probing]
         if not urls:
             return
         self._probing.update(urls)
-        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start)
+        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset)
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -812,10 +815,12 @@ class MainWindow(QMainWindow):
         # Klik u browseru znači „preuzmi ovo sada", bez čekanja na dugme Preuzmi.
         access = {"http_headers": request.headers, "cookies": request.cookies}
         if request.media_url is None:
-            self._start_probe([request.page_url], access, auto_start=True)
+            self._start_probe([request.page_url], access, auto_start=True, preset=request.preset)
             return
-        item = self._queue.add(request.media_url, request.page_title, self.preset_combo.currentData(),
+        item = self._queue.add(request.media_url, request.page_title,
+                               request.preset or self.preset_combo.currentData(),
                                self._output_dir, filename_title=request.page_title, **access)
+        item.custom_format = bool(request.preset)  # izbor iz dodatka ne mijenja glavni format
         self._append_row(item)
         self._set_status(tr("status.from_browser", title=request.page_title))
         self._manual.append(item.id)
@@ -829,16 +834,18 @@ class MainWindow(QMainWindow):
         self.raise_()
         self.activateWindow()
 
-    @Slot(object, str, object, bool)
-    def _on_probed(self, result: ProbeResult, output_dir: str, access: dict, auto_start: bool) -> None:
+    @Slot(object, str, object, bool, object)
+    def _on_probed(self, result: ProbeResult, output_dir: str, access: dict, auto_start: bool,
+                   preset: str | None = None) -> None:
         if not result.entries:
             self._set_status(tr("status.playlist_empty", title=result.title))
             return
         subfolder = result.title if result.is_playlist else None
-        preset_key = self.preset_combo.currentData()
+        preset_key = preset or self.preset_combo.currentData()
         for entry in result.entries:
             item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
                                    thumbnail=entry.thumbnail, duration=entry.duration, **access)
+            item.custom_format = bool(preset)  # format tražen iz dodatka ostaje na toj stavci
             self._append_row(item)
             if auto_start:
                 self._manual.append(item.id)
@@ -850,10 +857,12 @@ class MainWindow(QMainWindow):
             self._set_status(tr("status.added", title=result.title))
         self._start_next()
 
-    @Slot(str, str, str, object)
-    def _on_probe_failed(self, url: str, message: str, output_dir: str, access: dict) -> None:
+    @Slot(str, str, str, object, object)
+    def _on_probe_failed(self, url: str, message: str, output_dir: str, access: dict,
+                         preset: str | None = None) -> None:
         # Neuspio link ostaje vidljiv kao crveni red; „Pokušaj ponovo" ga daje yt-dlp-u direktno.
-        item = self._queue.add(url, url, self.preset_combo.currentData(), output_dir, **access)
+        item = self._queue.add(url, url, preset or self.preset_combo.currentData(), output_dir, **access)
+        item.custom_format = bool(preset)
         item.status = ItemStatus.FAILED
         item.message = message
         self._append_row(item)

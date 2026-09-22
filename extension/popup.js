@@ -3,6 +3,7 @@ import { pickLanguage, translate } from "./i18n.js";
 
 const pageButton = document.getElementById("download-page");
 const playingButton = document.getElementById("download-playing");
+const playingMp3Button = document.getElementById("download-playing-mp3");
 const resultLine = document.getElementById("result");
 let pageSupported = false;
 // Jezik browsera dok aplikacija ne javi svoj (isti kao u aplikaciji).
@@ -58,6 +59,7 @@ function setBusy(busy) {
   for (const button of document.querySelectorAll("button")) button.disabled = busy;
   pageButton.disabled = busy || !pageSupported;
   playingButton.disabled = busy || !pageSupported;
+  playingMp3Button.disabled = busy || !pageSupported;
 }
 
 function setResult(text, kind) {
@@ -77,14 +79,14 @@ function showReply(reply) {
   }
 }
 
-async function send(tabId, mediaUrl, type = "send") {
+async function send(tabId, mediaUrl, type = "send", preset = null) {
   // Dozvola za kolačiće (video iza prijave) traži se kroz dijalog browsera, samo prvi put;
   // mora biti prvi poziv u kliku. Odbijanje ne smeta: preuzimanje ide bez prijave.
   await chrome.permissions.request({ permissions: ["cookies"] }).catch(() => false);
   setBusy(true);
   lastResult = null;
   setResult(t("popup.sending"));
-  const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl });
+  const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl, preset });
   setBusy(false);
   showReply(reply);
 }
@@ -99,8 +101,11 @@ async function main() {
   pageSupported = /^https?:/.test(tab.url || "");
   pageButton.disabled = !pageSupported;
   playingButton.disabled = !pageSupported;
+  playingMp3Button.disabled = !pageSupported;
   pageButton.addEventListener("click", () => send(tab.id, null));
   playingButton.addEventListener("click", () => send(tab.id, null, "send-playing"));
+  // Isti video, ali aplikacija ga snima kao MP3 bez obzira na izabrani format.
+  playingMp3Button.addEventListener("click", () => send(tab.id, null, "send-playing", "mp3"));
 
   const state = await chrome.runtime.sendMessage({ type: "get-state", tabId: tab.id });
   renderMedia(tab, state);

@@ -387,6 +387,26 @@ class MainWindowTest(unittest.TestCase):
         history = store.load_history(store.history_path(Path(self.tmp.name)))
         self.assertEqual([entry.url for entry in history], ["https://v/a"])
 
+    def test_browser_request_can_ask_for_mp3(self):
+        window = self.make_window(self.quick_download)
+        window.preset_combo.setCurrentIndex(window.preset_combo.findData("best"))
+        window.browser_request.emit(BrowserRequest(page_url="https://v/pjesma", page_title="Pjesma",
+                                                   media_url="https://v/pjesma.m3u8", preset="mp3"))
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE]))
+        item = window._queue.items()[0]
+        self.assertEqual((item.preset_key, item.custom_format), ("mp3", True))
+        self.assertEqual(self.calls[0][1], "mp3")
+
+        # Promjena glavnog formata ne dira stavku koja je došla sa izabranim formatom.
+        window.preset_combo.setCurrentIndex(window.preset_combo.findData("720p"))
+        self.assertEqual(item.preset_key, "mp3")
+
+    def test_browser_page_request_with_mp3_marks_every_item(self):
+        window = self.make_window(self.quick_download)
+        window.browser_request.emit(BrowserRequest(page_url="https://v/lista", page_title="Lista", preset="mp3"))
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        self.assertEqual({item.preset_key for item in window._queue.items()}, {"mp3"})
+
     def test_remove_active_row_cancels_and_removes(self):
         window = self.make_window(self.blocking_download)
         window.add_links_from_text("https://v/a https://v/b")

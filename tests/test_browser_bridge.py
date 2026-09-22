@@ -240,5 +240,21 @@ class NativeMessagingInstallTest(unittest.TestCase):
         self.assertTrue(all(value == str(manifest_path) for value in written.values()))
 
 
+
+class PresetFromExtensionTest(unittest.TestCase):
+    """Dugme „Preuzmi kao MP3" šalje format uz zahtjev; prihvata se samo poznat format."""
+
+    def parse(self, **extra):
+        return parse_browser_request({"page_url": "https://v.test/a", "page_title": "A", **extra})
+
+    def test_known_preset_is_kept(self):
+        self.assertEqual(self.parse(preset="mp3").preset, "mp3")
+        self.assertEqual(self.parse(preset="720p").preset, "720p")
+
+    def test_unknown_or_missing_preset_is_ignored(self):
+        for value in (None, "", "exe", 5, {"key": "mp3"}, "mp3; rm -rf"):
+            self.assertIsNone(self.parse(preset=value).preset, value)
+        self.assertIsNone(self.parse().preset)
+
 if __name__ == "__main__":
     unittest.main()

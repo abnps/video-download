@@ -40,6 +40,7 @@ class BrowserRequest:
     media_kind: str | None = None
     headers: dict[str, str] = field(default_factory=dict)
     cookies: tuple[Cookie, ...] = ()
+    preset: str | None = None  # format koji je dodatak izričito tražio (npr. „mp3")
 
 
 def parse_browser_request(payload) -> BrowserRequest:
@@ -64,7 +65,15 @@ def parse_browser_request(payload) -> BrowserRequest:
         media_kind=media_kind,
         headers=_headers(payload.get("headers")),
         cookies=_cookies(payload.get("cookies"), [page_url, media_url]),
+        preset=_preset(payload.get("preset")),
     )
+
+
+def _preset(value) -> str | None:
+    """Prihvata se samo ključ formata koji aplikacija stvarno ima."""
+    from .presets import PRESETS
+
+    return value if isinstance(value, str) and value in {preset.key for preset in PRESETS} else None
 
 
 def _http_url(value, what: str) -> str:

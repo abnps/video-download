@@ -101,6 +101,9 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   folder podataka; kolačići se nikad ne upisuju. Preuzimanja → „Istorija preuzimanja…".
 - [x] Izvještaj o problemu (v0.6.0): Pomoć → „Sačuvaj izvještaj o problemu…"; linkovi se skraćuju
   na ime sajta, ime korisnika i tajne se sakrivaju (`videodl/diagnostics.py`).
+- [x] Dugme „Preuzmi kao MP3" u dodatku (22.9.2026, dodatak v0.5.0, aplikacija v0.6.1): isti video,
+  ali samo zvuk. Format putuje uz zahtjev (`preset`), aplikacija prihvata samo poznate ključeve i
+  označava stavku kao „vlastiti format". E2E u Edge-u pravi .mp3 fajl.
 - [x] Desni klik u browseru (17.9.2026, dodatak v0.4.5): stavke „Preuzmi ovaj link / ovaj video /
   video koji se pušta". Direktan tok ide odmah, blob/MSE traži objavu. Kolačići samo ako je dozvola
   već data (meni je ne može tražiti). E2E provjerava da stavke postoje; pravi desni klik čeka Ahmeda.

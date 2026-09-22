@@ -116,11 +116,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === "send") {
-    sendToApp(message.tabId, message.mediaUrl).then(sendResponse);
+    sendToApp(message.tabId, message.mediaUrl, message.preset).then(sendResponse);
     return true;
   }
   if (message?.type === "send-playing") {
-    sendPlaying(message.tabId).then(sendResponse);
+    sendPlaying(message.tabId, message.preset).then(sendResponse);
     return true;
   }
   return false;
@@ -184,7 +184,7 @@ async function buildRequest(tabId, mediaUrl) {
 }
 
 // Feed (X, TikTok, Instagram…): link taba nije link videa, pa se traži objava videa koji se pušta.
-async function sendPlaying(tabId) {
+async function sendPlaying(tabId, preset) {
   const tab = await chrome.tabs.get(tabId);
   let frames = [];
   try {
@@ -229,6 +229,7 @@ async function sendPlaying(tabId) {
     return reply;
   }
   request.cookies = await cookiesFor([tab.url, request.page_url, request.media?.url]);
+  if (preset) request.preset = preset;  // npr. „mp3": aplikacija snima samo zvuk
   const reply = await sendNative({ action: "add", request });
   await flashBadge(tabId, reply.ok);
   return { ...reply, target };
@@ -261,9 +262,12 @@ async function cookiesFor(urls) {
   return [...found.values()];
 }
 
-async function sendToApp(tabId, mediaUrl) {
+async function sendToApp(tabId, mediaUrl, preset) {
   const { request, error } = await buildRequest(tabId, mediaUrl);
-  if (request) request.cookies = await cookiesFor([request.page_url, request.media?.url]);
+  if (request) {
+    request.cookies = await cookiesFor([request.page_url, request.media?.url]);
+    if (preset) request.preset = preset;
+  }
   const reply = error || (await sendNative({ action: "add", request }));
   await flashBadge(tabId, reply.ok);
   return reply;

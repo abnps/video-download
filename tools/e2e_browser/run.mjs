@@ -199,6 +199,19 @@ async function run(cdp, report) {
   report.playingFile = path.relative(OUT, playingFile);
   log("Video koji se pušta:", report.playingReply, "->", report.playingFile);
 
+  // 5a) Isti video, ali dugme „Preuzmi kao MP3": aplikacija mora napraviti .mp3
+  const beforeMp3 = new Set(filesIn(OUT));
+  await cdp.send("Target.activateTarget", { targetId: feedTarget });
+  await sleep(1500);
+  // Poruka može biti ista kao maloprije, pa se polje prvo isprazni.
+  await cdp.evaluate(feedPopup, `(() => { const r = document.getElementById("result");
+    r.textContent = ""; r.className = "result";
+    document.getElementById("download-playing-mp3").click(); })()`);
+  report.mp3Reply = await popupResult(cdp, feedPopup, "");
+  const mp3File = await waitFor(() => filesIn(OUT).find((f) => !beforeMp3.has(f) && f.endsWith(".mp3")), 90000, "MP3 fajl");
+  report.mp3File = path.relative(OUT, mp3File);
+  log("MP3:", report.mp3Reply, "->", report.mp3File);
+
   // 5b) Feed nalik Instagramu: link muzike (/reels/audio/) ne smije biti uzet kao video
   const { targetId: igTarget } = await cdp.send("Target.createTarget", { url: `${SITE}/ig-feed.html` });
   const igTab = await tabState(`${SITE}/ig-feed.html`, "() => true");
