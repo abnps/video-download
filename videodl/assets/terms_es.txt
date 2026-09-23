@@ -1,0 +1,29 @@
+﻿VIDEO DOWNLOAD — CONDICIONES DE USO
+
+Al instalar o usar Video Download aceptas estas condiciones.
+
+1. Finalidad
+El programa sirve para descargar vídeo y audio que tienes derecho a descargar, sobre todo:
+- tus propios vídeos, por ejemplo vídeos que tú mismo has publicado en YouTube u otra plataforma;
+- contenido para el que tienes el permiso del titular de los derechos;
+- contenido bajo licencia libre (p. ej. Creative Commons) y contenido de dominio público.
+
+2. Lo que no está permitido
+- Descargar contenido protegido ajeno sin el permiso del titular de los derechos.
+- Compartir, volver a publicar, vender o usar públicamente de otro modo el contenido descargado sin permiso.
+- Eludir la protección DRM. El programa no elude el DRM; reconoce ese contenido y lo rechaza.
+
+3. Tu responsabilidad
+Eres responsable de lo que descargas y de cómo lo usas, incluido el cumplimiento de las leyes de tu país y de las condiciones de uso de la plataforma desde la que descargas (p. ej. las condiciones de YouTube).
+
+4. Sin relación con las plataformas
+Video Download no está afiliado a YouTube, Google ni a ninguna otra plataforma, ni cuenta con su respaldo. Los nombres de las plataformas pertenecen a sus propietarios.
+
+5. Sin garantía
+El programa se ofrece gratis y «tal cual», sin garantía de que funcione con todos los sitios. El autor no responde de los daños causados por el uso del programa, salvo cuando la ley no permita excluir la responsabilidad.
+
+6. Privacidad
+El programa no envía datos sobre ti. Solo se conecta al sitio desde el que descargas, a GitHub (comprobar si hay una nueva versión) y a PyPI (actualizar el lector de sitios yt-dlp). Las cookies de inicio de sesión del navegador se usan solo para ese sitio, se guardan solo en memoria y nunca se escriben en el disco.
+
+7. Componentes de terceros
+El programa usa yt-dlp, FFmpeg, Qt (PySide6), Node.js y otros componentes bajo sus propias licencias; la lista está en THIRD-PARTY-NOTICES.txt en la carpeta del programa.

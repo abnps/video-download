@@ -49,6 +49,19 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npg
 gh release edit v<prethodna_verzija> --repo npgamy/video-download --draft=true
 ```
 
+## Uslovi korištenja
+
+Program je namijenjen preuzimanju sadržaja koji korisnik ima pravo da preuzme, prije svega
+**vlastitih videa** (npr. videa koje je sam objavio na YouTube-u), sadržaja uz dozvolu nosioca
+prava i sadržaja pod slobodnom licencom. Zabranjeno je preuzimanje tuđeg zaštićenog sadržaja bez
+dozvole i dijeljenje preuzetog. DRM se ne zaobilazi. Korisnik odgovara za ono što preuzima.
+Program nije povezan sa YouTube-om ni Google-om.
+
+Puni tekst (prihvata se u instaleru, stoji i u Pomoć → Uslovi korištenja):
+[bosanski](videodl/assets/terms_bs.txt) · [English](videodl/assets/terms_en.txt) ·
+[Deutsch](videodl/assets/terms_de.txt) · [Español](videodl/assets/terms_es.txt) ·
+[Français](videodl/assets/terms_fr.txt)
+
 ## Zahtjevi (razvoj)
 
 - Python 3.14

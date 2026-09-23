@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.2", "24.9.2026", {
+        "bs": ["Uslovi korištenja: prihvataju se u instaleru i stoje u Pomoć → Uslovi korištenja."],
+        "en": ["Terms of use: accepted in the installer and available under Help → Terms of use."],
+        "de": ["Nutzungsbedingungen: werden im Installer akzeptiert und stehen unter Hilfe → Nutzungsbedingungen."],
+        "es": ["Condiciones de uso: se aceptan en el instalador y están en Ayuda → Condiciones de uso."],
+        "fr": ["Conditions d'utilisation : acceptées dans l'installateur et disponibles dans Aide → Conditions d'utilisation."],
+    }),
     ("0.7.1", "23.9.2026", {
         "bs": ["Pomoć → Šta je novo: kratke bilješke o izmjenama po verzijama."],
         "en": ["Help → What's new: short notes about the changes in each version."],

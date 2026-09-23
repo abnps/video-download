@@ -321,6 +321,34 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
+def terms_text(language: str) -> str:
+    """Uslovi korištenja iz istog fajla koji prikazuje instaler (videodl/assets/terms_<jezik>.txt)."""
+    folder = Path(__file__).parent / "assets"
+    path = folder / f"terms_{language}.txt"
+    if not path.is_file():
+        path = folder / "terms_en.txt"
+    return path.read_text(encoding="utf-8-sig")
+
+
+class TermsDialog(QDialog):
+    """Pomoć → Uslovi korištenja: isti tekst koji je prihvaćen u instaleru."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("menu.terms").rstrip("…"))
+        self.resize(620, 560)
+        layout = QVBoxLayout(self)
+        self.browser = QTextBrowser()
+        self.browser.setPlainText(terms_text(get_language()))
+        layout.addWidget(self.browser)
+        close_button = QPushButton(tr("history.close"))
+        close_button.clicked.connect(self.accept)
+        buttons = QHBoxLayout()
+        buttons.addStretch(1)
+        buttons.addWidget(close_button)
+        layout.addLayout(buttons)
+
+
 class WhatsNewDialog(QDialog):
     """Pomoć → Šta je novo: kratke bilješke po verzijama, na jeziku aplikacije."""
 
@@ -584,6 +612,7 @@ class MainWindow(QMainWindow):
         self.help_menu.addSeparator()
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
         self.report_action = self.help_menu.addAction("", self._save_report)
+        self.terms_action = self.help_menu.addAction("", self._show_terms)
         self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
@@ -629,6 +658,7 @@ class MainWindow(QMainWindow):
             action.setChecked(action.data() == get_language())
         self.browser_help_action.setText(tr("menu.browser_help"))
         self.report_action.setText(tr("menu.report"))
+        self.terms_action.setText(tr("menu.terms"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
 
@@ -768,6 +798,10 @@ class MainWindow(QMainWindow):
 
     def _save_queue(self) -> None:
         store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
+
+    @Slot()
+    def _show_terms(self) -> None:
+        TermsDialog(self).exec()
 
     @Slot()
     def _show_whats_new(self) -> None:

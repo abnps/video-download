@@ -1,0 +1,29 @@
+﻿VIDEO DOWNLOAD — USLOVI KORIŠTENJA
+
+Instalacijom ili korištenjem programa Video Download prihvataš ove uslove.
+
+1. Namjena
+Program služi za preuzimanje videa i zvuka koje imaš pravo da preuzmeš, a prije svega:
+- vlastitih videa, na primjer videa koje si sam objavio na YouTube-u ili drugoj platformi;
+- sadržaja za koji imaš dozvolu nosioca prava;
+- sadržaja pod slobodnom licencom (npr. Creative Commons) i sadržaja u javnom domenu.
+
+2. Šta nije dozvoljeno
+- Preuzimanje tuđeg zaštićenog sadržaja bez dozvole nosioca prava.
+- Dijeljenje, ponovno objavljivanje, prodaja ili drugo javno korištenje preuzetog sadržaja bez dozvole.
+- Zaobilaženje DRM zaštite. Program DRM ne zaobilazi; takav sadržaj prepoznaje i odbija.
+
+3. Tvoja odgovornost
+Ti odgovaraš za to šta preuzimaš i kako preuzeto koristiš, uključujući poštovanje zakona tvoje zemlje i uslova korištenja platforme sa koje preuzimaš (npr. uslova YouTube-a).
+
+4. Bez veze sa platformama
+Video Download nije povezan sa YouTube-om, Google-om niti bilo kojom drugom platformom, niti ga one podržavaju. Nazivi platformi pripadaju njihovim vlasnicima.
+
+5. Bez garancije
+Program se daje besplatno i „kakav jeste", bez garancije da će raditi sa svakim sajtom. Autor ne odgovara za štetu nastalu korištenjem programa, osim u slučajevima u kojima zakon ne dozvoljava isključenje odgovornosti.
+
+6. Privatnost
+Program ne šalje podatke o tebi. Povezuje se samo sa sajtom sa kog preuzimaš, sa GitHub-om (provjera nove verzije) i sa PyPI-jem (ažuriranje čitača sajtova yt-dlp). Kolačići prijave iz browsera koriste se samo za taj sajt, drže se samo u memoriji i ne upisuju se na disk.
+
+7. Komponente trećih strana
+Program koristi yt-dlp, FFmpeg, Qt (PySide6), Node.js i druge komponente pod njihovim licencama; spisak je u fajlu THIRD-PARTY-NOTICES.txt u folderu programa.

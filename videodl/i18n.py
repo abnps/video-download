@@ -132,6 +132,8 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
     "report.failed": ("Izvještaj nije sačuvan: {error}", "The report was not saved: {error}",
                       "Bericht nicht gespeichert: {error}", "El informe no se guardó: {error}",
                       "Rapport non enregistré : {error}"),
+    "menu.terms": ("Uslovi korištenja…", "Terms of use…", "Nutzungsbedingungen…", "Condiciones de uso…",
+                   "Conditions d'utilisation…"),
     "menu.whats_new": ("Šta je novo (bilješke o izmjenama)…", "What's new (patch notes)…",
                        "Was ist neu (Änderungshinweise)…", "Novedades (notas de la versión)…",
                        "Nouveautés (notes de version)…"),

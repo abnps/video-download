@@ -1,0 +1,29 @@
+﻿VIDEO DOWNLOAD — TERMS OF USE
+
+By installing or using Video Download you accept these terms.
+
+1. Purpose
+The program is meant for downloading video and audio that you have the right to download, above all:
+- your own videos, for example videos you have published yourself on YouTube or another platform;
+- content for which you have the permission of the rights holder;
+- content under a free license (e.g. Creative Commons) and content in the public domain.
+
+2. What is not allowed
+- Downloading other people's protected content without the permission of the rights holder.
+- Sharing, republishing, selling or otherwise publicly using downloaded content without permission.
+- Circumventing DRM protection. The program does not circumvent DRM; it recognises such content and refuses it.
+
+3. Your responsibility
+You are responsible for what you download and how you use it, including compliance with the laws of your country and with the terms of use of the platform you download from (e.g. YouTube's terms).
+
+4. No affiliation with platforms
+Video Download is not affiliated with, or endorsed by, YouTube, Google or any other platform. Platform names belong to their owners.
+
+5. No warranty
+The program is provided free of charge and "as is", without any guarantee that it will work with every site. The author is not liable for damage caused by using the program, except where the law does not allow liability to be excluded.
+
+6. Privacy
+The program does not send any data about you. It only connects to the site you download from, to GitHub (checking for a new version) and to PyPI (updating the site reader yt-dlp). Login cookies from the browser are used only for that site, kept only in memory and never written to disk.
+
+7. Third-party components
+The program uses yt-dlp, FFmpeg, Qt (PySide6), Node.js and other components under their own licenses; the list is in THIRD-PARTY-NOTICES.txt in the program folder.

@@ -1,0 +1,29 @@
+﻿VIDEO DOWNLOAD — NUTZUNGSBEDINGUNGEN
+
+Mit der Installation oder Nutzung von Video Download akzeptierst du diese Bedingungen.
+
+1. Zweck
+Das Programm dient zum Herunterladen von Video und Audio, zu dem du berechtigt bist, vor allem:
+- deiner eigenen Videos, zum Beispiel Videos, die du selbst auf YouTube oder einer anderen Plattform veröffentlicht hast;
+- Inhalten, für die du die Erlaubnis des Rechteinhabers hast;
+- Inhalten unter einer freien Lizenz (z. B. Creative Commons) und gemeinfreien Inhalten.
+
+2. Was nicht erlaubt ist
+- Das Herunterladen fremder geschützter Inhalte ohne Erlaubnis des Rechteinhabers.
+- Das Teilen, erneute Veröffentlichen, Verkaufen oder sonstige öffentliche Nutzen heruntergeladener Inhalte ohne Erlaubnis.
+- Das Umgehen von DRM-Schutz. Das Programm umgeht kein DRM; es erkennt solche Inhalte und lehnt sie ab.
+
+3. Deine Verantwortung
+Du bist verantwortlich dafür, was du herunterlädst und wie du es nutzt, einschließlich der Einhaltung der Gesetze deines Landes und der Nutzungsbedingungen der Plattform, von der du herunterlädst (z. B. der Bedingungen von YouTube).
+
+4. Keine Verbindung zu Plattformen
+Video Download ist nicht mit YouTube, Google oder einer anderen Plattform verbunden und wird von ihnen nicht unterstützt. Plattformnamen gehören ihren Inhabern.
+
+5. Keine Gewährleistung
+Das Programm wird kostenlos und „wie besehen" bereitgestellt, ohne Garantie, dass es mit jeder Seite funktioniert. Der Autor haftet nicht für Schäden durch die Nutzung des Programms, außer soweit ein Haftungsausschluss gesetzlich nicht zulässig ist.
+
+6. Datenschutz
+Das Programm sendet keine Daten über dich. Es verbindet sich nur mit der Seite, von der du herunterlädst, mit GitHub (Suche nach einer neuen Version) und mit PyPI (Aktualisierung des Seiten-Readers yt-dlp). Anmelde-Cookies aus dem Browser werden nur für diese Seite verwendet, nur im Speicher gehalten und nie auf die Festplatte geschrieben.
+
+7. Komponenten Dritter
+Das Programm nutzt yt-dlp, FFmpeg, Qt (PySide6), Node.js und weitere Komponenten unter deren Lizenzen; die Liste steht in THIRD-PARTY-NOTICES.txt im Programmordner.

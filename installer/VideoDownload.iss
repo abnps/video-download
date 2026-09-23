@@ -45,11 +45,11 @@ CloseApplications=yes
 RestartApplications=no
 
 [Languages]
-Name: "bosnian"; MessagesFile: "Bosnian.isl"
-Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+Name: "bosnian"; MessagesFile: "Bosnian.isl"; LicenseFile: "..\videodl\assets\terms_bs.txt"
+Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\videodl\assets\terms_en.txt"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"; LicenseFile: "..\videodl\assets\terms_de.txt"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "..\videodl\assets\terms_es.txt"
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "..\videodl\assets\terms_fr.txt"
 
 [CustomMessages]
 bosnian.BrowserNote=Za preuzimanje iz Edge/Chrome browsera učitaj dodatak iz foldera „extension" (Pomoć → Preuzimanje iz browsera).

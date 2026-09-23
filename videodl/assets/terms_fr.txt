@@ -1,0 +1,29 @@
+﻿VIDEO DOWNLOAD — CONDITIONS D'UTILISATION
+
+En installant ou en utilisant Video Download, tu acceptes ces conditions.
+
+1. Objet
+Le programme sert à télécharger des vidéos et du son que tu as le droit de télécharger, avant tout :
+- tes propres vidéos, par exemple des vidéos que tu as toi-même publiées sur YouTube ou une autre plateforme ;
+- du contenu pour lequel tu as l'autorisation du titulaire des droits ;
+- du contenu sous licence libre (p. ex. Creative Commons) et du contenu du domaine public.
+
+2. Ce qui n'est pas autorisé
+- Télécharger le contenu protégé d'autrui sans l'autorisation du titulaire des droits.
+- Partager, republier, vendre ou utiliser publiquement d'une autre manière le contenu téléchargé sans autorisation.
+- Contourner une protection DRM. Le programme ne contourne pas les DRM ; il reconnaît ce contenu et le refuse.
+
+3. Ta responsabilité
+Tu es responsable de ce que tu télécharges et de l'usage que tu en fais, y compris du respect des lois de ton pays et des conditions d'utilisation de la plateforme d'où tu télécharges (p. ex. les conditions de YouTube).
+
+4. Aucun lien avec les plateformes
+Video Download n'est pas affilié à YouTube, Google ou toute autre plateforme, et n'est pas soutenu par elles. Les noms des plateformes appartiennent à leurs propriétaires.
+
+5. Aucune garantie
+Le programme est fourni gratuitement et « en l'état », sans garantie qu'il fonctionne avec tous les sites. L'auteur n'est pas responsable des dommages causés par l'utilisation du programme, sauf lorsque la loi ne permet pas d'exclure la responsabilité.
+
+6. Confidentialité
+Le programme n'envoie aucune donnée te concernant. Il se connecte uniquement au site d'où tu télécharges, à GitHub (recherche d'une nouvelle version) et à PyPI (mise à jour du lecteur de sites yt-dlp). Les cookies de connexion du navigateur ne servent qu'à ce site, restent uniquement en mémoire et ne sont jamais écrits sur le disque.
+
+7. Composants tiers
+Le programme utilise yt-dlp, FFmpeg, Qt (PySide6), Node.js et d'autres composants sous leurs propres licences ; la liste se trouve dans THIRD-PARTY-NOTICES.txt dans le dossier du programme.
