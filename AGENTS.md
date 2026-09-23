@@ -71,6 +71,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `pokreni.pyw` mora ostati PRIJE prvog `import yt_dlp` (inače radi verzija iz paketa).
 - Red i istorija (`videodl/store.py`) se upisuju u folder podataka; u te fajlove NIKAD ne smiju
   ući kolačići. Izvještaj o problemu (`videodl/diagnostics.py`) skraćuje linkove na ime sajta.
+- ffmpeg za paket: `python tools/build_release.py` uzima „essentials“ build iz
+  `%LOCALAPPDATA%\VideoDownload-ffmpeg\x-ffmpeg-*-essentials_build\*\bin` (ili `VIDEODL_FFMPEG_DIR`);
+  bez njega pada na ffmpeg sa PATH-a. Izvor: gyan.dev / github.com/GyanD/codexffmpeg, SHA-256 sa gyan.dev.
 - Instalirana verzija koristi alate iz `tools/` pored `.exe`-a (ffmpeg, ffprobe, node);
   razvoj koristi PATH (`videodl/runtime.py`).
 

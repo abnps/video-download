@@ -95,7 +95,8 @@ class Cdp {
 function filesIn(folder) {
   if (!existsSync(folder)) return [];
   return readdirSync(folder, { withFileTypes: true, recursive: true })
-    .filter((entry) => entry.isFile())
+    // Nedovršeni fajlovi (.part, .ytdl, međukoraci .fNNN) nisu rezultat preuzimanja.
+    .filter((entry) => entry.isFile() && !/\.(part|ytdl|temp)$|\.f\d+\.\w+$/.test(entry.name))
     .map((entry) => path.join(entry.parentPath, entry.name));
 }
 
@@ -261,7 +262,7 @@ async function run(cdp, report) {
 
   // 6a) Stavke menija desnog klika postoje (update uspijeva samo za stvarno napravljenu stavku)
   report.menuItems = await waitFor(() => cdp.evaluate(helper, `(async () => {
-    const ids = ["videodl-link", "videodl-video", "videodl-page"];
+    const ids = ["videodl-link", "videodl-link-mp3", "videodl-video", "videodl-page", "videodl-playing-mp3"];
     const titles = [];
     for (const id of ids) {
       const title = await new Promise((resolve) => chrome.contextMenus.update(id, {}, () =>

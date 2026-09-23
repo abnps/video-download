@@ -147,7 +147,7 @@ async function sendFromMenu(info, tabId) {
   const target = menuTarget(info);
   if (!target) return;
   if (target.kind === "playing") {
-    await sendPlaying(tabId);
+    await sendPlaying(tabId, target.preset);
     return;
   }
   const tab = await chrome.tabs.get(tabId);
@@ -162,6 +162,7 @@ async function sendFromMenu(info, tabId) {
   }
   // Kolačići samo ako je dozvola već data kroz prozor dodatka; meni je ne može tražiti.
   request.cookies = await cookiesFor([tab.url, request.page_url, request.media?.url]);
+  if (target.preset) request.preset = target.preset;
   const reply = await sendNative({ action: "add", request });
   await flashBadge(tabId, reply.ok);
 }

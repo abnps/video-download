@@ -407,6 +407,67 @@ class MainWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
         self.assertEqual({item.preset_key for item in window._queue.items()}, {"mp3"})
 
+    def test_menu_options_reach_the_download(self):
+        window = self.make_window(self.quick_download)
+        window._set_option("_subtitles", True)
+        window._set_option("_thumbnail_cover", True)
+        window._set_option("_rate_limit", 2)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        window.set_item_section(item.id, (150.0, 370.0))
+        self.assertIn("2:30", window._rows[item.id].format_link.text())
+
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        extra = self.extras[0]
+        self.assertEqual(extra["section"], (150.0, 370.0))
+        self.assertTrue(extra["subtitles"] and extra["thumbnail"])
+        self.assertEqual(extra["subtitle_langs"][0], "bs.*")
+        self.assertEqual(extra["ratelimit"], 2 * 1024 * 1024)  # jedno preuzimanje dobija cijeli limit
+        self.assertTrue(window.subtitles_action.isChecked())
+
+        window.set_parallel(2)  # dva istovremena dijele ukupni limit
+        self.assertEqual(window._download_options(item)["ratelimit"], 1024 * 1024)
+
+    def test_plain_download_gets_no_extra_options(self):
+        window = self.make_window(self.quick_download)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE]))
+        for key in ("section", "subtitles", "thumbnail", "ratelimit"):
+            self.assertNotIn(key, self.extras[0])
+
+    def test_whole_playlist_option_reaches_link_reading(self):
+        seen = []
+
+        def probe_fn(url, http_headers=None, whole_playlist=False):
+            seen.append(whole_playlist)
+            return fake_probe(url)
+
+        window = self.make_window(self.quick_download, probe_fn=probe_fn)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(seen) == 1))
+        window._set_option("_whole_playlist", True)
+        window.add_links_from_text("https://v/b")
+        self.assertTrue(wait_until(lambda: len(seen) == 2))
+        self.assertEqual(seen, [False, True])
+
+    def test_options_and_clip_survive_restart(self):
+        window = self.make_window(self.quick_download)
+        window._set_option("_thumbnail_cover", True)
+        window._set_option("_rate_limit", 5)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        window.set_item_section(window._queue.items()[0].id, (10.0, 20.0))
+        window.close()
+
+        again = self.make_window(self.quick_download)
+        self.assertTrue(again._thumbnail_cover)
+        self.assertEqual(again._rate_limit, 5)
+        self.assertEqual(again._queue.items()[0].section, (10.0, 20.0))
+
     def test_remove_active_row_cancels_and_removes(self):
         window = self.make_window(self.blocking_download)
         window.add_links_from_text("https://v/a https://v/b")

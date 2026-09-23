@@ -158,7 +158,12 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              cancel_event: threading.Event | None = None, *,
              http_headers: dict[str, str] | None = None,
              filename_title: str | None = None,
-             cookies: tuple[Cookie, ...] = ()) -> DownloadResult:
+             cookies: tuple[Cookie, ...] = (),
+             section: tuple[float, float] | None = None,
+             subtitles: bool = False,
+             subtitle_langs: list[str] | None = None,
+             thumbnail: bool = False,
+             ratelimit: int | None = None) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
@@ -168,7 +173,9 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         # Kolačići prijave postoje na disku samo dok radi ovo jedno preuzimanje.
         with cookie_file(cookies) as cookiefile:
             opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
-                                     filename_title=filename_title, source_url=url, cookiefile=cookiefile)
+                                     filename_title=filename_title, source_url=url, cookiefile=cookiefile,
+                                     section=section, subtitles=subtitles, subtitle_langs=subtitle_langs,
+                                     thumbnail=thumbnail, ratelimit=ratelimit)
             opts["progress_hooks"] = [attempt.progress_hook]
             opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
             with YoutubeDL(opts) as ydl:

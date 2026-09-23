@@ -2,11 +2,12 @@
 
 import hashlib
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from yt_dlp.utils import sanitize_filename
+from yt_dlp.utils import download_range_func, sanitize_filename
 
 from .i18n import tr
 from .ytdl import base_options, reject_live
@@ -64,17 +65,59 @@ def safe_folder_name(name: str, fallback: str = "Plejlista") -> str:
     return cleaned[:80].rstrip(". ") or fallback
 
 
+def parse_section(text: str) -> tuple[float, float] | None:
+    """„2:30-6:10", „1:02:03 – 1:05:00" ili „90-120" u sekunde; None ako nije ispravno."""
+    parts = re.split(r"\s*[-–—]\s*", (text or "").strip())
+    if len(parts) != 2:
+        return None
+    try:
+        start, end = (_seconds(part) for part in parts)
+    except ValueError:
+        return None
+    return (start, end) if 0 <= start < end else None
+
+
+def format_section(section: tuple[float, float] | None) -> str:
+    return "–".join(_clock(value) for value in section) if section else ""
+
+
+def subtitle_languages(language: str) -> list[str]:
+    """Titlovi na jeziku aplikacije i engleski; za bs i srodni jezici (hr, sr)."""
+    wanted = ["bs", "hr", "sr"] if language == "bs" else [language]
+    return [f"{code}.*" for code in wanted if code != "en"] + ["en.*"]
+
+
+def _seconds(text: str) -> float:
+    pieces = text.split(":")
+    if not 1 <= len(pieces) <= 3 or not all(re.fullmatch(r"\d+(?:[.,]\d+)?", piece) for piece in pieces):
+        raise ValueError(text)
+    total = 0.0
+    for piece in pieces:
+        total = total * 60 + float(piece.replace(",", "."))
+    return total
+
+
+def _clock(value: float) -> str:
+    whole = int(value)
+    hours, rest = divmod(whole, 3600)
+    minutes, seconds = divmod(rest, 60)
+    return f"{hours}:{minutes:02d}:{seconds:02d}" if hours else f"{minutes}:{seconds:02d}"
+
+
 def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = None,
                       logger=None, *, http_headers: dict[str, str] | None = None,
                       filename_title: str | None = None, source_url: str | None = None,
-                      cookiefile: str | None = None) -> dict:
+                      cookiefile: str | None = None, section: tuple[float, float] | None = None,
+                      subtitles: bool = False, subtitle_langs: list[str] | None = None,
+                      thumbnail: bool = False, ratelimit: int | None = None) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
 
     opts = base_options(logger)
     opts["format"] = preset.format
-    opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _output_name(filename_title, source_url)
+    opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _with_section(
+        _output_name(filename_title, source_url), section)
     opts["match_filter"] = reject_live
     if http_headers:
         opts["http_headers"] = dict(http_headers)
@@ -84,19 +127,47 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         opts["format_sort"] = list(preset.format_sort)
     if preset.merge_output_format:
         opts["merge_output_format"] = preset.merge_output_format
+    postprocessors = []
+    if thumbnail:
+        # Sličica postaje omot fajla (MP3 i MP4); jpg jer ga svi playeri prikazuju.
+        opts["writethumbnail"] = True
+        postprocessors.append({"key": "FFmpegThumbnailsConvertor", "format": "jpg", "when": "before_dl"})
     if preset.is_audio:
         extract = {"key": "FFmpegExtractAudio", "preferredcodec": preset.audio_codec}
         if preset.audio_quality:
             extract["preferredquality"] = preset.audio_quality
-        opts["postprocessors"] = [extract]
+        postprocessors.append(extract)
         # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo.
         opts["final_ext"] = preset.audio_codec
+    elif subtitles:
+        # Titlovi se ugrađuju u MP4 (može ih uključiti svaki player); samo ručno napravljeni.
+        opts["writesubtitles"] = True
+        opts["subtitleslangs"] = list(subtitle_langs or ["en.*"])
+        postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": False})
+    if thumbnail:
+        postprocessors.append({"key": "EmbedThumbnail", "already_have_thumbnail": False})
+    if postprocessors:
+        opts["postprocessors"] = postprocessors
+    if section:
+        # Samo dio videa; rezovi na tačnom mjestu traže ponovno kodiranje oko ključnih kadrova.
+        opts["download_ranges"] = download_range_func(None, [section])
+        opts["force_keyframes_at_cuts"] = True
+    if ratelimit:
+        opts["ratelimit"] = int(ratelimit)
     return opts
 
 
 def _escape(text: str) -> str:
     # '%' u putanji ili naslovu yt-dlp bi čitao kao dio šablona.
     return text.replace("%", "%%")
+
+
+def _with_section(template: str, section: tuple[float, float] | None) -> str:
+    """Isječak dobija svoje ime, da ne zamijeni cijeli video niti se s njim pomiješa."""
+    if not section:
+        return template
+    label = format_section(section).replace(":", ".")
+    return template.replace(".%(ext)s", f" ({label}).%(ext)s")
 
 
 def _output_name(filename_title: str | None, source_url: str | None) -> str:

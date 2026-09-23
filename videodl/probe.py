@@ -32,8 +32,10 @@ class ProbeResult:
 
 
 def probe(url: str, extract: Extractor | None = None, logger=None,
-          http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = ()) -> ProbeResult:
-    extract = extract or _make_extractor(logger, http_headers, cookies)
+          http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = (),
+          whole_playlist: bool = False) -> ProbeResult:
+    """`whole_playlist`: link videa koji je u plejlisti (watch?v=…&list=…) daje cijelu plejlistu."""
+    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist)
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
@@ -93,10 +95,13 @@ def pick_thumbnail(info: dict) -> str | None:
     return info.get("thumbnail")
 
 
-def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[Cookie, ...]) -> Extractor:
+def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[Cookie, ...],
+                    whole_playlist: bool = False) -> Extractor:
     def extract(url: str) -> dict:
         opts = base_options(logger)
         opts["extract_flat"] = "in_playlist"
+        if whole_playlist:
+            opts["noplaylist"] = False
         if http_headers:
             opts["http_headers"] = dict(http_headers)
         # Kolačići prijave postoje na disku samo dok traje ovo jedno čitanje.

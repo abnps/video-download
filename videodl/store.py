@@ -14,7 +14,7 @@ from .jobs import ItemStatus, QueueItem
 
 MAX_HISTORY = 500
 _QUEUE_FIELDS = ("url", "title", "preset_key", "output_dir", "subfolder", "status", "message", "filepath",
-                 "http_headers", "filename_title", "thumbnail", "duration", "custom_format")
+                 "http_headers", "filename_title", "thumbnail", "duration", "custom_format", "section")
 # Stanja koja nema smisla pamtiti: gotovo ide u istoriju, a prekinuto se ne vraća samo od sebe.
 _KEEP_STATUSES = (ItemStatus.WAITING, ItemStatus.ACTIVE, ItemStatus.FAILED)
 

@@ -66,10 +66,23 @@ def pyinstaller(*args: str) -> None:
         cwd=PROJECT)
 
 
+def ffmpeg_dir() -> Path | None:
+    """Folder sa ffmpeg buildom za paket: VIDEODL_FFMPEG_DIR ili najnoviji raspakovani
+    „essentials" u %LOCALAPPDATA%\\VideoDownload-ffmpeg. Upola je manji od „full" builda sa PATH-a,
+    a ima sve što aplikacija koristi (lame, x264, aac, mov_text, webp, hls, dash)."""
+    override = os.environ.get("VIDEODL_FFMPEG_DIR")
+    if override:
+        return Path(override)
+    candidates = sorted((Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-ffmpeg").glob("x-ffmpeg-*-essentials_build/*/bin"))
+    return candidates[-1] if candidates else None
+
+
 def copy_tool(name: str) -> Path:
-    source = shutil.which(name)
+    folder = ffmpeg_dir() if name in ("ffmpeg", "ffprobe") else None
+    source = str(folder / f"{name}.exe") if folder and (folder / f"{name}.exe").is_file() else shutil.which(name)
     if not source:
         raise SystemExit(f"Alat {name} nije na PATH-u; potreban je za paket.")
+    print(f"› {name}: {source}", flush=True)
     target = APP / "tools" / f"{name}.exe"
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(Path(source).resolve(), target)

@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_RETRY, tr
 from .icons import icon
 from .jobs import ItemStatus, QueueItem
-from .presets import get_preset
+from .presets import format_section, get_preset
 
 LINK_COLOR = "#1a73e8"
 MUTED_COLOR = "#7a7a7a"
@@ -269,6 +269,8 @@ class QueueRow(QFrame):
 
     def update_item(self, item: QueueItem, size: int | None = None) -> None:
         preset = get_preset(item.preset_key).short_label
+        if item.section:
+            preset = f"{preset} · {format_section(item.section)}"
         active = item.status == ItemStatus.ACTIVE
         if active:
             self.format_link.setText(f'<span style="color:{MUTED_COLOR}">{preset}</span>')

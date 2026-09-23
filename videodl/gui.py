@@ -34,7 +34,10 @@ from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
 from .native_messaging import install_native_host, uninstall_native_host
 from .runtime import extension_dir, find_tool, mark_running
-from .presets import DEFAULT_PRESET_KEY, PRESETS, get_preset, safe_folder_name
+from .presets import (
+    DEFAULT_PRESET_KEY, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
+    subtitle_languages,
+)
 from .probe import ProbeResult, probe
 from . import diagnostics, store
 from . import updater, ytdlp_update
@@ -47,6 +50,9 @@ MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
 # Pucanje veze: koliko puta aplikacija sama ponavlja i koliko čeka između pokušaja.
 MAX_AUTO_RETRIES = 3
 AUTO_RETRY_DELAY_MS = 5000
+
+# Ukupno ograničenje brzine u MB/s (0 = bez ograničenja); dijeli se na preuzimanja u toku.
+RATE_CHOICES = (0, 1, 2, 5, 10)
 
 # Koliko preuzimanja može ići istovremeno (Preuzimanja → Istovremeno).
 PARALLEL_CHOICES = (1, 2, 3, 4)
@@ -187,7 +193,8 @@ class ProbeJob(QObject):
     finished = Signal(int)  # id posla
 
     def __init__(self, job_id: int, urls: list[str], output_dir: str, probe_fn,
-                 access: dict | None = None, auto_start: bool = False, preset: str | None = None):
+                 access: dict | None = None, auto_start: bool = False, preset: str | None = None,
+                 probe_options: dict | None = None):
         super().__init__()
         self.job_id = job_id
         self._urls = urls
@@ -197,6 +204,7 @@ class ProbeJob(QObject):
         self._access = {key: value for key, value in (access or {}).items() if value}
         self._auto_start = auto_start
         self._preset = preset
+        self._probe_options = {key: value for key, value in (probe_options or {}).items() if value}
         self._cancel = threading.Event()
 
     def cancel(self) -> None:
@@ -212,7 +220,7 @@ class ProbeJob(QObject):
             if self._cancel.is_set():
                 break
             try:
-                result = self._probe_fn(url, **self._access)
+                result = self._probe_fn(url, **self._access, **self._probe_options)
                 if not self._cancel.is_set():
                     self.probed.emit(result, self._output_dir, self._access, self._auto_start, self._preset)
             except Exception as exc:  # granica radne niti
@@ -225,13 +233,15 @@ class DownloadJob(QObject):
     progress = Signal(int, object)  # id stavke, Progress
     finished = Signal(int, object)  # id stavke, DownloadResult
 
-    def __init__(self, item: QueueItem, download_fn):
+    def __init__(self, item: QueueItem, download_fn, options: dict | None = None):
         super().__init__()
         self.item_id = item.id
         self._args = (item.url, get_preset(item.preset_key), item.output_dir, item.subfolder)
         self._extra = {"http_headers": dict(item.http_headers), "filename_title": item.filename_title}
         if item.cookies:
             self._extra["cookies"] = item.cookies
+        # Isječak, titlovi, sličica, brzina: samo ono što je uključeno.
+        self._extra.update(options or {})
         self._download_fn = download_fn
         self._cancel = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
@@ -456,6 +466,10 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.setStyleSheet(STYLE)
         self._parallel = DEFAULT_PARALLEL
+        self._subtitles = False
+        self._thumbnail_cover = False
+        self._whole_playlist = False
+        self._rate_limit = 0
         self._probing: set[str] = set()  # linkovi koji se upravo čitaju
         self._errors: list[str] = []  # posljednje greške za izvještaj o problemu
         self._data_dir = Path(data_dir_path) if data_dir_path else data_dir()
@@ -502,6 +516,25 @@ class MainWindow(QMainWindow):
         self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
         self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
         self.history_action = self.downloads_menu.addAction("", self._show_history)
+        self.downloads_menu.addSeparator()
+        self.subtitles_action = self.downloads_menu.addAction(
+            "", lambda checked: self._set_option("_subtitles", checked))
+        self.subtitles_action.setCheckable(True)
+        self.thumbnail_action = self.downloads_menu.addAction(
+            "", lambda checked: self._set_option("_thumbnail_cover", checked))
+        self.thumbnail_action.setCheckable(True)
+        self.whole_playlist_action = self.downloads_menu.addAction(
+            "", lambda checked: self._set_option("_whole_playlist", checked))
+        self.whole_playlist_action.setCheckable(True)
+        self.rate_menu = self.downloads_menu.addMenu("")
+        self.rate_actions = QActionGroup(self)
+        self.rate_actions.setExclusive(True)
+        for value in RATE_CHOICES:
+            action = self.rate_menu.addAction("")
+            action.setCheckable(True)
+            action.setData(value)
+            action.triggered.connect(lambda _checked, rate=value: self._set_option("_rate_limit", rate))
+            self.rate_actions.addAction(action)
         self.downloads_menu.addSeparator()
         self.parallel_menu = self.downloads_menu.addMenu("")
         self.parallel_actions = QActionGroup(self)
@@ -552,6 +585,14 @@ class MainWindow(QMainWindow):
         self.clear_action.setText(tr("menu.clear_finished"))
         self.remove_all_action.setText(tr("menu.remove_all"))
         self.history_action.setText(tr("menu.history"))
+        self.subtitles_action.setText(tr("menu.subtitles"))
+        self.thumbnail_action.setText(tr("menu.thumbnail"))
+        self.whole_playlist_action.setText(tr("menu.whole_playlist"))
+        self.rate_menu.setTitle(tr("menu.rate_limit"))
+        for action in self.rate_actions.actions():
+            value = action.data()
+            action.setText(tr("rate.value", value=value) if value else tr("rate.none"))
+        self._sync_option_actions()
         self.parallel_menu.setTitle(tr("menu.parallel"))
         for action in self.parallel_actions.actions():
             action.setChecked(action.data() == self._parallel)
@@ -657,6 +698,11 @@ class MainWindow(QMainWindow):
         self.set_output_dir(self._settings.value("output_dir", default_output_dir(), type=str) or default_output_dir(),
                             save=False)
         self.set_watch_clipboard(self._settings.value("watch_clipboard", True, type=bool), save=False)
+        self._subtitles = self._settings.value("subtitles", False, type=bool)
+        self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
+        self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
+        rate = self._settings.value("rate_limit", 0, type=int)
+        self._rate_limit = rate if rate in RATE_CHOICES else 0
         parallel = self._settings.value("parallel", DEFAULT_PARALLEL, type=int)
         self._parallel = parallel if parallel in PARALLEL_CHOICES else DEFAULT_PARALLEL
         preset_key = self._settings.value("preset_key", DEFAULT_PRESET_KEY, type=str)
@@ -668,6 +714,10 @@ class MainWindow(QMainWindow):
         self._settings.setValue("output_dir", self._output_dir)
         self._settings.setValue("preset_key", self.preset_combo.currentData())
         self._settings.setValue("parallel", self._parallel)
+        self._settings.setValue("subtitles", self._subtitles)
+        self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
+        self._settings.setValue("whole_playlist", self._whole_playlist)
+        self._settings.setValue("rate_limit", self._rate_limit)
         self._settings.setValue("watch_clipboard", self._watch_clipboard)
 
     def _restore_queue(self) -> None:
@@ -682,6 +732,9 @@ class MainWindow(QMainWindow):
                                    filename_title=row.get("filename_title"), thumbnail=row.get("thumbnail"),
                                    duration=row.get("duration"))
             item.custom_format = bool(row.get("custom_format"))
+            section = row.get("section")
+            if isinstance(section, (list, tuple)) and len(section) == 2:
+                item.section = (float(section[0]), float(section[1]))
             self._append_row(item)
             restored += 1
         if restored:
@@ -724,6 +777,55 @@ class MainWindow(QMainWindow):
             return
         self._set_status(tr("status.clipboard_added", title=urls[0]))
         self._start_probe(urls)
+
+    def _download_options(self, item: QueueItem) -> dict:
+        options = {}
+        if item.section:
+            options["section"] = item.section
+        if self._subtitles:
+            options["subtitles"] = True
+            options["subtitle_langs"] = subtitle_languages(get_language())
+        if self._thumbnail_cover:
+            options["thumbnail"] = True
+        if self._rate_limit:
+            # Ukupno ograničenje se dijeli na preuzimanja koja mogu ići istovremeno.
+            options["ratelimit"] = self._rate_limit * 1024 * 1024 // max(1, self._parallel)
+        return options
+
+    def _set_option(self, name: str, value) -> None:
+        setattr(self, name, value)
+        self._sync_option_actions()
+        self._save_settings()
+
+    def _sync_option_actions(self) -> None:
+        self.subtitles_action.setChecked(self._subtitles)
+        self.thumbnail_action.setChecked(self._thumbnail_cover)
+        self.whole_playlist_action.setChecked(self._whole_playlist)
+        for action in self.rate_actions.actions():
+            action.setChecked(action.data() == self._rate_limit)
+
+    def set_item_section(self, item_id: int, section: tuple[float, float] | None) -> None:
+        item = self._queue.get(item_id)
+        if item is None or item.status == ItemStatus.ACTIVE:
+            return
+        item.section = section
+        self._sizes.pop(item_id, None)
+        self._refresh_row(item)
+        self._save_queue()
+
+    def _ask_section(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None:
+            return
+        text, ok = QInputDialog.getText(self, tr("section.title"), tr("section.prompt"),
+                                        text=format_section(item.section))
+        if not ok:
+            return
+        section = parse_section(text)
+        if section is None:
+            QMessageBox.warning(self, tr("section.title"), tr("section.invalid"))
+            return
+        self.set_item_section(item_id, section)
 
     def set_parallel(self, count: int) -> None:
         """Koliko preuzimanja ide istovremeno; veći broj ne znači uvijek brže (dijeli se veza)."""
@@ -800,7 +902,8 @@ class MainWindow(QMainWindow):
         if not urls:
             return
         self._probing.update(urls)
-        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset)
+        job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset,
+                       {"whole_playlist": self._whole_playlist})
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -898,7 +1001,7 @@ class MainWindow(QMainWindow):
             item.status = ItemStatus.ACTIVE
             item.message = ""
             self._refresh_row(item)
-            job = DownloadJob(item, self._download_fn)
+            job = DownloadJob(item, self._download_fn, self._download_options(item))
             job.progress.connect(self._on_download_progress)
             job.finished.connect(self._on_download_finished)
             self._download_jobs[item.id] = job
@@ -1069,8 +1172,17 @@ class MainWindow(QMainWindow):
             action.setData(preset.key)
             group.addAction(action)
             menu.addAction(action)
+        menu.addSeparator()
+        section_action = menu.addAction(tr("row.section"))
+        remove_section = menu.addAction(tr("row.section_remove")) if item.section else None
         chosen = menu.exec(position)
-        if chosen is not None:
+        if chosen is None:
+            return
+        if chosen is section_action:
+            self._ask_section(item_id)
+        elif chosen is remove_section:
+            self.set_item_section(item_id, None)
+        else:
             self.set_item_preset(item_id, chosen.data())
 
     def set_item_preset(self, item_id: int, preset_key: str) -> None:
@@ -1388,6 +1500,18 @@ def _settings() -> QSettings:
     return QSettings("VideoDownload", "VideoDownload")
 
 
+def _tool_version(path: str | None) -> str | None:
+    """Prvi red `-version`: iz izvještaja se vidi koji je build ušao u paket."""
+    if not path:
+        return None
+    try:
+        result = subprocess.run([path, "-version"], capture_output=True, text=True, timeout=20,
+                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    except OSError:
+        return None
+    return (result.stdout.splitlines() or [""])[0][:120] or None
+
+
 def self_test(report_path: str) -> int:
     """Provjera paketa bez prozora: uvozi, alati i yt-dlp dodaci. Rezultat ide u JSON fajl."""
     import importlib.util
@@ -1400,6 +1524,7 @@ def self_test(report_path: str) -> int:
         "yt_dlp": yt_dlp.version.__version__,
         "yt_dlp_store": str(ytdlp_update.store_dir()),
         "ffmpeg": find_tool("ffmpeg"),
+        "ffmpeg_build": _tool_version(find_tool("ffmpeg")),
         "ffprobe": find_tool("ffprobe"),
         "node": find_tool("node"),
         "yt_dlp_ejs": importlib.util.find_spec("yt_dlp_ejs") is not None,

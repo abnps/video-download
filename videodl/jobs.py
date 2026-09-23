@@ -32,6 +32,8 @@ class QueueItem:
     custom_format: bool = False
     # Koliko puta je aplikacija sama ponovila pokušaj poslije pucanja veze.
     auto_retries: int = 0
+    # Samo dio videa (od, do) u sekundama; None = cijeli video.
+    section: tuple[float, float] | None = None
     # Kolačići prijave iz browsera: samo u memoriji, nikad u podešavanjima ni na disku.
     cookies: tuple = field(default=(), repr=False)
 

@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { TEXT_KEYS, translate } from "../../extension/i18n.js";
-import { MENU_ITEMS, MENU_LINK, MENU_PAGE, MENU_VIDEO, menuTarget } from "../../extension/menus.js";
+import {
+  MENU_ITEMS, MENU_LINK, MENU_LINK_MP3, MENU_PAGE, MENU_PLAYING_MP3, MENU_VIDEO, menuTarget,
+} from "../../extension/menus.js";
 
 test("desni klik na link šalje taj link, a ne stranicu", () => {
   assert.deepEqual(menuTarget({ menuItemId: MENU_LINK, linkUrl: "https://x.com/a/status/1" }),
@@ -34,4 +36,17 @@ test("svaka stavka menija ima prevod i koristi se u pozadinskoj skripti", () => 
     assert.ok(translate("bs", item.key).trim(), item.key);
     assert.ok(item.contexts.length, item.id);
   }
+});
+
+test("MP3 stavke nose format uz isti cilj kao obične", () => {
+  assert.deepEqual(menuTarget({ menuItemId: MENU_LINK_MP3, linkUrl: "https://youtu.be/abc" }),
+    { kind: "url", url: "https://youtu.be/abc", preset: "mp3" });
+  assert.equal(menuTarget({ menuItemId: MENU_LINK_MP3, linkUrl: "mailto:x@y.z" }), null);
+  assert.deepEqual(menuTarget({ menuItemId: MENU_PLAYING_MP3 }), { kind: "playing", preset: "mp3" });
+  assert.deepEqual(menuTarget({ menuItemId: MENU_PLAYING_MP3, srcUrl: "https://c.test/a.mp4" }),
+    { kind: "media", url: "https://c.test/a.mp4", preset: "mp3" });
+  assert.deepEqual(menuTarget({ menuItemId: MENU_PLAYING_MP3, srcUrl: "blob:https://x.com/1" }),
+    { kind: "playing", preset: "mp3" });
+  // Obične stavke ostaju bez formata (aplikacija koristi izabrani).
+  assert.equal(menuTarget({ menuItemId: MENU_LINK, linkUrl: "https://youtu.be/abc" }).preset, undefined);
 });

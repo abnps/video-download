@@ -94,7 +94,13 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
-- Titlovi i thumbnail (opciono uz video).
+- [x] Titlovi i sličica (23.9.2026, v0.7.0): Preuzimanja → „Titlovi uz video“ (ručno napravljeni,
+  jezik aplikacije + engleski, ugrađeni u MP4) i „Sličica kao omot fajla“ (MP3 i MP4).
+- [x] Isječak videa (v0.7.0): u meniju formata reda „Isječak (od–do)…“; yt-dlp `download_ranges` +
+  `force_keyframes_at_cuts`, fajl dobija oznaku isječka u imenu. Živi test: od 8 s ostaje 3 s.
+- [x] Ograničenje brzine (v0.7.0): 1/2/5/10 MB/s ukupno, dijeli se na istovremena preuzimanja.
+- [x] MP3 u meniju desnog klika (v0.7.0, dodatak v0.5.1): „Preuzmi ovaj link kao MP3“ i
+  „Preuzmi video koji se pušta kao MP3“.
 - [x] Hvatanje kopiranog linka (18.9.2026, v0.6.0): Fajl → „Hvataj kopirane linkove" (uključeno
   po podrazumijevanom); kopiran link ulazi u red, preuzimanje i dalje kreće na „Preuzmi".
 - [x] Red i istorija se pamte (v0.6.0): `videodl/store.py` upisuje `queue.json` i `history.json` u
@@ -111,7 +117,8 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   plus tiha provjera jednom dnevno. Wheel sa PyPI-ja, SHA-256, raspakivanje u folder podataka
   korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
   paket se briše i ostaje onaj iz paketa. Živa provjera na PyPI-ju prošla.
-- Opcija „cijela plejlista" za linkove videa unutar liste (sada se preuzima samo video).
+- [x] Cijela plejlista (v0.7.0): Preuzimanja → „Link videa iz plejliste: preuzmi cijelu
+  plejlistu“; tada čitanje linka radi sa `noplaylist=False`.
 - [x] Više istovremenih preuzimanja (17.9.2026, v0.5.7): Preuzimanja → „Istovremenih preuzimanja"
   (1–4, podrazumijevano 2); izbor se pamti. Prekid i zatvaranje rade nad svim poslovima u toku.
 - [x] Automatsko ponavljanje kad veza pukne (17.9.2026, v0.5.7): yt-dlp sam ponavlja i nastavlja
