@@ -59,6 +59,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Repo je JAVAN (Ahmedova odluka 22.9.2026, mijenja odluku od 17.9.2026): kod i izdanja su
   javno dostupni. Sajt i prodaja i dalje traže novu odluku i pravnu provjeru
   (§95a UrhG, LG Hamburg/Uberspace). Program se ne prilagođava piratskim izvorima ni DRM-u.
+- Javno je samo POSLJEDNJE izdanje (Ahmedova odluka 23.9.2026): poslije objave novog izdanja
+  prethodno se prebacuje u nacrt (`gh release edit <tag> --draft=true`), ne briše se.
 - Javna distribucija instalera nosi GPL obavezu za ffmpeg: uz izdanje mora stajati link na
   izvorni kod tog builda (vidi THIRD-PARTY-NOTICES u `tools/build_release.py`).
 - Ažuriranje čita izdanja repoa `npgamy/video-download` preko `gh` prijave

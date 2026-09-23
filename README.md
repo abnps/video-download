@@ -43,6 +43,12 @@ izdanjima repoa `npgamy/video-download` (GitHub → Releases).
 gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes "<šta je novo>"
 ```
 
+4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
+
+```
+gh release edit v<prethodna_verzija> --repo npgamy/video-download --draft=true
+```
+
 ## Zahtjevi (razvoj)
 
 - Python 3.14
