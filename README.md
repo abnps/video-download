@@ -40,7 +40,7 @@ izdanjima repoa `npgamy/video-download` (GitHub → Releases).
 3. Objavi instaler i `.sha256` kao izdanje:
 
 ```
-gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes "<šta je novo>"
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
 4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:

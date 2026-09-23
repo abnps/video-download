@@ -159,6 +159,13 @@ def main() -> int:
     installer = INSTALLER_OUT / f"VideoDownload-Setup-{__version__}.exe"
     digest = hashlib.sha256(installer.read_bytes()).hexdigest()
     Path(f"{installer}.sha256").write_text(f"{digest}  {installer.name}\n", encoding="ascii")
+    # Opis izdanja iz istih bilješki kao Pomoć → Šta je novo; UTF-8 fajl, jer Windows konzola
+    # (cp1250) ne zna ispisati znakove poput „→" pa bi se opis izgubio.
+    from videodl import changelog
+
+    notes = INSTALLER_OUT / "release-notes.md"
+    notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n",
+                     encoding="utf-8")
     size_mb = installer.stat().st_size / 1024 / 1024
     print(f"Instaler: {installer} ({size_mb:.0f} MB)\nSHA-256: {digest}")
     return 0
