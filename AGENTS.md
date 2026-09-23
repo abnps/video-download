@@ -59,6 +59,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Repo je JAVAN (Ahmedova odluka 22.9.2026, mijenja odluku od 17.9.2026): kod i izdanja su
   javno dostupni. Sajt i prodaja i dalje traže novu odluku i pravnu provjeru
   (§95a UrhG, LG Hamburg/Uberspace). Program se ne prilagođava piratskim izvorima ni DRM-u.
+- Svaka nova verzija dobija kratku bilješku u `videodl/changelog.py` na svih 5 jezika (Pomoć → Šta je
+  novo); test pada ako je nema. Opis izdanja na GitHub-u je `changelog.release_notes(verzija)`.
 - Javno je samo POSLJEDNJE izdanje (Ahmedova odluka 23.9.2026): poslije objave novog izdanja
   prethodno se prebacuje u nacrt (`gh release edit <tag> --draft=true`), ne briše se.
 - Javna distribucija instalera nosi GPL obavezu za ffmpeg: uz izdanje mora stajati link na

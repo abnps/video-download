@@ -94,6 +94,7 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Pomoć → Šta je novo (v0.7.1): kratke bilješke po verzijama na 5 jezika (`videodl/changelog.py`).
 - [x] Titlovi i sličica (23.9.2026, v0.7.0): Preuzimanja → „Titlovi uz video“ (ručno napravljeni,
   jezik aplikacije + engleski, ugrađeni u MP4) i „Sličica kao omot fajla“ (MP3 i MP4).
 - [x] Isječak videa (v0.7.0): u meniju formata reda „Isječak (od–do)…“; yt-dlp `download_ranges` +

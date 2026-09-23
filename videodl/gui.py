@@ -21,7 +21,8 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QListWidget,
     QListWidgetItem, QMainWindow,
-    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
+    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QTextBrowser, QVBoxLayout,
+    QWidget,
 )
 
 from . import __version__
@@ -39,7 +40,7 @@ from .presets import (
     subtitle_languages,
 )
 from .probe import ProbeResult, probe
-from . import diagnostics, store
+from . import changelog, diagnostics, store
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error
@@ -320,6 +321,28 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
+class WhatsNewDialog(QDialog):
+    """Pomoć → Šta je novo: kratke bilješke po verzijama, na jeziku aplikacije."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("menu.whats_new").rstrip("…"))
+        self.resize(560, 480)
+        layout = QVBoxLayout(self)
+        self.current_label = QLabel(tr("whats_new.current", version=__version__))
+        layout.addWidget(self.current_label)
+        self.browser = QTextBrowser()
+        self.browser.setOpenExternalLinks(False)
+        self.browser.setHtml(changelog.to_html(get_language(), __version__))
+        layout.addWidget(self.browser)
+        close_button = QPushButton(tr("history.close"))
+        close_button.clicked.connect(self.accept)
+        buttons = QHBoxLayout()
+        buttons.addStretch(1)
+        buttons.addWidget(close_button)
+        layout.addLayout(buttons)
+
+
 class HistoryDialog(QDialog):
     """Šta je i kada preuzeto; fajl se može otvoriti u folderu i kad je red odavno obrisan."""
 
@@ -548,6 +571,7 @@ class MainWindow(QMainWindow):
 
         self.help_menu = menu.addMenu("")
         self.check_updates_action = self.help_menu.addAction("", lambda: self.check_for_updates(manual=True))
+        self.whats_new_action = self.help_menu.addAction("", self._show_whats_new)
         self.update_ytdlp_action = self.help_menu.addAction("", lambda: self.update_ytdlp(manual=True))
         self.language_menu = self.help_menu.addMenu("")
         self.language_actions = QActionGroup(self)
@@ -598,6 +622,7 @@ class MainWindow(QMainWindow):
             action.setChecked(action.data() == self._parallel)
         self.help_menu.setTitle(tr("menu.help"))
         self.check_updates_action.setText(tr("menu.check_updates"))
+        self.whats_new_action.setText(tr("menu.whats_new"))
         self.update_ytdlp_action.setText(tr("menu.update_ytdlp"))
         self.language_menu.setTitle(tr("menu.language"))
         for action in self.language_actions.actions():
@@ -743,6 +768,10 @@ class MainWindow(QMainWindow):
 
     def _save_queue(self) -> None:
         store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
+
+    @Slot()
+    def _show_whats_new(self) -> None:
+        WhatsNewDialog(self).exec()
 
     @Slot()
     def _show_history(self) -> None:
