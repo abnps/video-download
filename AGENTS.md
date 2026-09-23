@@ -63,7 +63,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   prethodno se prebacuje u nacrt (`gh release edit <tag> --draft=true`), ne briše se.
 - Javna distribucija instalera nosi GPL obavezu za ffmpeg: uz izdanje mora stajati link na
   izvorni kod tog builda (vidi THIRD-PARTY-NOTICES u `tools/build_release.py`).
-- Ažuriranje čita izdanja repoa `npgamy/video-download` preko `gh` prijave
+- Ažuriranje čita posljednje izdanje repoa `npgamy/video-download` običnim HTTPS-om (od v0.6.2,
+  bez GitHub naloga); `gh` prijava je samo rezerva ako GitHub odbije pristup (privatan repo)
   (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
   SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz

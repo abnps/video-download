@@ -1,10 +1,11 @@
-"""Automatsko ažuriranje iz privatnog GitHub repoa (bez Qt-a).
+"""Automatsko ažuriranje sa GitHub izdanja (bez Qt-a).
 
-Izdanja se čitaju i preuzimaju preko GitHub CLI (`gh`) prijave na ovom računaru, pa u
-aplikaciji nema tokena. Izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i
-`VideoDownload-Setup-<verzija>.exe.sha256`; instaler se pokreće tek kad se SHA-256 poklopi.
+Repo je javan, pa se posljednje izdanje čita i preuzima običnim HTTPS-om: korisniku ne treba
+GitHub nalog ni `gh`. Ako GitHub odbije pristup (npr. repo ponovo privatan), a `gh` je
+instaliran i prijavljen, koristi se on. Izdanje mora imati `VideoDownload-Setup-<verzija>.exe`
+i `.exe.sha256`; instaler se pokreće tek kad se SHA-256 poklopi. U aplikaciji nema tokena.
 
-VIDEODL_UPDATE_URL (testovi) zamjenjuje gh lokalnim HTTP serverom sa istim JSON-om.
+VIDEODL_UPDATE_URL (testovi) zamjenjuje GitHub lokalnim HTTP serverom sa istim JSON-om.
 """
 
 import dataclasses
@@ -17,6 +18,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
 import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -26,6 +28,9 @@ from urllib.parse import urlsplit
 from . import __version__
 
 RELEASES_REPO = "npgamy/video-download"
+LATEST_URL = f"https://api.github.com/repos/{RELEASES_REPO}/releases/latest"
+# Odgovori koji znače „bez prijave ne može" (privatan repo): tada ima smisla probati gh.
+_NEEDS_LOGIN = (401, 403, 404)
 INSTALLER_NAME = re.compile(r"^VideoDownload-Setup-(\d+(?:\.\d+){1,3})\.exe$")
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 MAX_NOTES = 800
@@ -89,11 +94,29 @@ def parse_release(data) -> Release | None:
 
 def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, runner=subprocess.run,
                  timeout: float = 30) -> Release | None:
-    url = url or os.environ.get("VIDEODL_UPDATE_URL")
-    if url:
-        with opener(_request(url), timeout=timeout) as response:
+    """Posljednje izdanje; None kad izdanja još nema. HTTPS prvo, `gh` samo kao rezerva."""
+    test_url = url or os.environ.get("VIDEODL_UPDATE_URL")
+    try:
+        with opener(_request(test_url or LATEST_URL), timeout=timeout) as response:
             return parse_release(json.loads(response.read(2 * 1024 * 1024).decode("utf-8")))
-    result = runner([gh_path(), "api", f"repos/{RELEASES_REPO}/releases/latest"], capture_output=True,
+    except urllib.error.HTTPError as exc:
+        if test_url or exc.code not in _NEEDS_LOGIN:
+            raise UpdateError(f"HTTP {exc.code}") from exc
+        http_error = exc
+    except urllib.error.URLError as exc:
+        # Nema mreže ili je GitHub nedostupan: gh bi pao iz istog razloga.
+        raise UpdateError(str(exc.reason or exc)) from exc
+    try:
+        gh = gh_path()
+    except UpdateError:
+        if http_error.code == 404:
+            return None  # javan repo bez ijednog izdanja izgleda isto kao privatan
+        raise
+    return _fetch_with_gh(gh, runner, timeout)
+
+
+def _fetch_with_gh(gh: str, runner, timeout: float) -> Release | None:
+    result = runner([gh, "api", f"repos/{RELEASES_REPO}/releases/latest"], capture_output=True,
                     text=True, encoding="utf-8", timeout=timeout, creationflags=_NO_WINDOW)
     if result.returncode != 0:
         if "Not Found" in (result.stderr or ""):
@@ -183,7 +206,10 @@ def _request(url: str) -> urllib.request.Request:
     local = parts.hostname in ("127.0.0.1", "localhost")
     if not (parts.scheme == "https" or (parts.scheme == "http" and local)):
         raise UpdateError(f"Nesiguran link za ažuriranje: {url}")
-    return urllib.request.Request(url, headers={"User-Agent": f"VideoDownload/{__version__}"})
+    headers = {"User-Agent": f"VideoDownload/{__version__}"}  # GitHub API odbija zahtjev bez njega
+    if parts.hostname == "api.github.com":
+        headers["Accept"] = "application/vnd.github+json"
+    return urllib.request.Request(url, headers=headers)
 
 
 def _download_http(release: Release, final: Path, checksum_file: Path, on_progress, cancel, opener, timeout) -> None:

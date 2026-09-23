@@ -8,6 +8,7 @@ import string
 import tempfile
 import threading
 import unittest
+import urllib.error
 from pathlib import Path
 from unittest import mock
 
@@ -154,8 +155,27 @@ class UpdaterTest(unittest.TestCase):
             updater.fetch_latest(url="http://primjer.com/latest", opener=self.opener({}))
         self.assertEqual(self.urls, [])
 
-    def test_gh_mode_reads_private_release_and_downloads_with_gh(self):
-        # Pravi oblik odgovora: GitHub i za privatni repo šalje browser_download_url (bez prijave 404).
+    def http_error(self, code):
+        def open_url(request, timeout):
+            self.urls.append(request.full_url)
+            raise urllib.error.HTTPError(request.full_url, code, "greška", {}, None)
+        return open_url
+
+    def test_public_repo_updates_over_https_without_gh(self):
+        pages = {updater.LATEST_URL: self.release_json()}
+        no_gh = mock.patch("videodl.updater.gh_path", side_effect=AssertionError("gh ne smije biti potreban"))
+        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}), no_gh:
+            release = updater.fetch_latest(opener=self.opener(pages),
+                                           runner=lambda *a, **k: self.fail("gh ne smije biti pozvan"))
+            self.assertEqual(release.version, "9.9.9")
+            self.assertTrue(release.installer_url.startswith("https://github.com/"))  # preuzima se HTTPS-om
+            with tempfile.TemporaryDirectory() as tmp:
+                files = {release.checksum_url: f"{self.digest}  x.exe\n".encode(), release.installer_url: self.installer}
+                path = updater.download_installer(release, Path(tmp), opener=self.opener(files))
+                self.assertEqual(path.read_bytes(), self.installer)
+        self.assertEqual(self.urls[0], updater.LATEST_URL)
+
+    def test_private_repo_falls_back_to_gh(self):
         release_data = json.loads(self.release_json(version="9.9.9"))
         calls = []
 
@@ -163,8 +183,10 @@ class UpdaterTest(unittest.TestCase):
             calls.append(args)
             return mock.Mock(returncode=0, stdout=json.dumps(release_data), stderr="")
 
-        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}), mock.patch("videodl.updater.gh_path", return_value="gh.exe"):
-            release = updater.fetch_latest(runner=runner)
+        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}), \
+                mock.patch("videodl.updater.gh_path", return_value="gh.exe"):
+            release = updater.fetch_latest(opener=self.http_error(404), runner=runner)
+            # GitHub i za privatni repo šalje browser_download_url (bez prijave 404): preuzima gh.
             self.assertEqual((release.version, release.tag, release.installer_url), ("9.9.9", "v9.9.9", ""))
             self.assertEqual(calls[0], ["gh.exe", "api", "repos/npgamy/video-download/releases/latest"])
 
@@ -174,7 +196,6 @@ class UpdaterTest(unittest.TestCase):
 
                 class FakeGh:
                     def __init__(self, args, **kwargs):
-                        self.args = args
                         self.returncode = 0
                         self.stderr = io.StringIO("")
                         (target / release.installer_name).write_bytes(installer)
@@ -189,14 +210,26 @@ class UpdaterTest(unittest.TestCase):
                 self.assertFalse((target / f"{release.installer_name}.sha256").exists())
 
             not_found = lambda args, **kwargs: mock.Mock(returncode=1, stdout="", stderr="HTTP 404: Not Found")  # noqa: E731
-            self.assertIsNone(updater.fetch_latest(runner=not_found))
+            self.assertIsNone(updater.fetch_latest(opener=self.http_error(404), runner=not_found))
 
-    def test_missing_gh_is_a_translated_error(self):
+    def test_without_gh_login_errors_are_clear(self):
         missing = {"VIDEODL_UPDATE_URL": "", "ProgramFiles": r"Z:\nema", "LOCALAPPDATA": r"Z:\nema"}
         with mock.patch.dict(os.environ, missing), mock.patch("shutil.which", return_value=None):
+            # Pristup odbijen, a gh nema: poruka kaže šta treba.
             with self.assertRaises(updater.UpdateError) as caught:
-                updater.fetch_latest()
-        self.assertEqual(caught.exception.key, "update.no_gh")
+                updater.fetch_latest(opener=self.http_error(403))
+            self.assertEqual(caught.exception.key, "update.no_gh")
+            # Javan repo bez ijednog izdanja: nema šta ažurirati.
+            self.assertIsNone(updater.fetch_latest(opener=self.http_error(404)))
+
+    def test_no_network_is_an_error_without_calling_gh(self):
+        def offline(request, timeout):
+            raise urllib.error.URLError("nema mreže")
+
+        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}):
+            with self.assertRaises(updater.UpdateError) as caught:
+                updater.fetch_latest(opener=offline, runner=lambda *a, **k: self.fail("gh ne treba zvati"))
+        self.assertIn("nema mreže", str(caught.exception))
 
     def test_installer_gets_silent_flags_and_language(self):
         with mock.patch("subprocess.Popen") as popen:

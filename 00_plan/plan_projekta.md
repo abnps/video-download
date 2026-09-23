@@ -142,6 +142,9 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
       prije preuzimanja, a stavke uživo u plejlisti/kanalu se preskaču. Testovi 82 + 10, E2E
       sa MediaSource „live" stranicom u Edge-u: dodatak odbio, nijedan fajl.
 - [ ] Ahmed potvrdio ažuriranje preko `gh` sa objavljene verzije (0.5.2 → 0.5.3) i LIVE na pravom sajtu.
+- [x] Ažuriranje bez `gh` (23.9.2026, v0.6.2): repo je javan, pa se posljednje izdanje čita i
+      preuzima HTTPS-om; `gh` je rezerva za 401/403/404. Živo provjereno sa isključenim `gh`:
+      v0.6.1 nađena, 198 MB preuzeto za 647 s, SHA-256 se poklopio.
 - [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
 
 Prvobitne stavke:
