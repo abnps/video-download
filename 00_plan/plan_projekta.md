@@ -163,5 +163,5 @@ Prvobitne stavke:
 - JS runtime u paketu (Deno `.exe`) ili jasna provjera pri pokretanju.
 - Ikona aplikacije.
 
-Exit gate: `.exe` radi na čistom Windowsu bez instaliranog Pythona. — **otvoreno**: Ahmedov računar
-ima Python, pa ovo potvrđuje tek prijateljev računar (ili čista virtuelna mašina).
+Exit gate: `.exe` radi na čistom Windowsu bez instaliranog Pythona. — **ispunjeno** 24.9.2026:
+Ahmedov prijatelj potvrdio da instaler i program rade na njegovom računaru.
