@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.8", "24.9.2026", {
+        "bs": ["Link koji nije video ni audio (npr. .exe, .zip, .pdf ili obična stranica) više ne pravi karticu "
+               "kad se samo kopira; ako ga zalijepiš sam, poruka jasno kaže zašto. Direktni .mp3 i .mp4 linkovi rade kao i prije."],
+        "en": ["A link that isn't a video or audio (e.g. .exe, .zip, .pdf or a plain page) no longer creates a card "
+               "when it's just copied; if you paste it yourself, the message clearly says why. Direct .mp3 and .mp4 links work as before."],
+        "de": ["Ein Link, der kein Video oder Audio ist (z. B. .exe, .zip, .pdf oder eine normale Seite), erzeugt beim bloßen "
+               "Kopieren keine Karte mehr; fügst du ihn selbst ein, sagt die Meldung klar, warum. Direkte .mp3- und .mp4-Links funktionieren wie bisher."],
+        "es": ["Un enlace que no es un vídeo ni un audio (p. ej. .exe, .zip, .pdf o una página normal) ya no crea una tarjeta "
+               "al copiarlo; si lo pegas tú, el mensaje explica claramente por qué. Los enlaces directos .mp3 y .mp4 funcionan como antes."],
+        "fr": ["Un lien qui n'est ni une vidéo ni un audio (p. ex. .exe, .zip, .pdf ou une page ordinaire) ne crée plus de carte "
+               "quand il est simplement copié ; si tu le colles toi-même, le message explique clairement pourquoi. Les liens directs .mp3 et .mp4 fonctionnent comme avant."],
+    }),
     ("0.7.7", "24.9.2026", {
         "bs": ["Prozor „Podrži projekat“ ima i QR kod za prilog telefonom, pored dugmeta."],
         "en": ["The “Support the project” window also has a QR code for contributing by phone, next to the button."],

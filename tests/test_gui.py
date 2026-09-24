@@ -19,10 +19,11 @@ from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  
 from videodl.gui import (  # noqa: E402
     MainWindow, apply_theme, extract_urls, format_eta, format_progress, format_speed,
 )
-from videodl.i18n import get_language, set_language  # noqa: E402
+from videodl.i18n import MESSAGE_NOT_MEDIA, get_language, set_language  # noqa: E402
 from videodl.jobs import ItemStatus  # noqa: E402
 from videodl.probe import Entry, ProbeResult  # noqa: E402
 from videodl.widgets import format_duration, format_size  # noqa: E402
+from videodl.ytdl import NotMediaError  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 apply_theme(app)
@@ -367,6 +368,42 @@ class MainWindowTest(unittest.TestCase):
         time.sleep(0.2)
         app.processEvents()
         self.assertEqual(window._queue.items(), [])
+
+    def test_copied_link_that_is_not_media_makes_no_row(self):
+        probed = []
+
+        def probe(url, http_headers=None):
+            probed.append(url)
+            if "preuzmi" in url:
+                raise NotMediaError(url)  # npr. link bez ekstenzije koji vodi na .zip
+            return fake_probe(url)
+
+        window = self.make_window(self.quick_download, probe_fn=probe)
+        exe = "https://github.com/npgamy/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe"
+        QApplication.clipboard().setText(exe)
+        self.assertTrue(wait_until(lambda: "preskočeno" in window.status_label.text()))
+        self.assertEqual(probed, [])  # .exe se ne šalje ni na čitanje
+
+        QApplication.clipboard().setText("https://x.test/preuzmi?id=7")
+        self.assertTrue(wait_until(lambda: probed == ["https://x.test/preuzmi?id=7"] and not window._probe_jobs))
+        self.assertIn("preskočeno", window.status_label.text())
+        self.assertEqual(window._queue.items(), [])
+
+        # Pravi video iz clipboarda i dalje dolazi u red.
+        QApplication.clipboard().setText("https://v/kopirano")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+
+    def test_pasted_link_that_is_not_media_gets_a_clear_red_row(self):
+        from videodl.probe import probe  # pravo čitanje: .exe odbija bez interneta
+
+        window = self.make_window(self.quick_download, probe_fn=probe)
+        window.add_links_from_text("https://x.test/Setup.exe")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        self.assertEqual(item.status, ItemStatus.FAILED)
+        self.assertEqual(item.message, MESSAGE_NOT_MEDIA)
+        self.assertIn("ne vodi na video ni audio", window.status_label.text())
+        self.assertIn("ne vodi na video ni audio", window._rows[item.id].status_label.text())
 
     def test_queue_survives_restart_and_history_is_written(self):
         window = self.make_window(self.quick_download)

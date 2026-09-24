@@ -30,7 +30,7 @@ from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
-from .i18n import LANGUAGES, MESSAGE_EXISTS, MESSAGE_RETRY, get_language, pick_language, set_language, tr
+from .i18n import LANGUAGES, MESSAGE_EXISTS, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
@@ -44,7 +44,7 @@ from .probe import ProbeResult, probe
 from . import changelog, convert, diagnostics, legal, store, support
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
-from .ytdl import JS_RUNTIMES, error_message, is_network_error
+from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
 
 _URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
 MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
@@ -625,6 +625,8 @@ class MainWindow(QMainWindow):
         self._whole_playlist = False
         self._rate_limit = 0
         self._probing: set[str] = set()  # linkovi koji se upravo čitaju
+        # Linkovi uhvaćeni iz clipboarda: ako nisu video ni audio, ne prave crveni red.
+        self._from_clipboard: set[str] = set()
         self._errors: list[str] = []  # posljednje greške za izvještaj o problemu
         self._data_dir = Path(data_dir_path) if data_dir_path else data_dir()
         self._watch_clipboard = False
@@ -1016,10 +1018,14 @@ class MainWindow(QMainWindow):
         self._last_clipboard = text
         known = {item.url for item in self._queue.items()}
         urls = [url for url in extract_urls(text) if url not in known]
+        skipped = [url for url in urls if is_obviously_not_media(url)]
+        urls = [url for url in urls if url not in skipped]
         if not urls:
+            if skipped:
+                self._set_status(tr("status.clipboard_not_media", url=skipped[0]))
             return
         self._set_status(tr("status.clipboard_added", title=urls[0]))
-        self._start_probe(urls)
+        self._start_probe(urls, from_clipboard=True)
 
     def _download_options(self, item: QueueItem) -> dict:
         options = {}
@@ -1139,12 +1145,14 @@ class MainWindow(QMainWindow):
         event.acceptProposedAction()
 
     def _start_probe(self, urls: list[str], access: dict | None = None, auto_start: bool = False,
-                     preset: str | None = None) -> None:
+                     preset: str | None = None, from_clipboard: bool = False) -> None:
         # Isti link koji se upravo čita ne treba čitati dvaput (npr. hvatanje clipboarda pa „Zalijepi").
         urls = [url for url in urls if url not in self._probing]
         if not urls:
             return
         self._probing.update(urls)
+        if from_clipboard:
+            self._from_clipboard.update(urls)
         job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset,
                        {"whole_playlist": self._whole_playlist})
         self._next_probe_id += 1
@@ -1206,6 +1214,10 @@ class MainWindow(QMainWindow):
     @Slot(str, str, str, object, object)
     def _on_probe_failed(self, url: str, message: str, output_dir: str, access: dict,
                          preset: str | None = None) -> None:
+        if message == MESSAGE_NOT_MEDIA and url in self._from_clipboard:
+            # Kopiran link na .exe, dokument ili običnu stranicu: samo kratka napomena, bez reda u listi.
+            self._set_status(tr("status.clipboard_not_media", url=url))
+            return
         # Neuspio link ostaje vidljiv kao crveni red; „Pokušaj ponovo" ga daje yt-dlp-u direktno.
         item = self._queue.add(url, url, preset or self.preset_combo.currentData(), output_dir, **access)
         item.custom_format = bool(preset)
@@ -1221,6 +1233,7 @@ class MainWindow(QMainWindow):
         job = self._probe_jobs.pop(job_id, None)
         if job is not None:
             self._probing.difference_update(job.urls)
+            self._from_clipboard.difference_update(job.urls)
             job.deleteLater()
         self._update_controls()
 

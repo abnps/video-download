@@ -1,6 +1,8 @@
 """Zajedničke yt-dlp postavke, logger i čitljive poruke o greškama."""
 
 import re
+from pathlib import PurePosixPath
+from urllib.parse import unquote, urlsplit
 
 # YouTube traži JavaScript runtime za rješavanje zaštite linkova. yt-dlp sam
 # uključuje samo Deno; Node dodajemo jer je češće već instaliran.
@@ -20,10 +22,57 @@ def is_live(info: dict) -> bool:
     return bool(info.get("is_live")) or info.get("live_status") in LIVE_STATUSES
 
 
+class NotMediaError(Exception):
+    """Link ne vodi na video ni audio (npr. .exe, .zip, .pdf ili obična stranica bez videa)."""
+
+
+# Ekstenzije koje video/audio fajl smije imati kad server ne kaže tip sadržaja.
+MEDIA_EXTENSIONS = frozenset((
+    "mp4", "m4v", "mov", "mkv", "webm", "avi", "flv", "wmv", "mpg", "mpeg", "ts", "m2ts", "mts",
+    "3gp", "3g2", "ogv", "mp3", "m4a", "m4b", "aac", "ogg", "oga", "opus", "wav", "flac", "wma",
+    "aif", "aiff", "alac", "mka", "m3u8", "mpd", "f4m", "ism"))
+
+# Fajlovi koji sigurno nisu video ni audio: odbijaju se bez ikakvog čitanja preko interneta.
+NOT_MEDIA_EXTENSIONS = frozenset((
+    "exe", "msi", "msix", "appx", "bat", "cmd", "ps1", "dll", "sys", "apk", "aab", "ipa", "dmg", "pkg",
+    "deb", "rpm", "appimage", "iso", "img", "bin", "zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "xz",
+    "zst", "cab", "jar", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp", "rtf",
+    "txt", "csv", "json", "xml", "epub", "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico",
+    "tif", "tiff", "heic", "psd", "torrent", "ttf", "otf", "woff", "woff2"))
+
+
+def url_extension(url: str) -> str:
+    """Ekstenzija posljednjeg dijela putanje linka (bez upita), malim slovima."""
+    try:
+        path = unquote(urlsplit(url).path)
+    except ValueError:
+        return ""
+    return PurePosixPath(path).suffix.lower().lstrip(".")
+
+
+def is_obviously_not_media(url: str) -> bool:
+    return url_extension(url) in NOT_MEDIA_EXTENSIONS
+
+
+def is_guessed_non_media(info: dict) -> bool:
+    """yt-dlp za fajl koji server ne označi kao audio/video samo nagađa „možda je video"
+    (`direct`, bez liste formata). Prihvata se samo ako ekstenzija zaista jeste video ili audio."""
+    if not info.get("direct") or info.get("formats"):
+        return False
+    return str(info.get("ext") or "").lower() not in MEDIA_EXTENSIONS
+
+
+def check_media(info: dict) -> None:
+    if is_guessed_non_media(info):
+        raise NotMediaError("Not a video or audio file")
+
+
 def reject_live(info: dict, *, incomplete: bool = False) -> None:
-    """yt-dlp `match_filter`: prekida prije početka preuzimanja kad se ispostavi da je prenos uživo."""
+    """yt-dlp `match_filter`: prekida prije početka preuzimanja kad se ispostavi da je prenos uživo
+    ili da link uopšte nije video ni audio (npr. „Pokušaj ponovo" na linku za .exe)."""
     if is_live(info):
         raise LiveStreamError("Live stream")
+    check_media(info)
 
 
 class YdlLogger:
@@ -80,9 +129,9 @@ _NETWORK_ERROR = re.compile(
 
 def is_network_error(message: str) -> bool:
     """Greška zbog veze (vrijedi ponovo), za razliku od DRM-a, nepodržanog sajta ili 404."""
-    from .i18n import MESSAGE_DRM, MESSAGE_LIVE
+    from .i18n import MESSAGE_DRM, MESSAGE_LIVE, MESSAGE_NOT_MEDIA
 
-    if message in (MESSAGE_DRM, MESSAGE_LIVE):
+    if message in (MESSAGE_DRM, MESSAGE_LIVE, MESSAGE_NOT_MEDIA):
         return False
     if re.search(r"http error 4\d\d|unsupported url|private|members[- ]only|sign in|age", message, re.IGNORECASE):
         return False
@@ -90,13 +139,18 @@ def is_network_error(message: str) -> bool:
 
 
 def error_message(exc: BaseException) -> str:
-    from .i18n import MESSAGE_DRM, MESSAGE_LIVE
+    from yt_dlp.utils import UnsupportedError
+
+    from .i18n import MESSAGE_DRM, MESSAGE_LIVE, MESSAGE_NOT_MEDIA
 
     # yt-dlp izuzetak iz match_filter-a ponekad umota u DownloadError.
     seen = exc
     while seen is not None:
         if isinstance(seen, LiveStreamError):
             return MESSAGE_LIVE
+        # „Unsupported URL": obična stranica na kojoj yt-dlp nije našao ni video ni audio.
+        if isinstance(seen, (NotMediaError, UnsupportedError)):
+            return MESSAGE_NOT_MEDIA
         wrapped = getattr(seen, "exc_info", None)
         seen = seen.__cause__ or seen.__context__ or (wrapped[1] if wrapped and wrapped[1] is not seen else None)
     text = str(exc).strip() or exc.__class__.__name__

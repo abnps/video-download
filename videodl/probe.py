@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from yt_dlp import YoutubeDL
 
 from .browser import Cookie, cookie_file
-from .ytdl import LiveStreamError, base_options, is_live
+from .ytdl import LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media
 
 # Kanal -> tabovi (Videos, Shorts...) -> videi: dva nivoa ugnježdavanja su dovoljna.
 MAX_NESTING = 2
@@ -35,12 +35,15 @@ def probe(url: str, extract: Extractor | None = None, logger=None,
           http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = (),
           whole_playlist: bool = False) -> ProbeResult:
     """`whole_playlist`: link videa koji je u plejlisti (watch?v=…&list=…) daje cijelu plejlistu."""
+    if is_obviously_not_media(url):
+        raise NotMediaError(url)  # .exe, .zip, .pdf…: ne treba ni pitati server
     extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist)
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
         if is_live(info):
             raise LiveStreamError("Live stream")
+        check_media(info)
         return ProbeResult(title, (_entry(info, info.get("webpage_url") or url),), is_playlist=False)
     skipped = []
     entries = tuple(_flatten(info, extract, depth=0, skipped=skipped))

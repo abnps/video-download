@@ -9,6 +9,7 @@ MESSAGE_EXISTS = "@exists"
 MESSAGE_DRM = "@drm"
 MESSAGE_LIVE = "@live"
 MESSAGE_RETRY = "@retry"
+MESSAGE_NOT_MEDIA = "@not_media"
 
 _current = FALLBACK
 
@@ -356,6 +357,16 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                    "Das ist ein Livestream und wird nicht heruntergeladen. Nach dem Ende laden, wenn die Aufzeichnung veröffentlicht ist.",
                    "Es una transmisión en directo y no se descarga. Descárgala cuando termine y se publique la grabación.",
                    "C'est un direct : il n'est pas téléchargé. Téléchargez-le quand le direct est terminé et l'enregistrement publié."),
+    "error.not_media": ("Link ne vodi na video ni audio (npr. program, arhiva, dokument ili obična stranica).",
+                        "The link doesn't lead to a video or audio (e.g. a program, archive, document or plain page).",
+                        "Der Link führt zu keinem Video oder Audio (z. B. Programm, Archiv, Dokument oder normale Seite).",
+                        "El enlace no lleva a un vídeo ni a un audio (p. ej. un programa, archivo comprimido, documento o página normal).",
+                        "Le lien ne mène pas à une vidéo ni à un audio (p. ex. un programme, une archive, un document ou une page ordinaire)."),
+    "status.clipboard_not_media": ("Kopirani link nije video ni audio — preskočeno: {url}",
+                                   "The copied link is not a video or audio — skipped: {url}",
+                                   "Der kopierte Link ist kein Video oder Audio — übersprungen: {url}",
+                                   "El enlace copiado no es un vídeo ni un audio — omitido: {url}",
+                                   "Le lien copié n'est ni une vidéo ni un audio — ignoré : {url}"),
     # ažuriranje yt-dlp-a (čitač sajtova; mijenja se češće od same aplikacije)
     "menu.update_ytdlp": ("Ažuriraj čitač sajtova (yt-dlp)", "Update the site reader (yt-dlp)",
                           "Seiten-Reader aktualisieren (yt-dlp)", "Actualizar el lector de sitios (yt-dlp)",

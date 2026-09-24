@@ -95,6 +95,11 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Link koji nije video ni audio (24.9.2026, v0.7.8): `.exe`, `.zip`, `.pdf`… se odbijaju bez čitanja;
+  fajl koji yt-dlp samo „nagađa" kao video (`direct`, bez formata) prolazi samo s video/audio
+  ekstenzijom; „Unsupported URL" dobija jasnu poruku. Iz clipboarda: bez kartice, samo napomena u
+  statusnoj traci; zalijepljen ručno: crveni red s jasnom porukom. Isto i pri „Pokušaj ponovo"
+  (`match_filter`). Direktni `.mp3`/`.mp4` linkovi rade (`tests/test_not_media.py`).
 - [x] Podrži projekat (24.9.2026, v0.7.5; v0.7.6: PayPal stranica za prilog — Donate dugme nije dostupno u Srbiji): link u statusnoj traci i Pomoć meniju; traka poslije
   svakih 10 novih preuzimanja, prozor najviše jednom sedmično kad ništa ne radi; „Već sam podržao" (bez
   provjere uplate) gasi sve na 90 dana. Ništa se ne otključava ni blokira (`videodl/support.py`).
