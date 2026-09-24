@@ -95,6 +95,14 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Udobnost (25.9.2026, v0.9.0; Ahmed: „23456", bez stavke 1 „Završeno · MB za s"):
+  2) obavještenje u Windowsu kad se cijela grupa završi (samo ako prozor nije u fokusu, ne poslije
+  ručnog „Zaustavi"; isključivo u meniju); 3) istorija: pretraga (sve riječi, naslov/link/ime fajla)
+  i filter video/zvuk/obrisani; 4) Preuzimanja → Ime fajla (Naslov [id], Samo naslov, Izvođač -
+  Naslov, Kanal - Naslov, Datum Naslov; bez [id] dva videa istog naslova dijele ime); 5) Pomoć →
+  Tema: svijetla/tamna/kao Windows (`videodl/theme.py`, tamna naslovna traka); 6) napredak na
+  dugmetu u traci zadataka (ITaskbarList3 preko ctypes-a, `videodl/winshell.py`, provjereno na
+  pravom Windowsu). Testovi: `tests/test_comfort.py`.
 - [x] Animirana traka napretka (25.9.2026, v0.8.0, Ahmedov izbor „varijanta 4" iz 4 prikazane):
   klizi do novog procenta, sjaj prelazi preko popunjenog dijela, plavo = video, ljubičasto = zvuk
   (i MP4→MP3), bez procenta (priprema, ffmpeg) klizi lijevo-desno, na kraju zeleno + kratak puls pa

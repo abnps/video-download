@@ -22,7 +22,8 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QListWidget,
     QListWidgetItem, QMainWindow,
-    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QTabWidget, QTextBrowser, QVBoxLayout,
+    QLineEdit, QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon,
+    QTabWidget, QTextBrowser, QVBoxLayout,
     QWidget,
 )
 
@@ -37,13 +38,13 @@ from .native_host import call_app, data_dir, find_running_app
 from .native_messaging import install_native_host, uninstall_native_host
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import (
-    DEFAULT_PRESET_KEY, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
+    DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
     subtitle_languages,
 )
 from .probe import ProbeResult, probe
-from . import changelog, convert, diagnostics, legal, store, support
+from . import changelog, convert, diagnostics, legal, store, support, theme, winshell
 from . import updater, ytdlp_update
-from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
+from .widgets import DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
 
 _URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
@@ -60,57 +61,6 @@ RATE_CHOICES = (0, 1, 2, 5, 10)
 PARALLEL_CHOICES = (1, 2, 3, 4)
 DEFAULT_PARALLEL = 2
 
-STYLE = f"""
-QMainWindow, QWidget#central, QScrollArea, QWidget#rows, QWidget#dropZone {{ background: #ffffff; }}
-QMenuBar {{ background: #ffffff; border-bottom: 1px solid #e6e6e6; padding: 2px 4px; }}
-QMenuBar::item {{ padding: 4px 10px; background: transparent; }}
-QMenuBar::item:selected {{ background: #eef3fb; }}
-QLabel#cornerLink {{ padding-right: 10px; }}
-QFrame#toolbar {{ background: #ffffff; border-bottom: 1px solid #e6e6e6; }}
-QPushButton#pasteButton, QPushButton#downloadButton {{
-    color: #ffffff; border: none; border-radius: 3px; padding: 0 18px; min-height: 32px; font-size: 10pt;
-}}
-QPushButton#pasteButton {{ background: #4caf50; }}
-QPushButton#pasteButton:hover {{ background: #43a047; }}
-QPushButton#pasteButton:pressed {{ background: #388e3c; }}
-QPushButton#downloadButton {{ background: #1e88e5; }}
-QPushButton#downloadButton:hover {{ background: #1976d2; }}
-QPushButton#downloadButton:pressed {{ background: #1565c0; }}
-QPushButton#downloadButton[state="stop"] {{ background: #e53935; }}
-QPushButton#downloadButton[state="stop"]:hover {{ background: #d32f2f; }}
-QPushButton#downloadButton:disabled {{ background: #a9cdf2; }}
-QComboBox#presetCombo {{
-    border: 1px solid #cfcfcf; border-radius: 3px; padding: 0 10px; min-height: 32px; background: #ffffff;
-    font-size: 10pt;
-}}
-QComboBox#presetCombo:hover {{ border-color: #9fbfe8; }}
-QComboBox#presetCombo::drop-down {{ border: none; width: 28px; }}
-QComboBox#presetCombo::down-arrow {{ image: url("{(Path(__file__).parent / 'assets' / 'chevron-down.svg').as_posix()}"); width: 12px; height: 12px; }}
-QComboBox#presetCombo QAbstractItemView {{ border: 1px solid #cfcfcf; selection-background-color: #e8f0fe; selection-color: #202124; }}
-QLabel#warning {{ background: #fff4e5; color: #8a5300; padding: 6px 12px; border-bottom: 1px solid #f3d9b1; }}
-QFrame#queueRow {{ background: #ffffff; border-bottom: 1px solid #ececec; }}
-QFrame#queueRow:hover {{ background: #f7faff; }}
-QLabel#rowTitle {{ color: #202124; font-size: 10pt; }}
-QLabel#rowStatus {{ color: #7a7a7a; }}
-QLabel#rowStatus[state="done"] {{ color: #2e7d32; }}
-QLabel#rowStatus[state="failed"] {{ color: #c62828; }}
-QToolButton#rowAction {{ border: none; border-radius: 17px; background: transparent; }}
-QToolButton#rowAction:hover {{ background: #e8f0fe; }}
-QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transparent; }}
-QToolButton#rowRemove:hover {{ background: #eeeeee; }}
-QToolButton#rowConvert {{ border: 1px solid #c7d7f5; border-radius: 17px; background: #f5f8ff;
-    color: #1a73e8; font-weight: 600; font-size: 12px; }}
-QFrame#supportBanner {{ background: #fff8e1; border: 1px solid #f2d27a; border-radius: 8px; margin: 0 12px 6px 12px; }}
-QPushButton#supportButton {{ background: #c2185b; color: white; border: none; border-radius: 4px; padding: 6px 14px; font-weight: 600; }}
-QPushButton#supportButton:hover {{ background: #ad1457; }}
-QLabel#supportNote {{ color: #5f6368; font-size: 12px; }}
-QToolButton#rowConvert:hover {{ background: #e8f0fe; border-color: #1a73e8; }}
-QLabel#dropTitle {{ color: #5f6368; font-size: 10pt; }}
-QLabel#dropHint {{ color: #9aa0a6; }}
-QStatusBar {{ background: #fafafa; border-top: 1px solid #e6e6e6; color: #666666; }}
-QStatusBar QLabel {{ color: #666666; padding: 0 6px; }}
-QScrollArea {{ border: none; }}
-"""
 
 
 def default_output_dir() -> str:
@@ -176,18 +126,29 @@ def fetch_thumbnail(url: str) -> bytes | None:
 
 
 def apply_theme(app: QApplication) -> None:
-    # Izgled je namjerno svijetao i isti bez obzira na temu Windowsa.
+    """Paleta za trenutnu temu (theme.set_colors); dijalozi i meniji je preuzimaju."""
     app.setStyle("Fusion")
     app.setFont(QFont("Segoe UI", 9))
     palette = QPalette()
-    for role, color in ((QPalette.ColorRole.Window, "#ffffff"), (QPalette.ColorRole.Base, "#ffffff"),
-                        (QPalette.ColorRole.AlternateBase, "#f5f5f5"), (QPalette.ColorRole.Text, "#202124"),
-                        (QPalette.ColorRole.WindowText, "#202124"), (QPalette.ColorRole.Button, "#f3f3f3"),
-                        (QPalette.ColorRole.ButtonText, "#202124"), (QPalette.ColorRole.Highlight, "#1e88e5"),
-                        (QPalette.ColorRole.HighlightedText, "#ffffff"), (QPalette.ColorRole.ToolTipBase, "#ffffff"),
-                        (QPalette.ColorRole.ToolTipText, "#202124"), (QPalette.ColorRole.Link, LINK_COLOR)):
+    k = theme.c
+    for role, color in ((QPalette.ColorRole.Window, k("bg")), (QPalette.ColorRole.Base, k("bg")),
+                        (QPalette.ColorRole.AlternateBase, k("alt_base")), (QPalette.ColorRole.Text, k("text")),
+                        (QPalette.ColorRole.WindowText, k("text")), (QPalette.ColorRole.Button, k("button")),
+                        (QPalette.ColorRole.ButtonText, k("text")), (QPalette.ColorRole.Highlight, "#1e88e5"),
+                        (QPalette.ColorRole.HighlightedText, "#ffffff"), (QPalette.ColorRole.ToolTipBase, k("bg")),
+                        (QPalette.ColorRole.ToolTipText, k("text")), (QPalette.ColorRole.Link, k("link")),
+                        (QPalette.ColorRole.PlaceholderText, k("hint"))):
         palette.setColor(role, QColor(color))
+    for role in (QPalette.ColorRole.Text, QPalette.ColorRole.WindowText, QPalette.ColorRole.ButtonText):
+        palette.setColor(QPalette.ColorGroup.Disabled, role, QColor(k("hint")))
     app.setPalette(palette)
+
+
+def system_prefers_dark() -> bool:
+    app = QApplication.instance()
+    if app is None:
+        return False
+    return app.styleHints().colorScheme() == Qt.ColorScheme.Dark
 
 
 class ProbeJob(QObject):
@@ -435,6 +396,26 @@ class WhatsNewDialog(QDialog):
         layout.addLayout(buttons)
 
 
+HISTORY_KINDS = ("all", "video", "audio", "missing")
+AUDIO_EXTENSIONS = frozenset((".mp3", ".m4a", ".aac", ".opus", ".ogg", ".oga", ".wav", ".flac", ".wma"))
+
+
+def filter_history(entries, text: str = "", kind: str = "all") -> list:
+    """Istorija po riječima iz naslova, linka ili imena fajla (sve riječi, bez obzira na velika slova)
+    i po vrsti: video, zvuk ili fajl koji više ne postoji."""
+    words = text.casefold().split()
+    result = []
+    for entry in entries:
+        haystack = f"{entry.title} {entry.url} {os.path.basename(entry.filepath or '')}".casefold()
+        if any(word not in haystack for word in words):
+            continue
+        audio = Path(entry.filepath or "").suffix.lower() in AUDIO_EXTENSIONS
+        if kind == "video" and audio or kind == "audio" and not audio or kind == "missing" and entry.exists:
+            continue
+        result.append(entry)
+    return result
+
+
 class HistoryDialog(QDialog):
     """Šta je i kada preuzeto; fajl se može otvoriti u folderu i kad je red odavno obrisan."""
 
@@ -442,11 +423,26 @@ class HistoryDialog(QDialog):
         super().__init__(parent)
         self._path = path
         self.setWindowTitle(tr("history.title"))
-        self.resize(640, 420)
+        self.resize(680, 460)
         layout = QVBoxLayout(self)
+        filters = QHBoxLayout()
+        self.search = QLineEdit()
+        self.search.setPlaceholderText(tr("history.search"))
+        self.search.setClearButtonEnabled(True)
+        self.search.textChanged.connect(self._apply_filter)
+        filters.addWidget(self.search, 1)
+        self.kind = QComboBox()
+        for key in HISTORY_KINDS:
+            self.kind.addItem(tr(f"history.kind.{key}"), key)
+        self.kind.currentIndexChanged.connect(self._apply_filter)
+        filters.addWidget(self.kind)
+        layout.addLayout(filters)
         self.list = QListWidget()
         self.list.itemDoubleClicked.connect(self._open_selected)
         layout.addWidget(self.list)
+        self.count_label = QLabel()
+        self.count_label.setObjectName("supportNote")
+        layout.addWidget(self.count_label)
         buttons = QHBoxLayout()
         self.open_button = QPushButton(tr("history.open"))
         self.open_button.clicked.connect(self._open_selected)
@@ -462,9 +458,14 @@ class HistoryDialog(QDialog):
         self._fill()
 
     def _fill(self) -> None:
+        self._entries = store.load_history(self._path)
+        self._apply_filter()
+
+    def _apply_filter(self, *_args) -> None:
         self.list.clear()
-        entries = store.load_history(self._path)
-        for entry in entries:
+        entries = self._entries
+        shown = filter_history(entries, self.search.text(), self.kind.currentData() or "all")
+        for entry in shown:
             when = datetime.datetime.fromtimestamp(entry.finished_at).strftime("%d.%m.%Y %H:%M")
             size = format_size(entry.size) if entry.size else ""
             note = "" if entry.exists else f" — {tr('history.missing')}"
@@ -472,11 +473,16 @@ class HistoryDialog(QDialog):
             row.setData(Qt.ItemDataRole.UserRole, entry.filepath)
             row.setToolTip(entry.filepath or entry.url)
             self.list.addItem(row)
-        self.list.setEnabled(bool(entries))
-        self.open_button.setEnabled(bool(entries))
+        self.list.setEnabled(bool(shown))
+        self.open_button.setEnabled(bool(shown))
         self.clear_button.setEnabled(bool(entries))
+        self.search.setEnabled(bool(entries))
+        self.kind.setEnabled(bool(entries))
         if not entries:
             self.list.addItem(tr("history.empty"))
+        elif not shown:
+            self.list.addItem(tr("history.no_match"))
+        self.count_label.setText(tr("history.count", shown=len(shown), total=len(entries)) if entries else "")
 
     def _open_selected(self) -> None:
         row = self.list.currentItem()
@@ -616,13 +622,22 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(640, 380)
         self.resize(820, 520)
         self.setAcceptDrops(True)
-        self.setStyleSheet(STYLE)
+        self._theme = theme.DEFAULT_THEME
+        self._follows_system = False
         self._parallel = DEFAULT_PARALLEL
         self._subtitles = False
         self._thumbnail_cover = False
         self._whole_playlist = False
         self._rate_limit = 0
+        self._name_template = DEFAULT_NAME_TEMPLATE
         self._probing: set[str] = set()  # linkovi koji se upravo čitaju
+        # Grupa preuzimanja od pokretanja dok sve ne stane: napredak u traci zadataka i obavještenje.
+        self._batch: dict[int, float] = {}  # stavka -> udio 0..1
+        self._batch_stopped = False
+        self._notify_done = True
+        self._taskbar = winshell.TaskbarProgress(self)
+        self._tray: QSystemTrayIcon | None = None
+        self._notifier = self._show_notification
         self._errors: list[str] = []  # posljednje greške za izvještaj o problemu
         self._data_dir = Path(data_dir_path) if data_dir_path else data_dir()
         self._watch_clipboard = False
@@ -687,7 +702,19 @@ class MainWindow(QMainWindow):
             action.setData(value)
             action.triggered.connect(lambda _checked, rate=value: self._set_option("_rate_limit", rate))
             self.rate_actions.addAction(action)
+        self.name_menu = self.downloads_menu.addMenu("")
+        self.name_actions = QActionGroup(self)
+        self.name_actions.setExclusive(True)
+        for key in NAME_TEMPLATES:
+            action = self.name_menu.addAction("")
+            action.setCheckable(True)
+            action.setData(key)
+            action.triggered.connect(lambda _checked, value=key: self._set_option("_name_template", value))
+            self.name_actions.addAction(action)
         self.downloads_menu.addSeparator()
+        self.notify_action = self.downloads_menu.addAction(
+            "", lambda checked: self._set_option("_notify_done", checked))
+        self.notify_action.setCheckable(True)
         self.parallel_menu = self.downloads_menu.addMenu("")
         self.parallel_actions = QActionGroup(self)
         self.parallel_actions.setExclusive(True)
@@ -702,6 +729,15 @@ class MainWindow(QMainWindow):
         self.check_updates_action = self.help_menu.addAction("", lambda: self.check_for_updates(manual=True))
         self.whats_new_action = self.help_menu.addAction("", self._show_whats_new)
         self.update_ytdlp_action = self.help_menu.addAction("", lambda: self.update_ytdlp(manual=True))
+        self.theme_menu = self.help_menu.addMenu("")
+        self.theme_actions = QActionGroup(self)
+        self.theme_actions.setExclusive(True)
+        for name in theme.THEMES:
+            action = self.theme_menu.addAction("")
+            action.setCheckable(True)
+            action.setData(name)
+            action.triggered.connect(lambda _checked, value=name: self.set_theme(value))
+            self.theme_actions.addAction(action)
         self.language_menu = self.help_menu.addMenu("")
         self.language_actions = QActionGroup(self)
         for code, name in LANGUAGES.items():
@@ -748,6 +784,10 @@ class MainWindow(QMainWindow):
             value = action.data()
             action.setText(tr("rate.value", value=value) if value else tr("rate.none"))
         self._sync_option_actions()
+        self.notify_action.setText(tr("menu.notify_done"))
+        self.name_menu.setTitle(tr("menu.file_name"))
+        for action in self.name_actions.actions():
+            action.setText(tr(f"name.{action.data()}"))
         self.parallel_menu.setTitle(tr("menu.parallel"))
         for action in self.parallel_actions.actions():
             action.setChecked(action.data() == self._parallel)
@@ -755,6 +795,10 @@ class MainWindow(QMainWindow):
         self.check_updates_action.setText(tr("menu.check_updates"))
         self.whats_new_action.setText(tr("menu.whats_new"))
         self.update_ytdlp_action.setText(tr("menu.update_ytdlp"))
+        self.theme_menu.setTitle(tr("menu.theme"))
+        for action in self.theme_actions.actions():
+            action.setText(tr(f"theme.{action.data()}"))
+            action.setChecked(action.data() == self._theme)
         self.language_menu.setTitle(tr("menu.language"))
         for action in self.language_actions.actions():
             action.setChecked(action.data() == get_language())
@@ -762,12 +806,12 @@ class MainWindow(QMainWindow):
         self.report_action.setText(tr("menu.report"))
         self.legal_action.setText(tr("menu.legal"))
         self.support_action.setText(tr("menu.support"))
-        self.support_link.setText(f'<a href="support" style="color:#c2185b;text-decoration:none">{tr("support.link")}</a>')
+        self.support_link.setText(f'<a href="support" style="color:{theme.c('support_link')};text-decoration:none">{tr("support.link")}</a>')
         self.support_banner_label.setText(tr("support.banner"))
         self.support_banner_button.setText(tr("support.button"))
         self.support_banner_later.setText(tr("support.later"))
         self.about_action.setText(tr("menu.about"))
-        self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
+        self.corner_link.setText(f'<a href="open" style="color:{theme.c("link")}">{tr("corner.open_folder")}</a>')
 
         self.paste_button.setText(tr("toolbar.paste"))
         self.paste_button.setToolTip(tr("toolbar.paste_tip"))
@@ -890,6 +934,11 @@ class MainWindow(QMainWindow):
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
+        self._notify_done = self._settings.value("notify_done", True, type=bool)
+        name_template = self._settings.value("name_template", DEFAULT_NAME_TEMPLATE, type=str)
+        self._name_template = name_template if name_template in NAME_TEMPLATES else DEFAULT_NAME_TEMPLATE
+        name = self._settings.value("theme", theme.DEFAULT_THEME, type=str)
+        self.set_theme(name if name in theme.THEMES else theme.DEFAULT_THEME, save=False)
         rate = self._settings.value("rate_limit", 0, type=int)
         self._rate_limit = rate if rate in RATE_CHOICES else 0
         parallel = self._settings.value("parallel", DEFAULT_PARALLEL, type=int)
@@ -910,7 +959,10 @@ class MainWindow(QMainWindow):
         self._settings.setValue("support/snooze_until", self._support.snooze_until)
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
         self._settings.setValue("whole_playlist", self._whole_playlist)
+        self._settings.setValue("notify_done", self._notify_done)
+        self._settings.setValue("name_template", self._name_template)
         self._settings.setValue("rate_limit", self._rate_limit)
+        self._settings.setValue("theme", self._theme)
         self._settings.setValue("watch_clipboard", self._watch_clipboard)
 
     def _restore_queue(self) -> None:
@@ -1034,6 +1086,8 @@ class MainWindow(QMainWindow):
             options["subtitle_langs"] = subtitle_languages(get_language())
         if self._thumbnail_cover:
             options["thumbnail"] = True
+        if self._name_template != DEFAULT_NAME_TEMPLATE:
+            options["name_template"] = self._name_template
         if self._rate_limit:
             # Ukupno ograničenje se dijeli na preuzimanja koja mogu ići istovremeno.
             options["ratelimit"] = self._rate_limit * 1024 * 1024 // max(1, self._parallel)
@@ -1048,6 +1102,9 @@ class MainWindow(QMainWindow):
         self.subtitles_action.setChecked(self._subtitles)
         self.thumbnail_action.setChecked(self._thumbnail_cover)
         self.whole_playlist_action.setChecked(self._whole_playlist)
+        self.notify_action.setChecked(self._notify_done)
+        for action in self.name_actions.actions():
+            action.setChecked(action.data() == self._name_template)
         for action in self.rate_actions.actions():
             action.setChecked(action.data() == self._rate_limit)
 
@@ -1074,6 +1131,39 @@ class MainWindow(QMainWindow):
             return
         self.set_item_section(item_id, section)
 
+    def set_theme(self, name: str, save: bool = True) -> None:
+        """Svijetla, tamna ili kao Windows; mijenja se odmah, bez ponovnog pokretanja."""
+        self._theme = name if name in theme.THEMES else theme.DEFAULT_THEME
+        dark = system_prefers_dark() if self._theme == "system" else self._theme == "dark"
+        theme.set_colors(dark)
+        app = QApplication.instance()
+        if app is not None:
+            apply_theme(app)
+            # Samo „Kao Windows" prati promjenu teme u Windowsu dok program radi.
+            follow = self._theme == "system"
+            if follow != self._follows_system:
+                signal = app.styleHints().colorSchemeChanged
+                if follow:
+                    signal.connect(self._on_system_scheme)
+                else:
+                    signal.disconnect(self._on_system_scheme)
+                self._follows_system = follow
+        self.setStyleSheet(theme.stylesheet())
+        winshell.set_dark_title_bar(self, dark)
+        for action in self.theme_actions.actions():
+            action.setChecked(action.data() == self._theme)
+        if hasattr(self, "drop_zone"):
+            self.retranslate_ui()  # linkovi u tekstu nose svoju boju
+            for item in self._queue.items():
+                self._refresh_row(item)
+            self.drop_zone.update()
+        if save:
+            self._save_settings()
+
+    def _on_system_scheme(self, _scheme=None) -> None:
+        if self._theme == "system":
+            self.set_theme("system", save=False)
+
     def set_parallel(self, count: int) -> None:
         """Koliko preuzimanja ide istovremeno; veći broj ne znači uvijek brže (dijeli se veza)."""
         self._parallel = count if count in PARALLEL_CHOICES else DEFAULT_PARALLEL
@@ -1096,7 +1186,7 @@ class MainWindow(QMainWindow):
 
     def _update_folder_label(self) -> None:
         name = Path(self._output_dir).name or self._output_dir
-        self.folder_label.setText(f'{tr("folder.label")} <a href="change" style="color:{LINK_COLOR}">{name}</a>')
+        self.folder_label.setText(f'{tr("folder.label")} <a href="change" style="color:{theme.c("link")}">{name}</a>')
         self.folder_label.setToolTip(tr("folder.tip", path=self._output_dir))
 
     @Slot()
@@ -1252,6 +1342,9 @@ class MainWindow(QMainWindow):
                 break
             item.status = ItemStatus.ACTIVE
             item.message = ""
+            if not self._batch:
+                self._batch_stopped = False
+            self._batch[item.id] = 0.0
             self._refresh_row(item)
             job = DownloadJob(item, self._download_fn, self._download_options(item))
             job.progress.connect(self._on_download_progress)
@@ -1259,6 +1352,7 @@ class MainWindow(QMainWindow):
             self._download_jobs[item.id] = job
             started.append(job)
         self._update_controls()
+        self._update_taskbar()
         for job in started:
             job.start()
 
@@ -1270,6 +1364,9 @@ class MainWindow(QMainWindow):
             return
         audio = progress.label == "progress.audio" or get_preset(item.preset_key).is_audio
         row.show_progress(format_progress(progress), progress.fraction, "audio" if audio else "video")
+        if progress.fraction is not None and item_id in self._batch:
+            self._batch[item_id] = progress.fraction
+            self._update_taskbar()
 
     @Slot(int, object)
     def _on_download_finished(self, item_id: int, result: DownloadResult) -> None:
@@ -1277,6 +1374,8 @@ class MainWindow(QMainWindow):
         if job is not None:
             job.deleteLater()
         item = self._queue.get(item_id)
+        if item_id in self._batch:
+            self._batch[item_id] = 1.0
         if item is not None and self._auto_retry(item, result):
             return
         if item is not None:
@@ -1298,7 +1397,59 @@ class MainWindow(QMainWindow):
                 self._refresh_row(item)
         self._save_queue()
         self._start_next()
+        self._check_batch_done()
         self._maybe_remind_support()
+
+    def _batch_fraction(self) -> float:
+        waiting = 0
+        if self._running:
+            waiting = sum(1 for item in self._queue.items()
+                          if item.status == ItemStatus.WAITING and item.id not in self._batch)
+        total = len(self._batch) + waiting
+        return sum(self._batch.values()) / total if total else 0.0
+
+    def _update_taskbar(self) -> None:
+        if self._batch and (self._download_jobs or self._running):
+            self._taskbar.set(self._batch_fraction())
+
+    def _check_batch_done(self) -> None:
+        """Kad ništa više ne radi (ni ponovni pokušaj ne čeka): traka zadataka se čisti, stiže obavještenje."""
+        if not self._batch or self._download_jobs or self._running:
+            return
+        items = [self._queue.get(item_id) for item_id in self._batch]
+        if any(item is not None and item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY
+               for item in items):
+            return
+        done = [item for item in items if item is not None and item.status == ItemStatus.DONE]
+        failed = sum(1 for item in items if item is not None and item.status == ItemStatus.FAILED)
+        stopped = self._batch_stopped
+        self._batch.clear()
+        self._taskbar.clear()
+        if stopped or not self._notify_done or not (done or failed):
+            return
+        if self.isActiveWindow() and not self.isMinimized():
+            return  # korisnik gleda u prozor: kartice već sve pokazuju
+        if len(done) == 1 and not failed:
+            title, body = tr("notify.done_one"), done[0].title
+        else:
+            title = tr("notify.done_many")
+            body = tr("notify.summary", done=len(done), failed=failed) if failed else \
+                tr("notify.summary_ok", done=len(done))
+        QApplication.alert(self)  # dugme u traci zadataka zatreperi
+        self._notifier(title, body)
+
+    def _show_notification(self, title: str, body: str) -> None:
+        if not QSystemTrayIcon.isSystemTrayAvailable():
+            return
+        if self._tray is None:
+            self._tray = QSystemTrayIcon(self.windowIcon() or QApplication.windowIcon(), self)
+            self._tray.setToolTip("Video Download")
+            self._tray.messageClicked.connect(self._bring_to_front)
+            self._tray.activated.connect(lambda _reason: self._bring_to_front())
+        self._tray.show()
+        self._tray.showMessage(title, body, QSystemTrayIcon.MessageIcon.Information, 8000)
+        # Ikonica u sistemskoj traci treba samo za obavještenje; poslije se sklanja.
+        QTimer.singleShot(15000, lambda: self._tray is not None and self._tray.hide())
 
     @Slot()
     def _toggle_running(self) -> None:
@@ -1371,9 +1522,11 @@ class MainWindow(QMainWindow):
                 item.auto_retries = MAX_AUTO_RETRIES  # zaustavljeno ručno: bez daljeg ponavljanja
                 self._refresh_row(item)
         self._cancel_probes()
+        self._batch_stopped = True  # ručno zaustavljeno: bez obavještenja „sve je gotovo"
         if self._download_jobs:
             self._set_status(tr("status.stopping"))
             self._cancel_active()
+        self._check_batch_done()
         self._update_controls()
 
     @Slot(int)
@@ -1769,6 +1922,13 @@ class MainWindow(QMainWindow):
             job.join(timeout=5)
         self._save_settings()
         self._save_queue()
+        self._taskbar.clear()
+        if self._tray is not None:
+            self._tray.hide()
+        if self._follows_system:
+            with contextlib.suppress(RuntimeError):
+                QApplication.instance().styleHints().colorSchemeChanged.disconnect(self._on_system_scheme)
+            self._follows_system = False
         # Prozor se gasi: signal clipboarda više ne smije stizati.
         with contextlib.suppress(RuntimeError):
             QApplication.clipboard().dataChanged.disconnect(self._on_clipboard_change)

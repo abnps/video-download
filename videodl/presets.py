@@ -15,6 +15,18 @@ from .ytdl import base_options, reject_live
 # .150B ograničava naslov na 150 bajtova da putanja ne pređe Windows limit.
 OUTPUT_NAME = "%(title).150B [%(id)s].%(ext)s"
 
+# Šabloni imena fajla (Preuzimanja → Ime fajla). Dio ispred naslova ostaje prazan kad sajt ne da
+# taj podatak (npr. video bez izvođača), pa ime nikad ne počinje sa „NA - ".
+# Bez [id] u imenu dva različita videa istog naslova dobiju isto ime: drugi se tada smatra već preuzetim.
+NAME_TEMPLATES = {
+    "title_id": OUTPUT_NAME,
+    "title": "%(title).150B.%(ext)s",
+    "artist_title": "%(artist,creator&{} - |).80B%(title).150B.%(ext)s",
+    "channel_title": "%(channel,uploader&{} - |).80B%(title).150B.%(ext)s",
+    "date_title": "%(upload_date>%Y-%m-%d&{} |)s%(title).150B.%(ext)s",
+}
+DEFAULT_NAME_TEMPLATE = "title_id"
+
 # Pri istoj rezoluciji prednost imaju H.264 i AAC: takav MP4 se pušta svuda.
 _COMPATIBLE = ("fps", "vcodec:h264", "acodec:aac")
 
@@ -109,7 +121,8 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
                       filename_title: str | None = None, source_url: str | None = None,
                       cookiefile: str | None = None, section: tuple[float, float] | None = None,
                       subtitles: bool = False, subtitle_langs: list[str] | None = None,
-                      thumbnail: bool = False, ratelimit: int | None = None) -> dict:
+                      thumbnail: bool = False, ratelimit: int | None = None,
+                      name_template: str | None = None) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
@@ -117,7 +130,7 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
     opts = base_options(logger)
     opts["format"] = preset.format
     opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _with_section(
-        _output_name(filename_title, source_url), section)
+        _output_name(filename_title, source_url, name_template), section)
     opts["match_filter"] = reject_live
     if http_headers:
         opts["http_headers"] = dict(http_headers)
@@ -170,9 +183,9 @@ def _with_section(template: str, section: tuple[float, float] | None) -> str:
     return template.replace(".%(ext)s", f" ({label}).%(ext)s")
 
 
-def _output_name(filename_title: str | None, source_url: str | None) -> str:
+def _output_name(filename_title: str | None, source_url: str | None, name_template: str | None = None) -> str:
     if not filename_title:
-        return OUTPUT_NAME
+        return NAME_TEMPLATES.get(name_template or DEFAULT_NAME_TEMPLATE, OUTPUT_NAME)
     # Direktan tok (npr. index.m3u8) nema smislen naslov ni id, pa ime daje naslov
     # stranice, a kratki otisak putanje toka razlikuje različite videe istog naslova.
     title = sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"

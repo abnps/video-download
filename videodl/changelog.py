@@ -8,6 +8,33 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.0", "25.9.2026", {
+        "bs": ["Tamna tema: Pomoć → Tema (svijetla, tamna ili kao Windows).",
+               "Obavještenje u Windowsu kad se sva preuzimanja završe (Preuzimanja → Obavijesti me…).",
+               "Napredak se vidi i na dugmetu programa u traci zadataka.",
+               "Istorija: pretraga po naslovu, linku ili imenu fajla i izbor video, zvuk ili obrisani fajlovi.",
+               "Ime fajla po izboru: Preuzimanja → Ime fajla (npr. „Izvođač - Naslov“)."],
+        "en": ["Dark theme: Help → Theme (light, dark or same as Windows).",
+               "A Windows notification when all downloads have finished (Downloads → Notify me…).",
+               "Progress is also shown on the program's taskbar button.",
+               "History: search by title, link or file name and filter by video, audio or deleted files.",
+               "Choose the file name: Downloads → File name (e.g. \u201cArtist - Title\u201d)."],
+        "de": ["Dunkles Design: Hilfe → Design (hell, dunkel oder wie Windows).",
+               "Eine Windows-Benachrichtigung, wenn alle Downloads fertig sind (Downloads → Benachrichtigen…).",
+               "Der Fortschritt ist auch auf der Schaltfläche in der Taskleiste zu sehen.",
+               "Verlauf: Suche nach Titel, Link oder Dateiname und Filter nach Video, Audio oder gelöschten Dateien.",
+               "Dateiname wählbar: Downloads → Dateiname (z. B. \u201eInterpret - Titel\u201c)."],
+        "es": ["Tema oscuro: Ayuda → Tema (claro, oscuro o como Windows).",
+               "Una notificación de Windows cuando terminan todas las descargas (Descargas → Avisarme…).",
+               "El progreso también se ve en el botón del programa en la barra de tareas.",
+               "Historial: búsqueda por título, enlace o nombre de archivo y filtro por vídeo, audio o archivos borrados.",
+               "Nombre del archivo a elegir: Descargas → Nombre del archivo (p. ej. «Artista - Título»)."],
+        "fr": ["Thème sombre : Aide → Thème (clair, sombre ou comme Windows).",
+               "Une notification Windows quand tous les téléchargements sont terminés (Téléchargements → Me prévenir…).",
+               "La progression s'affiche aussi sur le bouton du programme dans la barre des tâches.",
+               "Historique : recherche par titre, lien ou nom de fichier et filtre vidéo, audio ou fichiers supprimés.",
+               "Nom du fichier au choix : Téléchargements → Nom du fichier (p. ex. « Artiste - Titre »)."],
+    }),
     ("0.8.0", "25.9.2026", {
         "bs": ["Animirana traka napretka: glatko klizi, preko nje prelazi sjaj, plava je za video i ljubičasta za zvuk, "
                "dok se video i zvuk spajaju klizi lijevo-desno, a na kraju zazeleni."],

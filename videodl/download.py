@@ -163,7 +163,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              subtitles: bool = False,
              subtitle_langs: list[str] | None = None,
              thumbnail: bool = False,
-             ratelimit: int | None = None) -> DownloadResult:
+             ratelimit: int | None = None,
+             name_template: str | None = None) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
@@ -175,7 +176,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
                                      filename_title=filename_title, source_url=url, cookiefile=cookiefile,
                                      section=section, subtitles=subtitles, subtitle_langs=subtitle_langs,
-                                     thumbnail=thumbnail, ratelimit=ratelimit)
+                                     thumbnail=thumbnail, ratelimit=ratelimit, name_template=name_template)
             opts["progress_hooks"] = [attempt.progress_hook]
             opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
             with YoutubeDL(opts) as ydl:

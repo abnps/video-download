@@ -10,16 +10,14 @@ from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QSizePolicy, QToolButton, QVBoxLayout, QWidget,
 )
 
+from . import theme
 from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, tr
 from .icons import icon
 from .jobs import ItemStatus, QueueItem
 from .presets import format_section, get_preset
 
-LINK_COLOR = "#1a73e8"
-MUTED_COLOR = "#7a7a7a"
 
 # Boje trake napretka po fazi (Ahmedov izbor, varijanta 4).
-PROGRESS_TRACK = "#e3ecf8"
 PROGRESS_COLORS = {"video": "#1e88e5", "audio": "#8e24aa", "work": "#8e24aa", "done": "#43a047"}
 
 
@@ -189,7 +187,7 @@ class AnimatedProgress(QWidget):
         radius = thickness / 2
         track = QPainterPath()
         track.addRoundedRect(QRectF(0, top, width, thickness), radius, radius)
-        painter.fillPath(track, QColor(PROGRESS_TRACK))
+        painter.fillPath(track, QColor(theme.c("progress_track")))
         color = QColor(PROGRESS_COLORS.get(self.phase, PROGRESS_COLORS["video"]))
 
         if self.indeterminate:
@@ -272,7 +270,7 @@ class Thumbnail(QWidget):
                                          Qt.TransformationMode.SmoothTransformation)
             painter.drawPixmap((self.width() - scaled.width()) // 2, (self.height() - scaled.height()) // 2, scaled)
         else:
-            painter.fillRect(self.rect(), QColor("#2f3136"))
+            painter.fillRect(self.rect(), QColor(theme.c("thumb")))
             play = QPainterPath()
             cx, cy = self.width() / 2, self.height() / 2
             play.moveTo(cx - 6, cy - 9)
@@ -327,7 +325,7 @@ class DropZone(QWidget):
 
     def retranslate(self) -> None:
         self.title.setText(tr("drop.title"))
-        self.paste_link.setText(f'<a href="paste" style="color:{LINK_COLOR}">{tr("drop.paste")}</a>')
+        self.paste_link.setText(f'<a href="paste" style="color:{theme.c("link")}">{tr("drop.paste")}</a>')
         self.folder_hint.setText(tr("drop.folder", folder=self._folder))
 
     def set_folder(self, folder: str) -> None:
@@ -343,12 +341,12 @@ class _DashedBox(QWidget):
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        pen = QPen(QColor("#9aa0a6"), 3, Qt.PenStyle.CustomDashLine)
+        pen = QPen(QColor(theme.c("dash")), 3, Qt.PenStyle.CustomDashLine)
         pen.setDashPattern([3, 2.2])
         pen.setCapStyle(Qt.PenCapStyle.FlatCap)
         painter.setPen(pen)
         painter.drawRoundedRect(QRectF(3, 3, 78, 78), 12, 12)
-        arrow = QPen(QColor("#7d8288"), 5)
+        arrow = QPen(QColor(theme.c("arrow")), 5)
         arrow.setCapStyle(Qt.PenCapStyle.RoundCap)
         arrow.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
         painter.setPen(arrow)
@@ -401,7 +399,6 @@ class QueueRow(QFrame):
 
         self.play_button = QToolButton()
         self.play_button.setObjectName("rowAction")
-        self.play_button.setIcon(icon("play", "#5f6368"))
         self.play_button.setIconSize(QSize(20, 20))
         self.play_button.setFixedSize(34, 34)
         self.play_button.clicked.connect(lambda: self.play_clicked.emit(self.item_id))
@@ -429,7 +426,6 @@ class QueueRow(QFrame):
 
         self.remove_button = QToolButton()
         self.remove_button.setObjectName("rowRemove")
-        self.remove_button.setIcon(icon("close", "#9aa0a6"))
         self.remove_button.setIconSize(QSize(12, 12))
         self.remove_button.setFixedSize(20, 20)
         self.remove_button.clicked.connect(lambda: self.remove_clicked.emit(self.item_id))
@@ -447,17 +443,19 @@ class QueueRow(QFrame):
             preset = f"{preset} · {format_section(item.section)}"
         active = item.status == ItemStatus.ACTIVE
         if active:
-            self.format_link.setText(f'<span style="color:{MUTED_COLOR}">{preset}</span>')
+            self.format_link.setText(f'<span style="color:{theme.c("muted")}">{preset}</span>')
         else:
-            self.format_link.setText(f'<a href="format" style="color:{LINK_COLOR}">{preset}</a>')
+            self.format_link.setText(f'<a href="format" style="color:{theme.c("link")}">{preset}</a>')
 
         self.format_link.setToolTip(tr("row.format_tip"))
+        self.play_button.setIcon(icon("play", theme.c("icon")))
+        self.remove_button.setIcon(icon("close", theme.c("icon_soft")))
         if item.status == ItemStatus.WAITING:
             self._set_status(tr("row.waiting"), "muted")
-            self._set_action("download-solid", "#5f6368", tr("row.download_tip"))
+            self._set_action("download-solid", theme.c("icon"), tr("row.download_tip"))
         elif active:
             self._set_status(tr("row.starting"), "muted")
-            self._set_action("stop", "#5f6368", tr("row.stop_tip"))
+            self._set_action("stop", theme.c("icon"), tr("row.stop_tip"))
             if self.progress.isHidden() or self.progress.phase == "done":
                 self.progress.reset()
                 self.progress.set_fraction(None)  # priprema: traka klizi dok ne stigne prvi procenat
@@ -473,13 +471,13 @@ class QueueRow(QFrame):
             elif item.convert_state == "failed":
                 text, state = tr("row.convert_failed", error=item.convert_message), "failed"
             self._set_status(text, state)
-            self._set_action("folder", "#5f6368", tr("row.reveal_tip"))
+            self._set_action("folder", theme.c("icon"), tr("row.reveal_tip"))
         elif item.status == ItemStatus.FAILED:
             self._set_status(tr("row.failed", message=display_message(item.message)), "failed")
-            self._set_action("retry", "#5f6368", tr("row.retry_tip"))
+            self._set_action("retry", theme.c("icon"), tr("row.retry_tip"))
         else:
             self._set_status(tr("row.cancelled"), "muted")
-            self._set_action("retry", "#5f6368", tr("row.retry_tip"))
+            self._set_action("retry", theme.c("icon"), tr("row.retry_tip"))
 
         converting = item.status == ItemStatus.DONE and item.convert_state == "running"
         if active:
