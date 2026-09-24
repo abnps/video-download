@@ -45,11 +45,11 @@ CloseApplications=yes
 RestartApplications=no
 
 [Languages]
-Name: "bosnian"; MessagesFile: "Bosnian.isl"; LicenseFile: "..\videodl\assets\terms_bs.txt"
-Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "..\videodl\assets\terms_en.txt"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"; LicenseFile: "..\videodl\assets\terms_de.txt"
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "..\videodl\assets\terms_es.txt"
-Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "..\videodl\assets\terms_fr.txt"
+Name: "bosnian"; MessagesFile: "Bosnian.isl"; LicenseFile: "{#SourceDir}\legal\agreement_bs.txt"; InfoBeforeFile: "{#SourceDir}\legal\privacy_bs.txt"
+Name: "english"; MessagesFile: "compiler:Default.isl"; LicenseFile: "{#SourceDir}\legal\agreement_en.txt"; InfoBeforeFile: "{#SourceDir}\legal\privacy_en.txt"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"; LicenseFile: "{#SourceDir}\legal\agreement_de.txt"; InfoBeforeFile: "{#SourceDir}\legal\privacy_de.txt"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "{#SourceDir}\legal\agreement_es.txt"; InfoBeforeFile: "{#SourceDir}\legal\privacy_es.txt"
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "{#SourceDir}\legal\agreement_fr.txt"; InfoBeforeFile: "{#SourceDir}\legal\privacy_fr.txt"
 
 [CustomMessages]
 bosnian.BrowserNote=Za preuzimanje iz Edge/Chrome browsera učitaj dodatak iz foldera „extension" (Pomoć → Preuzimanje iz browsera).
@@ -82,6 +82,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts\com.videodl.br
 [UninstallDelete]
 Type: filesandordirs; Name: "{localappdata}\VideoDownload\native-host"
 Type: files; Name: "{localappdata}\VideoDownload\bridge.json"
+; Preuzeti yt-dlp je dio programa, ne korisnikovi podaci (red i istorija ostaju).
+Type: filesandordirs; Name: "{localappdata}\VideoDownload\yt-dlp"
 
 [Run]
 Filename: "{app}\VideoDownload.exe"; Description: "{cm:LaunchProgram,Video Download}"; Flags: nowait postinstall skipifsilent

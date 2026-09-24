@@ -1,0 +1,27 @@
+﻿VIDEO DOWNLOAD — CONTRATO DE LICENCIA DE USUARIO FINAL
+
+Este contrato rige entre tú y el autor de Video Download (el «autor»). Al instalar o usar el programa aceptas este contrato y las Condiciones de uso.
+
+1. Licencia
+El autor te concede una licencia gratuita y no exclusiva para instalar y usar el programa en tus propios ordenadores para uso personal.
+
+2. Distribución
+Puedes compartir gratis el instalador sin modificar, junto con este contrato. No puedes vender ni alquilar el programa, ni compartir una versión modificada con el nombre Video Download.
+
+3. Componentes de terceros
+El programa contiene componentes de otros autores (yt-dlp, FFmpeg, Qt/PySide6, Node.js y otros). A ellos se aplican sus propias licencias, que este contrato no limita. Los textos de las licencias están en la carpeta «licenses» y en THIRD-PARTY-NOTICES.txt en la carpeta del programa.
+
+4. Actualizaciones
+Como máximo una vez al día el programa comprueba si hay una nueva versión del programa (GitHub) y del lector de sitios yt-dlp (PyPI). Una nueva versión del programa solo se instala cuando la confirmas; yt-dlp se actualiza solo y surte efecto al siguiente inicio del programa.
+
+5. Sin garantía
+El programa se ofrece «tal cual». El autor no garantiza que funcione con todos los sitios, sin errores ni sin interrupciones, porque los sitios cambian su funcionamiento.
+
+6. Limitación de responsabilidad
+El autor no responde de los daños derivados del uso o de la imposibilidad de uso del programa, ni del contenido que descargues. Esto no se aplica cuando la ley no permita excluir la responsabilidad, por ejemplo en caso de dolo, negligencia grave o daños a la vida y la salud.
+
+7. Terminación
+Si incumples este contrato o las Condiciones de uso, la licencia termina y debes eliminar el programa.
+
+8. Contacto
+Preguntas e informes de errores: https://github.com/npgamy/video-download/issues

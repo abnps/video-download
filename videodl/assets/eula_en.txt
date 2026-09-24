@@ -1,0 +1,27 @@
+﻿VIDEO DOWNLOAD — END USER LICENSE AGREEMENT
+
+This agreement applies between you and the author of Video Download (the "author"). By installing or using the program you accept this agreement and the Terms of Use.
+
+1. License
+The author grants you a free, non-exclusive license to install and use the program on your own computers for personal use.
+
+2. Sharing
+You may share the unmodified installer free of charge, together with this agreement. You may not sell or rent the program, or share a modified version under the name Video Download.
+
+3. Third-party components
+The program contains components by other authors (yt-dlp, FFmpeg, Qt/PySide6, Node.js and others). Their own licenses apply to them and are not limited by this agreement. The license texts are in the "licenses" folder and in THIRD-PARTY-NOTICES.txt in the program folder.
+
+4. Updates
+At most once a day the program checks whether there is a new version of the program (GitHub) and of the site reader yt-dlp (PyPI). A new version of the program is installed only after you confirm it; yt-dlp updates itself and takes effect the next time the program starts.
+
+5. No warranty
+The program is provided "as is". The author does not guarantee that it will work with every site, without errors or without interruption, because sites change how they work.
+
+6. Limitation of liability
+The author is not liable for damage resulting from the use of, or the inability to use, the program, nor for the content you download. This does not apply where the law does not allow liability to be excluded, for example for intent, gross negligence or injury to life and health.
+
+7. Termination
+If you breach this agreement or the Terms of Use, the license ends and you must remove the program.
+
+8. Contact
+Questions and bug reports: https://github.com/npgamy/video-download/issues

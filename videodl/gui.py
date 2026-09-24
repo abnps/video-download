@@ -22,7 +22,7 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QListWidget,
     QListWidgetItem, QMainWindow,
-    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QTextBrowser, QVBoxLayout,
+    QMenu, QMessageBox, QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QTabWidget, QTextBrowser, QVBoxLayout,
     QWidget,
 )
 
@@ -41,7 +41,7 @@ from .presets import (
     subtitle_languages,
 )
 from .probe import ProbeResult, probe
-from . import changelog, convert, diagnostics, store
+from . import changelog, convert, diagnostics, legal, store
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error
@@ -325,32 +325,37 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
-def terms_text(language: str) -> str:
-    """Uslovi korištenja iz istog fajla koji prikazuje instaler (videodl/assets/terms_<jezik>.txt)."""
-    folder = Path(__file__).parent / "assets"
-    path = folder / f"terms_{language}.txt"
-    if not path.is_file():
-        path = folder / "terms_en.txt"
-    return path.read_text(encoding="utf-8-sig")
-
-
-class TermsDialog(QDialog):
-    """Pomoć → Uslovi korištenja: isti tekst koji je prihvaćen u instaleru."""
+class LegalDialog(QDialog):
+    """Pomoć → Ugovori i licence: isti tekstovi kao u instaleru, na jeziku aplikacije."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(tr("menu.terms").rstrip("…"))
-        self.resize(620, 560)
+        self.setWindowTitle(tr("menu.legal").rstrip("…"))
+        self.resize(680, 600)
         layout = QVBoxLayout(self)
-        self.browser = QTextBrowser()
-        self.browser.setPlainText(terms_text(get_language()))
-        layout.addWidget(self.browser)
+        self.tabs = QTabWidget()
+        language = get_language()
+        for kind, key in legal.DOCUMENTS:
+            self.tabs.addTab(self._text_view(legal.document_text(kind, language)), tr(key))
+        folder = legal.licenses_dir()
+        self.tabs.addTab(self._text_view(legal.notices_text(folder)), tr("legal.components"))
+        layout.addWidget(self.tabs)
+        buttons = QHBoxLayout()
+        self.open_licenses_button = QPushButton(tr("legal.open_licenses"))
+        self.open_licenses_button.clicked.connect(lambda: reveal(str(folder)))
+        self.open_licenses_button.setEnabled(folder.is_dir())
+        buttons.addWidget(self.open_licenses_button)
+        buttons.addStretch(1)
         close_button = QPushButton(tr("history.close"))
         close_button.clicked.connect(self.accept)
-        buttons = QHBoxLayout()
-        buttons.addStretch(1)
         buttons.addWidget(close_button)
         layout.addLayout(buttons)
+
+    @staticmethod
+    def _text_view(text: str) -> QTextBrowser:
+        view = QTextBrowser()
+        view.setPlainText(text)
+        return view
 
 
 class WhatsNewDialog(QDialog):
@@ -651,7 +656,7 @@ class MainWindow(QMainWindow):
         self.help_menu.addSeparator()
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
         self.report_action = self.help_menu.addAction("", self._save_report)
-        self.terms_action = self.help_menu.addAction("", self._show_terms)
+        self.legal_action = self.help_menu.addAction("", self._show_legal)
         self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
@@ -697,7 +702,7 @@ class MainWindow(QMainWindow):
             action.setChecked(action.data() == get_language())
         self.browser_help_action.setText(tr("menu.browser_help"))
         self.report_action.setText(tr("menu.report"))
-        self.terms_action.setText(tr("menu.terms"))
+        self.legal_action.setText(tr("menu.legal"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
 
@@ -839,8 +844,8 @@ class MainWindow(QMainWindow):
         store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
 
     @Slot()
-    def _show_terms(self) -> None:
-        TermsDialog(self).exec()
+    def _show_legal(self) -> None:
+        LegalDialog(self).exec()
 
     @Slot()
     def _show_whats_new(self) -> None:

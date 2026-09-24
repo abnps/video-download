@@ -1,0 +1,30 @@
+﻿VIDEO DOWNLOAD — DATENSCHUTZERKLÄRUNG
+
+Kurz gesagt: Der Autor des Programms erhebt keine Daten über dich. Keine Konten, kein Tracking, keine Werbung.
+
+1. Was das Programm nicht tut
+Das Programm sendet dem Autor keine Daten, keine Nutzungsstatistik und keine Fehlerberichte. Es gibt keine Werbung und keine Analyse.
+
+2. Womit sich das Programm verbindet
+- Mit der Seite, von der du herunterlädst (Video, Audio, Vorschaubilder, Untertitel).
+- Mit GitHub (api.github.com, github.com): Prüfung und Download einer neuen Programmversion, höchstens einmal täglich und wenn du „Nach Updates suchen" klickst.
+- Mit PyPI (pypi.org, files.pythonhosted.org): Prüfung und Download des Seiten-Readers yt-dlp, höchstens einmal täglich.
+Diese Dienste sehen deine IP-Adresse und die Programmversion; es gelten ihre Datenschutzerklärungen.
+
+3. Was auf deinem Computer gespeichert wird
+Einstellungen (Registry: HKCU\Software\VideoDownload), Download-Liste und Verlauf (Links, Titel, Pfade, Größen, Zeiten) und das geladene yt-dlp im Ordner %LOCALAPPDATA%\VideoDownload sowie ein lokaler Schlüssel für die Verbindung mit dem Browser. Nichts davon verlässt deinen Computer.
+
+4. Anmelde-Cookies
+Nur wenn du es im Browser erlaubst. An das Programm gehen nur Cookies der Seite, von der du herunterlädst; sie werden nur im Speicher gehalten, und die temporäre Datei für yt-dlp wird sofort gelöscht. Sie werden nie in Liste, Verlauf oder Berichte geschrieben.
+
+5. Browsererweiterung
+Berechtigungen: Beobachten von Netzwerkanfragen (um Videostreams zu erkennen), ein Skript auf der Seite (um das laufende Video zu finden und DRM zu erkennen), das Rechtsklickmenü, eine lokale Verbindung zum Programm (Native Messaging) und temporärer Speicher pro Tab; Cookies nur mit deiner Erlaubnis. Die Erweiterung sendet nichts ins Internet: Sie übergibt Daten nur an das Programm auf deinem Computer, und nur wenn du klickst.
+
+6. Problembericht
+Er wird nur erstellt, wenn du ihn selbst speicherst. Links darin sind auf den Seitennamen gekürzt, Benutzername und Geheimnisse sind verborgen. Du sendest ihn nur, wenn du das entscheidest.
+
+7. Daten löschen
+Den Verlauf löschst du unter Downloads → Download-Verlauf → Liste leeren. Die Deinstallation entfernt das Programm, die Browserverbindung und das geladene yt-dlp. Liste, Verlauf und Einstellungen bleiben, bis du den Ordner %LOCALAPPDATA%\VideoDownload und den Schlüssel HKCU\Software\VideoDownload löschst.
+
+8. Kontakt
+Da der Autor keine Daten erhebt, gibt es keine Daten, die er herausgeben, berichtigen oder löschen könnte. Fragen: https://github.com/npgamy/video-download/issues

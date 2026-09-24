@@ -95,6 +95,9 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Pravni paket (24.9.2026, v0.7.4): licencni ugovor, uslovi i privatnost na 5 jezika u instaleru
+  (stranica za prihvatanje + privatnost prije nje) i u Pomoć → Ugovori i licence; puni tekstovi
+  licenci komponenti u folderu `licenses`. Tekstovi su nacrt za pregled kod advokata.
 - [x] MP4 → MP3 (24.9.2026, v0.7.3): dugme „MP3“ na kartici gotovog MP4 videa, odmah desno od
   foldera (Ahmedov izbor mjesta). ffmpeg, 192 kbps, original ostaje, ime se ne gazi; folder poslije
   pokazuje MP3, a MP3 ulazi u istoriju (`videodl/convert.py`).

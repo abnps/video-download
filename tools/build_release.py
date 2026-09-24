@@ -89,21 +89,37 @@ def copy_tool(name: str) -> Path:
     return target
 
 
-def write_notices() -> None:
-    (APP / "THIRD-PARTY-NOTICES.txt").write_text("""Video Download uključuje sljedeći softver treće strane:
+def write_legal() -> None:
+    """Licence komponenti (puni tekstovi), pravni dokumenti na 5 jezika i stranica ugovora za instaler."""
+    import importlib.metadata
 
-- yt-dlp (Unlicense) — https://github.com/yt-dlp/yt-dlp
-- yt-dlp-ejs (Unlicense/MIT) — https://github.com/yt-dlp/ejs
-- Qt for Python / PySide6 (LGPLv3) — https://doc.qt.io/qtforpython/ ; izvorni kod: https://code.qt.io/
-- FFmpeg (GPLv3 build) — https://ffmpeg.org/ ; izvorni kod i build: https://www.gyan.dev/ffmpeg/builds/
-  Izvorni kod korišćenog ffmpeg builda dostupan je na https://www.gyan.dev/ffmpeg/builds/ (odjeljak
-  „source code"), u skladu sa GPLv3. Na zahtjev se može dostaviti i kopija tog izvornog koda.
-- Node.js (MIT i licence zavisnosti) — https://nodejs.org/ ; licence: https://github.com/nodejs/node/blob/main/LICENSE
-- curl_cffi (MIT) — https://github.com/lexiforest/curl_cffi
-- Python (PSF License) — https://www.python.org/
+    from videodl import legal
+    from videodl.i18n import LANGUAGES
 
-Licence se odnose na navedene komponente; FFmpeg i Qt se mogu zamijeniti drugim verzijama.
-""", encoding="utf-8")
+    licenses = APP / "licenses"
+    licenses.mkdir(parents=True, exist_ok=True)
+    for source in (PROJECT / "installer" / "licenses").iterdir():
+        shutil.copy2(source, licenses / source.name)  # GPL-3.0, LGPL-3.0, Node.js
+    for distribution in legal.PYTHON_DISTRIBUTIONS:
+        files = importlib.metadata.distribution(distribution).files or []
+        for entry in files:
+            name = Path(str(entry)).name
+            if ".dist-info" in str(entry) and name.upper().startswith(("LICENSE", "NOTICE", "COPYING")):
+                shutil.copy2(entry.locate(), licenses / f"{distribution}-{name}")
+    shutil.copy2(legal.python_license_path(), licenses / "Python-LICENSE.txt")
+    missing = [component.name for component in legal.COMPONENTS if not legal.license_files(component, licenses)]
+    if missing:
+        raise SystemExit(f"Nedostaje tekst licence za: {', '.join(missing)}")
+    (APP / "THIRD-PARTY-NOTICES.txt").write_text(legal.notices_text(licenses), encoding="utf-8")
+
+    documents = APP / "legal"
+    documents.mkdir(parents=True, exist_ok=True)
+    for language in LANGUAGES:
+        for kind, _key in legal.DOCUMENTS:
+            shutil.copy2(legal.document_path(kind, language), documents / f"{kind}_{language}.txt")
+        # Inno Setup čita UTF-8 samo sa BOM-om.
+        agreement = legal.agreement_text(language).replace("\r\n", "\n").replace("\n", "\r\n")
+        (documents / f"agreement_{language}.txt").write_bytes(b"\xef\xbb\xbf" + agreement.encode("utf-8"))
 
 
 def verify_package() -> None:
@@ -143,7 +159,7 @@ def main() -> int:
     shutil.copytree(PROJECT / "extension", APP / "extension", ignore=shutil.ignore_patterns("package.json"))
     for tool in ("ffmpeg", "ffprobe", "node"):
         copy_tool(tool)
-    write_notices()
+    write_legal()
     verify_package()
 
     report = BUILD / "self-test.json"

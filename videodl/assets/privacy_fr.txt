@@ -1,0 +1,30 @@
+﻿VIDEO DOWNLOAD — POLITIQUE DE CONFIDENTIALITÉ
+
+En bref : l'auteur du programme ne collecte aucune donnée te concernant. Pas de compte, pas de suivi, pas de publicité.
+
+1. Ce que le programme ne fait pas
+Le programme n'envoie à l'auteur aucune donnée, aucune statistique d'utilisation ni aucun rapport d'erreur. Il n'y a ni publicité ni analyse.
+
+2. À quoi le programme se connecte
+- Au site d'où tu télécharges (vidéo, son, miniatures, sous-titres).
+- À GitHub (api.github.com, github.com) : recherche et téléchargement d'une nouvelle version du programme, au plus une fois par jour et quand tu cliques sur « Rechercher des mises à jour ».
+- À PyPI (pypi.org, files.pythonhosted.org) : recherche et téléchargement du lecteur de sites yt-dlp, au plus une fois par jour.
+Ces services voient ton adresse IP et la version du programme ; leurs propres politiques de confidentialité s'appliquent.
+
+3. Ce qui est enregistré sur ton ordinateur
+Les réglages (registre : HKCU\Software\VideoDownload), la file et l'historique des téléchargements (liens, titres, chemins, tailles, heures) et le yt-dlp téléchargé dans le dossier %LOCALAPPDATA%\VideoDownload, ainsi qu'une clé locale pour la connexion avec le navigateur. Rien de tout cela ne quitte ton ordinateur.
+
+4. Cookies de connexion
+Seulement si tu l'autorises dans le navigateur. Seuls les cookies du site d'où tu télécharges sont transmis au programme ; ils restent uniquement en mémoire, et le fichier temporaire pour yt-dlp est supprimé immédiatement. Ils ne sont jamais écrits dans la file, l'historique ni les rapports.
+
+5. Extension du navigateur
+Autorisations : observation des requêtes réseau (pour reconnaître les flux vidéo), un script sur la page (pour trouver la vidéo en cours et reconnaître les DRM), le menu contextuel, une connexion locale avec le programme (native messaging) et un stockage temporaire par onglet ; les cookies seulement si tu les autorises. L'extension n'envoie rien sur internet : elle transmet des données uniquement au programme sur ton ordinateur, et seulement quand tu cliques.
+
+6. Rapport de problème
+Il n'est créé que lorsque tu l'enregistres toi-même. Les liens y sont réduits au nom du site, et le nom d'utilisateur et les secrets sont masqués. Tu ne l'envoies que si tu le décides.
+
+7. Supprimer les données
+L'historique se vide dans Téléchargements → Historique des téléchargements → Vider la liste. La désinstallation supprime le programme, la connexion au navigateur et le yt-dlp téléchargé. La file, l'historique et les réglages restent jusqu'à ce que tu supprimes le dossier %LOCALAPPDATA%\VideoDownload et la clé HKCU\Software\VideoDownload.
+
+8. Contact
+Comme l'auteur ne collecte aucune donnée, il n'a aucune donnée à fournir, corriger ou supprimer. Questions : https://github.com/npgamy/video-download/issues

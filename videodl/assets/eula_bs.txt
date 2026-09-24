@@ -1,0 +1,27 @@
+﻿VIDEO DOWNLOAD — LICENCNI UGOVOR ZA KRAJNJEG KORISNIKA
+
+Ovaj ugovor važi između tebe i autora programa Video Download (u daljem tekstu: autor). Instalacijom ili korištenjem programa prihvataš ovaj ugovor i Uslove korištenja.
+
+1. Licenca
+Autor ti daje besplatnu, neisključivu licencu da program instaliraš i koristiš na svojim računarima, za ličnu upotrebu.
+
+2. Dijeljenje
+Smiješ besplatno dijeliti neizmijenjen instaler, zajedno sa ovim ugovorom. Ne smiješ program prodavati ni iznajmljivati, niti dijeliti izmijenjenu verziju pod imenom Video Download.
+
+3. Komponente trećih strana
+Program sadrži komponente drugih autora (yt-dlp, FFmpeg, Qt/PySide6, Node.js i druge). Za njih važe njihove licence, koje ovaj ugovor ne ograničava. Tekstovi licenci su u folderu „licenses" i u fajlu THIRD-PARTY-NOTICES.txt u folderu programa.
+
+4. Ažuriranja
+Program najviše jednom dnevno provjerava da li postoji nova verzija programa (GitHub) i čitača sajtova yt-dlp (PyPI). Nova verzija programa instalira se tek kad je potvrdiš; yt-dlp se ažurira sam i počinje raditi od sljedećeg pokretanja.
+
+5. Bez garancije
+Program se daje „kakav jeste". Autor ne garantuje da će raditi sa svakim sajtom, bez grešaka ili bez prekida, jer sajtovi mijenjaju način rada.
+
+6. Ograničenje odgovornosti
+Autor ne odgovara za štetu nastalu korištenjem ili nemogućnošću korištenja programa, niti za sadržaj koji preuzmeš. Ovo ne važi tamo gdje zakon ne dozvoljava isključenje odgovornosti, na primjer za namjeru, grubu nepažnju ili povredu života i zdravlja.
+
+7. Prestanak licence
+Ako prekršiš ovaj ugovor ili Uslove korištenja, licenca prestaje i program moraš ukloniti.
+
+8. Kontakt
+Pitanja i prijave grešaka: https://github.com/npgamy/video-download/issues

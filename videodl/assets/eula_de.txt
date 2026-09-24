@@ -1,0 +1,27 @@
+﻿VIDEO DOWNLOAD — ENDBENUTZER-LIZENZVERTRAG
+
+Dieser Vertrag gilt zwischen dir und dem Autor von Video Download (nachfolgend „Autor"). Mit der Installation oder Nutzung des Programms akzeptierst du diesen Vertrag und die Nutzungsbedingungen.
+
+1. Lizenz
+Der Autor gewährt dir eine kostenlose, nicht ausschließliche Lizenz, das Programm auf deinen eigenen Computern für den persönlichen Gebrauch zu installieren und zu nutzen.
+
+2. Weitergabe
+Du darfst das unveränderte Installationsprogramm kostenlos weitergeben, zusammen mit diesem Vertrag. Du darfst das Programm weder verkaufen noch vermieten und keine veränderte Version unter dem Namen Video Download weitergeben.
+
+3. Komponenten Dritter
+Das Programm enthält Komponenten anderer Autoren (yt-dlp, FFmpeg, Qt/PySide6, Node.js und weitere). Für sie gelten ihre eigenen Lizenzen, die dieser Vertrag nicht einschränkt. Die Lizenztexte stehen im Ordner „licenses" und in THIRD-PARTY-NOTICES.txt im Programmordner.
+
+4. Aktualisierungen
+Höchstens einmal täglich prüft das Programm, ob es eine neue Version des Programms (GitHub) und des Seiten-Readers yt-dlp (PyPI) gibt. Eine neue Programmversion wird erst nach deiner Bestätigung installiert; yt-dlp aktualisiert sich selbst und wirkt ab dem nächsten Programmstart.
+
+5. Keine Gewährleistung
+Das Programm wird „wie besehen" bereitgestellt. Der Autor garantiert nicht, dass es mit jeder Seite, fehlerfrei oder ohne Unterbrechung funktioniert, da Seiten ihre Funktionsweise ändern.
+
+6. Haftungsbeschränkung
+Der Autor haftet nicht für Schäden durch die Nutzung oder Nichtnutzbarkeit des Programms und nicht für heruntergeladene Inhalte. Dies gilt nicht, soweit ein Haftungsausschluss gesetzlich unzulässig ist, etwa bei Vorsatz, grober Fahrlässigkeit oder Verletzung von Leben und Gesundheit.
+
+7. Beendigung
+Wenn du gegen diesen Vertrag oder die Nutzungsbedingungen verstößt, endet die Lizenz und du musst das Programm entfernen.
+
+8. Kontakt
+Fragen und Fehlermeldungen: https://github.com/npgamy/video-download/issues

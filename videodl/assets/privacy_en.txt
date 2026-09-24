@@ -1,0 +1,30 @@
+﻿VIDEO DOWNLOAD — PRIVACY POLICY
+
+In short: the author of the program does not collect any data about you. No accounts, no tracking, no ads.
+
+1. What the program does not do
+The program does not send the author any data, usage statistics or error reports. There are no ads and no analytics.
+
+2. Who the program connects to
+- The site you download from (video, audio, thumbnails, subtitles).
+- GitHub (api.github.com, github.com): checking for and downloading a new version of the program, at most once a day and when you click "Check for updates".
+- PyPI (pypi.org, files.pythonhosted.org): checking for and downloading the site reader yt-dlp, at most once a day.
+These services can see your IP address and the program version; their own privacy policies apply.
+
+3. What is stored on your computer
+Settings (registry: HKCU\Software\VideoDownload), the download queue and history (links, titles, paths, sizes, times) and the downloaded yt-dlp in the folder %LOCALAPPDATA%\VideoDownload, plus a local key for the connection with the browser. None of this leaves your computer.
+
+4. Login cookies
+Only if you allow it in the browser. Only cookies of the site you download from are passed to the program, they are kept only in memory, and the temporary file for yt-dlp is deleted immediately. They are never written to the queue, the history or reports.
+
+5. Browser extension
+Permissions: watching network requests (to recognise video streams), a script on the page (to find the playing video and recognise DRM), the right-click menu, a local connection to the program (native messaging) and temporary per-tab storage; cookies only if you allow them. The extension sends nothing to the internet: it passes data only to the program on your computer, and only when you click.
+
+6. Problem report
+It is created only when you save it yourself. Links in it are shortened to the site name, and the user name and secrets are hidden. You send it only if you decide to.
+
+7. Deleting data
+Clear the history in Downloads → Download history → Clear the list. Uninstalling removes the program, the browser connection and the downloaded yt-dlp. The queue, history and settings remain until you delete the folder %LOCALAPPDATA%\VideoDownload and the key HKCU\Software\VideoDownload.
+
+8. Contact
+As the author collects no data, there is no data they could provide, correct or delete. Questions: https://github.com/npgamy/video-download/issues

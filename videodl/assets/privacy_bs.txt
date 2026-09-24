@@ -1,0 +1,30 @@
+﻿VIDEO DOWNLOAD — POLITIKA PRIVATNOSTI
+
+Ukratko: autor programa ne prikuplja nikakve podatke o tebi. Nema naloga, praćenja ni reklama.
+
+1. Šta program ne radi
+Program ne šalje autoru nikakve podatke, statistiku korištenja ni izvještaje o greškama. Nema reklama ni analitike.
+
+2. Sa kim se program povezuje
+- Sa sajtom sa kog preuzimaš (video, zvuk, sličice, titlovi).
+- Sa GitHub-om (api.github.com, github.com): provjera i preuzimanje nove verzije programa, najviše jednom dnevno i kad klikneš „Provjeri ažuriranje".
+- Sa PyPI-jem (pypi.org, files.pythonhosted.org): provjera i preuzimanje čitača sajtova yt-dlp, najviše jednom dnevno.
+Tim servisima su vidljivi tvoja IP adresa i verzija programa; za njih važe njihove politike privatnosti.
+
+3. Šta se čuva na tvom računaru
+Podešavanja (registry: HKCU\Software\VideoDownload), red i istorija preuzimanja (linkovi, naslovi, putanje, veličine, vrijeme) i preuzeti yt-dlp u folderu %LOCALAPPDATA%\VideoDownload, te lokalni ključ za vezu sa browserom. Ništa od toga ne napušta tvoj računar.
+
+4. Kolačići prijave
+Samo ako u browseru daš dozvolu. Programu se šalju samo kolačići sajta sa kog preuzimaš, drže se samo u memoriji, a privremeni fajl za yt-dlp briše se odmah. Nikad se ne upisuju u red, istoriju ni izvještaje.
+
+5. Dodatak za browser
+Dozvole: praćenje mrežnih zahtjeva (da prepozna video tokove), skripta na stranici (da nađe video koji se pušta i prepozna DRM), meni desnog klika, lokalna veza sa programom (native messaging) i privremena memorija po tabu; kolačići samo ako ih dozvoliš. Dodatak ništa ne šalje na internet: podatke predaje samo programu na tvom računaru, i to tek kad klikneš.
+
+6. Izvještaj o problemu
+Pravi se samo kad ga sam sačuvaš. Linkovi su u njemu skraćeni na ime sajta, a ime korisnika i tajne su sakriveni. Šalješ ga samo ako to sam odlučiš.
+
+7. Brisanje podataka
+Istoriju brišeš u Preuzimanja → Istorija preuzimanja → Obriši listu. Deinstalacija uklanja program, vezu sa browserom i preuzeti yt-dlp. Red, istorija i podešavanja ostaju dok ne obrišeš folder %LOCALAPPDATA%\VideoDownload i ključ HKCU\Software\VideoDownload.
+
+8. Kontakt
+Pošto autor ne prikuplja podatke, nema podataka koje bi mogao dati, ispraviti ili obrisati. Pitanja: https://github.com/npgamy/video-download/issues

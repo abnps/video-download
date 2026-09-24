@@ -57,10 +57,17 @@ prava i sadržaja pod slobodnom licencom. Zabranjeno je preuzimanje tuđeg zašt
 dozvole i dijeljenje preuzetog. DRM se ne zaobilazi. Korisnik odgovara za ono što preuzima.
 Program nije povezan sa YouTube-om ni Google-om.
 
-Puni tekst (prihvata se u instaleru, stoji i u Pomoć → Uslovi korištenja):
-[bosanski](videodl/assets/terms_bs.txt) · [English](videodl/assets/terms_en.txt) ·
-[Deutsch](videodl/assets/terms_de.txt) · [Español](videodl/assets/terms_es.txt) ·
-[Français](videodl/assets/terms_fr.txt)
+Pravni dokumenti (5 jezika; u instaleru se prihvataju licencni ugovor i uslovi, prije toga se
+prikazuje politika privatnosti; u aplikaciji su u Pomoć → Ugovori i licence):
+
+| | bs | en | de | es | fr |
+|---|---|---|---|---|---|
+| Licencni ugovor | [bs](videodl/assets/eula_bs.txt) | [en](videodl/assets/eula_en.txt) | [de](videodl/assets/eula_de.txt) | [es](videodl/assets/eula_es.txt) | [fr](videodl/assets/eula_fr.txt) |
+| Uslovi korištenja | [bs](videodl/assets/terms_bs.txt) | [en](videodl/assets/terms_en.txt) | [de](videodl/assets/terms_de.txt) | [es](videodl/assets/terms_es.txt) | [fr](videodl/assets/terms_fr.txt) |
+| Privatnost | [bs](videodl/assets/privacy_bs.txt) | [en](videodl/assets/privacy_en.txt) | [de](videodl/assets/privacy_de.txt) | [es](videodl/assets/privacy_es.txt) | [fr](videodl/assets/privacy_fr.txt) |
+
+Licence komponenti (FFmpeg GPL-3.0, Qt LGPL-3.0, Node.js, yt-dlp i ostale) instaler stavlja u folder
+`licenses` pored programa, a spisak u `THIRD-PARTY-NOTICES.txt` (`videodl/legal.py`).
 
 ## Zahtjevi (razvoj)
 

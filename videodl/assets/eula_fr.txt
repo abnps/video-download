@@ -1,0 +1,27 @@
+﻿VIDEO DOWNLOAD — CONTRAT DE LICENCE UTILISATEUR FINAL
+
+Ce contrat s'applique entre toi et l'auteur de Video Download (l'« auteur »). En installant ou en utilisant le programme, tu acceptes ce contrat et les Conditions d'utilisation.
+
+1. Licence
+L'auteur t'accorde une licence gratuite et non exclusive pour installer et utiliser le programme sur tes propres ordinateurs, pour un usage personnel.
+
+2. Partage
+Tu peux partager gratuitement l'installateur non modifié, accompagné de ce contrat. Tu ne peux ni vendre ni louer le programme, ni partager une version modifiée sous le nom Video Download.
+
+3. Composants tiers
+Le programme contient des composants d'autres auteurs (yt-dlp, FFmpeg, Qt/PySide6, Node.js et d'autres). Leurs propres licences s'y appliquent et ce contrat ne les limite pas. Les textes des licences se trouvent dans le dossier « licenses » et dans THIRD-PARTY-NOTICES.txt dans le dossier du programme.
+
+4. Mises à jour
+Au plus une fois par jour, le programme vérifie s'il existe une nouvelle version du programme (GitHub) et du lecteur de sites yt-dlp (PyPI). Une nouvelle version du programme n'est installée qu'après ta confirmation ; yt-dlp se met à jour tout seul et prend effet au prochain démarrage.
+
+5. Aucune garantie
+Le programme est fourni « en l'état ». L'auteur ne garantit pas qu'il fonctionne avec tous les sites, sans erreur ni interruption, car les sites changent leur fonctionnement.
+
+6. Limitation de responsabilité
+L'auteur n'est pas responsable des dommages résultant de l'utilisation ou de l'impossibilité d'utiliser le programme, ni du contenu que tu télécharges. Cela ne s'applique pas lorsque la loi interdit d'exclure la responsabilité, par exemple en cas de faute intentionnelle, de négligence grave ou d'atteinte à la vie et à la santé.
+
+7. Résiliation
+Si tu enfreins ce contrat ou les Conditions d'utilisation, la licence prend fin et tu dois supprimer le programme.
+
+8. Contact
+Questions et signalements d'erreurs : https://github.com/npgamy/video-download/issues

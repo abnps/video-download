@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.4", "24.9.2026", {
+        "bs": ["Licencni ugovor, uslovi korištenja i politika privatnosti na 5 jezika u instaleru i u Pomoć \u2192 Ugovori i licence.",
+               "Puni tekstovi licenci komponenti (FFmpeg, Qt, Node.js, yt-dlp…) u folderu „licenses\u201c."],
+        "en": ["License agreement, terms of use and privacy policy in 5 languages, in the installer and under Help \u2192 Agreements and licenses.",
+               "Full license texts of the components (FFmpeg, Qt, Node.js, yt-dlp…) in the \u201clicenses\u201d folder."],
+        "de": ["Lizenzvertrag, Nutzungsbedingungen und Datenschutzerklärung in 5 Sprachen, im Installer und unter Hilfe \u2192 Verträge und Lizenzen.",
+               "Vollständige Lizenztexte der Komponenten (FFmpeg, Qt, Node.js, yt-dlp…) im Ordner \u201elicenses\u201c."],
+        "es": ["Contrato de licencia, condiciones de uso y política de privacidad en 5 idiomas, en el instalador y en Ayuda \u2192 Contratos y licencias.",
+               "Textos completos de las licencias de los componentes (FFmpeg, Qt, Node.js, yt-dlp…) en la carpeta «licenses»."],
+        "fr": ["Contrat de licence, conditions d'utilisation et politique de confidentialité en 5 langues, dans l'installateur et dans Aide \u2192 Contrats et licences.",
+               "Textes complets des licences des composants (FFmpeg, Qt, Node.js, yt-dlp…) dans le dossier « licenses »."],
+    }),
     ("0.7.3", "24.9.2026", {
         "bs": ["Dugme „MP3“ na kartici preuzetog MP4 videa, pored foldera: pretvara video u MP3, a MP4 ostaje."],
         "en": ["“MP3” button on the card of a downloaded MP4 video, next to the folder: converts it to MP3 and keeps the MP4."],
