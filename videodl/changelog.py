@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.8.0", "25.9.2026", {
+        "bs": ["Animirana traka napretka: glatko klizi, preko nje prelazi sjaj, plava je za video i ljubičasta za zvuk, "
+               "dok se video i zvuk spajaju klizi lijevo-desno, a na kraju zazeleni."],
+        "en": ["Animated progress bar: it glides smoothly with a moving shine, blue for video and purple for audio, "
+               "slides back and forth while video and audio are merged, and turns green at the end."],
+        "de": ["Animierter Fortschrittsbalken: gleitet sanft mit wanderndem Glanz, blau für Video und lila für Audio, "
+               "läuft beim Zusammenführen von Video und Audio hin und her und wird am Ende grün."],
+        "es": ["Barra de progreso animada: avanza con suavidad y un brillo que la recorre, azul para vídeo y morada para audio, "
+               "se desliza de un lado a otro mientras se unen vídeo y audio y al final se vuelve verde."],
+        "fr": ["Barre de progression animée : elle avance en douceur avec un reflet qui la parcourt, bleue pour la vidéo et violette pour l'audio, "
+               "glisse d'un côté à l'autre pendant la fusion vidéo et audio et devient verte à la fin."],
+    }),
     ("0.7.9", "24.9.2026", {
         "bs": ["Link koji nije video ni audio više nikad ne pravi karticu, ni preko „Zalijepi“ ni iz browsera; "
                "poruka je samo u statusnoj traci. Takva stara kartica se ne vraća pri pokretanju."],

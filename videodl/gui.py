@@ -94,8 +94,6 @@ QLabel#rowTitle {{ color: #202124; font-size: 10pt; }}
 QLabel#rowStatus {{ color: #7a7a7a; }}
 QLabel#rowStatus[state="done"] {{ color: #2e7d32; }}
 QLabel#rowStatus[state="failed"] {{ color: #c62828; }}
-QProgressBar#rowProgress {{ background: #e3ecf8; border: none; border-radius: 2px; }}
-QProgressBar#rowProgress::chunk {{ background: #1e88e5; border-radius: 2px; }}
 QToolButton#rowAction {{ border: none; border-radius: 17px; background: transparent; }}
 QToolButton#rowAction:hover {{ background: #e8f0fe; }}
 QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transparent; }}
@@ -1270,7 +1268,8 @@ class MainWindow(QMainWindow):
         row = self._rows.get(item_id)
         if item is None or row is None or item.status != ItemStatus.ACTIVE:
             return
-        row.show_progress(format_progress(progress), progress.fraction)
+        audio = progress.label == "progress.audio" or get_preset(item.preset_key).is_audio
+        row.show_progress(format_progress(progress), progress.fraction, "audio" if audio else "video")
 
     @Slot(int, object)
     def _on_download_finished(self, item_id: int, result: DownloadResult) -> None:
@@ -1416,8 +1415,7 @@ class MainWindow(QMainWindow):
         row = self._rows.get(item_id)
         if row is not None:
             percent = f" {round(fraction * 100)} %" if fraction is not None else ""
-            row.show_progress(tr("row.converting") + percent, fraction)
-            row.progress.show()
+            row.show_progress(tr("row.converting") + percent, fraction, "audio")
 
     @Slot(int, object, str)
     def _on_convert_finished(self, item_id: int, path, error: str) -> None:

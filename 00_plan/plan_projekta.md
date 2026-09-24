@@ -95,6 +95,11 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Animirana traka napretka (25.9.2026, v0.8.0, Ahmedov izbor „varijanta 4" iz 4 prikazane):
+  klizi do novog procenta, sjaj prelazi preko popunjenog dijela, plavo = video, ljubičasto = zvuk
+  (i MP4→MP3), bez procenta (priprema, ffmpeg) klizi lijevo-desno, na kraju zeleno + kratak puls pa
+  nestaje. Tajmer radi samo dok je traka vidljiva (`AnimatedProgress` u `videodl/widgets.py`,
+  `tests/test_progress_bar.py`).
 - [x] Link koji nije video ni audio (24.9.2026, v0.7.8): `.exe`, `.zip`, `.pdf`… se odbijaju bez čitanja;
   fajl koji yt-dlp samo „nagađa" kao video (`direct`, bez formata) prolazi samo s video/audio
   ekstenzijom; „Unsupported URL" dobija jasnu poruku. Iz clipboarda: bez kartice, samo napomena u

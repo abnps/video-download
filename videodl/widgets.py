@@ -2,10 +2,12 @@
 
 import os
 
-from PySide6.QtCore import QPoint, QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtCore import (
+    QEasingCurve, QElapsedTimer, QPoint, QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal,
+)
+from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import (
-    QFrame, QHBoxLayout, QLabel, QProgressBar, QSizePolicy, QToolButton, QVBoxLayout, QWidget,
+    QFrame, QHBoxLayout, QLabel, QSizePolicy, QToolButton, QVBoxLayout, QWidget,
 )
 
 from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, tr
@@ -15,7 +17,10 @@ from .presets import format_section, get_preset
 
 LINK_COLOR = "#1a73e8"
 MUTED_COLOR = "#7a7a7a"
-PROGRESS_MAX = 1000
+
+# Boje trake napretka po fazi (Ahmedov izbor, varijanta 4).
+PROGRESS_TRACK = "#e3ecf8"
+PROGRESS_COLORS = {"video": "#1e88e5", "audio": "#8e24aa", "work": "#8e24aa", "done": "#43a047"}
 
 
 def format_duration(seconds: float | None) -> str:
@@ -57,6 +62,163 @@ def set_state(widget: QWidget, state: str) -> None:
     widget.setProperty("state", state)
     widget.style().unpolish(widget)
     widget.style().polish(widget)
+
+
+class AnimatedProgress(QWidget):
+    """Traka napretka kartice: klizi do novog procenta, preko nje prelazi sjaj, boja pokazuje fazu
+    (video plavo, zvuk ljubičasto), dok ffmpeg radi klizi lijevo-desno, a na kraju zazeleni i pulsira.
+    Tajmer za animaciju radi samo dok je traka vidljiva i nešto se dešava."""
+
+    BAR = 6  # debljina trake; widget je malo viši zbog pulsa na kraju
+    SHINE_MS = 1600
+    SLIDE_MS = 1200
+    PULSE_MS = 700
+    DONE_HOLD_MS = 1100  # koliko zelena traka ostaje vidljiva poslije završetka
+
+    def __init__(self, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.setFixedHeight(self.BAR + 2)
+        self.phase = "video"
+        self.indeterminate = False
+        self.target = 0.0
+        self._value = 0.0
+        self._done_at: int | None = None
+        self._clock = QElapsedTimer()
+        self._clock.start()
+        self._slide = QVariantAnimation(self)
+        self._slide.setDuration(600)
+        self._slide.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self._slide.valueChanged.connect(self._on_slide)
+        self._tick = QTimer(self)
+        self._tick.setInterval(33)  # ~30 slika u sekundi
+        self._tick.timeout.connect(self._on_tick)
+        self._hide_timer = QTimer(self)
+        self._hide_timer.setSingleShot(True)
+        self._hide_timer.timeout.connect(self.hide)
+
+    @property
+    def value(self) -> float:
+        return self._value
+
+    def set_fraction(self, fraction: float | None, phase: str = "video") -> None:
+        self._hide_timer.stop()
+        self._done_at = None
+        if fraction is None:
+            self._slide.stop()
+            self.indeterminate = True
+            self.phase = "work"
+        else:
+            fraction = max(0.0, min(1.0, float(fraction)))
+            self._slide.stop()
+            if self.indeterminate or fraction < self._value:
+                self._value = fraction  # poslije klizanja ili novi pokušaj: bez animacije unazad
+            self.indeterminate = False
+            self.phase = phase
+            self.target = fraction
+            self._slide.setStartValue(self._value)
+            self._slide.setEndValue(fraction)
+            self._slide.start()
+        self.show()
+        self._ensure_ticking()
+        self.update()
+
+    def reset(self) -> None:
+        self._slide.stop()
+        self._hide_timer.stop()
+        self._done_at = None
+        self._value = self.target = 0.0
+        self.indeterminate = False
+        self.phase = "video"
+        self.update()
+
+    def finish(self) -> None:
+        """Gotovo: traka se puni do kraja, zazeleni, kratko pulsira i nestane."""
+        if not self.isVisible():
+            return
+        self._slide.stop()
+        self._value = self.target = 1.0
+        self.indeterminate = False
+        self.phase = "done"
+        self._done_at = self._clock.elapsed()
+        self._ensure_ticking()
+        self._hide_timer.start(self.DONE_HOLD_MS)
+        self.update()
+
+    def is_animating(self) -> bool:
+        return self._tick.isActive()
+
+    def _ensure_ticking(self) -> None:
+        if self.isVisible() and not self._tick.isActive():
+            self._tick.start()
+
+    def _on_slide(self, value) -> None:
+        self._value = float(value)
+        self.update()
+
+    def _on_tick(self) -> None:
+        if not self.isVisible():
+            self._tick.stop()
+            return
+        if (self.phase == "done" and self._done_at is not None
+                and self._clock.elapsed() - self._done_at > self.PULSE_MS):
+            self._tick.stop()  # puls je gotov; zelena traka stoji do skrivanja
+        self.update()
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        self._ensure_ticking()
+
+    def hideEvent(self, event) -> None:
+        super().hideEvent(event)
+        self._tick.stop()
+        self._hide_timer.stop()
+        if self.phase == "done":
+            self.reset()
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setPen(Qt.PenStyle.NoPen)
+        width, now = self.width(), self._clock.elapsed()
+        thickness = float(self.BAR)
+        if self.phase == "done" and self._done_at is not None:
+            # Puls: traka se na trenutak podeblja pa vrati.
+            t = min(1.0, (now - self._done_at) / self.PULSE_MS)
+            thickness += 2.0 * (1.0 - abs(2.0 * t - 1.0))
+        top = (self.height() - thickness) / 2
+        radius = thickness / 2
+        track = QPainterPath()
+        track.addRoundedRect(QRectF(0, top, width, thickness), radius, radius)
+        painter.fillPath(track, QColor(PROGRESS_TRACK))
+        color = QColor(PROGRESS_COLORS.get(self.phase, PROGRESS_COLORS["video"]))
+
+        if self.indeterminate:
+            segment = width * 0.3
+            t = (now % self.SLIDE_MS) / self.SLIDE_MS
+            eased = QEasingCurve(QEasingCurve.Type.InOutQuad).valueForProgress(t)
+            left = -segment + eased * (width + segment)
+            piece = QPainterPath()
+            piece.addRoundedRect(QRectF(left, top, segment, thickness), radius, radius)
+            painter.setClipPath(track)
+            painter.fillPath(piece, color)
+            return
+
+        filled = width * self._value
+        if filled <= 0:
+            return
+        bar = QPainterPath()
+        bar.addRoundedRect(QRectF(0, top, max(filled, thickness), thickness), radius, radius)
+        painter.fillPath(bar, color)
+        if self.phase != "done":
+            # Sjaj koji prelazi preko popunjenog dijela: vidi se da preuzimanje radi i kad je sporo.
+            shine = 60.0
+            x = -shine + ((now % self.SHINE_MS) / self.SHINE_MS) * (filled + shine)
+            gradient = QLinearGradient(x, 0, x + shine, 0)
+            gradient.setColorAt(0.0, QColor(255, 255, 255, 0))
+            gradient.setColorAt(0.5, QColor(255, 255, 255, 150))
+            gradient.setColorAt(1.0, QColor(255, 255, 255, 0))
+            painter.setClipPath(bar)
+            painter.fillRect(QRectF(x, top, shine, thickness), gradient)
 
 
 class ElidedLabel(QLabel):
@@ -231,11 +393,8 @@ class QueueRow(QFrame):
         detail.addWidget(self.status_label, 1)
         text.addLayout(detail)
 
-        self.progress = QProgressBar()
+        self.progress = AnimatedProgress()
         self.progress.setObjectName("rowProgress")
-        self.progress.setTextVisible(False)
-        self.progress.setFixedHeight(4)
-        self.progress.setRange(0, PROGRESS_MAX)
         self.progress.hide()
         text.addWidget(self.progress)
         layout.addLayout(text, 1)
@@ -299,7 +458,9 @@ class QueueRow(QFrame):
         elif active:
             self._set_status(tr("row.starting"), "muted")
             self._set_action("stop", "#5f6368", tr("row.stop_tip"))
-            self.progress.setRange(0, 0)
+            if self.progress.isHidden() or self.progress.phase == "done":
+                self.progress.reset()
+                self.progress.set_fraction(None)  # priprema: traka klizi dok ne stigne prvi procenat
         elif item.status == ItemStatus.DONE:
             text = tr("row.exists") if item.message == MESSAGE_EXISTS else tr("row.done")
             if size:
@@ -320,7 +481,13 @@ class QueueRow(QFrame):
             self._set_status(tr("row.cancelled"), "muted")
             self._set_action("retry", "#5f6368", tr("row.retry_tip"))
 
-        self.progress.setVisible(active)
+        converting = item.status == ItemStatus.DONE and item.convert_state == "running"
+        if active:
+            self.progress.show()
+        elif item.status == ItemStatus.DONE and not converting and not self.progress.isHidden():
+            self.progress.finish()  # zazeleni, pulsira i sama nestane
+        elif not converting:
+            self.progress.hide()
         can_play = item.status == ItemStatus.DONE and bool(item.filepath) and os.path.isfile(item.filepath)
         self.play_button.setVisible(can_play)
         self.convert_button.setText(tr("row.convert"))
@@ -332,13 +499,10 @@ class QueueRow(QFrame):
         self.status_label.setToolTip("\n".join(p for p in (item.filepath, item.convert_path) if p)
                                      or display_message(item.message))
 
-    def show_progress(self, text: str, fraction: float | None) -> None:
+    def show_progress(self, text: str, fraction: float | None, phase: str = "video") -> None:
+        """`phase`: "video" ili "audio" (boja trake); bez procenta traka klizi (npr. ffmpeg radi)."""
         self._set_status(text, "muted")
-        if fraction is None:
-            self.progress.setRange(0, 0)
-        else:
-            self.progress.setRange(0, PROGRESS_MAX)
-            self.progress.setValue(round(fraction * PROGRESS_MAX))
+        self.progress.set_fraction(fraction, phase)
 
     def _set_status(self, text: str, state: str) -> None:
         self.status_label.setText(text)
