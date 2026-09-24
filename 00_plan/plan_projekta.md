@@ -98,6 +98,8 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 - [x] Podrži projekat (24.9.2026, v0.7.5; v0.7.6: PayPal stranica za prilog — Donate dugme nije dostupno u Srbiji): link u statusnoj traci i Pomoć meniju; traka poslije
   svakih 10 novih preuzimanja, prozor najviše jednom sedmično kad ništa ne radi; „Već sam podržao" (bez
   provjere uplate) gasi sve na 90 dana. Ništa se ne otključava ni blokira (`videodl/support.py`).
+  v0.7.7: u prozoru i README-u i QR kod (`videodl/assets/support-qr.png`) pored dugmeta; test
+  dekodira QR i provjerava da vodi na isti `SUPPORT_URL`.
 - [x] Pravni paket (24.9.2026, v0.7.4): licencni ugovor, uslovi i privatnost na 5 jezika u instaleru
   (stranica za prihvatanje + privatnost prije nje) i u Pomoć → Ugovori i licence; puni tekstovi
   licenci komponenti u folderu `licenses`. Tekstovi su nacrt za pregled kod advokata.
