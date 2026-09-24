@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.9", "24.9.2026", {
+        "bs": ["Link koji nije video ni audio više nikad ne pravi karticu, ni preko „Zalijepi“ ni iz browsera; "
+               "poruka je samo u statusnoj traci. Takva stara kartica se ne vraća pri pokretanju."],
+        "en": ["A link that isn't a video or audio never creates a card any more, not via “Paste” nor from the browser; "
+               "the message is only in the status bar. Such an old card is not restored at startup."],
+        "de": ["Ein Link, der kein Video oder Audio ist, erzeugt nie mehr eine Karte, weder über „Einfügen“ noch aus dem Browser; "
+               "die Meldung steht nur in der Statusleiste. Eine solche alte Karte wird beim Start nicht wiederhergestellt."],
+        "es": ["Un enlace que no es un vídeo ni un audio ya nunca crea una tarjeta, ni con «Pegar» ni desde el navegador; "
+               "el mensaje aparece solo en la barra de estado. Una tarjeta antigua así no se restaura al iniciar."],
+        "fr": ["Un lien qui n'est ni une vidéo ni un audio ne crée plus jamais de carte, ni via « Coller » ni depuis le navigateur ; "
+               "le message s'affiche seulement dans la barre d'état. Une telle ancienne carte n'est pas restaurée au démarrage."],
+    }),
     ("0.7.8", "24.9.2026", {
         "bs": ["Link koji nije video ni audio (npr. .exe, .zip, .pdf ili obična stranica) više ne pravi karticu "
                "kad se samo kopira; ako ga zalijepiš sam, poruka jasno kaže zašto. Direktni .mp3 i .mp4 linkovi rade kao i prije."],

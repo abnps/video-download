@@ -19,8 +19,8 @@ from videodl.download import DOWNLOADING, PROCESSING, DownloadResult, Progress  
 from videodl.gui import (  # noqa: E402
     MainWindow, apply_theme, extract_urls, format_eta, format_progress, format_speed,
 )
-from videodl.i18n import MESSAGE_NOT_MEDIA, get_language, set_language  # noqa: E402
-from videodl.jobs import ItemStatus  # noqa: E402
+from videodl.i18n import get_language, set_language  # noqa: E402
+from videodl.jobs import ItemStatus, QueueItem  # noqa: E402
 from videodl.probe import Entry, ProbeResult  # noqa: E402
 from videodl.widgets import format_duration, format_size  # noqa: E402
 from videodl.ytdl import NotMediaError  # noqa: E402
@@ -393,17 +393,29 @@ class MainWindowTest(unittest.TestCase):
         QApplication.clipboard().setText("https://v/kopirano")
         self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
 
-    def test_pasted_link_that_is_not_media_gets_a_clear_red_row(self):
+    def test_pasted_or_browser_link_that_is_not_media_makes_no_row_either(self):
         from videodl.probe import probe  # pravo čitanje: .exe odbija bez interneta
 
         window = self.make_window(self.quick_download, probe_fn=probe)
-        window.add_links_from_text("https://x.test/Setup.exe")
-        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
-        item = window._queue.items()[0]
-        self.assertEqual(item.status, ItemStatus.FAILED)
-        self.assertEqual(item.message, MESSAGE_NOT_MEDIA)
-        self.assertIn("ne vodi na video ni audio", window.status_label.text())
-        self.assertIn("ne vodi na video ni audio", window._rows[item.id].status_label.text())
+        QApplication.clipboard().setText("https://x.test/Setup.exe")
+        window._paste_from_clipboard()  # dugme „Zalijepi"
+        self.assertTrue(wait_until(lambda: "preskočeno" in window.status_label.text() and not window._probe_jobs))
+        window._on_browser_request(BrowserRequest("https://x.test/arhiva.zip", "Arhiva"))
+        self.assertTrue(wait_until(lambda: not window._probe_jobs))
+        self.assertIn("arhiva.zip", window.status_label.text())
+        self.assertEqual(window._queue.items(), [])
+        self.assertEqual(window._rows, {})
+
+    def test_old_exe_card_is_not_restored(self):
+        from videodl import store
+
+        store.save_queue([
+            QueueItem(1, "https://github.com/npgamy/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe",
+                      "Setup", "best", self.tmp.name),
+            QueueItem(2, "https://v/pravi", "Pravi video", "best", self.tmp.name)],
+            store.queue_path(Path(self.tmp.name)))
+        window = self.make_window(self.quick_download)
+        self.assertEqual([item.url for item in window._queue.items()], ["https://v/pravi"])
 
     def test_queue_survives_restart_and_history_is_written(self):
         window = self.make_window(self.quick_download)
