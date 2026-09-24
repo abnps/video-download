@@ -160,6 +160,8 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                           "La contribution est volontaire et ne débloque rien : le programme est le même pour tous."),
     "support.button": ("♥ Podrži (PayPal)", "♥ Support (PayPal)", "♥ Unterstützen (PayPal)", "♥ Apoyar (PayPal)",
                        "♥ Soutenir (PayPal)"),
+    "support.qr": ("Skeniraj kamerom telefona", "Scan with your phone camera", "Mit der Handykamera scannen",
+                   "Escanea con la cámara del móvil", "Scanne avec l'appareil photo du téléphone"),
     "support.later": ("Kasnije", "Later", "Später", "Más tarde", "Plus tard"),
     "support.already": ("Već sam podržao", "I already supported it", "Schon unterstützt", "Ya lo he apoyado",
                         "Déjà soutenu"),

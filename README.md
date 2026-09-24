@@ -55,6 +55,8 @@ Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, može�
 podržati razvoj: **[PayPal — Support for Video Download](https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ)**. Prilog ništa ne otključava;
 program je isti za sve.
 
+<img src="videodl/assets/support-qr.png" alt="QR kod za prilog preko PayPal-a" width="160">
+
 ## Uslovi korištenja
 
 Program je namijenjen preuzimanju sadržaja koji korisnik ima pravo da preuzme, prije svega

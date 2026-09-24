@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.7", "24.9.2026", {
+        "bs": ["Prozor „Podrži projekat“ ima i QR kod za prilog telefonom, pored dugmeta."],
+        "en": ["The “Support the project” window also has a QR code for contributing by phone, next to the button."],
+        "de": ["Das Fenster „Projekt unterstützen“ hat neben der Schaltfläche auch einen QR-Code für Beiträge per Handy."],
+        "es": ["La ventana «Apoyar el proyecto» también tiene un código QR para aportar con el móvil, junto al botón."],
+        "fr": ["La fenêtre « Soutenir le projet » a aussi un QR code pour contribuer depuis le téléphone, à côté du bouton."],
+    }),
     ("0.7.6", "24.9.2026", {
         "bs": ["„Podrži projekat“ otvara PayPal stranicu za prilog, gdje sam biraš iznos."],
         "en": ["\u201cSupport the project\u201d opens a PayPal contribution page where you choose the amount."],

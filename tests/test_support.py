@@ -65,6 +65,17 @@ class SupportStateTest(unittest.TestCase):
         self.assertFalse(state.should_show_dialog(1000 + 89 * DAY, busy=False))
         self.assertTrue(state.should_show_dialog(1000 + 91 * DAY, busy=False))
 
+    def test_qr_code_points_to_the_same_link(self):
+        try:
+            import cv2
+            import numpy
+        except ImportError:
+            self.skipTest("OpenCV nije instaliran")
+        path = Path(support.__file__).parent / "assets" / "support-qr.png"
+        image = cv2.imdecode(numpy.fromfile(str(path), dtype=numpy.uint8), cv2.IMREAD_COLOR)
+        data, _points, _ = cv2.QRCodeDetector().detectAndDecode(image)
+        self.assertEqual(data, support.SUPPORT_URL)
+
     def test_link_is_the_paypal_page(self):
         self.assertEqual(support.SUPPORT_URL, "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ")
 
@@ -126,6 +137,8 @@ class SupportWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: window._support_dialog is not None))
         dialog = window._support_dialog
         self.assertIn("Preuzeo si već 5 videa", dialog.findChildren(type(window.status_label))[0].text())
+        self.assertFalse(dialog.qr_label.pixmap().isNull())  # i link (dugme) i QR kod
+        self.assertEqual(dialog.qr_caption.text(), "Skeniraj kamerom telefona")
         dialog.already_button.click()  # bez ikakve provjere uplate
         self.assertTrue(wait_until(lambda: window._support_dialog is None))
         self.assertGreater(self.settings.value("support/snooze_until", type=float), time.time() + 89 * DAY)
