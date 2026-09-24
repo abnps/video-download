@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.3", "24.9.2026", {
+        "bs": ["Dugme „MP3“ na kartici preuzetog MP4 videa, pored foldera: pretvara video u MP3, a MP4 ostaje."],
+        "en": ["“MP3” button on the card of a downloaded MP4 video, next to the folder: converts it to MP3 and keeps the MP4."],
+        "de": ["Schaltfläche „MP3“ auf der Karte eines geladenen MP4-Videos, neben dem Ordner: wandelt in MP3 um, die MP4 bleibt."],
+        "es": ["Botón «MP3» en la tarjeta de un vídeo MP4 descargado, junto a la carpeta: lo convierte a MP3 y conserva el MP4."],
+        "fr": ["Bouton « MP3 » sur la carte d'une vidéo MP4 téléchargée, à côté du dossier : la convertit en MP3 et garde le MP4."],
+    }),
     ("0.7.2", "24.9.2026", {
         "bs": ["Uslovi korištenja: prihvataju se u instaleru i stoje u Pomoć → Uslovi korištenja."],
         "en": ["Terms of use: accepted in the installer and available under Help → Terms of use."],

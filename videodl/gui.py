@@ -1,6 +1,7 @@
 """Glavni prozor: traka (Zalijepi / format / Preuzmi), red preuzimanja sa sličicama, meni."""
 
 import contextlib
+import dataclasses
 import datetime
 import os
 import queue
@@ -40,7 +41,7 @@ from .presets import (
     subtitle_languages,
 )
 from .probe import ProbeResult, probe
-from . import changelog, diagnostics, store
+from . import changelog, convert, diagnostics, store
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error
@@ -99,6 +100,9 @@ QToolButton#rowAction {{ border: none; border-radius: 17px; background: transpar
 QToolButton#rowAction:hover {{ background: #e8f0fe; }}
 QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transparent; }}
 QToolButton#rowRemove:hover {{ background: #eeeeee; }}
+QToolButton#rowConvert {{ border: 1px solid #c7d7f5; border-radius: 17px; background: #f5f8ff;
+    color: #1a73e8; font-weight: 600; font-size: 12px; }}
+QToolButton#rowConvert:hover {{ background: #e8f0fe; border-color: #1a73e8; }}
 QLabel#dropTitle {{ color: #5f6368; font-size: 10pt; }}
 QLabel#dropHint {{ color: #9aa0a6; }}
 QStatusBar {{ background: #fafafa; border-top: 1px solid #e6e6e6; color: #666666; }}
@@ -425,6 +429,39 @@ class HistoryDialog(QDialog):
         self._fill()
 
 
+class ConvertJob(QObject):
+    """MP4 → MP3 u pozadinskoj niti; prozor ostaje upotrebljiv."""
+
+    progress = Signal(int, object)  # id stavke, udio 0..1 ili None
+    finished = Signal(int, object, str)  # id stavke, putanja MP3 ili None, poruka greške
+
+    def __init__(self, item_id: int, source: str, duration: float | None, convert_fn):
+        super().__init__()
+        self.item_id = item_id
+        self._source = source
+        self._duration = duration
+        self._convert_fn = convert_fn
+        self._cancel = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+
+    def start(self) -> None:
+        self._thread.start()
+
+    def cancel(self) -> None:
+        self._cancel.set()
+
+    def join(self, timeout: float) -> None:
+        self._thread.join(timeout)
+
+    def _run(self) -> None:
+        try:
+            path = self._convert_fn(self._source, on_progress=lambda f: self.progress.emit(self.item_id, f),
+                                    cancel_event=self._cancel, duration=self._duration)
+            self.finished.emit(self.item_id, path, "")
+        except Exception as exc:  # granica radne niti
+            self.finished.emit(self.item_id, None, str(exc) or exc.__class__.__name__)
+
+
 class YtdlpUpdateJob(QObject):
     """Provjera i preuzimanje yt-dlp-a u pozadinskoj niti (mreža ne smije blokirati prozor)."""
 
@@ -488,13 +525,15 @@ class MainWindow(QMainWindow):
 
     def __init__(self, settings: QSettings | None = None, probe_fn=probe, download_fn=download,
                  thumbnail_fetch=fetch_thumbnail, update_fetch=None, check_updates_on_start: bool = False,
-                 data_dir_path: Path | None = None):
+                 data_dir_path: Path | None = None, convert_fn=None):
         super().__init__()
         self.browser_request.connect(self._on_browser_request)
         self.focus_requested.connect(self._bring_to_front)
         self._settings = settings if settings is not None else QSettings("VideoDownload", "VideoDownload")
         self._probe_fn = probe_fn
         self._download_fn = download_fn
+        self._convert_fn = convert_fn or convert.convert_to_mp3
+        self._convert_jobs: dict[int, ConvertJob] = {}
         self._queue = DownloadQueue()
         self._rows: dict[int, QueueRow] = {}
         self._sizes: dict[int, int] = {}
@@ -1192,7 +1231,8 @@ class MainWindow(QMainWindow):
             self._cancel_active(item_id)
             return
         if item.status == ItemStatus.DONE:
-            reveal(item.filepath or _item_folder(item))
+            converted = item.convert_path if item.convert_path and os.path.isfile(item.convert_path) else None
+            reveal(converted or item.filepath or _item_folder(item))
             return
         if item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED):
             self._queue.retry(item_id)
@@ -1202,6 +1242,47 @@ class MainWindow(QMainWindow):
         else:
             self._manual.append(item_id)
         self._start_next()
+
+    @Slot(int)
+    def _on_row_convert(self, item_id: int) -> None:
+        item = self._queue.get(item_id)
+        if item is None or item_id in self._convert_jobs or not convert.is_convertible(item.filepath):
+            return
+        item.convert_state, item.convert_message = "running", ""
+        self._refresh_row(item)
+        job = ConvertJob(item_id, item.filepath, item.duration, self._convert_fn)
+        job.progress.connect(self._on_convert_progress)
+        job.finished.connect(self._on_convert_finished)
+        self._convert_jobs[item_id] = job
+        job.start()
+
+    @Slot(int, object)
+    def _on_convert_progress(self, item_id: int, fraction) -> None:
+        row = self._rows.get(item_id)
+        if row is not None:
+            percent = f" {round(fraction * 100)} %" if fraction is not None else ""
+            row.show_progress(tr("row.converting") + percent, fraction)
+            row.progress.show()
+
+    @Slot(int, object, str)
+    def _on_convert_finished(self, item_id: int, path, error: str) -> None:
+        job = self._convert_jobs.pop(item_id, None)
+        if job is not None:
+            job.deleteLater()
+        item = self._queue.get(item_id)
+        if item is None:
+            return
+        if path:
+            item.convert_state, item.convert_path = "done", path
+            mp3 = dataclasses.replace(item, filepath=path)
+            store.append_history(mp3, store.history_path(self._data_dir), os.path.getsize(path))
+        else:
+            item.convert_state, item.convert_message = "failed", error
+            self._note_error(error)
+        row = self._rows.get(item_id)
+        if row is not None:
+            row.progress.hide()
+        self._refresh_row(item)
 
     @Slot(int)
     def _on_row_play(self, item_id: int) -> None:
@@ -1216,6 +1297,9 @@ class MainWindow(QMainWindow):
         item = self._queue.get(item_id)
         if item is None:
             return
+        job = self._convert_jobs.pop(item_id, None)
+        if job is not None:
+            job.cancel()
         if item.status == ItemStatus.ACTIVE:
             self._remove_when_done.add(item_id)
             self._cancel_active(item_id)
@@ -1279,6 +1363,7 @@ class MainWindow(QMainWindow):
         row = QueueRow(item)
         row.action_clicked.connect(self._on_row_action)
         row.play_clicked.connect(self._on_row_play)
+        row.convert_clicked.connect(self._on_row_convert)
         row.remove_clicked.connect(self._on_row_remove)
         row.format_clicked.connect(self._on_row_format)
         self._rows[item.id] = row
@@ -1526,6 +1611,9 @@ class MainWindow(QMainWindow):
             # Kratko sačekaj da se obrišu privremeni fajlovi prekinutih preuzimanja.
             for job in jobs:
                 job.join(timeout=10)
+        for job in list(self._convert_jobs.values()):
+            job.cancel()
+            job.join(timeout=5)
         self._save_settings()
         self._save_queue()
         # Prozor se gasi: signal clipboarda više ne smije stizati.

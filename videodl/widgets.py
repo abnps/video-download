@@ -195,6 +195,7 @@ class _DashedBox(QWidget):
 class QueueRow(QFrame):
     action_clicked = Signal(int)
     play_clicked = Signal(int)
+    convert_clicked = Signal(int)
     remove_clicked = Signal(int)
     format_clicked = Signal(int, QPoint)
 
@@ -253,6 +254,18 @@ class QueueRow(QFrame):
         self.action_button.clicked.connect(lambda: self.action_clicked.emit(self.item_id))
         layout.addWidget(self.action_button, 0, Qt.AlignmentFlag.AlignVCenter)
 
+        # Samo na gotovom MP4: pretvori u MP3 (pored dugmeta za folder).
+        self.convert_button = QToolButton()
+        self.convert_button.setObjectName("rowConvert")
+        self.convert_button.setFixedSize(44, 34)
+        self.convert_button.clicked.connect(lambda: self.convert_clicked.emit(self.item_id))
+        # Mjesto ostaje i kad je dugme sakriveno, da „Pusti" i folder stoje u istoj koloni u svim redovima.
+        policy = self.convert_button.sizePolicy()
+        policy.setRetainSizeWhenHidden(True)
+        self.convert_button.setSizePolicy(policy)
+        self.convert_button.hide()
+        layout.addWidget(self.convert_button, 0, Qt.AlignmentFlag.AlignVCenter)
+
         self.remove_button = QToolButton()
         self.remove_button.setObjectName("rowRemove")
         self.remove_button.setIcon(icon("close", "#9aa0a6"))
@@ -289,7 +302,14 @@ class QueueRow(QFrame):
             text = tr("row.exists") if item.message == MESSAGE_EXISTS else tr("row.done")
             if size:
                 text += f" · {format_size(size)}"
-            self._set_status(text, "done")
+            state = "done"
+            if item.convert_state == "running":
+                text, state = tr("row.converting"), "muted"
+            elif item.convert_state == "done":
+                text += f" · {tr('row.converted')}"
+            elif item.convert_state == "failed":
+                text, state = tr("row.convert_failed", error=item.convert_message), "failed"
+            self._set_status(text, state)
             self._set_action("folder", "#5f6368", tr("row.reveal_tip"))
         elif item.status == ItemStatus.FAILED:
             self._set_status(tr("row.failed", message=display_message(item.message)), "failed")
@@ -301,9 +321,14 @@ class QueueRow(QFrame):
         self.progress.setVisible(active)
         can_play = item.status == ItemStatus.DONE and bool(item.filepath) and os.path.isfile(item.filepath)
         self.play_button.setVisible(can_play)
+        self.convert_button.setText(tr("row.convert"))
+        self.convert_button.setToolTip(tr("row.convert_tip"))
+        self.convert_button.setVisible(can_play and item.filepath.lower().endswith(".mp4")
+                                       and item.convert_state not in ("running", "done"))
         self.play_button.setToolTip(tr("row.play_audio") if get_preset(item.preset_key).is_audio else tr("row.play_video"))
         self.remove_button.setToolTip(tr("row.cancel_remove_tip") if active else tr("row.remove_tip"))
-        self.status_label.setToolTip(item.filepath or display_message(item.message))
+        self.status_label.setToolTip("\n".join(p for p in (item.filepath, item.convert_path) if p)
+                                     or display_message(item.message))
 
     def show_progress(self, text: str, fraction: float | None) -> None:
         self._set_status(text, "muted")

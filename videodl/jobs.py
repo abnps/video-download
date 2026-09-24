@@ -34,6 +34,10 @@ class QueueItem:
     auto_retries: int = 0
     # Samo dio videa (od, do) u sekundama; None = cijeli video.
     section: tuple[float, float] | None = None
+    # Pretvaranje preuzetog MP4 u MP3: "" | "running" | "done" | "failed"
+    convert_state: str = ""
+    convert_path: str | None = None
+    convert_message: str = ""
     # Kolačići prijave iz browsera: samo u memoriji, nikad u podešavanjima ni na disku.
     cookies: tuple = field(default=(), repr=False)
 
