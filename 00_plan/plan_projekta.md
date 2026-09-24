@@ -87,7 +87,7 @@ Exit gate:
 - [x] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa YouTube-a, X-a i TikToka.
       24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8): YouTube preko dodatka (MP4 i MP3) potvrđen.
       17.9.2026: X potvrđen; TikTok potvrđen preko „Preuzmi video koji se pušta"
-      (dodatak v0.3.2). YouTube preko dodatka još nije potvrđen.
+      (dodatak v0.3.2); YouTube tada još nije bio potvrđen.
 
 Prekid dok yt-dlp još čita informacije o videu (prije prvog bajta, na YouTube-u ponekad
 10+ s): od v0.5.6 stavka odmah dobija stanje „prekinuto", a posao se napušta (nijedan
