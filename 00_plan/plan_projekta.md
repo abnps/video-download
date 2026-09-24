@@ -81,10 +81,11 @@ Exit gate:
       postojeći fajl; MP3 192 kbps; plejlista i kanal (@jawed) se čitaju;
       prekid usred preuzimanja i tokom drugog dijela (zvuk) reaguje odmah i ne
       ostavlja nijedan fajl. Napredak je monoton za video + zvuk.
-- [ ] Ahmed pokrenuo `pokreni.bat` i potvrdio da prozor i preuzimanje rade.
+- [x] Ahmed potvrdio da prozor i preuzimanje rade (instalirana verzija umjesto `pokreni.bat`; 24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8)).
 - [x] E2E „video koji se pušta" u feedu (lokalna stranica nalik X-u): uzeta
       objava videa koji se pušta, ne link taba ni prvi video.
-- [ ] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa YouTube-a, X-a i TikToka.
+- [x] Ahmed učitao ekstenziju u svoj Edge/Chrome i preuzeo video sa YouTube-a, X-a i TikToka.
+      24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8): YouTube preko dodatka (MP4 i MP3) potvrđen.
       17.9.2026: X potvrđen; TikTok potvrđen preko „Preuzmi video koji se pušta"
       (dodatak v0.3.2). YouTube preko dodatka još nije potvrđen.
 
@@ -113,7 +114,7 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   označava stavku kao „vlastiti format". E2E u Edge-u pravi .mp3 fajl.
 - [x] Desni klik u browseru (17.9.2026, dodatak v0.4.5): stavke „Preuzmi ovaj link / ovaj video /
   video koji se pušta". Direktan tok ide odmah, blob/MSE traži objavu. Kolačići samo ako je dozvola
-  već data (meni je ne može tražiti). E2E provjerava da stavke postoje; pravi desni klik čeka Ahmeda.
+  već data (meni je ne može tražiti). E2E provjerava da stavke postoje; pravi desni klik potvrđen (24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8)).
 - [x] Ažuriranje yt-dlp-a iz aplikacije (17.9.2026, v0.5.4): Pomoć → „Ažuriraj čitač sajtova",
   plus tiha provjera jednom dnevno. Wheel sa PyPI-ja, SHA-256, raspakivanje u folder podataka
   korisnika; `activate()` ga pri pokretanju stavlja ispred verzije iz instalacije, a pokvaren
@@ -149,11 +150,11 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
       (video bez kraja, `duration = Infinity`), probe ga odbija, `match_filter` ga zaustavlja i
       prije preuzimanja, a stavke uživo u plejlisti/kanalu se preskaču. Testovi 82 + 10, E2E
       sa MediaSource „live" stranicom u Edge-u: dodatak odbio, nijedan fajl.
-- [ ] Ahmed potvrdio ažuriranje preko `gh` sa objavljene verzije (0.5.2 → 0.5.3) i LIVE na pravom sajtu.
+- [x] Ahmed potvrdio ažuriranje sa objavljene verzije i LIVE na pravom sajtu (24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8)).
 - [x] Ažuriranje bez `gh` (23.9.2026, v0.6.2): repo je javan, pa se posljednje izdanje čita i
       preuzima HTTPS-om; `gh` je rezerva za 401/403/404. Živo provjereno sa isključenim `gh`:
       v0.6.1 nađena, 198 MB preuzeto za 647 s, SHA-256 se poklopio.
-- [ ] Ažuriranje preko `gh` sa stvarnog izdanja na sljedeće provjereno uživo.
+- [x] Ažuriranje sa stvarnog izdanja na sljedeće provjereno uživo (24.9.2026 Ahmed potvrdio na v0.7.2: „Sve radi trenutno“ (provjera 1–8); od v0.6.2 bez `gh`).
 
 Prvobitne stavke:
 
@@ -162,4 +163,5 @@ Prvobitne stavke:
 - JS runtime u paketu (Deno `.exe`) ili jasna provjera pri pokretanju.
 - Ikona aplikacije.
 
-Exit gate: `.exe` radi na čistom Windowsu bez instaliranog Pythona.
+Exit gate: `.exe` radi na čistom Windowsu bez instaliranog Pythona. — **otvoreno**: Ahmedov računar
+ima Python, pa ovo potvrđuje tek prijateljev računar (ili čista virtuelna mašina).
