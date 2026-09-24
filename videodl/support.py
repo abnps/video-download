@@ -8,7 +8,7 @@ Pravila, da prilog ostane dobrovoljan (a ne kupovina):
 
 from dataclasses import dataclass
 
-SUPPORT_URL = "https://paypal.me/ABNPG"
+SUPPORT_URL = "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ"
 BANNER_EVERY = 10  # traka iznad liste poslije svakih N novih preuzimanja
 DIALOG_INTERVAL = 7 * 24 * 60 * 60  # prozor najviše jednom sedmično
 SNOOZE = 90 * 24 * 60 * 60  # „Već sam podržao" gasi podsjetnik na 90 dana

@@ -9,7 +9,7 @@ The program does not send the author any data, usage statistics or error reports
 - The site you download from (video, audio, thumbnails, subtitles).
 - GitHub (api.github.com, github.com): checking for and downloading a new version of the program, at most once a day and when you click "Check for updates".
 - PyPI (pypi.org, files.pythonhosted.org): checking for and downloading the site reader yt-dlp, at most once a day.
-- PayPal only if you click “Support the project”: the paypal.me page opens in your browser, and the program sends nothing.
+- PayPal only if you click “Support the project”: the PayPal contribution page opens in your browser, and the program sends nothing.
 These services can see your IP address and the program version; their own privacy policies apply.
 
 3. What is stored on your computer

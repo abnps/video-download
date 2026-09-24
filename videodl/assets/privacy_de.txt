@@ -9,7 +9,7 @@ Das Programm sendet dem Autor keine Daten, keine Nutzungsstatistik und keine Feh
 - Mit der Seite, von der du herunterlädst (Video, Audio, Vorschaubilder, Untertitel).
 - Mit GitHub (api.github.com, github.com): Prüfung und Download einer neuen Programmversion, höchstens einmal täglich und wenn du „Nach Updates suchen" klickst.
 - Mit PyPI (pypi.org, files.pythonhosted.org): Prüfung und Download des Seiten-Readers yt-dlp, höchstens einmal täglich.
-- Mit PayPal nur, wenn du „Projekt unterstützen“ klickst: Die Seite paypal.me öffnet sich in deinem Browser, das Programm sendet dabei nichts.
+- Mit PayPal nur, wenn du „Projekt unterstützen“ klickst: Die PayPal-Seite für Beiträge öffnet sich in deinem Browser, das Programm sendet dabei nichts.
 Diese Dienste sehen deine IP-Adresse und die Programmversion; es gelten ihre Datenschutzerklärungen.
 
 3. Was auf deinem Computer gespeichert wird

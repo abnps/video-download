@@ -52,7 +52,7 @@ gh release edit v<prethodna_verzija> --repo npgamy/video-download --draft=true
 ## Podrži projekat
 
 Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, možeš dobrovoljno
-podržati razvoj: **[paypal.me/ABNPG](https://paypal.me/ABNPG)**. Prilog ništa ne otključava;
+podržati razvoj: **[PayPal — Support for Video Download](https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ)**. Prilog ništa ne otključava;
 program je isti za sve.
 
 ## Uslovi korištenja

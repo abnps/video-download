@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.6", "24.9.2026", {
+        "bs": ["„Podrži projekat“ otvara PayPal stranicu za prilog, gdje sam biraš iznos."],
+        "en": ["\u201cSupport the project\u201d opens a PayPal contribution page where you choose the amount."],
+        "de": ["\u201eProjekt unterstützen\u201c öffnet eine PayPal-Seite für Beiträge, auf der du den Betrag selbst wählst."],
+        "es": ["«Apoyar el proyecto» abre una página de aportaciones de PayPal donde eliges el importe."],
+        "fr": ["« Soutenir le projet » ouvre une page de contribution PayPal où tu choisis le montant."],
+    }),
     ("0.7.5", "24.9.2026", {
         "bs": ["„Podrži projekat“: dobrovoljni prilog preko PayPal-a (statusna traka, Pomoć, povremeni podsjetnik koji se može sakriti). Prilog ništa ne otključava."],
         "en": ["\u201cSupport the project\u201d: voluntary contribution via PayPal (status bar, Help, an occasional reminder you can hide). A contribution unlocks nothing."],

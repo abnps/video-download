@@ -66,7 +66,7 @@ class SupportStateTest(unittest.TestCase):
         self.assertTrue(state.should_show_dialog(1000 + 91 * DAY, busy=False))
 
     def test_link_is_the_paypal_page(self):
-        self.assertEqual(support.SUPPORT_URL, "https://paypal.me/ABNPG")
+        self.assertEqual(support.SUPPORT_URL, "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ")
 
 
 class SupportWindowTest(unittest.TestCase):
@@ -106,7 +106,7 @@ class SupportWindowTest(unittest.TestCase):
         self.assertIn(window.support_action, window.help_menu.actions())
         with mock.patch("videodl.gui.QDesktopServices.openUrl") as open_url:
             window._open_support()
-        open_url.assert_called_once_with(QUrl("https://paypal.me/ABNPG"))
+        open_url.assert_called_once_with(QUrl("https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ"))
 
     def test_banner_after_ten_downloads_blocks_nothing_and_later_hides_it(self):
         window = self.window()
