@@ -9,6 +9,7 @@ Le programme n'envoie à l'auteur aucune donnée, aucune statistique d'utilisati
 - Au site d'où tu télécharges (vidéo, son, miniatures, sous-titres).
 - À GitHub (api.github.com, github.com) : recherche et téléchargement d'une nouvelle version du programme, au plus une fois par jour et quand tu cliques sur « Rechercher des mises à jour ».
 - À PyPI (pypi.org, files.pythonhosted.org) : recherche et téléchargement du lecteur de sites yt-dlp, au plus une fois par jour.
+- À PayPal seulement si tu cliques sur « Soutenir le projet » : la page paypal.me s'ouvre dans ton navigateur et le programme n'envoie rien.
 Ces services voient ton adresse IP et la version du programme ; leurs propres politiques de confidentialité s'appliquent.
 
 3. Ce qui est enregistré sur ton ordinateur

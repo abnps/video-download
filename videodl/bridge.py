@@ -98,6 +98,15 @@ def _make_handler(bridge: BridgeServer):
             if self.headers.get("Host") in expected_hosts and hmac.compare_digest(
                     token.encode("utf-8"), bridge.token.encode("utf-8")):
                 return True
+            # Malo tijelo se pročita prije odgovora: inače Windows ponekad prekine vezu (reset)
+            # prije nego klijent dobije 403. Veće se ne čita, veza se samo zatvara.
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                length = 0
+            if 0 < length <= 64 * 1024:
+                self.rfile.read(length)
+            self.close_connection = True
             self._reply(403, {"error": "Zabranjeno."})
             return False
 

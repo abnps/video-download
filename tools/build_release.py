@@ -180,7 +180,7 @@ def main() -> int:
     from videodl import changelog
 
     notes = INSTALLER_OUT / "release-notes.md"
-    notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n",
+    notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://paypal.me/ABNPG\n",
                      encoding="utf-8")
     size_mb = installer.stat().st_size / 1024 / 1024
     print(f"Instaler: {installer} ({size_mb:.0f} MB)\nSHA-256: {digest}")

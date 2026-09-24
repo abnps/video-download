@@ -49,6 +49,12 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npg
 gh release edit v<prethodna_verzija> --repo npgamy/video-download --draft=true
 ```
 
+## Podrži projekat
+
+Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, možeš dobrovoljno
+podržati razvoj: **[paypal.me/ABNPG](https://paypal.me/ABNPG)**. Prilog ništa ne otključava;
+program je isti za sve.
+
 ## Uslovi korištenja
 
 Program je namijenjen preuzimanju sadržaja koji korisnik ima pravo da preuzme, prije svega

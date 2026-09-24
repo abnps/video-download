@@ -9,6 +9,7 @@ El programa no envía al autor ningún dato, estadística de uso ni informe de e
 - Con el sitio desde el que descargas (vídeo, audio, miniaturas, subtítulos).
 - Con GitHub (api.github.com, github.com): comprobar y descargar una nueva versión del programa, como máximo una vez al día y cuando pulsas «Buscar actualizaciones».
 - Con PyPI (pypi.org, files.pythonhosted.org): comprobar y descargar el lector de sitios yt-dlp, como máximo una vez al día.
+- Con PayPal solo si pulsas «Apoyar el proyecto»: la página paypal.me se abre en tu navegador y el programa no envía nada.
 Estos servicios ven tu dirección IP y la versión del programa; se aplican sus propias políticas de privacidad.
 
 3. Qué se guarda en tu ordenador

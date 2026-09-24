@@ -41,7 +41,7 @@ from .presets import (
     subtitle_languages,
 )
 from .probe import ProbeResult, probe
-from . import changelog, convert, diagnostics, legal, store
+from . import changelog, convert, diagnostics, legal, store, support
 from . import updater, ytdlp_update
 from .widgets import LINK_COLOR, DropZone, QueueRow, display_message, format_size, set_state
 from .ytdl import JS_RUNTIMES, error_message, is_network_error
@@ -102,6 +102,10 @@ QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transpar
 QToolButton#rowRemove:hover {{ background: #eeeeee; }}
 QToolButton#rowConvert {{ border: 1px solid #c7d7f5; border-radius: 17px; background: #f5f8ff;
     color: #1a73e8; font-weight: 600; font-size: 12px; }}
+QFrame#supportBanner {{ background: #fff8e1; border: 1px solid #f2d27a; border-radius: 8px; margin: 0 12px 6px 12px; }}
+QPushButton#supportButton {{ background: #c2185b; color: white; border: none; border-radius: 4px; padding: 6px 14px; font-weight: 600; }}
+QPushButton#supportButton:hover {{ background: #ad1457; }}
+QLabel#supportNote {{ color: #5f6368; font-size: 12px; }}
 QToolButton#rowConvert:hover {{ background: #e8f0fe; border-color: #1a73e8; }}
 QLabel#dropTitle {{ color: #5f6368; font-size: 10pt; }}
 QLabel#dropHint {{ color: #9aa0a6; }}
@@ -325,6 +329,42 @@ class UpdateCheckJob(QObject):
             self.finished.emit(None, exc, self._manual)
 
 
+class SupportDialog(QDialog):
+    """Podsjetnik za dobrovoljni prilog: tri dugmeta, ništa se ne otključava ni blokira."""
+
+    support_clicked = Signal()
+    already_clicked = Signal()
+
+    def __init__(self, text: str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("support.title"))
+        self.setMinimumWidth(460)
+        layout = QVBoxLayout(self)
+        message = QLabel(text)
+        message.setWordWrap(True)
+        layout.addWidget(message)
+        note = QLabel(tr("support.voluntary"))
+        note.setWordWrap(True)
+        note.setObjectName("supportNote")
+        layout.addWidget(note)
+        buttons = QHBoxLayout()
+        self.support_button = QPushButton(tr("support.button"))
+        self.support_button.setObjectName("supportButton")
+        self.support_button.setDefault(True)
+        self.support_button.clicked.connect(self.support_clicked)
+        self.support_button.clicked.connect(self.accept)
+        self.later_button = QPushButton(tr("support.later"))
+        self.later_button.clicked.connect(self.reject)
+        self.already_button = QPushButton(tr("support.already"))
+        self.already_button.clicked.connect(self.already_clicked)
+        self.already_button.clicked.connect(self.accept)
+        buttons.addWidget(self.support_button)
+        buttons.addStretch(1)
+        buttons.addWidget(self.later_button)
+        buttons.addWidget(self.already_button)
+        layout.addLayout(buttons)
+
+
 class LegalDialog(QDialog):
     """Pomoć → Ugovori i licence: isti tekstovi kao u instaleru, na jeziku aplikacije."""
 
@@ -539,6 +579,8 @@ class MainWindow(QMainWindow):
         self._download_fn = download_fn
         self._convert_fn = convert_fn or convert.convert_to_mp3
         self._convert_jobs: dict[int, ConvertJob] = {}
+        self._support = support.SupportState()
+        self._support_dialog = None
         self._queue = DownloadQueue()
         self._rows: dict[int, QueueRow] = {}
         self._sizes: dict[int, int] = {}
@@ -657,6 +699,7 @@ class MainWindow(QMainWindow):
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
         self.report_action = self.help_menu.addAction("", self._save_report)
         self.legal_action = self.help_menu.addAction("", self._show_legal)
+        self.support_action = self.help_menu.addAction("", lambda: self.show_support_dialog(automatic=False))
         self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
@@ -703,6 +746,11 @@ class MainWindow(QMainWindow):
         self.browser_help_action.setText(tr("menu.browser_help"))
         self.report_action.setText(tr("menu.report"))
         self.legal_action.setText(tr("menu.legal"))
+        self.support_action.setText(tr("menu.support"))
+        self.support_link.setText(f'<a href="support" style="color:#c2185b;text-decoration:none">{tr("support.link")}</a>')
+        self.support_banner_label.setText(tr("support.banner"))
+        self.support_banner_button.setText(tr("support.button"))
+        self.support_banner_later.setText(tr("support.later"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{LINK_COLOR}">{tr("corner.open_folder")}</a>')
 
@@ -764,6 +812,24 @@ class MainWindow(QMainWindow):
         self.warning_label.setWordWrap(True)
         layout.addWidget(self.warning_label)
 
+        # Podsjetnik za dobrovoljni prilog: ništa ne blokira, „Kasnije" ga sakrije.
+        self.support_banner = QFrame()
+        self.support_banner.setObjectName("supportBanner")
+        banner = QHBoxLayout(self.support_banner)
+        banner.setContentsMargins(14, 8, 10, 8)
+        self.support_banner_label = QLabel()
+        self.support_banner_label.setWordWrap(True)
+        banner.addWidget(self.support_banner_label, 1)
+        self.support_banner_button = QPushButton()
+        self.support_banner_button.setObjectName("supportButton")
+        self.support_banner_button.clicked.connect(self._open_support)
+        banner.addWidget(self.support_banner_button)
+        self.support_banner_later = QPushButton()
+        self.support_banner_later.clicked.connect(self._support_banner_later)
+        banner.addWidget(self.support_banner_later)
+        self.support_banner.hide()
+        layout.addWidget(self.support_banner)
+
         self.stack = QStackedWidget()
         self.drop_zone = DropZone()
         self.drop_zone.paste_requested.connect(self._paste_from_clipboard)
@@ -789,6 +855,10 @@ class MainWindow(QMainWindow):
         self.folder_label = QLabel()
         self.folder_label.linkActivated.connect(lambda _href: self._choose_folder())
         self.statusBar().addPermanentWidget(self.folder_label)
+        self.support_link = QLabel()
+        self.support_link.setObjectName("supportLink")
+        self.support_link.linkActivated.connect(lambda _href: self._open_support())
+        self.statusBar().addPermanentWidget(self.support_link)
         self.statusBar().setSizeGripEnabled(False)
 
     # ---------- podešavanja ----------
@@ -797,6 +867,11 @@ class MainWindow(QMainWindow):
         self.set_output_dir(self._settings.value("output_dir", default_output_dir(), type=str) or default_output_dir(),
                             save=False)
         self.set_watch_clipboard(self._settings.value("watch_clipboard", True, type=bool), save=False)
+        self._support = support.SupportState(
+            downloads=self._settings.value("support/downloads", 0, type=int),
+            banner_next=self._settings.value("support/banner_next", support.BANNER_EVERY, type=int),
+            last_dialog=self._settings.value("support/last_dialog", 0.0, type=float),
+            snooze_until=self._settings.value("support/snooze_until", 0.0, type=float))
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
@@ -814,6 +889,10 @@ class MainWindow(QMainWindow):
         self._settings.setValue("preset_key", self.preset_combo.currentData())
         self._settings.setValue("parallel", self._parallel)
         self._settings.setValue("subtitles", self._subtitles)
+        self._settings.setValue("support/downloads", self._support.downloads)
+        self._settings.setValue("support/banner_next", self._support.banner_next)
+        self._settings.setValue("support/last_dialog", self._support.last_dialog)
+        self._settings.setValue("support/snooze_until", self._support.snooze_until)
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
         self._settings.setValue("whole_playlist", self._whole_playlist)
         self._settings.setValue("rate_limit", self._rate_limit)
@@ -842,6 +921,46 @@ class MainWindow(QMainWindow):
 
     def _save_queue(self) -> None:
         store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
+
+    # ---------- podrška (dobrovoljni prilog) ----------
+
+    def _maybe_remind_support(self) -> None:
+        now = time.time()
+        if self._support.should_show_banner(now):
+            self.support_banner.show()
+        busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
+        if self._support.should_show_dialog(now, busy) and self._support_dialog is None:
+            self.show_support_dialog(automatic=True)
+        self._save_settings()
+
+    @Slot()
+    def _open_support(self) -> None:
+        QDesktopServices.openUrl(QUrl(support.SUPPORT_URL))
+
+    @Slot()
+    def _support_banner_later(self) -> None:
+        self._support.banner_later()
+        self.support_banner.hide()
+        self._save_settings()
+
+    def show_support_dialog(self, automatic: bool) -> None:
+        """Nije modalan za rad: preuzimanja teku dalje, a zatvaranje ništa ne mijenja u programu."""
+        if automatic:
+            self._support.dialog_shown(time.time())
+        count = self._support.downloads
+        text = tr("support.dialog_count", count=count) if count else tr("support.dialog_plain")
+        dialog = SupportDialog(text, self)
+        dialog.support_clicked.connect(self._open_support)
+        dialog.already_clicked.connect(self._support_already)
+        dialog.finished.connect(lambda _result: setattr(self, "_support_dialog", None))
+        self._support_dialog = dialog
+        dialog.open()
+
+    @Slot()
+    def _support_already(self) -> None:
+        self._support.already_supported(time.time())
+        self.support_banner.hide()
+        self._save_settings()
 
     @Slot()
     def _show_legal(self) -> None:
@@ -1143,6 +1262,8 @@ class MainWindow(QMainWindow):
                 self._sizes[item_id] = os.path.getsize(result.filepath)
             if result.status == ItemStatus.DONE and result.filepath:
                 store.append_history(item, store.history_path(self._data_dir), self._sizes.get(item_id))
+                if not result.already_existed:
+                    self._support.count_download()
             if item_id in self._remove_when_done:
                 self._remove_when_done.discard(item_id)
                 self._remove_item(item_id)
@@ -1150,6 +1271,7 @@ class MainWindow(QMainWindow):
                 self._refresh_row(item)
         self._save_queue()
         self._start_next()
+        self._maybe_remind_support()
 
     @Slot()
     def _toggle_running(self) -> None:

@@ -9,6 +9,7 @@ Program ne šalje autoru nikakve podatke, statistiku korištenja ni izvještaje 
 - Sa sajtom sa kog preuzimaš (video, zvuk, sličice, titlovi).
 - Sa GitHub-om (api.github.com, github.com): provjera i preuzimanje nove verzije programa, najviše jednom dnevno i kad klikneš „Provjeri ažuriranje".
 - Sa PyPI-jem (pypi.org, files.pythonhosted.org): provjera i preuzimanje čitača sajtova yt-dlp, najviše jednom dnevno.
+- Sa PayPal-om samo ako klikneš „Podrži projekat“: stranica paypal.me otvara se u tvom browseru, a program pri tome ništa ne šalje.
 Tim servisima su vidljivi tvoja IP adresa i verzija programa; za njih važe njihove politike privatnosti.
 
 3. Šta se čuva na tvom računaru

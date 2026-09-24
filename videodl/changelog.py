@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.7.5", "24.9.2026", {
+        "bs": ["„Podrži projekat“: dobrovoljni prilog preko PayPal-a (statusna traka, Pomoć, povremeni podsjetnik koji se može sakriti). Prilog ništa ne otključava."],
+        "en": ["\u201cSupport the project\u201d: voluntary contribution via PayPal (status bar, Help, an occasional reminder you can hide). A contribution unlocks nothing."],
+        "de": ["\u201eProjekt unterstützen\u201c: freiwilliger Beitrag über PayPal (Statusleiste, Hilfe, gelegentliche ausblendbare Erinnerung). Ein Beitrag schaltet nichts frei."],
+        "es": ["«Apoyar el proyecto»: aportación voluntaria por PayPal (barra de estado, Ayuda, un recordatorio ocasional que se puede ocultar). La aportación no desbloquea nada."],
+        "fr": ["« Soutenir le projet » : contribution volontaire via PayPal (barre d'état, Aide, un rappel occasionnel masquable). Une contribution ne débloque rien."],
+    }),
     ("0.7.4", "24.9.2026", {
         "bs": ["Licencni ugovor, uslovi korištenja i politika privatnosti na 5 jezika u instaleru i u Pomoć \u2192 Ugovori i licence.",
                "Puni tekstovi licenci komponenti (FFmpeg, Qt, Node.js, yt-dlp…) u folderu „licenses\u201c."],

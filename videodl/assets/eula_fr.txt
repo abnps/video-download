@@ -3,7 +3,7 @@
 Ce contrat s'applique entre toi et l'auteur de Video Download (l'« auteur »). En installant ou en utilisant le programme, tu acceptes ce contrat et les Conditions d'utilisation.
 
 1. Licence
-L'auteur t'accorde une licence gratuite et non exclusive pour installer et utiliser le programme sur tes propres ordinateurs, pour un usage personnel.
+L'auteur t'accorde une licence gratuite et non exclusive pour installer et utiliser le programme sur tes propres ordinateurs, pour un usage personnel. Le programme est gratuit ; les contributions via « Soutenir le projet » sont volontaires et n'accordent aucun droit ni fonction supplémentaire.
 
 2. Partage
 Tu peux partager gratuitement l'installateur non modifié, accompagné de ce contrat. Tu ne peux ni vendre ni louer le programme, ni partager une version modifiée sous le nom Video Download.

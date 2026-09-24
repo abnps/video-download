@@ -3,7 +3,7 @@
 Ovaj ugovor važi između tebe i autora programa Video Download (u daljem tekstu: autor). Instalacijom ili korištenjem programa prihvataš ovaj ugovor i Uslove korištenja.
 
 1. Licenca
-Autor ti daje besplatnu, neisključivu licencu da program instaliraš i koristiš na svojim računarima, za ličnu upotrebu.
+Autor ti daje besplatnu, neisključivu licencu da program instaliraš i koristiš na svojim računarima, za ličnu upotrebu. Program je besplatan; prilozi preko „Podrži projekat“ su dobrovoljni i ne daju nikakva dodatna prava ni funkcije.
 
 2. Dijeljenje
 Smiješ besplatno dijeliti neizmijenjen instaler, zajedno sa ovim ugovorom. Ne smiješ program prodavati ni iznajmljivati, niti dijeliti izmijenjenu verziju pod imenom Video Download.

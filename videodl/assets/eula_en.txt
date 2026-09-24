@@ -3,7 +3,7 @@
 This agreement applies between you and the author of Video Download (the "author"). By installing or using the program you accept this agreement and the Terms of Use.
 
 1. License
-The author grants you a free, non-exclusive license to install and use the program on your own computers for personal use.
+The author grants you a free, non-exclusive license to install and use the program on your own computers for personal use. The program is free; contributions via “Support the project” are voluntary and grant no additional rights or features.
 
 2. Sharing
 You may share the unmodified installer free of charge, together with this agreement. You may not sell or rent the program, or share a modified version under the name Video Download.

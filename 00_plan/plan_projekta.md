@@ -95,6 +95,9 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Podrži projekat (24.9.2026, v0.7.5): paypal.me/ABNPG u statusnoj traci i Pomoć meniju; traka poslije
+  svakih 10 novih preuzimanja, prozor najviše jednom sedmično kad ništa ne radi; „Već sam podržao" (bez
+  provjere uplate) gasi sve na 90 dana. Ništa se ne otključava ni blokira (`videodl/support.py`).
 - [x] Pravni paket (24.9.2026, v0.7.4): licencni ugovor, uslovi i privatnost na 5 jezika u instaleru
   (stranica za prihvatanje + privatnost prije nje) i u Pomoć → Ugovori i licence; puni tekstovi
   licenci komponenti u folderu `licenses`. Tekstovi su nacrt za pregled kod advokata.
