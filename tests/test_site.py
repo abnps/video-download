@@ -1,5 +1,7 @@
-"""Zvanični sajt (site/): usklađen s aplikacijom, bez zabranjenih izraza, bez pokvarenih linkova."""
+"""Zvanični sajt (site/, engleski glavni, bosanski u site/bs/): usklađen s aplikacijom, bez zabranjenih
+izraza i pokvarenih linkova."""
 
+import posixpath
 import re
 import sys
 import unittest
@@ -12,11 +14,18 @@ import build_site  # noqa: E402
 
 from videodl import __version__, changelog  # noqa: E402
 
+PAGES = ("index.html", "terms.html", "privacy.html", "licenses.html", "extension.html")
+
 
 class SiteTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.pages = build_site.build()
+
+    def test_every_language_has_every_page(self):
+        expected = {build_site.TEXTS[lang]["dir"] + page for lang in build_site.LANGUAGES for page in PAGES}
+        self.assertEqual(set(self.pages), expected)
+        self.assertEqual(build_site.LANGUAGES[0], "en")  # engleski je glavni jezik (korijen sajta)
 
     def test_site_is_up_to_date(self):
         # Poslije izmjene changeloga, pravnih tekstova ili verzije: python tools/build_site.py
@@ -25,30 +34,40 @@ class SiteTest(unittest.TestCase):
                 self.assertEqual((build_site.SITE / name).read_text(encoding="utf-8"), text,
                                  f"site/{name} nije ažuran — pokreni python tools/build_site.py")
 
-    def test_front_page_shows_current_version_and_news(self):
-        index = self.pages["index.html"]
-        self.assertIn(f"Verzija {__version__} ·", index)
-        for version, _date, _items in changelog.entries("bs")[:build_site.NEWS_COUNT]:
-            self.assertIn(f"<h3>{version} <span>", index)
-        self.assertIn(build_site.INSTALLER_URL, index)
+    def test_front_pages_show_current_version_news_and_smartscreen_help(self):
+        for lang, label, more_info, run_anyway in (("en", "Version", "More info", "Run anyway"),
+                                                   ("bs", "Verzija", "Više informacija", "Ipak pokreni")):
+            index = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            with self.subTest(lang=lang):
+                self.assertIn(f"<html lang=\"{lang}\">", index)
+                self.assertIn(f"{label} {__version__} ·", index)
+                for version, _date, items in changelog.entries(lang)[:build_site.NEWS_COUNT]:
+                    self.assertIn(f"<h3>{version} <span>", index)
+                    self.assertIn(items[0].replace('"', "&quot;")[:30].split("&")[0], index)
+                self.assertIn(build_site.INSTALLER_URL, index)
+                self.assertIn(more_info, index)
+                self.assertIn(run_anyway, index)
 
     def test_no_forbidden_words_on_promo_pages(self):
         self.assertEqual(build_site.forbidden_words(self.pages), [])
         self.assertTrue(build_site.forbidden_words({"index.html": "<p>Preuzmi sa YouTube-a</p>"}))
-        self.assertFalse(build_site.forbidden_words({"index.html": "<p>čitač sajtova yt-dlp</p>"}))
+        self.assertTrue(build_site.forbidden_words({"bs/extension.html": "<p>bypass protection</p>"}))
+        self.assertFalse(build_site.forbidden_words({"index.html": "<p>the site reader yt-dlp</p>"}))
 
     def test_legal_pages_carry_the_same_text_as_the_app(self):
-        terms = build_site._asset_text("terms")
-        self.assertIn("vlastitih videa", self.pages["uslovi.html"])
-        self.assertIn("GitHub Pages", self.pages["privatnost.html"])
-        self.assertIn("GPL-3.0", self.pages["licence.html"])
-        self.assertTrue(terms)
+        self.assertIn("vlastitih videa", self.pages["bs/terms.html"])
+        self.assertIn("TERMS OF USE".title().split()[0], self.pages["terms.html"])
+        for prefix in ("", "bs/"):
+            self.assertIn("GitHub Pages", self.pages[prefix + "privacy.html"])
+            self.assertIn("GPL-3.0", self.pages[prefix + "licenses.html"])
 
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():
+            folder = posixpath.dirname(name)
             for target in re.findall(r'(?:href|src|srcset)="([^"#:]+)(?:#[^"]*)?"', text):
+                path = posixpath.normpath(posixpath.join(folder, target))
                 with self.subTest(page=name, target=target):
-                    self.assertTrue((build_site.SITE / target).is_file(), target)
+                    self.assertTrue((build_site.SITE / path).is_file(), path)
 
     def test_text_conversion(self):
         title, body = build_site.text_to_html("﻿NASLOV\n\nUvod.\n\n1. Prvo\n- a\n  nastavak\n- b\n\nVidi https://x.test/a.")

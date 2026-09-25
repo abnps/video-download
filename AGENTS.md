@@ -68,6 +68,14 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - 25.9.2026 Ahmed: repo je prebačen iz naloga `npgamy` u organizaciju `abnps` (nalog `npgamy` ostaje,
   da GitHub-ovo preusmjeravanje starih linkova za programe v0.9.0 i starije ostane sigurno; u nalogu
   `npgamy` se NIKAD ne smije napraviti repo `video-download`).
+- Sajt je na više jezika: ENGLESKI je glavni (`site/`, Ahmedova odluka 25.9.2026), bosanski je u
+  `site/bs/`. `index.html` svakog jezika se piše ručno (isti raspored); ostale stranice pravi
+  `tools/build_site.py` (TEXTS po jeziku). Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
+  programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
+- Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se
+  skuplja po fajlu, pa svako novo izdanje kreće od nule. Izmjene se skupljaju i izdaju otprilike jednom
+  sedmično ili kad je nešto važno; hitne popravke odmah. Popravke za sajtove idu preko ažuriranja
+  yt-dlp-a, bez novog izdanja programa. Potpis koda se kupuje tek kad ga prilozi pokriju.
 - Izdanje uz instaler s verzijom nosi i kopiju `VideoDownload-Setup.exe` (link na sajtu vodi na
   `releases/latest/download/VideoDownload-Setup.exe`); ažuriranje u aplikaciji tu kopiju ne koristi.
 - Pravni dokumenti su u `videodl/assets/{eula,terms,privacy}_<jezik>.txt` (UTF-8 sa BOM-om, 5 jezika).
