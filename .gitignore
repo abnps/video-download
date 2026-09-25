@@ -22,3 +22,6 @@ dist/
 .idea/
 .vscode/
 Thumbs.db
+
+# Lokalna podešavanja Claude Code-a (pregled sajta)
+.claude/

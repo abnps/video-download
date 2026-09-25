@@ -32,15 +32,22 @@ izdanjima repoa `npgamy/video-download` (GitHub → Releases).
 - Instaler nije digitalno potpisan, pa Windows SmartScreen može pitati
   „Više informacija → Ipak pokreni".
 
+## Sajt
+
+Zvanični sajt: https://npgamy.github.io/video-download/ (folder `site/`, objavljuje ga GitHub Actions
+pri svakoj izmjeni). Poslije izmjene changeloga ili pravnih tekstova: `python tools/build_site.py`.
+Lokalni pregled: `python -m http.server 8765 --directory site`.
+
 ## Izdavanje nove verzije
 
 1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
 2. `python tools/build_release.py` (build van OneDrive-a u `%LOCALAPPDATA%\VideoDownload-build`;
    uključuje self-test spakovane aplikacije).
-3. Objavi instaler i `.sha256` kao izdanje:
+3. Build osvježi i sajt (`site/`: verzija, veličina, „Šta je novo"); te izmjene idu u commit izdanja.
+   Objavi instaler, `.sha256` i kopiju bez verzije (za stalni link na sajtu) kao izdanje:
 
 ```
-gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" --repo npgamy/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\VideoDownload-Setup.exe" --repo npgamy/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
 4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:

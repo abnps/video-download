@@ -182,7 +182,12 @@ def main() -> int:
     notes = INSTALLER_OUT / "release-notes.md"
     notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ\n",
                      encoding="utf-8")
+    # Kopija bez broja verzije: link na sajtu (releases/latest/download/VideoDownload-Setup.exe)
+    # uvijek vodi na najnovije izdanje. Ažuriranje u aplikaciji traži samo ime s verzijom.
+    shutil.copyfile(installer, INSTALLER_OUT / "VideoDownload-Setup.exe")
     size_mb = installer.stat().st_size / 1024 / 1024
+    # Sajt pokazuje novu verziju i veličinu instalera; mijenja site/, pa ide u commit izdanja.
+    run([sys.executable, str(PROJECT / "tools" / "build_site.py"), "--size-mb", str(round(size_mb))])
     print(f"Instaler: {installer} ({size_mb:.0f} MB)\nSHA-256: {digest}")
     return 0
 
