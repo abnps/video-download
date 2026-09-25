@@ -257,18 +257,25 @@ def forbidden_words(pages: dict[str, str]) -> list[str]:
     return found
 
 
+def write_site(size_mb: int | None = None) -> list[str]:
+    """Piše sve stranice; vraća zabranjene izraze (tada ne piše ništa). Zove ga i build_release.py."""
+    pages = build(size_mb)
+    problems = forbidden_words(pages)
+    if not problems:
+        for name, text in pages.items():
+            (SITE / name).write_text(text, encoding="utf-8", newline="\n")
+    return problems
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--size-mb", type=int, help="veličina instalera u MB (inače ostaje postojeća)")
     args = parser.parse_args()
-    pages = build(args.size_mb)
-    problems = forbidden_words(pages)
+    problems = write_site(args.size_mb)
     if problems:
         print("Zabranjeni izrazi na sajtu:\n  " + "\n  ".join(problems))
         return 1
-    for name, text in pages.items():
-        (SITE / name).write_text(text, encoding="utf-8", newline="\n")
-    print("sajt: " + ", ".join(pages))
+    print("sajt: gotov")
     return 0
 
 

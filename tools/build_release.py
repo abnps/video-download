@@ -187,7 +187,12 @@ def main() -> int:
     shutil.copyfile(installer, INSTALLER_OUT / "VideoDownload-Setup.exe")
     size_mb = installer.stat().st_size / 1024 / 1024
     # Sajt pokazuje novu verziju i veličinu instalera; mijenja site/, pa ide u commit izdanja.
-    run([sys.executable, str(PROJECT / "tools" / "build_site.py"), "--size-mb", str(round(size_mb))])
+    # U istom procesu: ispis putanje projekta (ćirilica u „Прилози") ruši Windows konzolu (cp1250).
+    sys.path.insert(0, str(PROJECT / "tools"))
+    import build_site
+
+    if build_site.write_site(round(size_mb)):
+        raise SystemExit("Sajt sadrži zabranjene izraze (python tools/build_site.py ih ispisuje).")
     print(f"Instaler: {installer} ({size_mb:.0f} MB)\nSHA-256: {digest}")
     return 0
 
