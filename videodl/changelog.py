@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.3", "26.9.2026", {
+        "bs": ["Pomoć → Preuzimanje iz browsera: dugmad „Kopiraj putanju foldera“, „Otvori folder“ i otvaranje stranice dodataka u Edge-u ili Chrome-u; uputstvo sa slikama na sajtu.",
+               "Priprema za dodatak u Firefoxu (bez developer moda)."],
+        "en": ["Help → Downloading from the browser: buttons “Copy the folder path”, “Open the folder” and opening the extensions page in Edge or Chrome; illustrated guide on the website.",
+               "Groundwork for the Firefox extension (without developer mode)."],
+        "de": ["Hilfe → Aus dem Browser herunterladen: Schaltflächen „Ordnerpfad kopieren“, „Ordner öffnen“ und Öffnen der Erweiterungsseite in Edge oder Chrome; bebilderte Anleitung auf der Website.",
+               "Vorbereitung für die Firefox-Erweiterung (ohne Entwicklermodus)."],
+        "es": ["Ayuda → Descargar desde el navegador: botones «Copiar la ruta de la carpeta», «Abrir la carpeta» y abrir la página de extensiones en Edge o Chrome; guía con imágenes en el sitio web.",
+               "Preparación para la extensión de Firefox (sin modo de desarrollador)."],
+        "fr": ["Aide → Télécharger depuis le navigateur : boutons « Copier le chemin du dossier », « Ouvrir le dossier » et ouverture de la page des extensions dans Edge ou Chrome ; guide illustré sur le site.",
+               "Préparation de l'extension Firefox (sans mode développeur)."],
+    }),
     ("0.9.2", "26.9.2026", {
         "bs": ["Titlovi: kad video nema ručne titlove, uzimaju se automatski; titl se čuva i kao .srt pored videa (s istim imenom, pa ga playeri sami učitaju), a ne samo u MP4.",
                "Ako titl ne može da se preuzme, video se ipak preuzme, uz napomenu „bez titlova“.",

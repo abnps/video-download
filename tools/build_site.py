@@ -69,8 +69,9 @@ on a link or video. Works in Edge and Chrome.</p>
 <li>Install the app (the extension comes with it).</li>
 <li>In your browser open <code>edge://extensions</code> (Edge) or <code>chrome://extensions</code> (Chrome).</li>
 <li>Turn on <b>Developer mode</b> and click <b>Load unpacked</b>.</li>
-<li>Choose the folder <code>{html.escape(INSTALL_DIR)}</code>. The app also shows the exact path:
-Help → Downloading from the browser.</li>
+<li>Choose the folder <code>{html.escape(INSTALL_DIR)}</code>. Easiest: in the app open
+Help → Downloading from the browser, click <b>Copy the folder path</b> and paste it (Ctrl+V) into the folder picker.
+The same window has a button that opens the extensions page in Edge or Chrome.</li>
 <li>Pin the Video Download icon to the browser toolbar (puzzle icon → pin).</li>
 </ol>
 <div class="box">For now the extension is loaded by hand, because extension stores don't accept programs like this.
@@ -119,8 +120,9 @@ Radi u Edge-u i Chrome-u.</p>
 <li>Instaliraj program (dodatak dolazi s njim).</li>
 <li>U browseru otvori <code>edge://extensions</code> (Edge) ili <code>chrome://extensions</code> (Chrome).</li>
 <li>Uključi <b>Developer mode</b> (Način za programere) i klikni <b>Load unpacked</b> (Učitaj raspakovano).</li>
-<li>Izaberi folder <code>{html.escape(INSTALL_DIR)}</code>. Tačnu putanju prikazuje i program:
-Pomoć → Preuzimanje iz browsera.</li>
+<li>Izaberi folder <code>{html.escape(INSTALL_DIR)}</code>. Najlakše: u programu otvori
+Pomoć → Preuzimanje iz browsera, klikni <b>Kopiraj putanju foldera</b> i zalijepi je (Ctrl+V) u prozor za izbor foldera.
+U istom prozoru je i dugme koje otvara stranicu dodataka u Edge-u ili Chrome-u.</li>
 <li>Prikvači ikonu Video Download na traku browsera (ikona slagalice → pribadača).</li>
 </ol>
 <div class="box">Dodatak se za sada učitava ručno jer prodavnice dodataka ne primaju ovakve programe.
@@ -313,9 +315,43 @@ def page_licenses(lang: str) -> str:
     return _page(lang, "licenses.html", t["licenses_title"], t["licenses_desc"], body)
 
 
+MOCK_LABELS = {
+    "en": ("Extensions", "Developer mode", "Load unpacked", "Pack extension", "Select folder", "Select Folder",
+           "Help → Downloading from the browser", "Copy the folder path", "Open extensions in Edge",
+           "Firefox version: coming soon, installed without developer mode."),
+    "bs": ("Dodaci", "Developer mode", "Load unpacked", "Pack extension", "Izaberi folder", "Izaberi folder",
+           "Pomoć → Preuzimanje iz browsera", "Kopiraj putanju foldera", "Otvori dodatke u Edge-u",
+           "Verzija za Firefox: uskoro, instalira se bez developer moda."),
+}
+MOCK_FOLDER = r"...\Programs\Video Download\extension"
+
+
+def extension_mock(lang: str) -> str:
+    """Tri male slike koraka (u HTML-u, pa rade u svijetloj i tamnoj temi i na svim jezicima)."""
+    extensions, dev_mode, load, pack, select, select_button, help_menu, copy_path, open_edge, _ = \
+        (html.escape(label) for label in MOCK_LABELS[lang])
+    return f"""<div class="mock-row" aria-hidden="true">
+  <div class="mock"><div class="mock-bar">Video Download — {help_menu}</div>
+    <div class="mock-body"><span class="mock-btn ss-hl">{copy_path}</span>
+      <span class="mock-btn">{open_edge}</span></div></div>
+  <div class="ss-arrow">→</div>
+  <div class="mock"><div class="mock-bar">edge://extensions</div>
+    <div class="mock-body"><b>{extensions}</b>
+      <span class="mock-toggle ss-hl">{dev_mode} <i></i></span></div>
+    <div class="mock-body"><span class="mock-btn ss-hl">{load}</span>
+      <span class="mock-btn">{pack}</span></div></div>
+  <div class="ss-arrow">→</div>
+  <div class="mock"><div class="mock-bar">{select}</div>
+    <div class="mock-body"><span class="mock-field ss-hl">{html.escape(MOCK_FOLDER)}</span></div>
+    <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">{select_button}</span></div></div>
+</div>"""
+
+
 def page_extension(lang: str) -> str:
     t = TEXTS[lang]
-    return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], f"<h1>{t['ext_title']}</h1>\n{t['ext_body']}")
+    body = (f"<h1>{t['ext_title']}</h1>\n{extension_mock(lang)}\n{t['ext_body']}\n"
+            f"<div class=\"box\">{html.escape(MOCK_LABELS[lang][-1])}</div>")
+    return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], body)
 
 
 def news_html(lang: str) -> str:

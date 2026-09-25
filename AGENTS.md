@@ -72,6 +72,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `site/bs/`. `index.html` svakog jezika se piše ručno (isti raspored); ostale stranice pravi
   `tools/build_site.py` (TEXTS po jeziku). Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
+- Firefox dodatak (26.9.2026, „nastaviti ekstenziju"): isti kod iz `extension/`, manifest pravi
+  `python tools/build_firefox.py` (gecko ID `video-download@abnps.github.io`, background.scripts umjesto
+  service_worker, Firefox 128+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`
+  s posebnim manifestom (`allowed_extensions`). Chromium-only opcije (npr. webRequest `extraHeaders`) samo uz
+  provjeru postojanja. Potpis: Ahmed predaje ZIP na addons.mozilla.org kao „On your own" (nelistano) sa
+  svog naloga; potpisan .xpi ide uz izdanje. Firefox nije instaliran na razvojnom računaru.
 - Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se
   skuplja po fajlu, pa svako novo izdanje kreće od nule. Izmjene se skupljaju i izdaju otprilike jednom
   sedmično ili kad je nešto važno; hitne popravke odmah. Popravke za sajtove idu preko ažuriranja

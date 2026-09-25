@@ -29,6 +29,21 @@
 <main class="doc">
 <a class="back" href="index.html">← Home</a>
 <h1>Browser extension</h1>
+<div class="mock-row" aria-hidden="true">
+  <div class="mock"><div class="mock-bar">Video Download — Help → Downloading from the browser</div>
+    <div class="mock-body"><span class="mock-btn ss-hl">Copy the folder path</span>
+      <span class="mock-btn">Open extensions in Edge</span></div></div>
+  <div class="ss-arrow">→</div>
+  <div class="mock"><div class="mock-bar">edge://extensions</div>
+    <div class="mock-body"><b>Extensions</b>
+      <span class="mock-toggle ss-hl">Developer mode <i></i></span></div>
+    <div class="mock-body"><span class="mock-btn ss-hl">Load unpacked</span>
+      <span class="mock-btn">Pack extension</span></div></div>
+  <div class="ss-arrow">→</div>
+  <div class="mock"><div class="mock-bar">Select folder</div>
+    <div class="mock-body"><span class="mock-field ss-hl">...\Programs\Video Download\extension</span></div>
+    <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">Select Folder</span></div></div>
+</div>
 <p class="lead">With the extension you download the video that is playing with one click, or with a right-click
 on a link or video. Works in Edge and Chrome.</p>
 <h2>Installation (once)</h2>
@@ -36,8 +51,9 @@ on a link or video. Works in Edge and Chrome.</p>
 <li>Install the app (the extension comes with it).</li>
 <li>In your browser open <code>edge://extensions</code> (Edge) or <code>chrome://extensions</code> (Chrome).</li>
 <li>Turn on <b>Developer mode</b> and click <b>Load unpacked</b>.</li>
-<li>Choose the folder <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. The app also shows the exact path:
-Help → Downloading from the browser.</li>
+<li>Choose the folder <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. Easiest: in the app open
+Help → Downloading from the browser, click <b>Copy the folder path</b> and paste it (Ctrl+V) into the folder picker.
+The same window has a button that opens the extensions page in Edge or Chrome.</li>
 <li>Pin the Video Download icon to the browser toolbar (puzzle icon → pin).</li>
 </ol>
 <div class="box">For now the extension is loaded by hand, because extension stores don't accept programs like this.
@@ -51,6 +67,7 @@ The browser may therefore remind you about “Developer mode”; that is expecte
 </ul>
 <h2>After updating the app</h2>
 <p>If the extension stops responding, click <b>Reload</b> next to it in <code>edge://extensions</code>.</p>
+<div class="box">Firefox version: coming soon, installed without developer mode.</div>
 </main>
 
 <footer>

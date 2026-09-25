@@ -416,6 +416,98 @@ def filter_history(entries, text: str = "", kind: str = "all") -> list:
     return result
 
 
+SITE_URL = "https://abnps.github.io/video-download/"
+# Stranica dodataka u browseru; otvara se pokretanjem browsera s tom adresom.
+BROWSERS = (("msedge.exe", "edge://extensions", "help.open_edge"),
+            ("chrome.exe", "chrome://extensions", "help.open_chrome"))
+
+
+def browser_exe(name: str) -> str | None:
+    """Putanja browsera iz „App Paths" registra (tako ga nalazi i Windows), ili None."""
+    if sys.platform != "win32":
+        return None
+    import winreg
+
+    for root in (winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE):
+        try:
+            with winreg.OpenKey(root, rf"Software\Microsoft\Windows\CurrentVersion\App Paths\{name}") as key:
+                path = winreg.QueryValue(key, None)
+        except OSError:
+            continue
+        path = path.strip('"')
+        if path and os.path.isfile(path):
+            return path
+    return None
+
+
+class BrowserHelpDialog(QDialog):
+    """Uputstvo za dodatak: koraci + dugmad koja rade teške dijelove (putanja, folder, stranica dodataka)."""
+
+    def __init__(self, folder: str, parent=None, find_browser=browser_exe, launch=subprocess.Popen):
+        super().__init__(parent)
+        self._folder = folder
+        self._launch = launch
+        self.setWindowTitle(tr("menu.browser_help"))
+        self.setMinimumWidth(560)
+        layout = QVBoxLayout(self)
+        text = QLabel(tr("help.browser_text", folder=folder))
+        text.setWordWrap(True)
+        text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addWidget(text)
+
+        row = QHBoxLayout()
+        self.copy_button = QPushButton(tr("help.copy_path"))
+        self.copy_button.clicked.connect(self._copy_path)
+        row.addWidget(self.copy_button)
+        self.folder_button = QPushButton(tr("help.open_folder"))
+        self.folder_button.clicked.connect(lambda: reveal(self._folder))
+        row.addWidget(self.folder_button)
+        row.addStretch(1)
+        layout.addLayout(row)
+
+        browsers = QHBoxLayout()
+        self.browser_buttons = {}
+        for exe, url, key in BROWSERS:
+            path = find_browser(exe)
+            if not path:
+                continue  # browser nije instaliran: bez dugmeta
+            button = QPushButton(tr(key))
+            button.clicked.connect(lambda _checked=False, path=path, url=url: self._open_extensions(path, url))
+            browsers.addWidget(button)
+            self.browser_buttons[exe] = button
+        browsers.addStretch(1)
+        layout.addLayout(browsers)
+
+        self.note = QLabel()
+        self.note.setObjectName("supportNote")
+        layout.addWidget(self.note)
+        bottom = QHBoxLayout()
+        guide = QLabel(f'<a href="guide">{tr("help.guide_online")}</a>')
+        guide.linkActivated.connect(lambda _href: QDesktopServices.openUrl(QUrl(self.guide_url())))
+        bottom.addWidget(guide)
+        bottom.addStretch(1)
+        close_button = QPushButton(tr("history.close"))
+        close_button.clicked.connect(self.accept)
+        bottom.addWidget(close_button)
+        layout.addLayout(bottom)
+
+    @staticmethod
+    def guide_url() -> str:
+        return SITE_URL + ("bs/" if get_language() == "bs" else "") + "extension.html"
+
+    def _copy_path(self) -> None:
+        QApplication.clipboard().setText(self._folder)
+        self.note.setText(tr("help.copied"))
+
+    def _open_extensions(self, exe: str, url: str) -> None:
+        try:
+            self._launch([exe, url])
+            self.note.setText(tr("help.opened"))
+        except OSError:
+            QApplication.clipboard().setText(url)
+            self.note.setText(tr("help.open_failed", url=url))
+
+
 class HistoryDialog(QDialog):
     """Šta je i kada preuzeto; fajl se može otvoriti u folderu i kad je red odavno obrisan."""
 
@@ -1768,7 +1860,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _show_browser_help(self) -> None:
-        QMessageBox.information(self, tr("menu.browser_help"), tr("help.browser_text", folder=str(extension_dir())))
+        BrowserHelpDialog(str(extension_dir()), self).exec()
 
     def _note_error(self, message: str) -> None:
         if message:
