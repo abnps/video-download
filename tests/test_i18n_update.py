@@ -188,7 +188,7 @@ class UpdaterTest(unittest.TestCase):
             release = updater.fetch_latest(opener=self.http_error(404), runner=runner)
             # GitHub i za privatni repo šalje browser_download_url (bez prijave 404): preuzima gh.
             self.assertEqual((release.version, release.tag, release.installer_url), ("9.9.9", "v9.9.9", ""))
-            self.assertEqual(calls[0], ["gh.exe", "api", "repos/npgamy/video-download/releases/latest"])
+            self.assertEqual(calls[0], ["gh.exe", "api", "repos/abnps/video-download/releases/latest"])
 
             with tempfile.TemporaryDirectory() as tmp:
                 target = Path(tmp)

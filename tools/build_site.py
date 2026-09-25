@@ -23,7 +23,7 @@ SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
 LANGUAGE = "bs"
 NEWS_COUNT = 3
-REPO = "https://github.com/npgamy/video-download"
+REPO = "https://github.com/abnps/video-download"
 INSTALLER_URL = f"{REPO}/releases/latest/download/VideoDownload-Setup.exe"
 INSTALL_DIR = r"%LOCALAPPDATA%\Programs\Video Download\extension"
 
@@ -71,7 +71,7 @@ FOOT = """</main>
       <a href="uslovi.html">Uslovi korištenja</a>
       <a href="privatnost.html">Privatnost</a>
       <a href="licence.html">Licence</a>
-      <a href="https://github.com/npgamy/video-download">GitHub</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a>
     </div>
   </div>
 </footer>

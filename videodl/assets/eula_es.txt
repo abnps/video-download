@@ -24,4 +24,4 @@ El autor no responde de los daños derivados del uso o de la imposibilidad de us
 Si incumples este contrato o las Condiciones de uso, la licencia termina y debes eliminar el programa.
 
 8. Contacto
-Preguntas e informes de errores: https://github.com/npgamy/video-download/issues
+Preguntas e informes de errores: https://github.com/abnps/video-download/issues

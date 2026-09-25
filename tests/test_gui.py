@@ -379,7 +379,7 @@ class MainWindowTest(unittest.TestCase):
             return fake_probe(url)
 
         window = self.make_window(self.quick_download, probe_fn=probe)
-        exe = "https://github.com/npgamy/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe"
+        exe = "https://github.com/abnps/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe"
         QApplication.clipboard().setText(exe)
         self.assertTrue(wait_until(lambda: "preskočeno" in window.status_label.text()))
         self.assertEqual(probed, [])  # .exe se ne šalje ni na čitanje
@@ -410,7 +410,7 @@ class MainWindowTest(unittest.TestCase):
         from videodl import store
 
         store.save_queue([
-            QueueItem(1, "https://github.com/npgamy/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe",
+            QueueItem(1, "https://github.com/abnps/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe",
                       "Setup", "best", self.tmp.name),
             QueueItem(2, "https://v/pravi", "Pravi video", "best", self.tmp.name)],
             store.queue_path(Path(self.tmp.name)))

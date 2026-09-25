@@ -16,7 +16,7 @@ from videodl.probe import probe
 from videodl.widgets import display_message
 from videodl.ytdl import NotMediaError, error_message, is_network_error, is_obviously_not_media
 
-GITHUB_EXE = "https://github.com/npgamy/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe"
+GITHUB_EXE = "https://github.com/abnps/video-download/releases/download/v0.7.7/VideoDownload-Setup-0.7.7.exe"
 
 # putanja: (Content-Type, tijelo)
 BINARY = b"\x00\x01binarni sadrzaj" * 64

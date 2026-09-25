@@ -24,4 +24,4 @@ Der Autor haftet nicht für Schäden durch die Nutzung oder Nichtnutzbarkeit des
 Wenn du gegen diesen Vertrag oder die Nutzungsbedingungen verstößt, endet die Lizenz und du musst das Programm entfernen.
 
 8. Kontakt
-Fragen und Fehlermeldungen: https://github.com/npgamy/video-download/issues
+Fragen und Fehlermeldungen: https://github.com/abnps/video-download/issues

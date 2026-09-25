@@ -28,4 +28,4 @@ Pravi se samo kad ga sam sačuvaš. Linkovi su u njemu skraćeni na ime sajta, a
 Istoriju brišeš u Preuzimanja → Istorija preuzimanja → Obriši listu. Deinstalacija uklanja program, vezu sa browserom i preuzeti yt-dlp. Red, istorija i podešavanja ostaju dok ne obrišeš folder %LOCALAPPDATA%\VideoDownload i ključ HKCU\Software\VideoDownload.
 
 8. Kontakt
-Pošto autor ne prikuplja podatke, nema podataka koje bi mogao dati, ispraviti ili obrisati. Pitanja: https://github.com/npgamy/video-download/issues
+Pošto autor ne prikuplja podatke, nema podataka koje bi mogao dati, ispraviti ili obrisati. Pitanja: https://github.com/abnps/video-download/issues

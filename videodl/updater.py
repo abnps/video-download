@@ -27,7 +27,7 @@ from urllib.parse import urlsplit
 
 from . import __version__
 
-RELEASES_REPO = "npgamy/video-download"
+RELEASES_REPO = "abnps/video-download"
 LATEST_URL = f"https://api.github.com/repos/{RELEASES_REPO}/releases/latest"
 # Odgovori koji znače „bez prijave ne može" (privatan repo): tada ima smisla probati gh.
 _NEEDS_LOGIN = (401, 403, 404)

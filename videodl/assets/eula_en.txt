@@ -24,4 +24,4 @@ The author is not liable for damage resulting from the use of, or the inability 
 If you breach this agreement or the Terms of Use, the license ends and you must remove the program.
 
 8. Contact
-Questions and bug reports: https://github.com/npgamy/video-download/issues
+Questions and bug reports: https://github.com/abnps/video-download/issues

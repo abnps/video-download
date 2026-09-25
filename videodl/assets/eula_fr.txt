@@ -24,4 +24,4 @@ L'auteur n'est pas responsable des dommages résultant de l'utilisation ou de l'
 Si tu enfreins ce contrat ou les Conditions d'utilisation, la licence prend fin et tu dois supprimer le programme.
 
 8. Contact
-Questions et signalements d'erreurs : https://github.com/npgamy/video-download/issues
+Questions et signalements d'erreurs : https://github.com/abnps/video-download/issues

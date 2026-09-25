@@ -59,12 +59,15 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Repo je JAVAN (Ahmedova odluka 22.9.2026, mijenja odluku od 17.9.2026): kod i izdanja su
   javno dostupni. Sajt i prodaja i dalje traže novu odluku i pravnu provjeru
   (§95a UrhG, LG Hamburg/Uberspace). Program se ne prilagođava piratskim izvorima ni DRM-u.
-- Zvanični sajt (Ahmedova odluka 25.9.2026: objava na GitHub Pages, `npgamy.github.io/video-download`,
+- Zvanični sajt (Ahmedova odluka 25.9.2026: objava na GitHub Pages, `abnps.github.io/video-download`,
   program ostaje besplatan uz dobrovoljne priloge): folder `site/`, objavljuje ga `.github/workflows/pages.yml`
   pri svakom push-u na `main`. Pravne stranice, „Šta je novo" i verziju pravi `python tools/build_site.py`
   iz istih izvora kao aplikacija (poziva ga i `build_release.py`); `tests/test_site.py` pada ako sajt nije
   ažuran ili ako početna/dodatak sadrže zabranjene izraze (npr. imena platformi). Impressum još nije
   objavljen (čeka Ahmedovu odluku o imenu i adresi).
+- 25.9.2026 Ahmed: repo je prebačen iz naloga `npgamy` u organizaciju `abnps` (nalog `npgamy` ostaje,
+  da GitHub-ovo preusmjeravanje starih linkova za programe v0.9.0 i starije ostane sigurno; u nalogu
+  `npgamy` se NIKAD ne smije napraviti repo `video-download`).
 - Izdanje uz instaler s verzijom nosi i kopiju `VideoDownload-Setup.exe` (link na sajtu vodi na
   `releases/latest/download/VideoDownload-Setup.exe`); ažuriranje u aplikaciji tu kopiju ne koristi.
 - Pravni dokumenti su u `videodl/assets/{eula,terms,privacy}_<jezik>.txt` (UTF-8 sa BOM-om, 5 jezika).
@@ -79,7 +82,7 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   prethodno se prebacuje u nacrt (`gh release edit <tag> --draft=true`), ne briše se.
 - Javna distribucija instalera nosi GPL obavezu za ffmpeg: uz izdanje mora stajati link na
   izvorni kod tog builda (vidi THIRD-PARTY-NOTICES u `tools/build_release.py`).
-- Ažuriranje čita posljednje izdanje repoa `npgamy/video-download` običnim HTTPS-om (od v0.6.2,
+- Ažuriranje čita posljednje izdanje repoa `abnps/video-download` običnim HTTPS-om (od v0.6.2,
   bez GitHub naloga); `gh` prijava je samo rezerva ako GitHub odbije pristup (privatan repo)
   (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz

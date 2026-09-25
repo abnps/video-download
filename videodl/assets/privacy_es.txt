@@ -28,4 +28,4 @@ Solo se crea cuando tú lo guardas. Los enlaces aparecen acortados al nombre del
 El historial se borra en Descargas → Historial de descargas → Borrar la lista. La desinstalación elimina el programa, la conexión con el navegador y el yt-dlp descargado. La cola, el historial y la configuración permanecen hasta que borres la carpeta %LOCALAPPDATA%\VideoDownload y la clave HKCU\Software\VideoDownload.
 
 8. Contacto
-Como el autor no recopila datos, no hay datos que pueda facilitar, corregir o borrar. Preguntas: https://github.com/npgamy/video-download/issues
+Como el autor no recopila datos, no hay datos que pueda facilitar, corregir o borrar. Preguntas: https://github.com/abnps/video-download/issues

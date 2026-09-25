@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.1", "25.9.2026", {
+        "bs": ["Nova adresa projekta: github.com/abnps/video-download i sajt abnps.github.io/video-download."],
+        "en": ["New project address: github.com/abnps/video-download and the website abnps.github.io/video-download."],
+        "de": ["Neue Projektadresse: github.com/abnps/video-download und die Website abnps.github.io/video-download."],
+        "es": ["Nueva dirección del proyecto: github.com/abnps/video-download y el sitio abnps.github.io/video-download."],
+        "fr": ["Nouvelle adresse du projet : github.com/abnps/video-download et le site abnps.github.io/video-download."],
+    }),
     ("0.9.0", "25.9.2026", {
         "bs": ["Tamna tema: Pomoć → Tema (svijetla, tamna ili kao Windows).",
                "Obavještenje u Windowsu kad se sva preuzimanja završe (Preuzimanja → Obavijesti me…).",

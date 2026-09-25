@@ -28,4 +28,4 @@ Er wird nur erstellt, wenn du ihn selbst speicherst. Links darin sind auf den Se
 Den Verlauf löschst du unter Downloads → Download-Verlauf → Liste leeren. Die Deinstallation entfernt das Programm, die Browserverbindung und das geladene yt-dlp. Liste, Verlauf und Einstellungen bleiben, bis du den Ordner %LOCALAPPDATA%\VideoDownload und den Schlüssel HKCU\Software\VideoDownload löschst.
 
 8. Kontakt
-Da der Autor keine Daten erhebt, gibt es keine Daten, die er herausgeben, berichtigen oder löschen könnte. Fragen: https://github.com/npgamy/video-download/issues
+Da der Autor keine Daten erhebt, gibt es keine Daten, die er herausgeben, berichtigen oder löschen könnte. Fragen: https://github.com/abnps/video-download/issues

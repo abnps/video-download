@@ -28,4 +28,4 @@ Il n'est créé que lorsque tu l'enregistres toi-même. Les liens y sont réduit
 L'historique se vide dans Téléchargements → Historique des téléchargements → Vider la liste. La désinstallation supprime le programme, la connexion au navigateur et le yt-dlp téléchargé. La file, l'historique et les réglages restent jusqu'à ce que tu supprimes le dossier %LOCALAPPDATA%\VideoDownload et la clé HKCU\Software\VideoDownload.
 
 8. Contact
-Comme l'auteur ne collecte aucune donnée, il n'a aucune donnée à fournir, corriger ou supprimer. Questions : https://github.com/npgamy/video-download/issues
+Comme l'auteur ne collecte aucune donnée, il n'a aucune donnée à fournir, corriger ou supprimer. Questions : https://github.com/abnps/video-download/issues

@@ -20,7 +20,7 @@ preko linka ili direktno iz browsera (Edge/Chrome). Samo za ličnu upotrebu.
 ## Instalacija (instaler)
 
 Aplikacija je za ličnu upotrebu. Instaler `VideoDownload-Setup-<verzija>.exe` je u
-izdanjima repoa `npgamy/video-download` (GitHub → Releases).
+izdanjima repoa `abnps/video-download` (GitHub → Releases).
 
 - Instaler je na 5 jezika: bosanski, engleski, njemački, španski, francuski.
   Izabrani jezik postaje i jezik aplikacije (mijenja se u **Pomoć → Jezik**).
@@ -34,7 +34,7 @@ izdanjima repoa `npgamy/video-download` (GitHub → Releases).
 
 ## Sajt
 
-Zvanični sajt: https://npgamy.github.io/video-download/ (folder `site/`, objavljuje ga GitHub Actions
+Zvanični sajt: https://abnps.github.io/video-download/ (folder `site/`, objavljuje ga GitHub Actions
 pri svakoj izmjeni). Poslije izmjene changeloga ili pravnih tekstova: `python tools/build_site.py`.
 Lokalni pregled: `python -m http.server 8765 --directory site`.
 
@@ -47,13 +47,13 @@ Lokalni pregled: `python -m http.server 8765 --directory site`.
    Objavi instaler, `.sha256` i kopiju bez verzije (za stalni link na sajtu) kao izdanje:
 
 ```
-gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\VideoDownload-Setup.exe" --repo npgamy/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
 4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
 
 ```
-gh release edit v<prethodna_verzija> --repo npgamy/video-download --draft=true
+gh release edit v<prethodna_verzija> --repo abnps/video-download --draft=true
 ```
 
 ## Podrži projekat

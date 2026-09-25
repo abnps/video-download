@@ -28,4 +28,4 @@ It is created only when you save it yourself. Links in it are shortened to the s
 Clear the history in Downloads → Download history → Clear the list. Uninstalling removes the program, the browser connection and the downloaded yt-dlp. The queue, history and settings remain until you delete the folder %LOCALAPPDATA%\VideoDownload and the key HKCU\Software\VideoDownload.
 
 8. Contact
-As the author collects no data, there is no data they could provide, correct or delete. Questions: https://github.com/npgamy/video-download/issues
+As the author collects no data, there is no data they could provide, correct or delete. Questions: https://github.com/abnps/video-download/issues

@@ -24,4 +24,4 @@ Autor ne odgovara za štetu nastalu korištenjem ili nemogućnošću korištenja
 Ako prekršiš ovaj ugovor ili Uslove korištenja, licenca prestaje i program moraš ukloniti.
 
 8. Kontakt
-Pitanja i prijave grešaka: https://github.com/npgamy/video-download/issues
+Pitanja i prijave grešaka: https://github.com/abnps/video-download/issues
