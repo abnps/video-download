@@ -77,7 +77,10 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   service_worker, Firefox 128+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`
   s posebnim manifestom (`allowed_extensions`). Chromium-only opcije (npr. webRequest `extraHeaders`) samo uz
   provjeru postojanja. Potpis: Ahmed predaje ZIP na addons.mozilla.org kao „On your own" (nelistano) sa
-  svog naloga; potpisan .xpi ide uz izdanje. Firefox nije instaliran na razvojnom računaru.
+  svog naloga. Potpisan .xpi ide u `site/firefox/`, a unos (verzija, link, sha256) u
+  `site/firefox/updates.json` i `FIREFOX_XPI` u `tools/build_site.py`; test provjerava da se slažu.
+  Nova verzija dodatka = veći `version` u `extension/manifest.json` (AMO ne prima isti broj dvaput).
+  Firefox nije instaliran na razvojnom računaru.
 - Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se
   skuplja po fajlu, pa svako novo izdanje kreće od nule. Izmjene se skupljaju i izdaju otprilike jednom
   sedmično ili kad je nešto važno; hitne popravke odmah. Popravke za sajtove idu preko ažuriranja

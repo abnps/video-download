@@ -41,6 +41,19 @@ class FirefoxPackageTest(unittest.TestCase):
         self.assertIn(FIREFOX_EXTENSION_ID, updates["addons"])
         self.assertIn("nativeMessaging", m["permissions"])
 
+    def test_signed_xpi_on_the_site_matches_updates_json(self):
+        import hashlib
+        import build_site
+
+        updates = json.loads((ROOT / "site" / "firefox" / "updates.json").read_text(encoding="utf-8"))
+        entry = updates["addons"][FIREFOX_EXTENSION_ID]["updates"][-1]
+        xpi = ROOT / "site" / build_site.FIREFOX_XPI
+        self.assertTrue(entry["update_link"].endswith(build_site.FIREFOX_XPI))
+        self.assertEqual(entry["update_hash"], "sha256:" + hashlib.sha256(xpi.read_bytes()).hexdigest())
+        with zipfile.ZipFile(xpi) as archive:
+            self.assertIn("META-INF/mozilla.rsa", archive.namelist())  # potpis Mozille
+            self.assertEqual(json.loads(archive.read("manifest.json"))["version"], entry["version"])
+
     def test_every_file_the_manifest_needs_is_packed(self):
         m = self.manifest
         needed = {"background.js", m["action"]["default_popup"], *m["icons"].values(),

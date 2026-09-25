@@ -1,7 +1,13 @@
 {
   "addons": {
     "video-download@abnps.github.io": {
-      "updates": []
+      "updates": [
+        {
+          "version": "0.5.2",
+          "update_link": "https://abnps.github.io/video-download/firefox/video-download-0.5.2.xpi",
+          "update_hash": "sha256:4f2c46ce1cdf78881643027ba8b26415002061eb73340c8be85ecc734b9cc014"
+        }
+      ]
     }
   }
 }

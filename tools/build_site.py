@@ -63,7 +63,7 @@ TEXTS = {
         "ext_title": "Browser extension",
         "ext_desc": "How to install the Video Download extension for Edge and Chrome.",
         "ext_body": f"""<p class="lead">With the extension you download the video that is playing with one click, or with a right-click
-on a link or video. Works in Edge and Chrome.</p>
+on a link or video. Works in Firefox, Edge and Chrome.</p>
 <h2>Installation (once)</h2>
 <ol>
 <li>Install the app (the extension comes with it).</li>
@@ -114,7 +114,7 @@ The browser may therefore remind you about “Developer mode”; that is expecte
         "ext_title": "Dodatak za browser",
         "ext_desc": "Kako instalirati dodatak Video Download za Edge i Chrome.",
         "ext_body": f"""<p class="lead">Sa dodatkom preuzimaš video koji se upravo pušta, jednim klikom ili desnim klikom na link ili video.
-Radi u Edge-u i Chrome-u.</p>
+Radi u Firefoxu, Edge-u i Chrome-u.</p>
 <h2>Instalacija (jednom)</h2>
 <ol>
 <li>Instaliraj program (dodatak dolazi s njim).</li>
@@ -318,10 +318,10 @@ def page_licenses(lang: str) -> str:
 MOCK_LABELS = {
     "en": ("Extensions", "Developer mode", "Load unpacked", "Pack extension", "Select folder", "Select Folder",
            "Help → Downloading from the browser", "Copy the folder path", "Open extensions in Edge",
-           "Firefox version: coming soon, installed without developer mode."),
+           ""),
     "bs": ("Dodaci", "Developer mode", "Load unpacked", "Pack extension", "Izaberi folder", "Izaberi folder",
            "Pomoć → Preuzimanje iz browsera", "Kopiraj putanju foldera", "Otvori dodatke u Edge-u",
-           "Verzija za Firefox: uskoro, instalira se bez developer moda."),
+           ""),
 }
 MOCK_FOLDER = r"...\Programs\Video Download\extension"
 
@@ -347,10 +347,41 @@ def extension_mock(lang: str) -> str:
 </div>"""
 
 
+# Potpisan Firefox dodatak (Mozilla, nelistan) leži na sajtu; site/firefox/updates.json vodi na isti fajl.
+FIREFOX_XPI = "firefox/video-download-0.5.2.xpi"
+FIREFOX_TEXT = {
+    "en": ("Firefox", "Install in Firefox — no developer mode needed. The extension is signed by Mozilla and "
+           "updates itself.", "Add to Firefox",
+           ("Install the app first (the extension talks to it).",
+            "Open this page in Firefox 140 or newer and click <b>Add to Firefox</b>.",
+            "Firefox asks to allow the installation from this site: click <b>Continue to installation</b>, then <b>Add</b>.",
+            "Pin the Video Download icon (puzzle icon → pin).")),
+    "bs": ("Firefox", "Instalacija u Firefoxu — bez developer moda. Dodatak je potpisala Mozilla i sam se ažurira.",
+           "Dodaj u Firefox",
+           ("Prvo instaliraj program (dodatak radi s njim).",
+            "Otvori ovu stranicu u Firefoxu 140 ili novijem i klikni <b>Dodaj u Firefox</b>.",
+            "Firefox pita da dozvoliš instalaciju s ovog sajta: klikni <b>Continue to installation</b>, pa <b>Add</b>.",
+            "Prikvači ikonu Video Download (ikona slagalice → pribadača).")),
+}
+
+
+def firefox_section(lang: str) -> str:
+    title, lead, button, steps = FIREFOX_TEXT[lang]
+    items = "\n".join(f"<li>{step}</li>" for step in steps)
+    return f"""<div class="box">
+<h2 style="margin-top:0">{title}</h2>
+<p>{html.escape(lead)}</p>
+<p><a class="btn" href="{_up(lang)}{FIREFOX_XPI}">{html.escape(button)}</a></p>
+<ol>
+{items}
+</ol>
+</div>
+<h2>Edge / Chrome</h2>"""
+
+
 def page_extension(lang: str) -> str:
     t = TEXTS[lang]
-    body = (f"<h1>{t['ext_title']}</h1>\n{extension_mock(lang)}\n{t['ext_body']}\n"
-            f"<div class=\"box\">{html.escape(MOCK_LABELS[lang][-1])}</div>")
+    body = f"<h1>{t['ext_title']}</h1>\n{firefox_section(lang)}\n{extension_mock(lang)}\n{t['ext_body']}"
     return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], body)
 
 
