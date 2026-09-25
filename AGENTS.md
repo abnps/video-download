@@ -80,7 +80,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   svog naloga. Potpisan .xpi ide u `site/firefox/`, a unos (verzija, link, sha256) u
   `site/firefox/updates.json` i `FIREFOX_XPI` u `tools/build_site.py`; test provjerava da se slažu.
   Nova verzija dodatka = veći `version` u `extension/manifest.json` (AMO ne prima isti broj dvaput).
-  Firefox nije instaliran na razvojnom računaru.
+  Firefox nije instaliran na razvojnom računaru; provjereno 26.9.2026 raspakovanim Firefoxom 156 (Marionette,
+  `-remote-allow-system-access`): dodatak aktivan i potpisan, popup preko native messaging-a javlja „aplikacija radi".
 - Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se
   skuplja po fajlu, pa svako novo izdanje kreće od nule. Izmjene se skupljaju i izdaju otprilike jednom
   sedmično ili kad je nešto važno; hitne popravke odmah. Popravke za sajtove idu preko ažuriranja
