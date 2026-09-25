@@ -18,9 +18,11 @@ sys.path.insert(0, str(ROOT))
 from videodl.native_messaging import FIREFOX_EXTENSION_ID  # noqa: E402
 
 EXTENSION = ROOT / "extension"
-# world: "MAIN" za content skripte i scripting.executeScript postoji od Firefoxa 128.
-FIREFOX_MIN_VERSION = "128.0"
+# world: "MAIN" postoji od Firefoxa 128, a data_collection_permissions od 140 (Android 142); 140 je i ESR.
+FIREFOX_MIN_VERSION = "140.0"
+FIREFOX_ANDROID_MIN_VERSION = "142.0"
 SKIP = {"manifest.json", "package.json"}  # package.json služi samo za Node testove
+UPDATE_URL = "https://abnps.github.io/video-download/firefox/updates.json"
 
 
 def firefox_manifest(chrome: dict) -> dict:
@@ -32,9 +34,11 @@ def firefox_manifest(chrome: dict) -> dict:
     manifest["browser_specific_settings"] = {"gecko": {
         "id": FIREFOX_EXTENSION_ID,
         "strict_min_version": FIREFOX_MIN_VERSION,
+        # Nelistan dodatak: Firefox nove verzije traži ovdje (site/firefox/updates.json na GitHub Pages).
+        "update_url": UPDATE_URL,
         # Dodatak ništa ne šalje autoru: linkovi idu samo programu na istom računaru.
         "data_collection_permissions": {"required": ["none"]},
-    }}
+    }, "gecko_android": {"strict_min_version": FIREFOX_ANDROID_MIN_VERSION}}
     return manifest
 
 

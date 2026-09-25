@@ -35,6 +35,10 @@ class FirefoxPackageTest(unittest.TestCase):
         gecko = m["browser_specific_settings"]["gecko"]
         self.assertEqual(gecko["id"], FIREFOX_EXTENSION_ID)  # mora se poklapati s allowed_extensions hosta
         self.assertEqual(gecko["data_collection_permissions"], {"required": ["none"]})
+        # Nove verzije nelistanog dodatka Firefox traži na našem sajtu; fajl mora postojati u site/.
+        self.assertEqual(gecko["update_url"], "https://abnps.github.io/video-download/firefox/updates.json")
+        updates = json.loads((ROOT / "site" / "firefox" / "updates.json").read_text(encoding="utf-8"))
+        self.assertIn(FIREFOX_EXTENSION_ID, updates["addons"])
         self.assertIn("nativeMessaging", m["permissions"])
 
     def test_every_file_the_manifest_needs_is_packed(self):
