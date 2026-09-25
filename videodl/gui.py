@@ -31,7 +31,7 @@ from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, download
-from .i18n import LANGUAGES, MESSAGE_EXISTS, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
+from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
@@ -71,7 +71,7 @@ def format_speed(bytes_per_second: float) -> str:
     value = bytes_per_second / 1024
     for unit in ("KB/s", "MB/s", "GB/s"):
         if value < 1024 or unit == "GB/s":
-            return f"{value:.1f} {unit}".replace(".", ",")
+            return decimal(f"{value:.1f} {unit}")
         value /= 1024
     raise AssertionError("nedostižno")
 

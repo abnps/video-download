@@ -75,6 +75,12 @@ class FormattingTest(unittest.TestCase):
         self.assertEqual(format_duration(3725), "1:02:05")
         self.assertEqual(format_duration(None), "")
         self.assertEqual(format_size(int(23.8 * 1024 * 1024)), "23,8 MB")
+        set_language("en")
+        try:
+            self.assertEqual((format_speed(3.2 * 1024 * 1024), format_size(int(23.8 * 1024 * 1024))),
+                             ("3.2 MB/s", "23.8 MB"))
+        finally:
+            set_language("bs")
 
     def test_extract_urls_from_mixed_text(self):
         text = "Pogledaj https://youtu.be/abc, i (https://vimeo.com/1). Isto: https://youtu.be/abc\nnije-link"
@@ -472,7 +478,7 @@ class MainWindowTest(unittest.TestCase):
         extra = self.extras[0]
         self.assertEqual(extra["section"], (150.0, 370.0))
         self.assertTrue(extra["subtitles"] and extra["thumbnail"])
-        self.assertEqual(extra["subtitle_langs"][0], "bs.*")
+        self.assertEqual(extra["subtitle_langs"][0], "bs")
         self.assertEqual(extra["ratelimit"], 2 * 1024 * 1024)  # jedno preuzimanje dobija cijeli limit
         self.assertTrue(window.subtitles_action.isChecked())
 

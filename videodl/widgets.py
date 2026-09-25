@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from . import theme
-from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, tr
+from .i18n import MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, decimal, tr
 from .icons import icon
 from .jobs import ItemStatus, QueueItem
 from .presets import format_section, get_preset
@@ -35,7 +35,7 @@ def format_size(size: int | None) -> str:
     value = float(size)
     for unit in ("B", "KB", "MB", "GB"):
         if value < 1024 or unit == "GB":
-            return (f"{value:.0f} {unit}" if unit in ("B", "KB") else f"{value:.1f} {unit}").replace(".", ",")
+            return decimal(f"{value:.0f} {unit}" if unit in ("B", "KB") else f"{value:.1f} {unit}")
         value /= 1024
     raise AssertionError("nedostižno")
 
@@ -48,6 +48,8 @@ def display_message(message: str) -> str:
         return tr("error.live")
     if message == MESSAGE_NOT_MEDIA:
         return tr("error.not_media")
+    if message == MESSAGE_NO_SUBS:
+        return tr("row.no_subs")
     if message == MESSAGE_RETRY:
         return tr("row.retrying")
     if message == MESSAGE_EXISTS:
@@ -463,6 +465,8 @@ class QueueRow(QFrame):
             text = tr("row.exists") if item.message == MESSAGE_EXISTS else tr("row.done")
             if size:
                 text += f" · {format_size(size)}"
+            if item.message == MESSAGE_NO_SUBS:
+                text += f" · {tr('row.no_subs')}"
             state = "done"
             if item.convert_state == "running":
                 text, state = tr("row.converting"), "muted"

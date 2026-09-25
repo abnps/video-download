@@ -10,8 +10,14 @@ MESSAGE_DRM = "@drm"
 MESSAGE_LIVE = "@live"
 MESSAGE_RETRY = "@retry"
 MESSAGE_NOT_MEDIA = "@not_media"
+MESSAGE_NO_SUBS = "@no_subs"  # gotovo, ali video nema titlove (ili ih sajt nije dao)
 
 _current = FALLBACK
+
+
+def decimal(text: str) -> str:
+    """Decimalni zarez za bs/de/es/fr, tačka za engleski (npr. „8,4 MB/s" / „8.4 MB/s")."""
+    return text if _current == "en" else text.replace(".", ",")
 
 # ključ: (bs, en, de, es, fr)
 TEXTS: dict[str, tuple[str, str, str, str, str]] = {
@@ -396,6 +402,9 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                          "Nada coincide con la búsqueda.", "Rien ne correspond à la recherche."),
     "history.count": ("Prikazano {shown} od {total}", "Showing {shown} of {total}", "{shown} von {total} angezeigt",
                       "Mostrando {shown} de {total}", "{shown} affichés sur {total}"),
+    "row.no_subs": ("bez titlova (video ih nema)", "no subtitles (the video has none)",
+                    "ohne Untertitel (das Video hat keine)", "sin subtítulos (el vídeo no tiene)",
+                    "sans sous-titres (la vidéo n'en a pas)"),
     "error.not_media": ("Link ne vodi na video ni audio (npr. program, arhiva, dokument ili obična stranica).",
                         "The link doesn't lead to a video or audio (e.g. a program, archive, document or plain page).",
                         "Der Link führt zu keinem Video oder Audio (z. B. Programm, Archiv, Dokument oder normale Seite).",

@@ -12,7 +12,9 @@ from pathlib import Path
 from videodl import native_host
 from videodl.bridge import BridgeServer
 from videodl.browser import cookie_file, parse_browser_request
-from videodl.native_messaging import EXTENSION_ID, PROJECT_ROOT, REGISTRY_PATHS, install_native_host
+from videodl.native_messaging import (
+    EXTENSION_ID, FIREFOX_EXTENSION_ID, FIREFOX_REGISTRY_PATHS, PROJECT_ROOT, REGISTRY_PATHS, install_native_host,
+)
 
 
 class ParseBrowserRequestTest(unittest.TestCase):
@@ -224,6 +226,7 @@ class NativeMessagingInstallTest(unittest.TestCase):
                 set_registry=lambda keys, value: written.update(dict.fromkeys(keys, value)))
 
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            firefox = json.loads(Path(written[FIREFOX_REGISTRY_PATHS[0]]).read_text(encoding="utf-8"))
             script = (folder / "host.bat").read_bytes()
             config = json.loads((folder / "host-config.json").read_text(encoding="utf-8"))
             host_copied = (folder / "host.py").read_text(encoding="utf-8") == \
@@ -236,8 +239,13 @@ class NativeMessagingInstallTest(unittest.TestCase):
         self.assertIn(b'"C:\\Python314\\python.exe" "%~dp0host.py"', script)
         self.assertEqual(config["launch"][1], r"C:\Прилози\pokreni.pyw")
         self.assertTrue(host_copied)
-        self.assertEqual(set(written), set(REGISTRY_PATHS))
-        self.assertTrue(all(value == str(manifest_path) for value in written.values()))
+        self.assertEqual(set(written), set(REGISTRY_PATHS) | set(FIREFOX_REGISTRY_PATHS))
+        self.assertTrue(all(written[key] == str(manifest_path) for key in REGISTRY_PATHS))
+        # Firefox ima svoj manifest: isti host, ali dozvoljava samo naš Firefox dodatak.
+        self.assertTrue(written[FIREFOX_REGISTRY_PATHS[0]].endswith(".firefox.json"))
+        self.assertEqual(firefox["allowed_extensions"], [FIREFOX_EXTENSION_ID])
+        self.assertEqual(firefox["path"], manifest["path"])
+        self.assertNotIn("allowed_origins", firefox)
 
 
 

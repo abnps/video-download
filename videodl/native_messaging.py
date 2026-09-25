@@ -1,4 +1,4 @@
-"""Registracija native messaging hosta za Chrome i Edge, samo za trenutnog korisnika (HKCU).
+"""Registracija native messaging hosta za Chrome, Edge i Firefox, samo za trenutnog korisnika (HKCU).
 
 Uklanjanje: python -m videodl.native_messaging --uninstall
 """
@@ -18,6 +18,9 @@ REGISTRY_PATHS = (
     rf"Software\Google\Chrome\NativeMessagingHosts\{native_host.HOST_NAME}",
     rf"Software\Microsoft\Edge\NativeMessagingHosts\{native_host.HOST_NAME}",
 )
+# Firefox: isti host, ali svoj manifest (allowed_extensions umjesto allowed_origins) i svoj ključ.
+FIREFOX_EXTENSION_ID = "video-download@abnps.github.io"
+FIREFOX_REGISTRY_PATHS = (rf"Software\Mozilla\NativeMessagingHosts\{native_host.HOST_NAME}",)
 
 
 def default_install_dir() -> Path:
@@ -47,23 +50,24 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
         script = install_dir / "host.bat"
         script.write_bytes(f'@echo off\r\n"{_ascii_path(python_exe)}" "%~dp0host.py" %*\r\n'.encode("ascii"))
 
+    common = {"name": native_host.HOST_NAME, "description": "Video Download", "path": str(script), "type": "stdio"}
     manifest = install_dir / f"{native_host.HOST_NAME}.json"
-    manifest.write_text(json.dumps({
-        "name": native_host.HOST_NAME,
-        "description": "Video Download",
-        "path": str(script),
-        "type": "stdio",
-        "allowed_origins": [f"chrome-extension://{EXTENSION_ID}/"],
-    }, indent=2), encoding="utf-8")
+    manifest.write_text(json.dumps({**common, "allowed_origins": [f"chrome-extension://{EXTENSION_ID}/"]},
+                                   indent=2), encoding="utf-8")
+    firefox = install_dir / f"{native_host.HOST_NAME}.firefox.json"
+    firefox.write_text(json.dumps({**common, "allowed_extensions": [FIREFOX_EXTENSION_ID]}, indent=2),
+                       encoding="utf-8")
 
-    (set_registry or _set_registry_default)(REGISTRY_PATHS, str(manifest))
+    register = set_registry or _set_registry_default
+    register(REGISTRY_PATHS, str(manifest))
+    register(FIREFOX_REGISTRY_PATHS, str(firefox))
     return manifest
 
 
 def uninstall_native_host(install_dir: Path | None = None) -> None:
     import winreg
 
-    for subkey in REGISTRY_PATHS:
+    for subkey in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS:
         try:
             winreg.DeleteKey(winreg.HKEY_CURRENT_USER, subkey)
         except FileNotFoundError:

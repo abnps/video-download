@@ -14,7 +14,9 @@ from unittest import mock
 from videodl import probe as probe_module
 from videodl.download import download
 from videodl.jobs import ItemStatus
-from videodl.presets import build_ydl_options, format_section, get_preset, parse_section, subtitle_languages
+from videodl.presets import (
+    build_ydl_options, format_section, get_preset, parse_section, pick_subtitles, subtitle_languages,
+)
 
 
 class SectionTextTest(unittest.TestCase):
@@ -44,11 +46,16 @@ class OptionsTest(unittest.TestCase):
         self.assertNotIn("download_ranges", build_ydl_options(get_preset("best"), r"C:\v"))
 
     def test_subtitles_only_for_video_and_thumbnail_after_audio(self):
-        video = build_ydl_options(get_preset("best"), r"C:\v", subtitles=True, subtitle_langs=["bs.*", "en.*"],
+        video = build_ydl_options(get_preset("best"), r"C:\v", subtitles=True, subtitle_langs=["bs", "en"],
                                   thumbnail=True)
         self.assertEqual([pp["key"] for pp in video["postprocessors"]],
-                         ["FFmpegThumbnailsConvertor", "FFmpegEmbedSubtitle", "EmbedThumbnail"])
-        self.assertEqual(video["subtitleslangs"], ["bs.*", "en.*"])
+                         ["FFmpegThumbnailsConvertor", "FFmpegSubtitlesConvertor", "FFmpegEmbedSubtitle",
+                          "EmbedThumbnail"])
+        self.assertEqual(video["subtitleslangs"], ["bs", "en"])
+        # Ručni i automatski titlovi; .srt ostaje pored videa (mnogi playeri ne prikazuju ugrađeni).
+        self.assertTrue(video["writesubtitles"] and video["writeautomaticsub"])
+        embed = next(pp for pp in video["postprocessors"] if pp["key"] == "FFmpegEmbedSubtitle")
+        self.assertTrue(embed["already_have_subtitle"])
         self.assertTrue(video["writethumbnail"])
 
         audio = build_ydl_options(get_preset("mp3"), r"C:\v", subtitles=True, thumbnail=True)
@@ -63,9 +70,19 @@ class OptionsTest(unittest.TestCase):
             self.assertNotIn(key, plain)
 
     def test_subtitle_languages_follow_app_language(self):
-        self.assertEqual(subtitle_languages("bs"), ["bs.*", "hr.*", "sr.*", "en.*"])
-        self.assertEqual(subtitle_languages("de"), ["de.*", "en.*"])
-        self.assertEqual(subtitle_languages("en"), ["en.*"])
+        self.assertEqual(subtitle_languages("bs"), ["bs", "hr", "sr", "en"])
+        self.assertEqual(subtitle_languages("de"), ["de", "en"])
+        self.assertEqual(subtitle_languages("en"), ["en"])
+
+    def test_pick_one_subtitle_per_language_manual_first(self):
+        info = {"subtitles": {"de": [], "en-GB": [], "hr": [], "live_chat": []},
+                "automatic_captions": {"bs": [], "en": [], "en-orig": [], "sr": []}}
+        self.assertEqual(pick_subtitles(info, ["bs", "hr", "sr", "en"]), ["hr", "en-GB"])  # ručni hr prije auto bs
+        self.assertEqual(pick_subtitles(info, ["de", "en"]), ["de", "en-GB"])
+        only_auto = {"automatic_captions": {"bs": [], "en": [], "en-orig": [], "fr": []}}
+        self.assertEqual(pick_subtitles(only_auto, ["bs", "hr", "sr", "en"]), ["bs", "en"])
+        self.assertEqual(pick_subtitles({"automatic_captions": {"en-orig": []}}, ["en"]), ["en-orig"])
+        self.assertEqual(pick_subtitles({}, ["bs", "hr", "sr", "en"]), [])
 
 
 class WholePlaylistTest(unittest.TestCase):

@@ -60,7 +60,8 @@ chrome.webRequest.onSendHeaders.addListener(
     if (referers.size > MAX_TRACKED_REFERERS) referers.delete(referers.keys().next().value);
   },
   { urls: ["<all_urls>"], types: WATCHED_TYPES },
-  ["requestHeaders", "extraHeaders"],
+  // "extraHeaders" (Referer u Chrome/Edge) postoji samo u Chromiumu; Firefox bi s njim odbio cijeli listener.
+  chrome.webRequest.OnSendHeadersOptions?.EXTRA_HEADERS ? ["requestHeaders", "extraHeaders"] : ["requestHeaders"],
 );
 
 chrome.webRequest.onHeadersReceived.addListener(

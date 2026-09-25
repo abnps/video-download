@@ -94,9 +94,31 @@ def format_section(section: tuple[float, float] | None) -> str:
 
 
 def subtitle_languages(language: str) -> list[str]:
-    """Titlovi na jeziku aplikacije i engleski; za bs i srodni jezici (hr, sr)."""
+    """Jezici titlova po redu želje: jezik aplikacije (za bs i srodni hr, sr), pa engleski."""
     wanted = ["bs", "hr", "sr"] if language == "bs" else [language]
-    return [f"{code}.*" for code in wanted if code != "en"] + ["en.*"]
+    return [code for code in wanted if code != "en"] + ["en"]
+
+
+def pick_subtitles(info: dict, wanted: list[str]) -> list[str]:
+    """Najviše dva titla: prvi dostupan na jeziku aplikacije (ili srodnom) i engleski.
+
+    Ručno napravljeni imaju prednost; kad ih nema, uzimaju se automatski (YouTube ih ima za skoro
+    svaki video, i prevedene). Ključevi su tačno onakvi kakve sajt nudi (npr. "en-GB")."""
+    manual = [key for key in (info.get("subtitles") or {}) if key != "live_chat"]
+    auto = [key for key in (info.get("automatic_captions") or {}) if not key.endswith("-orig")]
+    auto += [key for key in (info.get("automatic_captions") or {}) if key.endswith("-orig")]  # zadnja opcija
+
+    def first(codes: list[str]) -> str | None:
+        for keys in (manual, auto):
+            for code in codes:
+                for key in keys:
+                    if key == code or key.startswith(code + "-"):
+                        return key
+        return None
+
+    own = [code for code in wanted if code != "en"]
+    chosen = [first(own) if own else None, first(["en"]) if "en" in wanted else None]
+    return [key for key in chosen if key]
 
 
 def _seconds(text: str) -> float:
@@ -153,10 +175,15 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo.
         opts["final_ext"] = preset.audio_codec
     elif subtitles:
-        # Titlovi se ugrađuju u MP4 (može ih uključiti svaki player); samo ručno napravljeni.
+        # Titl ide i u MP4 i kao .srt pored videa: mnogi playeri (Windows Media Player, TV, telefon)
+        # ugrađeni titl ne prikazuju sami, a .srt istog imena učitaju odmah. Ručni imaju prednost,
+        # a automatski se uzimaju kad ručnih nema; tačne jezike bira download.pick_subtitles.
         opts["writesubtitles"] = True
-        opts["subtitleslangs"] = list(subtitle_langs or ["en.*"])
-        postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": False})
+        opts["writeautomaticsub"] = True
+        opts["subtitleslangs"] = list(subtitle_langs or ["en"])
+        opts["subtitlesformat"] = "srt/vtt/best"
+        postprocessors.append({"key": "FFmpegSubtitlesConvertor", "format": "srt", "when": "before_dl"})
+        postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": True})
     if thumbnail:
         postprocessors.append({"key": "EmbedThumbnail", "already_have_thumbnail": False})
     if postprocessors:

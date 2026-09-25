@@ -8,6 +8,23 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.2", "26.9.2026", {
+        "bs": ["Titlovi: kad video nema ručne titlove, uzimaju se automatski; titl se čuva i kao .srt pored videa (s istim imenom, pa ga playeri sami učitaju), a ne samo u MP4.",
+               "Ako titl ne može da se preuzme, video se ipak preuzme, uz napomenu „bez titlova“.",
+               "Na engleskom se brojevi pišu s tačkom (8.4 MB/s)."],
+        "en": ["Subtitles: when a video has no manual subtitles, automatic ones are used; the subtitle is also saved as an .srt next to the video (same name, so players load it on their own), not only inside the MP4.",
+               "If a subtitle can't be downloaded, the video is still downloaded, marked “no subtitles”.",
+               "In English, numbers use a decimal point (8.4 MB/s)."],
+        "de": ["Untertitel: Hat ein Video keine manuellen Untertitel, werden automatische verwendet; der Untertitel wird auch als .srt neben dem Video gespeichert (gleicher Name, damit Player ihn selbst laden), nicht nur im MP4.",
+               "Kann ein Untertitel nicht geladen werden, wird das Video trotzdem heruntergeladen, mit dem Hinweis „ohne Untertitel“.",
+               "Im Englischen werden Zahlen mit Punkt geschrieben (8.4 MB/s)."],
+        "es": ["Subtítulos: si un vídeo no tiene subtítulos manuales, se usan los automáticos; el subtítulo también se guarda como .srt junto al vídeo (mismo nombre, para que los reproductores lo carguen solos), no solo dentro del MP4.",
+               "Si un subtítulo no se puede descargar, el vídeo se descarga igualmente, con la nota «sin subtítulos».",
+               "En inglés, los números usan punto decimal (8.4 MB/s)."],
+        "fr": ["Sous-titres : si une vidéo n'a pas de sous-titres manuels, les automatiques sont utilisés ; le sous-titre est aussi enregistré en .srt à côté de la vidéo (même nom, pour que les lecteurs le chargent seuls), pas seulement dans le MP4.",
+               "Si un sous-titre ne peut pas être téléchargé, la vidéo est quand même téléchargée, avec la mention « sans sous-titres ».",
+               "En anglais, les nombres utilisent un point décimal (8.4 MB/s)."],
+    }),
     ("0.9.1", "25.9.2026", {
         "bs": ["Nova adresa projekta: github.com/abnps/video-download i sajt abnps.github.io/video-download."],
         "en": ["New project address: github.com/abnps/video-download and the website abnps.github.io/video-download."],

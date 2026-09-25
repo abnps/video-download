@@ -13,10 +13,12 @@ from yt_dlp.utils import DownloadCancelled
 
 from .browser import Cookie, cookie_file
 from .jobs import ItemStatus
-from .presets import Preset, build_ydl_options
+from .presets import Preset, build_ydl_options, pick_subtitles
+from .i18n import MESSAGE_NO_SUBS
 from .ytdl import YdlLogger, error_message
 
 DOWNLOADING = "downloading"
+SUBTITLE_ERROR = "Unable to download video subtitles"
 PROCESSING = "processing"
 
 # Duži ffmpeg koraci; prije njihovog početka prekid još ne ostavlja polovičan izlaz.
@@ -170,6 +172,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         return DownloadResult(ItemStatus.CANCELLED)
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
+    no_subtitles = False
     try:
         # Kolačići prijave postoje na disku samo dok radi ovo jedno preuzimanje.
         with cookie_file(cookies) as cookiefile:
@@ -181,7 +184,18 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
             with YoutubeDL(opts) as ydl:
                 ydl.add_post_processor(_PartsRecorderPP(attempt.record_parts), when="before_dl")
-                info = ydl.extract_info(url, download=True)
+                if subtitles and not preset.is_audio:
+                    # Prvo se pročita koje titlove video ima, pa se uzme najviše jedan po jeziku
+                    # (inače bi automatski prevodi dali po titl za svaki traženi jezik).
+                    info = ydl.extract_info(url, download=False)
+                    chosen = pick_subtitles(info, subtitle_langs or ["en"])
+                    ydl.params["subtitleslangs"] = chosen
+                    if not chosen:
+                        ydl.params["writesubtitles"] = ydl.params["writeautomaticsub"] = False
+                        no_subtitles = True
+                    info = ydl.process_ie_result(info, download=True)
+                else:
+                    info = ydl.extract_info(url, download=True)
     except DownloadCancelled:
         attempt.cleanup()
         return DownloadResult(ItemStatus.CANCELLED)
@@ -190,10 +204,35 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         # yt-dlp ponekad umota prekid u DownloadError; bitno je šta je korisnik tražio.
         if cancel_event.is_set():
             return DownloadResult(ItemStatus.CANCELLED)
+        if subtitles and SUBTITLE_ERROR in str(exc):
+            # yt-dlp zbog neuspjelog titla (npr. HTTP 429) prekida cijelo preuzimanje; video je važniji.
+            result = download(url, preset, output_dir, subfolder, on_progress, cancel_event,
+                              http_headers=http_headers, filename_title=filename_title, cookies=cookies,
+                              section=section, subtitles=False, thumbnail=thumbnail, ratelimit=ratelimit,
+                              name_template=name_template)
+            if result.status == ItemStatus.DONE:
+                return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed)
+            return result
         return DownloadResult(ItemStatus.FAILED, message=error_message(exc))
 
-    return DownloadResult(ItemStatus.DONE, _final_path(info),
+    filepath = _final_path(info)
+    if subtitles and not no_subtitles and filepath:
+        _plain_name_for_first_subtitle(filepath, (info or {}).get("requested_subtitles") or {})
+    return DownloadResult(ItemStatus.DONE, filepath, MESSAGE_NO_SUBS if no_subtitles else "",
                           already_existed=not attempt.real_download)
+
+
+def _plain_name_for_first_subtitle(video: str, requested: dict) -> None:
+    """„Naslov [id].hr.srt" → „Naslov [id].srt": Windows playeri učitaju samo titl s istim imenom kao video.
+    Drugi titl (engleski) zadržava oznaku jezika."""
+    base = os.path.splitext(video)[0]
+    plain = base + ".srt"
+    if not requested or os.path.exists(plain):
+        return
+    first = next(iter(requested))
+    candidate = f"{base}.{first}.srt"
+    if os.path.isfile(candidate):
+        os.replace(candidate, plain)
 
 
 def _final_path(info: dict | None) -> str | None:
