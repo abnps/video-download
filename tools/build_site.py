@@ -23,6 +23,7 @@ SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
 NEWS_COUNT = 3
 REPO = "https://github.com/abnps/video-download"
+CONTACT_EMAIL = "abnpsdev@gmail.com"  # javni kontakt projekta (Ahmedova odluka 26.9.2026); lični e-mail nikad
 INSTALLER_URL = f"{REPO}/releases/latest/download/VideoDownload-Setup.exe"
 INSTALL_DIR = r"%LOCALAPPDATA%\Programs\Video Download\extension"
 GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
@@ -59,6 +60,8 @@ TEXTS = {
             "<b>Contributions</b> are processed by PayPal. As the recipient, the author sees what PayPal shows for every "
             "payment (e.g. the payer's name and e-mail) and uses it only for bookkeeping, never for advertising or "
             "anything else.",
+            "Messages to <b>abnpsdev@gmail.com</b> (the project's contact address, a Gmail mailbox at Google) are used "
+            "only to reply to you and are never passed on or used for anything else.",
         ),
         "licenses_title": "Licenses",
         "licenses_lead": "Video Download uses the following software by other authors. Their licenses apply to them; the "
@@ -114,6 +117,8 @@ The browser may therefore remind you about “Developer mode”; that is expecte
             "skraćuje linkove na ime sajta i skriva tvoje korisničko ime u Windowsu; ne dodaj lozinke, kolačiće ni lične podatke.",
             "<b>Prilozi</b> idu preko PayPal-a. Kao primalac, autor vidi ono što PayPal pokazuje za svaku uplatu (npr. ime i "
             "e-mail uplatioca) i koristi to samo za evidenciju, nikad za reklame ni bilo šta drugo.",
+            "Poruke na <b>abnpsdev@gmail.com</b> (kontakt adresa projekta, Gmail sanduče kod Google-a) koriste se samo za "
+            "odgovor tebi i nikad se ne prosljeđuju niti koriste za bilo šta drugo.",
         ),
         "licenses_title": "Licence",
         "licenses_lead": "Video Download koristi sljedeći softver drugih autora. Njihove licence važe za njih; puni tekstovi "
@@ -170,6 +175,8 @@ Browser zato ponekad podsjeti na „Developer mode"; to je očekivano i dodatak 
             "Passwörter, Cookies oder persönlichen Daten hinzu.",
             "<b>Beiträge</b> werden über PayPal abgewickelt. Als Empfänger sieht der Autor, was PayPal zu jeder Zahlung anzeigt "
             "(z. B. Name und E-Mail des Zahlenden), und nutzt es nur für die Buchhaltung, nie für Werbung oder etwas anderes.",
+            "Nachrichten an <b>abnpsdev@gmail.com</b> (die Kontaktadresse des Projekts, ein Gmail-Postfach bei Google) "
+            "werden nur genutzt, um dir zu antworten, und nie weitergegeben oder anders verwendet.",
         ),
         "licenses_title": "Lizenzen",
         "licenses_lead": "Video Download nutzt die folgende Software anderer Autoren. Für sie gelten ihre eigenen Lizenzen; die "
@@ -228,6 +235,8 @@ Der Browser erinnert deshalb manchmal an den „Entwicklermodus“; das ist norm
             "contraseñas, cookies ni datos personales.",
             "<b>Las contribuciones</b> las procesa PayPal. Como destinatario, el autor ve lo que PayPal muestra de cada pago "
             "(p. ej., el nombre y el correo de quien paga) y lo usa solo para la contabilidad, nunca para publicidad ni nada más.",
+            "Los mensajes a <b>abnpsdev@gmail.com</b> (la dirección de contacto del proyecto, un buzón de Gmail en Google) "
+            "se usan solo para responderte y nunca se comparten ni se usan para nada más.",
         ),
         "licenses_title": "Licencias",
         "licenses_lead": "Video Download usa el siguiente software de otros autores. Se rige por sus propias licencias; los textos "
@@ -288,6 +297,8 @@ Por eso el navegador a veces recuerda el «Modo de desarrollador»; es lo espera
             "<b>Les contributions</b> sont traitées par PayPal. En tant que destinataire, l'auteur voit ce que PayPal affiche pour "
             "chaque paiement (p. ex. le nom et l'e-mail du payeur) et ne l'utilise que pour la comptabilité, jamais pour la "
             "publicité ni autre chose.",
+            "Les messages envoyés à <b>abnpsdev@gmail.com</b> (l'adresse de contact du projet, une boîte Gmail chez "
+            "Google) servent uniquement à vous répondre et ne sont jamais transmis ni utilisés à d'autres fins.",
         ),
         "licenses_title": "Licences",
         "licenses_lead": "Video Download utilise les logiciels suivants d'autres auteurs. Leurs propres licences s'appliquent ; "
@@ -363,6 +374,7 @@ FOOT = """</main>
       <a href="privacy.html">{privacy}</a>
       <a href="licenses.html">{licenses}</a>
       <a href="https://github.com/abnps/video-download">GitHub</a>
+      <a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
     </div>
   </div>
 </footer>

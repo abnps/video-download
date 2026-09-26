@@ -74,6 +74,10 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `tools/build_site.py` (TEXTS po jeziku). Nazivi menija i dugmadi na sajtu = tačni prevodi iz `videodl/i18n.py`
   i `extension/i18n.js`. Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
+- Kontakt na sajtu (Ahmedova odluka 26.9.2026): javno se prikazuje SAMO `abnpsdev@gmail.com`
+  (`CONTACT_EMAIL` u `tools/build_site.py`, podnožje svih stranica + stavka u privatnosti). Ahmedov lični
+  e-mail, ime i adresa ne idu na sajt; test pada ako se lični e-mail pojavi. Pun Impressum (ime + adresa,
+  § 5 DDG) Ahmed za sada ne želi; stranica se zato NE zove „Impressum". Commiti idu s GitHub noreply adresom.
 - Firefox dodatak (26.9.2026, „nastaviti ekstenziju"): isti kod iz `extension/`, manifest pravi
   `python tools/build_firefox.py` (gecko ID `video-download@abnps.github.io`, background.scripts umjesto
   service_worker, Firefox 140+, Android 142+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`

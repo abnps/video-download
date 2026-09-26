@@ -72,6 +72,14 @@ class SiteTest(unittest.TestCase):
             self.assertIn("GitHub Pages", self.pages[prefix + "privacy.html"])
             self.assertIn("GPL-3.0", self.pages[prefix + "licenses.html"])
 
+    def test_contact_email_on_every_page_and_no_personal_email(self):
+        for name, text in self.pages.items():
+            with self.subTest(page=name):
+                self.assertIn(f'href="mailto:{build_site.CONTACT_EMAIL}"', text)
+                self.assertNotIn("bisevac", text.lower())  # lični e-mail nikad na sajtu
+        for lang in build_site.LANGUAGES:
+            self.assertIn(build_site.CONTACT_EMAIL, self.pages[build_site.TEXTS[lang]["dir"] + "privacy.html"])
+
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():
             folder = posixpath.dirname(name)
