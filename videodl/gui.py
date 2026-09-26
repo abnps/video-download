@@ -53,6 +53,7 @@ MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
 # Pucanje veze: koliko puta aplikacija sama ponavlja i koliko čeka između pokušaja.
 MAX_AUTO_RETRIES = 3
 AUTO_RETRY_DELAY_MS = 5000
+CLOSE_WAIT_SECONDS = 10  # zajednički rok za gašenje svih poslova pri zatvaranju
 
 # Ukupno ograničenje brzine u MB/s (0 = bez ograničenja); dijeli se na preuzimanja u toku.
 RATE_CHOICES = (0, 1, 2, 5, 10)
@@ -225,6 +226,9 @@ class DownloadJob(QObject):
 
     def join(self, timeout: float) -> None:
         self._thread.join(timeout)
+
+    def is_alive(self) -> bool:
+        return self._thread.is_alive()
 
     def _run(self) -> None:
         try:
@@ -610,6 +614,9 @@ class ConvertJob(QObject):
 
     def join(self, timeout: float) -> None:
         self._thread.join(timeout)
+
+    def is_alive(self) -> bool:
+        return self._thread.is_alive()
 
     def _run(self) -> None:
         try:
@@ -1186,7 +1193,9 @@ class MainWindow(QMainWindow):
             options["subtitle_langs"] = subtitle_languages(get_language())
         if self._thumbnail_cover:
             options["thumbnail"] = True
-        if self._name_template != DEFAULT_NAME_TEMPLATE:
+        if item.force_id_name:
+            options["name_template"] = DEFAULT_NAME_TEMPLATE  # naslov [id]: ne može se sudariti s drugim videom
+        elif self._name_template != DEFAULT_NAME_TEMPLATE:
             options["name_template"] = self._name_template
         if self._rate_limit:
             # Jedan zajednički budžet: dijeli se na preuzimanja koja stvarno rade (jedno dobija sve).
@@ -1428,17 +1437,36 @@ class MainWindow(QMainWindow):
 
     # ---------- red preuzimanja ----------
 
+    def _same_output_running(self, item: QueueItem) -> bool:
+        """Isti link, format i isječak već se preuzima (npr. jednom iz prozora, jednom iz browsera):
+        drugi posao čeka, da dva procesa ne pišu isti fajl."""
+        key = (item.url, item.preset_key, item.section, item.output_dir, item.subfolder)
+        for item_id in self._download_jobs:
+            other = self._queue.get(item_id)
+            if other is not None and other.id != item.id and \
+                    (other.url, other.preset_key, other.section, other.output_dir, other.subfolder) == key:
+                return True
+        return False
+
     def _start_next(self) -> None:
         """Pokreće stavke dok ih u toku ne bude onoliko koliko je izabrano (Preuzimanja → Istovremeno)."""
         started = []
         while len(self._download_jobs) < self._parallel:
             item = None
+            postponed = []
             while self._manual and item is None:
                 candidate = self._queue.get(self._manual.pop(0))
-                if candidate is not None and candidate.status == ItemStatus.WAITING:
+                if candidate is None or candidate.status != ItemStatus.WAITING:
+                    continue
+                if self._same_output_running(candidate):
+                    postponed.append(candidate.id)  # čeka da isti posao završi, pa kreće
+                else:
                     item = candidate
+            self._manual[:0] = postponed
             if item is None and self._running:
-                item = self._queue.next_waiting()
+                item = next((candidate for candidate in self._queue.items()
+                             if candidate.status == ItemStatus.WAITING and not self._same_output_running(candidate)),
+                            None)
             if item is None:
                 if not self._download_jobs:
                     self._running = False
@@ -1480,6 +1508,8 @@ class MainWindow(QMainWindow):
         if item_id in self._batch:
             self._batch[item_id] = 1.0
         if item is not None and self._auto_retry(item, result):
+            return
+        if item is not None and self._retry_with_id_name(item, result):
             return
         if item is not None:
             item.status = result.status
@@ -1613,6 +1643,23 @@ class MainWindow(QMainWindow):
         self._set_status(tr("row.retrying"))
         QTimer.singleShot(AUTO_RETRY_DELAY_MS, lambda: self._retry_after_drop(item.id))
         self._update_controls()
+        return True
+
+    def _retry_with_id_name(self, item: QueueItem, result: DownloadResult) -> bool:
+        """„Već preuzeto", a istorija kaže da taj fajl pripada DRUGOM linku (šablon imena bez ID-a,
+        dva videa istog naslova): isti posao se ponovi s ID-om u imenu umjesto lažnog „već preuzeto"."""
+        if not result.already_existed or not result.filepath or item.force_id_name:
+            return False
+        owner = next((entry.url for entry in store.load_history(store.history_path(self._data_dir))
+                      if entry.filepath == result.filepath), None)
+        if owner is None or owner == item.url:
+            return False
+        item.force_id_name = True
+        item.status = ItemStatus.WAITING
+        item.message = ""
+        self._refresh_row(item)
+        self._manual.insert(0, item.id)
+        self._start_next()
         return True
 
     def _retry_after_drop(self, item_id: int) -> None:
@@ -1984,10 +2031,15 @@ class MainWindow(QMainWindow):
         if not updater.is_installed_app():
             QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
             return
-        if self._download_jobs:
+        if self._busy_for_update():
             QMessageBox.information(self, tr("update.available_title"), tr("update.busy"))
             return
         self._install_update(release)
+
+    def _busy_for_update(self) -> bool:
+        """Instaler zatvara program: ne smije krenuti dok radi bilo koji posao (preuzimanje,
+        pretvaranje u MP3, čitanje linka) ili dok red još čeka da se obradi."""
+        return bool(self._download_jobs or self._convert_jobs or self._probe_jobs or self._running)
 
     def _install_update(self, release) -> None:
         dialog = QProgressDialog(tr("update.downloading"), tr("update.cancel"), 0, 100, self)
@@ -2013,6 +2065,26 @@ class MainWindow(QMainWindow):
 
     # ---------- zatvaranje ----------
 
+    def _stop_all_jobs(self, wait_seconds: float) -> None:
+        """Jedan postupak za sve vrste poslova: prvo SVI dobiju znak za prekid (pa se gase istovremeno),
+        zatim se čeka zajednički rok, a ne svaki posao posebno. Posao sam briše svoje privremene
+        fajlove tek kad mu se proces ugasi; ranije završeni fajlovi se nikad ne diraju."""
+        self._cancel_probes()
+        jobs = list(self._download_jobs.values()) + list(self._convert_jobs.values())
+        for job in jobs:
+            job.cancel()
+        deadline = time.monotonic() + wait_seconds
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        try:
+            for job in jobs:
+                while time.monotonic() < deadline:
+                    job.join(0.05)
+                    if not job.is_alive():
+                        break
+                    QApplication.processEvents()  # prozor se iscrtava dok čeka, ne „zamrzne se"
+        finally:
+            QApplication.restoreOverrideCursor()
+
     def closeEvent(self, event) -> None:
         if self._download_jobs:
             answer = QMessageBox.question(
@@ -2021,15 +2093,7 @@ class MainWindow(QMainWindow):
                 event.ignore()
                 return
             self._running = False
-            jobs = list(self._download_jobs.values())
-            for job in jobs:
-                job.cancel()
-            # Kratko sačekaj da se obrišu privremeni fajlovi prekinutih preuzimanja.
-            for job in jobs:
-                job.join(timeout=10)
-        for job in list(self._convert_jobs.values()):
-            job.cancel()
-            job.join(timeout=5)
+        self._stop_all_jobs(CLOSE_WAIT_SECONDS)
         self._save_settings()
         self._save_queue()
         self._taskbar.clear()

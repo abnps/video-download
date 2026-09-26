@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import threading
+import os
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -177,3 +178,20 @@ class RealSectionDownloadTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class QualityNameTest(unittest.TestCase):
+    def name(self, preset, **extra):
+        from yt_dlp import YoutubeDL
+
+        options = build_ydl_options(get_preset(preset), "C:/izlaz", **extra)
+        with YoutubeDL({"quiet": True}) as ydl:
+            return os.path.basename(ydl.evaluate_outtmpl(options["outtmpl"], {"title": "Film", "id": "abc", "ext": "mp4"}))
+
+    def test_limited_resolutions_get_their_own_file(self):
+        # 1080p poslije 720p istog videa ne smije biti „već preuzeto" (isto ime = isti fajl).
+        names = {preset: self.name(preset) for preset in ("best", "1080p", "720p", "480p")}
+        self.assertEqual(names, {"best": "Film [abc].mp4", "1080p": "Film [abc] [1080p].mp4",
+                                 "720p": "Film [abc] [720p].mp4", "480p": "Film [abc] [480p].mp4"})
+        self.assertEqual(self.name("720p", name_template="title"), "Film [720p].mp4")
+        self.assertEqual(self.name("mp3"), "Film [abc].mp4")  # zvuk bez oznake (ekstenzija ga razlikuje)

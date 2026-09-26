@@ -2,6 +2,7 @@
 
 import glob
 import os
+import subprocess
 import threading
 import time
 from collections.abc import Callable
@@ -14,7 +15,7 @@ from yt_dlp.utils import DownloadCancelled
 from .browser import Cookie, cookie_file
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles
-from .i18n import MESSAGE_NO_SUBS
+from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS
 from .ytdl import YdlLogger, error_message
 
 DOWNLOADING = "downloading"
@@ -256,10 +257,38 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         return DownloadResult(ItemStatus.FAILED, message=error_message(exc))
 
     filepath = _final_path(info)
+    if not output_is_usable(filepath):
+        # yt-dlp je javio uspjeh, ali fajla nema, prazan je ili se ne može pročitati: nije „Završeno".
+        return DownloadResult(ItemStatus.FAILED, filepath, MESSAGE_NO_OUTPUT)
     if subtitles and not no_subtitles and filepath:
         _plain_name_for_first_subtitle(filepath, (info or {}).get("requested_subtitles") or {})
     return DownloadResult(ItemStatus.DONE, filepath, MESSAGE_NO_SUBS if no_subtitles else "",
                           already_existed=not attempt.real_download)
+
+
+MEDIA_SUFFIXES = frozenset((".mp4", ".mkv", ".webm", ".mov", ".m4v", ".avi", ".flv", ".ts", ".3gp",
+                            ".mp3", ".m4a", ".aac", ".opus", ".ogg", ".oga", ".wav", ".flac", ".wma"))
+_NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+
+
+def output_is_usable(path: str | None, ffprobe: str | None = None, run=subprocess.run) -> bool:
+    """Gotov fajl postoji, nije prazan i (kad je ffprobe tu) ima bar jedan audio ili video tok."""
+    if not path or not os.path.isfile(path) or os.path.getsize(path) == 0:
+        return False
+    if os.path.splitext(path)[1].lower() not in MEDIA_SUFFIXES:
+        return True  # nepoznata vrsta (npr. direktan fajl): dovoljno je da postoji
+    from .runtime import find_tool
+
+    ffprobe = ffprobe or find_tool("ffprobe")
+    if not ffprobe:
+        return True
+    try:
+        result = run([ffprobe, "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", path],
+                     capture_output=True, text=True, timeout=60, creationflags=_NO_WINDOW)
+    except (OSError, subprocess.SubprocessError):
+        return True  # ffprobe ne radi: ne proglašavamo ispravan fajl neispravnim
+    kinds = {line.strip() for line in result.stdout.splitlines()}
+    return result.returncode == 0 and bool(kinds & {"video", "audio"})
 
 
 def _plain_name_for_first_subtitle(video: str, requested: dict) -> None:

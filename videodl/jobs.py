@@ -34,6 +34,8 @@ class QueueItem:
     auto_retries: int = 0
     # Samo dio videa (od, do) u sekundama; None = cijeli video.
     section: tuple[float, float] | None = None
+    # Postojeći fajl istog imena pripada drugom videu (šablon bez ID-a): ovaj ide s ID-om u imenu.
+    force_id_name: bool = False
     # Pretvaranje preuzetog MP4 u MP3: "" | "running" | "done" | "failed"
     convert_state: str = ""
     convert_path: str | None = None

@@ -152,7 +152,7 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
     opts = base_options(logger)
     opts["format"] = preset.format
     opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _with_section(
-        _output_name(filename_title, source_url, name_template), section)
+        _with_quality(_output_name(filename_title, source_url, name_template), preset), section)
     opts["match_filter"] = reject_live
     if http_headers:
         opts["http_headers"] = dict(http_headers)
@@ -200,6 +200,17 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
 def _escape(text: str) -> str:
     # '%' u putanji ili naslovu yt-dlp bi čitao kao dio šablona.
     return text.replace("%", "%%")
+
+
+# Formati s ograničenom rezolucijom dobijaju oznaku u imenu: isti video u 720p i 1080p su dva fajla,
+# a 1080p poslije 720p se ne proglašava „već preuzetim". „Najbolji" i zvuk ostaju bez oznake.
+QUALITY_TAGGED = ("1080p", "720p", "480p")
+
+
+def _with_quality(template: str, preset: Preset) -> str:
+    if preset.key not in QUALITY_TAGGED:
+        return template
+    return template.replace(".%(ext)s", f" [{preset.key}].%(ext)s")
 
 
 def _with_section(template: str, section: tuple[float, float] | None) -> str:

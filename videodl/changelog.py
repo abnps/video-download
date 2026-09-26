@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.5", "26.9.2026", {
+        "bs": ["1080p, 720p i 480p dobijaju oznaku u imenu fajla, pa različit kvalitet istog videa više nije „već preuzeto“.",
+               "Dva videa istog naslova (ime fajla bez ID-a) više se ne miješaju; isti video pokrenut dvaput istovremeno čeka da prvi završi.",
+               "„Završeno“ tek kad gotov fajl postoji i može se pročitati; pretvaranje u MP3 se uvijek može prekinuti.",
+               "Zatvaranje programa ne zamrzava prozor; ažuriranje čeka i pretvaranja u MP3."],
+        "en": ["1080p, 720p and 480p get a tag in the file name, so a different quality of the same video is no longer \u201calready downloaded\u201d.",
+               "Two videos with the same title (file name without ID) no longer get mixed up; the same video started twice at once waits for the first one.",
+               "\u201cFinished\u201d only when the file exists and can be read; MP3 conversion can always be stopped.",
+               "Closing the app no longer freezes the window; updating also waits for MP3 conversions."],
+        "de": ["1080p, 720p und 480p erhalten eine Markierung im Dateinamen, daher gilt eine andere Qualität desselben Videos nicht mehr als \u201ebereits heruntergeladen\u201c.",
+               "Zwei Videos mit gleichem Titel (Dateiname ohne ID) werden nicht mehr verwechselt; dasselbe Video, das zweimal gleichzeitig startet, wartet auf das erste.",
+               "\u201eFertig\u201c erst, wenn die Datei existiert und lesbar ist; die MP3-Umwandlung lässt sich immer abbrechen.",
+               "Das Schließen friert das Fenster nicht mehr ein; das Update wartet auch auf MP3-Umwandlungen."],
+        "es": ["1080p, 720p y 480p llevan una marca en el nombre del archivo, así que otra calidad del mismo vídeo ya no es «ya descargado».",
+               "Dos vídeos con el mismo título (nombre sin ID) ya no se mezclan; el mismo vídeo iniciado dos veces a la vez espera al primero.",
+               "«Terminado» solo cuando el archivo existe y se puede leer; la conversión a MP3 siempre se puede detener.",
+               "Cerrar el programa ya no congela la ventana; la actualización también espera a las conversiones a MP3."],
+        "fr": ["1080p, 720p et 480p reçoivent une marque dans le nom du fichier : une autre qualité de la même vidéo n'est plus « déjà téléchargée ».",
+               "Deux vidéos du même titre (nom sans ID) ne se mélangent plus ; la même vidéo lancée deux fois en même temps attend la première.",
+               "« Terminé » seulement quand le fichier existe et est lisible ; la conversion en MP3 peut toujours être arrêtée.",
+               "La fermeture ne fige plus la fenêtre ; la mise à jour attend aussi les conversions en MP3."],
+    }),
     ("0.9.4", "26.9.2026", {
         "bs": ["Stabilnost: isti link se može ponovo dodati odmah poslije „Zaustavi“.",
                "Ažuriranje čitača sajtova (yt-dlp) više ne briše verziju koja radi; ako nova ne radi, program se sam vraća na prethodnu.",

@@ -214,3 +214,55 @@ class RateBudgetTest(unittest.TestCase):
         self.assertEqual(result.status, ItemStatus.DONE)
         self.assertEqual(seen, [4_000_000, 2_000_000])
         self.assertEqual(budget.share(), 4_000_000)  # preuzimanje se odjavilo
+
+
+class OutputCheckTest(unittest.TestCase):
+    """„Završeno" samo kad gotov fajl postoji, nije prazan i ima audio ili video tok."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def probe(self, kinds, code=0):
+        class Result:
+            returncode = code
+            stdout = "\n".join(kinds)
+        return lambda *args, **kwargs: Result()
+
+    def test_missing_empty_or_streamless_file_is_not_usable(self):
+        from videodl.download import output_is_usable
+
+        video = Path(self.tmp.name) / "v.mp4"
+        self.assertFalse(output_is_usable(None))
+        self.assertFalse(output_is_usable(str(video)))  # ne postoji
+        video.write_bytes(b"")
+        self.assertFalse(output_is_usable(str(video), ffprobe="ffprobe", run=self.probe(["video"])))  # prazan
+        video.write_bytes(b"x" * 10)
+        self.assertTrue(output_is_usable(str(video), ffprobe="ffprobe", run=self.probe(["video", "audio"])))
+        self.assertTrue(output_is_usable(str(video), ffprobe="ffprobe", run=self.probe(["audio"])))
+        self.assertFalse(output_is_usable(str(video), ffprobe="ffprobe", run=self.probe(["data"])))
+        self.assertFalse(output_is_usable(str(video), ffprobe="ffprobe", run=self.probe([], code=1)))
+
+    def test_download_reports_failure_instead_of_done_without_file(self):
+        from videodl import download as module
+        from videodl.i18n import MESSAGE_NO_OUTPUT
+
+        class FakeYDL:
+            def __init__(self, params):
+                self.params = params
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def add_post_processor(self, *args, **kwargs):
+                pass
+
+            def extract_info(self, url, download=True):
+                return {"filepath": str(Path(tempfile.gettempdir()) / "nepostojeci-video.mp4")}
+
+        with tempfile.TemporaryDirectory() as out, mock.patch.object(module, "YoutubeDL", FakeYDL):
+            result = module.download("https://v/1", get_preset("best"), out)
+        self.assertEqual((result.status, result.message), (ItemStatus.FAILED, MESSAGE_NO_OUTPUT))

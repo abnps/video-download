@@ -328,6 +328,83 @@ class MainWindowTest(unittest.TestCase):
         self.assertIn("nisu sačuvani", window.status_label.text())
         self.assertTrue(any("nisu sačuvani" in error for error in window._errors))  # ide i u izvještaj
 
+    def test_same_video_twice_at_once_waits_instead_of_writing_one_file(self):
+        # Isti link i format dva puta (npr. prozor + browser): drugi čeka da prvi završi.
+        window = self.make_window(self.blocking_download, parallel=2)
+        first = window._queue.add("https://v/isti", "Isti", "best", self.tmp.name)
+        second = window._queue.add("https://v/isti", "Isti", "best", self.tmp.name)
+        other = window._queue.add("https://v/drugi", "Drugi", "best", self.tmp.name)
+        for item in (first, second, other):
+            window._append_row(item)
+        window._start_all()
+        self.assertTrue(wait_until(lambda: len(window._download_jobs) == 2))
+        self.assertEqual([first.status, second.status, other.status],
+                         [ItemStatus.ACTIVE, ItemStatus.WAITING, ItemStatus.ACTIVE])
+        self.release.set()
+        self.assertTrue(wait_until(lambda: second.status == ItemStatus.DONE))
+        self.assertEqual([call[0] for call in self.calls].count("https://v/isti"), 2)
+
+    def test_same_title_from_another_video_is_downloaded_with_id_in_name(self):
+        # Šablon bez ID-a: postojeći „Film.mp4" pripada drugom linku (istorija), pa ovo nije „već preuzeto".
+        from videodl import store
+
+        existing = os.path.join(self.tmp.name, "Film.mp4")
+        with open(existing, "wb") as file:
+            file.write(b"x")
+        other = QueueItem(1, "https://v/prvi-film", "Film", "best", self.tmp.name)
+        other.filepath = existing
+        store.append_history(other, store.history_path(Path(self.tmp.name)), 1)
+
+        def download(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            self.extras.append(extra)
+            if extra.get("name_template") == "title_id":
+                path = os.path.join(output_dir, "Film [id2].mp4")
+                with open(path, "wb") as file:
+                    file.write(b"y")
+                return DownloadResult(ItemStatus.DONE, filepath=path)
+            return DownloadResult(ItemStatus.DONE, filepath=existing, already_existed=True)
+
+        window = self.make_window(download)
+        window._set_option("_name_template", "title")
+        window.add_links_from_text("https://v/drugi-film")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and len(self.extras) == 2))
+        self.assertEqual(item.filepath, os.path.join(self.tmp.name, "Film [id2].mp4"))
+        self.assertNotEqual(item.message, "@exists")
+
+    def test_stopping_all_jobs_has_one_shared_deadline(self):
+        stubborn_started = threading.Event()
+
+        def stubborn(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            stubborn_started.set()
+            self.release.wait(10)  # posao koji ne reaguje na prekid (npr. zaglavljen proces)
+            return DownloadResult(ItemStatus.CANCELLED)
+
+        window = self.make_window(stubborn, parallel=2)
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: len(window._download_jobs) == 2 and stubborn_started.is_set()))
+        started = time.monotonic()
+        window._stop_all_jobs(0.5)  # dva zaglavljena posla: čeka se ukupno pola sekunde, ne 2×
+        self.assertLess(time.monotonic() - started, 1.5)
+        self.release.set()
+
+    def test_update_waits_for_every_kind_of_work(self):
+        window = self.make_window(self.quick_download)
+        self.assertFalse(window._busy_for_update())
+        window._convert_jobs[1] = object()  # pretvaranje u MP3 u toku
+        self.assertTrue(window._busy_for_update())
+        window._convert_jobs.clear()
+        window._probe_jobs[1] = object()  # čitanje linka u toku
+        self.assertTrue(window._busy_for_update())
+        window._probe_jobs.clear()
+        window._running = True  # red još čeka obradu
+        self.assertTrue(window._busy_for_update())
+        window._running = False
+
     def test_two_downloads_run_at_once_when_allowed(self):
         window = self.make_window(self.blocking_download, parallel=2)
         window.add_links_from_text("https://v/a https://v/b https://v/c")

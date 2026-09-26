@@ -101,8 +101,12 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   briše Firefox ključ (test poredi s registracijom); limit brzine kao zajednički budžet; README/AGENTS
   i SmartScreen tekst usklađeni sa stvarnim ponašanjem. Netačno u pregledu: Mutagen (nije u paketu) i
   „Free/Pro" (odluka je besplatno + prilozi).
-- [ ] Paket 2: odvojena imena za 720p/1080p, jedinstvena privremena imena i prekid konverzije bez
-  izlaza ffmpeg-a, provjera gotovog fajla prije „Završeno", zatvaranje bez zamrzavanja.
+- [x] Paket 2 (26.9.2026, v0.9.5): oznaka [1080p]/[720p]/[480p] u imenu; šablon bez ID-a — ako istorija kaže
+  da postojeći fajl pripada drugom linku, ponovo s ID-om; isti link+format+isječak ne ide dvaput
+  istovremeno (drugi čeka); konverzija: rezervisano ime (O_EXCL), jedinstven .part, čuvar prekida nezavisan
+  od ffmpeg ispisa; „Završeno" samo kad fajl postoji, nije prazan i ffprobe vidi audio/video tok;
+  zatvaranje: svi poslovi dobiju prekid odjednom, jedan zajednički rok, prozor se iscrtava; ažuriranje
+  čeka i konverzije, čitanje linkova i red.
 - [ ] Paket 3: GitHub Actions pokreće testove prije objave, zaključane verzije alata, potpisan opis izdanja.
 - [ ] Nova adresa (25.9.2026, v0.9.1): repo prelazi u organizaciju `abnps` (Ahmed je napravio organizaciju;
   prebacivanje repoa radi Ahmed u GitHub postavkama), sajt `abnps.github.io/video-download`.

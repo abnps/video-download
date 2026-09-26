@@ -179,3 +179,62 @@ class ConvertButtonTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SilentFfmpeg:
+    """Lažni ffmpeg koji ništa ne ispisuje dok ga neko ne ugasi (zaglavljen ulaz, spor disk…)."""
+
+    def __init__(self, *args, **kwargs):
+        self.killed = threading.Event()
+        self.returncode = None
+        outer = self
+
+        class Stream:
+            def __iter__(self):
+                outer.killed.wait(30)
+                return iter(())
+
+            def close(self):
+                pass
+
+        self.stdout, self.stderr = Stream(), Stream()
+
+    def poll(self):
+        return self.returncode
+
+    def kill(self):
+        self.returncode = -9
+        self.killed.set()
+
+    def wait(self, timeout=None):
+        self.killed.wait(timeout)
+        return self.returncode
+
+
+class ConvertSafetyTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.source = Path(self.tmp.name) / "video.mp4"
+        self.source.write_bytes(b"x")
+
+    def test_cancel_works_even_when_ffmpeg_prints_nothing(self):
+        cancel = threading.Event()
+        threading.Timer(0.3, cancel.set).start()
+        started = time.monotonic()
+        with self.assertRaises(convert.ConvertError):
+            convert.convert_to_mp3(str(self.source), cancel_event=cancel, ffmpeg="ffmpeg", popen=SilentFfmpeg)
+        self.assertLess(time.monotonic() - started, 5)
+        # Ni rezervisano ime ni privremeni fajl ne ostaju; original je netaknut.
+        self.assertEqual(sorted(p.name for p in Path(self.tmp.name).iterdir()), ["video.mp4"])
+
+    def test_two_conversions_never_share_a_name(self):
+        first = convert.reserve_target(self.source)
+        second = convert.reserve_target(self.source)
+        self.assertNotEqual(first, second)
+        self.assertEqual((first.name, second.name), ("video.mp3", "video (1).mp3"))
+        convert._release(second)  # prazno rezervisano ime se oslobađa
+        self.assertFalse(second.exists())
+        first.write_bytes(b"gotov mp3")
+        convert._release(first)  # gotov (neprazan) fajl se nikad ne briše
+        self.assertTrue(first.exists())

@@ -10,7 +10,8 @@ MESSAGE_DRM = "@drm"
 MESSAGE_LIVE = "@live"
 MESSAGE_RETRY = "@retry"
 MESSAGE_NOT_MEDIA = "@not_media"
-MESSAGE_NO_SUBS = "@no_subs"  # gotovo, ali video nema titlove (ili ih sajt nije dao)
+MESSAGE_NO_SUBS = "@no_subs"
+MESSAGE_NO_OUTPUT = "@no_output"  # yt-dlp javio uspjeh, a gotovog fajla nema ili je neispravan  # gotovo, ali video nema titlove (ili ih sajt nije dao)
 
 _current = FALLBACK
 
@@ -434,6 +435,11 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                            "Liste oder Verlauf konnten nicht gespeichert werden (Ordner {folder}). Prüfe den freien Speicherplatz.",
                            "No se pudo guardar la cola o el historial (carpeta {folder}). Comprueba que haya espacio en el disco.",
                            "La file ou l'historique n'a pas pu être enregistré (dossier {folder}). Vérifiez l'espace disque."),
+    "error.no_output": ("Preuzimanje nije dalo ispravan fajl (nema ga, prazan je ili se ne može pročitati). Pokušaj ponovo.",
+                        "The download didn't produce a valid file (missing, empty or unreadable). Try again.",
+                        "Der Download hat keine gültige Datei ergeben (fehlt, leer oder unlesbar). Versuche es erneut.",
+                        "La descarga no produjo un archivo válido (falta, está vacío o no se puede leer). Inténtalo de nuevo.",
+                        "Le téléchargement n'a pas produit de fichier valide (absent, vide ou illisible). Réessayez."),
     "error.not_media": ("Link ne vodi na video ni audio (npr. program, arhiva, dokument ili obična stranica).",
                         "The link doesn't lead to a video or audio (e.g. a program, archive, document or plain page).",
                         "Der Link führt zu keinem Video oder Audio (z. B. Programm, Archiv, Dokument oder normale Seite).",
@@ -502,11 +508,11 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                      "Für Updates wird die GitHub CLI (gh) mit angemeldetem Konto benötigt.",
                      "Para actualizar se necesita GitHub CLI (gh) con tu cuenta iniciada.",
                      "La mise à jour nécessite GitHub CLI (gh) connecté à votre compte."),
-    "update.busy": ("Sačekaj da se završi preuzimanje, pa pokušaj ponovo.",
-                    "Wait for the download to finish, then try again.",
-                    "Warte, bis der Download fertig ist, und versuche es dann erneut.",
-                    "Espera a que termine la descarga y vuelve a intentarlo.",
-                    "Attendez la fin du téléchargement, puis réessayez."),
+    "update.busy": ("Sačekaj da se završe preuzimanja i pretvaranja u MP3 (ili ih zaustavi), pa pokušaj ponovo.",
+                    "Wait for downloads and MP3 conversions to finish (or stop them), then try again.",
+                    "Warte, bis Downloads und MP3-Umwandlungen fertig sind (oder stoppe sie), und versuche es dann erneut.",
+                    "Espera a que terminen las descargas y conversiones a MP3 (o detenlas) y vuelve a intentarlo.",
+                    "Attendez la fin des téléchargements et conversions en MP3 (ou arrêtez-les), puis réessayez."),
 }
 
 

@@ -7,6 +7,7 @@ dodaje se „ (1)", „ (2)"… da se ništa ne pregazi. Kvalitet je isti kao fo
 import os
 import subprocess
 import threading
+import uuid
 from collections.abc import Callable
 from pathlib import Path
 
@@ -34,6 +35,19 @@ def target_path(source: Path) -> Path:
     return candidate
 
 
+def reserve_target(source: Path) -> Path:
+    """Slobodno ime za MP3, odmah zauzeto praznim fajlom (O_EXCL): dvije istovremene konverzije
+    istog videa ne mogu izabrati isto ime ni pregaziti tuđi rezultat."""
+    for _ in range(1000):
+        candidate = target_path(source)
+        try:
+            os.close(os.open(candidate, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            return candidate
+        except FileExistsError:
+            continue  # neko ga je uzeo u međuvremenu: sljedeće ime
+    raise ConvertError("Nema slobodnog imena za MP3.")
+
+
 def convert_to_mp3(source: str, on_progress: Callable[[float | None], None] | None = None,
                    cancel_event: threading.Event | None = None, duration: float | None = None,
                    ffmpeg: str | None = None, popen=subprocess.Popen) -> str:
@@ -44,20 +58,27 @@ def convert_to_mp3(source: str, on_progress: Callable[[float | None], None] | No
     ffmpeg = ffmpeg or find_tool("ffmpeg")
     if not ffmpeg:
         raise ConvertError("ffmpeg nije pronađen.")
-    target = target_path(src)
-    partial = target.with_name(target.name + ".part")
+    target = reserve_target(src)
+    # Privremeni fajl je samo ovog pokušaja; tuđi rezultat se nikad ne dira.
+    partial = target.with_name(f"{target.name}.{uuid.uuid4().hex[:8]}.part")
     command = [ffmpeg, "-hide_banner", "-nostdin", "-y", "-i", str(src), "-vn", "-map_metadata", "0",
                "-c:a", "libmp3lame", "-b:a", MP3_BITRATE, "-id3v2_version", "3", "-f", "mp3",
                "-progress", "pipe:1", "-nostats", str(partial)]
-    process = popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                    errors="replace", creationflags=_NO_WINDOW)
+    try:
+        process = popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
+                        errors="replace", creationflags=_NO_WINDOW)
+    except OSError as exc:
+        _release(target)
+        raise ConvertError(f"ffmpeg se nije pokrenuo: {exc}") from exc
     stderr_tail: list[str] = []
     reader = threading.Thread(target=_drain, args=(process.stderr, stderr_tail), daemon=True)
     reader.start()
+    # Prekid ne zavisi od toga da li ffmpeg nešto ispisuje: čuvar ga provjerava sam.
+    watcher = threading.Thread(target=_watch_cancel, args=(process, cancel_event), daemon=True)
+    watcher.start()
     try:
         for line in process.stdout:
             if cancel_event is not None and cancel_event.is_set():
-                process.kill()
                 break
             key, _, value = line.strip().partition("=")
             if key == "out_time_us" and on_progress and duration:
@@ -74,7 +95,11 @@ def convert_to_mp3(source: str, on_progress: Callable[[float | None], None] | No
             raise ConvertError(f"ffmpeg: {detail[:200]}" if detail else "ffmpeg nije uspio.")
         os.replace(partial, target)
     except BaseException:
+        if process.poll() is None:  # prvo se ffmpeg ugasi, tek onda se brišu njegovi fajlovi
+            process.kill()
+            process.wait()
         partial.unlink(missing_ok=True)
+        _release(target)
         raise
     finally:
         if process.poll() is None:
@@ -86,6 +111,25 @@ def convert_to_mp3(source: str, on_progress: Callable[[float | None], None] | No
     if on_progress:
         on_progress(1.0)
     return str(target)
+
+
+def _watch_cancel(process, cancel_event: threading.Event | None) -> None:
+    if cancel_event is None:
+        return
+    while process.poll() is None:
+        if cancel_event.wait(0.2):
+            if process.poll() is None:
+                process.kill()
+            return
+
+
+def _release(target: Path) -> None:
+    """Oslobađa rezervisano ime samo ako je još naš prazan fajl (nikad tuđi ili gotov MP3)."""
+    try:
+        if target.stat().st_size == 0:
+            target.unlink()
+    except OSError:
+        pass
 
 
 def _drain(stream, tail: list[str]) -> None:
