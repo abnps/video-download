@@ -2,8 +2,10 @@
 
 Repo je javan, pa se posljednje izdanje čita i preuzima običnim HTTPS-om: korisniku ne treba
 GitHub nalog ni `gh`. Ako GitHub odbije pristup (npr. repo ponovo privatan), a `gh` je
-instaliran i prijavljen, koristi se on. Izdanje mora imati `VideoDownload-Setup-<verzija>.exe`
-i `.exe.sha256`; instaler se pokreće tek kad se SHA-256 poklopi. U aplikaciji nema tokena.
+instaliran i prijavljen, koristi se on. Izdanje mora imati `VideoDownload-Setup-<verzija>.exe`,
+`.exe.sha256` i potpisan opis `release.json` + `release.json.sig` (od v0.9.6): instaler se pokreće
+tek kad je opis potpisan našim ključem i instaler mu odgovara (verzija, ime, veličina, SHA-256).
+U aplikaciji nema tokena.
 
 VIDEODL_UPDATE_URL (testovi) zamjenjuje GitHub lokalnim HTTP serverom sa istim JSON-om.
 """
@@ -25,7 +27,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from . import __version__
+from . import __version__, release_signing
 
 RELEASES_REPO = "abnps/video-download"
 LATEST_URL = f"https://api.github.com/repos/{RELEASES_REPO}/releases/latest"
@@ -57,6 +59,8 @@ class Release:
     checksum_url: str
     size: int
     tag: str = ""
+    manifest_url: str = ""  # potpisan opis izdanja (release.json)
+    signature_url: str = ""  # njegov potpis (release.json.sig)
 
 
 def parse_version(text: str) -> tuple[int, ...]:
@@ -88,6 +92,8 @@ def parse_release(data) -> Release | None:
                 checksum_url=checksum.get("browser_download_url") or "",
                 size=int(asset.get("size") or 0),
                 tag=data.get("tag_name") or "",
+                manifest_url=(assets.get(release_signing.MANIFEST_NAME) or {}).get("browser_download_url") or "",
+                signature_url=(assets.get(release_signing.SIGNATURE_NAME) or {}).get("browser_download_url") or "",
             )
     raise UpdateError("Release has no installer", key="update.no_asset")
 
@@ -125,7 +131,8 @@ def _fetch_with_gh(gh: str, runner, timeout: float) -> Release | None:
     release = parse_release(json.loads(result.stdout))
     # GitHub i za privatni repo vraća browser_download_url, ali bez prijave daje 404:
     # u gh načinu se preuzima isključivo preko gh.
-    return dataclasses.replace(release, installer_url="", checksum_url="") if release else None
+    return dataclasses.replace(release, installer_url="", checksum_url="", manifest_url="",
+                               signature_url="") if release else None
 
 
 def download_installer(release: Release, target_dir: Path, on_progress: Callable[[int, int], None] | None = None,
@@ -134,19 +141,34 @@ def download_installer(release: Release, target_dir: Path, on_progress: Callable
     target_dir.mkdir(parents=True, exist_ok=True)
     final = target_dir / release.installer_name
     checksum_file = target_dir / f"{release.installer_name}.sha256"
-    for stale in (final, checksum_file):
+    manifest_file = target_dir / release_signing.MANIFEST_NAME
+    signature_file = target_dir / release_signing.SIGNATURE_NAME
+    extras = (checksum_file, manifest_file, signature_file)
+    for stale in (final, *extras):
         stale.unlink(missing_ok=True)
     try:
         if release.installer_url:
+            if not (release.manifest_url and release.signature_url):
+                raise UpdateError("Release is not signed", key="update.unsigned")
+            # Potpis se provjerava PRIJE preuzimanja velikog instalera.
+            _fetch_small(release.manifest_url, manifest_file, opener, timeout)
+            _fetch_small(release.signature_url, signature_file, opener, timeout)
+            _verified_manifest(release, manifest_file, signature_file)
             _download_http(release, final, checksum_file, on_progress, cancel, opener, timeout)
         else:
             _download_gh(release, target_dir, final, on_progress, cancel, popen)
         _verify(final, checksum_file)
+        manifest = _verified_manifest(release, manifest_file, signature_file)
+        try:
+            release_signing.check_installer(manifest, release.version, final)
+        except release_signing.SignatureError as exc:
+            raise UpdateError(str(exc), key="update.unsigned") from exc
     except BaseException:
         final.unlink(missing_ok=True)
         raise
     finally:
-        checksum_file.unlink(missing_ok=True)
+        for extra in extras:
+            extra.unlink(missing_ok=True)
     return final
 
 
@@ -182,6 +204,7 @@ def _gh_error(stderr: str | None) -> str:
 def _download_gh(release: Release, target_dir: Path, final: Path, on_progress, cancel, popen) -> None:
     process = popen([gh_path(), "release", "download", release.tag, "--repo", RELEASES_REPO,
                      "--pattern", release.installer_name, "--pattern", f"{release.installer_name}.sha256",
+                     "--pattern", release_signing.MANIFEST_NAME, "--pattern", release_signing.SIGNATURE_NAME,
                      "--dir", str(target_dir), "--clobber"],
                     stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, encoding="utf-8",
                     creationflags=_NO_WINDOW)
@@ -233,6 +256,24 @@ def _download_http(release: Release, final: Path, checksum_file: Path, on_progre
         os.replace(partial, final)
     finally:
         partial.unlink(missing_ok=True)
+
+
+def _fetch_small(url: str, target: Path, opener, timeout: float) -> None:
+    with opener(_request(url), timeout=timeout) as response:
+        target.write_bytes(response.read(64 * 1024))
+
+
+def _verified_manifest(release: Release, manifest_file: Path, signature_file: Path) -> dict:
+    if not manifest_file.is_file() or not signature_file.is_file():
+        raise UpdateError("Release is not signed", key="update.unsigned")
+    try:
+        manifest = release_signing.verify_manifest(manifest_file.read_bytes(),
+                                                   signature_file.read_text(encoding="ascii", errors="replace"))
+    except release_signing.SignatureError as exc:
+        raise UpdateError(str(exc), key="update.unsigned") from exc
+    if manifest.get("version") != release.version or manifest.get("installer") != release.installer_name:
+        raise UpdateError("Signed manifest is for another release", key="update.unsigned")
+    return manifest
 
 
 def _verify(final: Path, checksum_file: Path) -> None:

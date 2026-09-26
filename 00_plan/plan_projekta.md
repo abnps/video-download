@@ -107,7 +107,14 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   od ffmpeg ispisa; „Završeno" samo kad fajl postoji, nije prazan i ffprobe vidi audio/video tok;
   zatvaranje: svi poslovi dobiju prekid odjednom, jedan zajednički rok, prozor se iscrtava; ažuriranje
   čeka i konverzije, čitanje linkova i red.
-- [ ] Paket 3: GitHub Actions pokreće testove prije objave, zaključane verzije alata, potpisan opis izdanja.
+- [x] Paket 3 (26.9.2026, v0.9.6): GitHub Actions testovi (sajt se objavljuje tek poslije testa sajta);
+  `tools/build-lock.json` + `requirements-lock.txt` (tačne verzije i SHA-256 alata, build staje na
+  neslaganje i prvo pokreće testove, `BUILD-MANIFEST.json` u paketu); potpisan `release.json` (Ed25519),
+  aplikacija odbija nepotpisano ažuriranje; most: najviše 8 veza, rok čitanja 10 s; brisanje zaostalih
+  fajlova s kolačićima starijih od sat pri pokretanju; keš sličica ograničen na 300; jednokratna
+  obavijest o praćenju clipboarda; šablon za prijavu problema; privatnost pominje GitHub Issues i PayPal;
+  dijalozi izdvojeni iz `gui.py` u `dialogs.py`/`desktop.py`. Ostaje: zaštita grane `main` (postavka
+  repoa, radi Ahmed ako želi), Impressum (čeka Ahmedovu odluku).
 - [ ] Nova adresa (25.9.2026, v0.9.1): repo prelazi u organizaciju `abnps` (Ahmed je napravio organizaciju;
   prebacivanje repoa radi Ahmed u GitHub postavkama), sajt `abnps.github.io/video-download`.
 - [x] Udobnost (25.9.2026, v0.9.0; Ahmed: „23456", bez stavke 1 „Završeno · MB za s"):

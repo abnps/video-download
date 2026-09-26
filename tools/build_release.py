@@ -77,16 +77,109 @@ def ffmpeg_dir() -> Path | None:
     return candidates[-1] if candidates else None
 
 
-def copy_tool(name: str) -> Path:
-    folder = ffmpeg_dir() if name in ("ffmpeg", "ffprobe") else None
-    source = str(folder / f"{name}.exe") if folder and (folder / f"{name}.exe").is_file() else shutil.which(name)
-    if not source:
+LOCK = PROJECT / "tools" / "build-lock.json"
+
+
+def load_lock() -> dict:
+    return json.loads(LOCK.read_text(encoding="utf-8"))
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def tool_source(name: str) -> Path:
+    """ffmpeg/ffprobe SAMO iz pripremljenog „essentials" builda (nikad tiho sa PATH-a), node sa PATH-a."""
+    if name in ("ffmpeg", "ffprobe"):
+        folder = ffmpeg_dir()
+        path = folder / f"{name}.exe" if folder else None
+        if not path or not path.is_file():
+            raise SystemExit(f"{name} iz pripremljenog builda nije pronađen (VIDEODL_FFMPEG_DIR ili "
+                             "%LOCALAPPDATA%\\VideoDownload-ffmpeg); build ne uzima drugi sa PATH-a.")
+        return path
+    found = shutil.which(name)
+    if not found:
         raise SystemExit(f"Alat {name} nije na PATH-u; potreban je za paket.")
+    return Path(found).resolve()
+
+
+def verify_environment(lock: dict | None = None) -> list[str]:
+    """Razlike između okruženja i build-lock.json (prazno = sve odgovara)."""
+    import importlib.metadata
+
+    lock = lock or load_lock()
+    problems = []
+    python = f"{sys.version_info.major}.{sys.version_info.minor}"
+    if python != lock["python"]:
+        problems.append(f"Python {python}, a traži se {lock['python']}")
+    for package, version in lock["packages"].items():
+        try:
+            installed = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            installed = None
+        if installed != version:
+            problems.append(f"{package} {installed or 'nije instaliran'}, a traži se {version}")
+    for name, spec in lock["tools"].items():
+        try:
+            digest = sha256_file(tool_source(name))
+        except SystemExit as exc:
+            problems.append(str(exc))
+            continue
+        if digest != spec["sha256"]:
+            problems.append(f"{name}: SHA-256 {digest[:12]}…, a traži se {spec['sha256'][:12]}… ({spec['version']})")
+    return problems
+
+
+def run_checks() -> None:
+    """Svi Python i JS testovi prije pakovanja; izlaz ide u build folder uz izdanje.
+    VIDEODL_SKIP_CHECKS=1 samo za hitne slučajeve (i tada se upisuje da su preskočeni)."""
+    report = BUILD / "checks.txt"
+    BUILD.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("VIDEODL_SKIP_CHECKS") == "1":
+        report.write_text("PRESKOČENO (VIDEODL_SKIP_CHECKS=1)\n", encoding="utf-8")
+        print("› testovi PRESKOČENI", flush=True)
+        return
+    env = {**os.environ, "QT_QPA_PLATFORM": "offscreen", "PYTHONIOENCODING": "utf-8"}
+    python = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests"], cwd=PROJECT, env=env,
+                            capture_output=True, text=True, encoding="utf-8", errors="replace")
+    node = subprocess.run(["node", "--test", "tests/extension/*.test.mjs"], cwd=PROJECT, env=env,
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", shell=False)
+    report.write_text(f"Python testovi (izlaz {python.returncode}):\n{python.stderr[-4000:]}\n\n"
+                      f"JS testovi (izlaz {node.returncode}):\n{node.stdout[-4000:]}\n", encoding="utf-8")
+    if python.returncode != 0 or node.returncode != 0:
+        raise SystemExit(f"Testovi nisu prošli; vidi {report}")
+    print("› testovi prošli", flush=True)
+
+
+def copy_tool(name: str) -> Path:
+    source = tool_source(name)
     print(f"› {name}: {source}", flush=True)
     target = APP / "tools" / f"{name}.exe"
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(Path(source).resolve(), target)
+    shutil.copy2(source, target)
     return target
+
+
+def write_manifest(lock: dict) -> None:
+    """BUILD-MANIFEST.json u paketu: tačne verzije i SHA-256 svega što je ugrađeno (za licence i provjeru)."""
+    import importlib.metadata
+
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=PROJECT, capture_output=True, text=True,
+                                check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        commit = ""
+    manifest = {
+        "app": __version__, "commit": commit, "python": sys.version.split()[0],
+        "packages": {name: importlib.metadata.version(name) for name in lock["packages"]},
+        "tools": {name: {"version": spec["version"], "source": spec["source"],
+                         "sha256": sha256_file(APP / "tools" / f"{name}.exe")} for name, spec in lock["tools"].items()},
+    }
+    (APP / "BUILD-MANIFEST.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def write_legal() -> None:
@@ -142,6 +235,16 @@ def verify_package() -> None:
 def main() -> int:
     if not ISCC.is_file():
         raise SystemExit(f"Inno Setup nije pronađen: {ISCC}")
+    from videodl import release_signing
+
+    signing_key = release_signing.load_key()  # bez privatnog ključa nema izdanja (provjeri prije dugog builda)
+    if release_signing.public_key_hex(signing_key) not in release_signing.PUBLIC_KEYS:
+        raise SystemExit("Privatni ključ ne odgovara javnom ključu ugrađenom u aplikaciju.")
+    lock = load_lock()
+    problems = verify_environment(lock)
+    if problems:
+        raise SystemExit("Okruženje se ne slaže s tools/build-lock.json:\n  " + "\n  ".join(problems))
+    run_checks()
     shutil.rmtree(DIST, ignore_errors=True)
     shutil.rmtree(INSTALLER_OUT, ignore_errors=True)
     icon = BUILD / "icon.ico"
@@ -159,6 +262,7 @@ def main() -> int:
     shutil.copytree(PROJECT / "extension", APP / "extension", ignore=shutil.ignore_patterns("package.json"))
     for tool in ("ffmpeg", "ffprobe", "node"):
         copy_tool(tool)
+    write_manifest(lock)
     write_legal()
     verify_package()
 
@@ -182,6 +286,10 @@ def main() -> int:
     notes = INSTALLER_OUT / "release-notes.md"
     notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ\n",
                      encoding="utf-8")
+    # Potpisan opis izdanja (release.json + .sig): aplikacije od v0.9.6 bez njega ne instaliraju ažuriranje.
+    from videodl import release_signing
+
+    release_signing.write_signed_manifest(__version__, installer)
     # Kopija bez broja verzije: link na sajtu (releases/latest/download/VideoDownload-Setup.exe)
     # uvijek vodi na najnovije izdanje. Ažuriranje u aplikaciji traži samo ime s verzijom.
     shutil.copyfile(installer, INSTALLER_OUT / "VideoDownload-Setup.exe")

@@ -4,6 +4,7 @@ import os
 import tempfile
 import time
 import unittest
+from pathlib import Path
 from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -239,3 +240,49 @@ class FileNameTest(WindowTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CleanupAndNoticeTest(WindowTestCase):
+    def test_only_our_old_cookie_files_are_removed(self):
+        import time as clock
+
+        from videodl.browser import remove_stale_cookie_files
+
+        folder = Path(self.tmp.name)
+        old = folder / "videodl-cookies-stari.txt"
+        fresh = folder / "videodl-cookies-aktivni.txt"
+        foreign = folder / "tudji-cookies.txt"
+        for path in (old, fresh, foreign):
+            path.write_text("x", encoding="utf-8")
+        hour_ago = clock.time() - 2 * 60 * 60
+        os.utime(old, (hour_ago, hour_ago))
+        os.utime(foreign, (hour_ago, hour_ago))
+        self.assertEqual(remove_stale_cookie_files(str(folder)), 1)
+        self.assertEqual(sorted(p.name for p in folder.iterdir() if p.suffix == ".txt"),
+                         ["tudji-cookies.txt", "videodl-cookies-aktivni.txt"])
+
+    def test_thumbnail_cache_is_limited(self):
+        from PySide6.QtGui import QColor, QImage
+
+        from videodl import gui
+
+        window = self.window()
+        image = QImage(16, 9, QImage.Format.Format_RGB32)
+        image.fill(QColor("red"))
+        with mock.patch.object(gui, "THUMBNAIL_CACHE_MAX", 3):
+            for index in range(6):
+                window._on_thumbnail(f"https://img/{index}.jpg", image)
+        self.assertEqual(list(window._thumbnail_cache), [f"https://img/{i}.jpg" for i in (3, 4, 5)])
+
+    def test_clipboard_notice_is_shown_once_and_can_turn_watching_off(self):
+        window = self.window()
+        self.assertTrue(window._watch_clipboard)
+        self.assertFalse(window.clipboard_notice.isHidden())  # prvo pokretanje: objašnjenje je vidljivo
+        self.assertIn("kopirane linkove", window.clipboard_notice_label.text())
+        window.clipboard_notice_off.click()
+        self.assertTrue(window.clipboard_notice.isHidden())
+        self.assertFalse(window._watch_clipboard)
+        self.assertEqual(self.settings.value("watch_clipboard", type=bool), False)
+
+        again = self.window()  # sljedeće pokretanje: bez obavijesti
+        self.assertTrue(again.clipboard_notice.isHidden())

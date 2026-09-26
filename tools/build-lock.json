@@ -1,0 +1,34 @@
+{
+  "comment": "Tačne verzije za izdanje. build_release.py odbija build ako se okruženje razlikuje. Mijenja se svjesno, uz testove.",
+  "python": "3.14",
+  "packages": {
+    "PySide6": "6.11.2",
+    "shiboken6": "6.11.2",
+    "yt-dlp": "2026.8.19",
+    "yt-dlp-ejs": "0.8.0",
+    "curl_cffi": "0.16.3",
+    "certifi": "2026.7.22",
+    "brotli": "1.2.0",
+    "requests": "2.34.2",
+    "urllib3": "2.7.0",
+    "pycryptodomex": "3.23.0",
+    "pyinstaller": "6.22.2"
+  },
+  "tools": {
+    "ffmpeg": {
+      "version": "9.0.2-essentials_build-www.gyan.dev",
+      "sha256": "3256173f3f8bffd7df12227c68adf68025edb1832273a9530688a7bb1ed8edec",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "ffprobe": {
+      "version": "9.0.2-essentials_build-www.gyan.dev",
+      "sha256": "f0d36ecbbdd3bcfac3efa078c96c7271c2e68b3810595552ac3b7f17e9a65c52",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "node": {
+      "version": "v24.14.1",
+      "sha256": "58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f",
+      "source": "https://nodejs.org/dist/v24.14.1/"
+    }
+  }
+}

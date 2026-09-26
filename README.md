@@ -28,7 +28,8 @@ izdanjima repoa `abnps/video-download` (GitHub → Releases).
   bez administratorskih prava. Python, ffmpeg i Node su u paketu.
 - **Pomoć → Provjeri ažuriranje** ili tiha provjera pri pokretanju (najviše jednom
   dnevno): nova verzija se preuzme običnim HTTPS-om sa javnih GitHub izdanja (bez naloga
-  i bez `gh`), provjeri SHA-256 i instalira preko postojeće.
+  i bez `gh`), provjeri potpis izdanja (`release.json` + `release.json.sig`, Ed25519) i SHA-256
+  i instalira preko postojeće. Nepotpisano ili tuđe izdanje se odbija (od v0.9.6).
 - Instaler nije digitalno potpisan, pa Windows SmartScreen može pitati
   „Više informacija → Ipak pokreni" — za svaki novi instaler preuzet iz browsera; ažuriranje
   iz same aplikacije to ne traži.
@@ -43,12 +44,15 @@ Glavni jezik je engleski, bosanski je u `site/bs/`. Lokalni pregled: `python -m 
 
 1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
 2. `python tools/build_release.py` (build van OneDrive-a u `%LOCALAPPDATA%\VideoDownload-build`;
-   uključuje self-test spakovane aplikacije).
+   uključuje self-test spakovane aplikacije). Build odbija da radi ako se paketi ili alati ne slažu
+   sa `tools/build-lock.json`, prvo pokreće sve testove, a na kraju potpisuje `release.json` ključem
+   `%USERPROFILE%\.videodl\release-signing-key.pem` (ključ nikad ne ide u repo; bez njega nema izdanja).
 3. Build osvježi i sajt (`site/`: verzija, veličina, „Šta je novo"); te izmjene idu u commit izdanja.
-   Objavi instaler, `.sha256` i kopiju bez verzije (za stalni link na sajtu) kao izdanje:
+   Objavi instaler, `.sha256`, `release.json`, `release.json.sig` i kopiju bez verzije (za stalni
+   link na sajtu) kao izdanje:
 
 ```
-gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\release.json" "<folder instalera>\release.json.sig" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
 4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
@@ -158,6 +162,9 @@ izlaz u `%TEMP%\videodl-e2e`); pokreće i gasi test instancu aplikacije.
 - `videodl/download.py` — preuzimanje, napredak, prekid, čišćenje
 - `videodl/jobs.py` — red čekanja
 - `videodl/gui.py` — glavni prozor (meni, traka, red, tema)
+- `videodl/dialogs.py`, `videodl/desktop.py` — pomoćni prozori (istorija, podrška, ugovori, uputstvo
+  za dodatak) i otvaranje fajlova/foldera u Windowsu
+- `videodl/release_signing.py` — potpis i provjera opisa izdanja (Ed25519)
 - `videodl/widgets.py`, `videodl/icons.py` — red sa sličicom, prazan ekran, ikone
 - `videodl/browser.py` — provjera zahtjeva iz browsera
 - `videodl/bridge.py` — lokalni most u aplikaciji (127.0.0.1 + token)

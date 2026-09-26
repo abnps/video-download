@@ -1,0 +1,12 @@
+# Tačne verzije za izdanje i CI (iste kao tools/build-lock.json; test provjerava da se slažu).
+PySide6==6.11.2
+shiboken6==6.11.2
+yt-dlp==2026.8.19
+yt-dlp-ejs==0.8.0
+curl_cffi==0.16.3
+certifi==2026.7.22
+brotli==1.2.0
+requests==2.34.2
+urllib3==2.7.0
+pycryptodomex==3.23.0
+pyinstaller==6.22.2

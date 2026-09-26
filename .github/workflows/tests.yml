@@ -1,0 +1,35 @@
+# Svi testovi na čistom Windowsu, sa zaključanim verzijama (requirements-lock.txt), na svaki push i PR.
+name: Testovi
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Zavisnosti (zaključane verzije)
+        run: python -m pip install -r requirements-lock.txt
+      - name: ffmpeg (testovi titlova, konverzije i prenosa uživo)
+        run: choco install ffmpeg -y --no-progress
+      - name: Python testovi
+        run: python -m unittest discover -s tests -v
+      - name: JS testovi (dodatak)
+        run: node --test "tests/extension/*.test.mjs"

@@ -52,6 +52,12 @@ TEXTS = {
             f"such as your IP address for security and operation; see <a href=\"{GITHUB_PRIVACY}\">GitHub's privacy statement</a>.",
             "The installer is downloaded from GitHub (same terms as above).",
             "The support button leads to PayPal; PayPal only receives data when you open it, under its own rules.",
+            "<b>Problem reports</b> go to GitHub Issues and are <b>public</b> (a GitHub account is needed). The app's "
+            "problem report shortens links to the site name and hides your Windows user name; don't add passwords, "
+            "cookies or personal data.",
+            "<b>Contributions</b> are processed by PayPal. As the recipient, the author sees what PayPal shows for every "
+            "payment (e.g. the payer's name and e-mail) and uses it only for bookkeeping, never for advertising or "
+            "anything else.",
         ),
         "licenses_title": "Licenses",
         "licenses_lead": "Video Download uses the following software by other authors. Their licenses apply to them; the "
@@ -103,6 +109,10 @@ The browser may therefore remind you about “Developer mode”; that is expecte
             f"npr. IP adresu, radi sigurnosti i rada servisa; vidi <a href=\"{GITHUB_PRIVACY}\">izjavu o privatnosti GitHub-a</a>.",
             "Instaler se preuzima sa GitHub-a (isti uslovi kao gore).",
             "Dugme za prilog vodi na PayPal; PayPal dobija podatke tek kad ga otvoriš, po svojim pravilima.",
+            "<b>Prijave problema</b> idu na GitHub Issues i <b>javne su</b> (treba GitHub nalog). Izvještaj iz programa "
+            "skraćuje linkove na ime sajta i skriva tvoje korisničko ime u Windowsu; ne dodaj lozinke, kolačiće ni lične podatke.",
+            "<b>Prilozi</b> idu preko PayPal-a. Kao primalac, autor vidi ono što PayPal pokazuje za svaku uplatu (npr. ime i "
+            "e-mail uplatioca) i koristi to samo za evidenciju, nikad za reklame ni bilo šta drugo.",
         ),
         "licenses_title": "Licence",
         "licenses_lead": "Video Download koristi sljedeći softver drugih autora. Njihove licence važe za njih; puni tekstovi "

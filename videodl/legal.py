@@ -45,9 +45,11 @@ PYTHON_DISTRIBUTIONS = ("yt-dlp", "yt-dlp-ejs", "curl_cffi", "certifi", "brotli"
 COMPONENTS = (
     Component("yt-dlp", "Unlicense", "https://github.com/yt-dlp/yt-dlp", ("yt-dlp-LICENSE",)),
     Component("yt-dlp-ejs", "Unlicense, MIT, ISC", "https://github.com/yt-dlp/ejs", ("yt-dlp-ejs-LICENSE",)),
-    Component("FFmpeg (essentials build by gyan.dev)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
-              "Source code of the exact build: https://www.gyan.dev/ffmpeg/builds/ and "
-              "https://github.com/GyanD/codexffmpeg . A copy of the source code is available on request."),
+    Component("FFmpeg 9.0.2 (essentials build by gyan.dev)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
+              "Bundled binaries: ffmpeg/ffprobe version 9.0.2-essentials_build-www.gyan.dev (SHA-256 in "
+              "BUILD-MANIFEST.json). Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; "
+              "build configuration: https://www.gyan.dev/ffmpeg/builds/ and https://github.com/GyanD/codexffmpeg . "
+              "A copy of the complete corresponding source code is available on request for three years."),
     Component("Qt for Python (PySide6, Shiboken6)", "LGPL-3.0", "https://doc.qt.io/qtforpython/",
               ("LGPL-3.0.txt", "GPL-3.0.txt"),
               "Source code: https://code.qt.io/ . The Qt libraries are separate files and can be replaced."),

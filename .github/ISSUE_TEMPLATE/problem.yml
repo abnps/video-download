@@ -1,0 +1,39 @@
+name: Problem / Problem
+description: Nešto ne radi kako treba / Something doesn't work
+labels: ["problem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Prijave su JAVNE.** Ne upisuj lozinke, kolačiće, lične podatke ni linkove na privatne videe.
+        Izvještaj iz programa (Pomoć → Sačuvaj izvještaj o problemu) već skraćuje linkove na ime sajta.
+        **Reports are PUBLIC.** Don't include passwords, cookies, personal data or links to private videos.
+  - type: input
+    id: version
+    attributes:
+      label: Verzija programa / App version
+      description: Pomoć → O programu / Help → About
+      placeholder: "0.9.6"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Koraci / Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Šta se desilo, a šta je trebalo / What happened vs. what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Izvještaj o problemu (opcionalno) / Problem report (optional)
+      description: Sadržaj fajla iz Pomoć → Sačuvaj izvještaj o problemu / Contents of Help → Save a problem report
+      render: text

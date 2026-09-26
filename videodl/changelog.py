@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.6", "26.9.2026", {
+        "bs": ["Ažuriranja su digitalno potpisana: program instalira samo novu verziju koju smo mi potpisali, čak i ako neko podmetne drugi fajl na mjesto objave.",
+               "Pri prvom pokretanju kratka obavijest da program prati kopirane linkove, s dugmetom da se to odmah isključi.",
+               "Zaostali privremeni fajlovi s kolačićima (poslije naglog prekida) brišu se pri sljedećem pokretanju; duge liste troše manje memorije.",
+               "Veza s dodatkom u pretraživaču otpornija je na spore i zaglavljene zahtjeve."],
+        "en": ["Updates are digitally signed: the app installs only a new version signed by us, even if someone swaps the file where it is published.",
+               "On first start, a short notice that the app watches copied links, with a button to turn it off right away.",
+               "Leftover temporary cookie files (after a sudden shutdown) are removed on the next start; long lists use less memory.",
+               "The connection with the browser add-on copes better with slow or stuck requests."],
+        "de": ["Updates sind digital signiert: Das Programm installiert nur eine von uns signierte neue Version, selbst wenn jemand die Datei am Veröffentlichungsort austauscht.",
+               "Beim ersten Start ein kurzer Hinweis, dass das Programm kopierte Links beobachtet, mit einer Schaltfläche zum sofortigen Abschalten.",
+               "Übrig gebliebene temporäre Cookie-Dateien (nach einem plötzlichen Abbruch) werden beim nächsten Start gelöscht; lange Listen brauchen weniger Speicher.",
+               "Die Verbindung zum Browser-Add-on kommt besser mit langsamen oder hängenden Anfragen zurecht."],
+        "es": ["Las actualizaciones están firmadas digitalmente: el programa solo instala una versión nueva firmada por nosotros, aunque alguien cambie el archivo donde se publica.",
+               "En el primer inicio, un breve aviso de que el programa vigila los enlaces copiados, con un botón para desactivarlo en el acto.",
+               "Los archivos temporales de cookies que quedan (tras un cierre repentino) se borran en el siguiente inicio; las listas largas usan menos memoria.",
+               "La conexión con el complemento del navegador resiste mejor las peticiones lentas o bloqueadas."],
+        "fr": ["Les mises à jour sont signées numériquement : le programme n'installe qu'une nouvelle version signée par nous, même si quelqu'un remplace le fichier publié.",
+               "Au premier démarrage, un court avis indiquant que le programme surveille les liens copiés, avec un bouton pour le désactiver tout de suite.",
+               "Les fichiers temporaires de cookies restants (après un arrêt brutal) sont supprimés au démarrage suivant ; les longues listes utilisent moins de mémoire.",
+               "La connexion avec le module du navigateur résiste mieux aux requêtes lentes ou bloquées."],
+    }),
     ("0.9.5", "26.9.2026", {
         "bs": ["1080p, 720p i 480p dobijaju oznaku u imenu fajla, pa različit kvalitet istog videa više nije „već preuzeto“.",
                "Dva videa istog naslova (ime fajla bez ID-a) više se ne miješaju; isti video pokrenut dvaput istovremeno čeka da prvi završi.",

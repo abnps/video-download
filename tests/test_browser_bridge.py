@@ -7,7 +7,9 @@ import re
 import os
 import tempfile
 import threading
+import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from videodl import native_host
@@ -119,6 +121,59 @@ class BridgeServerTest(unittest.TestCase):
         headers = {native_host.TOKEN_HEADER: self.server.token, "Host": f"zli.sajt:{self.server.port}"}
         self.assertEqual(self.raw("POST", "/add", payload, headers)[0], 403)
         self.assertEqual(self.added, [])
+
+    def test_slow_client_is_cut_off_and_extra_connections_are_refused(self):
+        import socket
+
+        from videodl import bridge as bridge_module
+
+        # Zaglavljeni klijenti (otvore vezu i ništa ne pošalju) popune sva mjesta…
+        stuck = [socket.create_connection(("127.0.0.1", self.server.port)) for _ in range(bridge_module.MAX_CONNECTIONS)]
+        self.addCleanup(lambda: [s.close() for s in stuck])
+        time.sleep(0.3)
+        # …višak se odmah zatvara umjesto da čeka…
+        extra = socket.create_connection(("127.0.0.1", self.server.port))
+        extra.settimeout(3)
+        try:
+            self.assertEqual(extra.recv(1), b"")  # server je odmah zatvorio vezu
+        except ConnectionResetError:
+            pass
+        finally:
+            extra.close()
+        # …a poslije roka za čitanje mjesta se oslobode i program opet normalno odgovara.
+        for s in stuck:
+            s.close()
+        deadline = time.monotonic() + 5
+        status = None
+        while time.monotonic() < deadline and status != 200:
+            try:
+                status, _ = self.raw("GET", "/ping", headers={native_host.TOKEN_HEADER: self.server.token,
+                                                              "Host": f"127.0.0.1:{self.server.port}"})
+            except OSError:
+                time.sleep(0.1)
+        self.assertEqual(status, 200)
+
+    def test_request_that_never_finishes_times_out(self):
+        import socket
+
+        from videodl import bridge as bridge_module
+
+        self.assertLessEqual(bridge_module.READ_TIMEOUT_SECONDS, 30)
+        with mock.patch.object(bridge_module, "READ_TIMEOUT_SECONDS", 0.5):
+            server = bridge_module.BridgeServer(lambda r: None, lambda: None, path=Path(self.tmp.name) / "b2.json")
+            server.start()
+            self.addCleanup(server.stop)
+            client = socket.create_connection(("127.0.0.1", server.port))
+            client.sendall(b"GET /ping HTTP/1.1\r\n")  # pola zaglavlja, pa ništa
+            client.settimeout(5)
+            started = time.monotonic()
+            try:
+                client.recv(1024)
+            except (ConnectionResetError, socket.timeout):
+                pass
+            finally:
+                client.close()
+            self.assertLess(time.monotonic() - started, 4)  # server je prekinuo, nije čekao zauvijek
 
     def test_add_and_focus_with_token(self):
         bridge = native_host.read_bridge(self.bridge_file)

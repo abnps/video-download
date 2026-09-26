@@ -15,6 +15,34 @@ from .i18n import get_language
 from .native_host import TOKEN_HEADER, bridge_path
 
 MAX_BODY_BYTES = 1024 * 1024
+READ_TIMEOUT_SECONDS = 10  # spor ili zaglavljen klijent ne drži nit zauvijek
+MAX_CONNECTIONS = 8  # dodatak šalje po jedan zahtjev; više istovremenih je greška ili napad
+
+
+class _LimitedServer(ThreadingHTTPServer):
+    """Najviše MAX_CONNECTIONS veza odjednom; višak se odmah zatvara."""
+
+    daemon_threads = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._slots = threading.BoundedSemaphore(MAX_CONNECTIONS)
+
+    def process_request(self, request, client_address):
+        if not self._slots.acquire(blocking=False):
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self._slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._slots.release()
 
 
 class BridgeServer:
@@ -32,8 +60,7 @@ class BridgeServer:
         return self._server.server_address[1]
 
     def start(self) -> None:
-        self._server = ThreadingHTTPServer(("127.0.0.1", 0), _make_handler(self))
-        self._server.daemon_threads = True
+        self._server = _LimitedServer(("127.0.0.1", 0), _make_handler(self))
         threading.Thread(target=self._server.serve_forever, daemon=True).start()
         self._path.parent.mkdir(parents=True, exist_ok=True)
         temporary = self._path.with_suffix(".tmp")
@@ -58,6 +85,7 @@ class BridgeServer:
 def _make_handler(bridge: BridgeServer):
     class Handler(BaseHTTPRequestHandler):
         server_version = "VideoDownload"
+        timeout = READ_TIMEOUT_SECONDS  # rok za čitanje zaglavlja i tijela zahtjeva
 
         def log_message(self, format, *args):
             pass  # pythonw nema konzolu

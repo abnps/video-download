@@ -102,13 +102,25 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   izvorni kod tog builda (vidi THIRD-PARTY-NOTICES u `tools/build_release.py`).
 - Ažuriranje čita posljednje izdanje repoa `abnps/video-download` običnim HTTPS-om (od v0.6.2,
   bez GitHub naloga); `gh` prijava je samo rezerva ako GitHub odbije pristup (privatan repo)
-  (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
+  (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe`, `.exe.sha256`,
+  `release.json` i `release.json.sig`.
+- Potpis izdanja (v0.9.6, Paket 3): `videodl/release_signing.py`, Ed25519 (Cryptodome, već u paketu uz
+  yt-dlp). `release.json` = {app, version, installer, size, sha256}; aplikacija ga provjeri javnim ključem
+  iz `PUBLIC_KEYS` PRIJE preuzimanja instalera i odbija nepotpisano (`update.unsigned`). Privatni ključ je
+  SAMO kod Ahmeda: `%USERPROFILE%\.videodl\release-signing-key.pem` — nikad u repo, vault ili log; bez
+  njega (ili rezervne kopije) instalirane verzije 0.9.6+ više ne mogu dobiti ažuriranje. Zamjena ključa:
+  novi javni ključ se doda u `PUBLIC_KEYS` u jednom izdanju potpisanom STARIM ključem.
+- Build (`tools/build_release.py`): tačne verzije paketa i SHA-256 alata su u `tools/build-lock.json`
+  (`requirements-lock.txt` za pip); neslaganje = build staje. Prije pakovanja pokreće sve testove
+  (`VIDEODL_SKIP_CHECKS=1` samo u nuždi), u paket upisuje `BUILD-MANIFEST.json`. GitHub Actions
+  (`.github/workflows/tests.yml`) pokreće testove na svaki push; sajt se objavljuje tek kad `test_site` prođe.
 - yt-dlp: verzija koja RADI se nikad ne briše (`prune` je uvijek čuva); nova se aktivira tek pri
   sljedećem pokretanju i mora napraviti `YoutubeDL` (ne samo pročitati broj verzije). Ako ne može, briše
   se, dobija oznaku `<verzija>.neispravna` (više se ne preuzima) i radi prethodna ispravna.
 - Stabilizaciono izdanje v0.9.4 (26.9.2026, Ahmed: „kreni" na pregled Codex-a): prije novih funkcija
   ispravljaju se problemi iz pregleda (Paket 1 gotov; Paket 2: imena fajlova po kvalitetu, prekid
-  konverzije, provjera gotovog fajla; Paket 3: CI i potpisan opis izdanja).
+  konverzije, provjera gotovog fajla; Paket 3 (v0.9.6): CI, zaključane verzije, potpisan opis izdanja,
+  ograničen most, čišćenje zaostalih kolačića, obavijest o praćenju clipboarda, dijalozi u `dialogs.py`).
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
   SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz
   `pokreni.pyw` mora ostati PRIJE prvog `import yt_dlp` (inače radi verzija iz paketa).

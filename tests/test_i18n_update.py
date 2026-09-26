@@ -17,7 +17,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QSettings  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from videodl import __version__, updater  # noqa: E402
+from videodl import __version__, release_signing, updater  # noqa: E402
 from videodl.gui import MainWindow  # noqa: E402
 from videodl.i18n import LANGUAGES, TEXTS, get_language, pick_language, set_language, tr  # noqa: E402
 
@@ -93,6 +93,27 @@ class UpdaterTest(unittest.TestCase):
         self.installer = b"MZ fake installer" * 1000
         self.digest = hashlib.sha256(self.installer).hexdigest()
         self.urls = []
+        # Testni ključ umjesto pravog (privatni pravi ključ je samo kod vlasnika).
+        from Cryptodome.PublicKey import ECC
+
+        self.key = ECC.generate(curve="ed25519")
+        patcher = mock.patch.object(release_signing, "PUBLIC_KEYS", (release_signing.public_key_hex(self.key),))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def signed(self, version="9.9.9", installer=None, key=None):
+        """(release.json, release.json.sig) za instaler, potpisano testnim (ili zadatim) ključem."""
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / f"VideoDownload-Setup-{version}.exe"
+            path.write_bytes(self.installer if installer is None else installer)
+            data = release_signing.manifest_bytes(version, path)
+        return data, (release_signing.sign(data, key or self.key).hex() + "\n").encode()
+
+    def files(self, release, installer=None, signed=None, checksum=None):
+        manifest, signature = signed or self.signed(release.version)
+        return {release.checksum_url: (checksum or f"{self.digest}  x.exe\n").encode(),
+                release.installer_url: self.installer if installer is None else installer,
+                release.manifest_url: manifest, release.signature_url: signature}
 
     def opener(self, pages):
         def open_url(request, timeout):
@@ -108,6 +129,8 @@ class UpdaterTest(unittest.TestCase):
                 {"name": name, "browser_download_url": f"https://github.com/r/{name}", "size": len(self.installer)},
                 {"name": f"{name}.sha256", "browser_download_url": f"https://github.com/r/{name}.sha256"},
                 {"name": "izvorni.zip", "browser_download_url": "https://github.com/r/izvorni.zip"},
+                {"name": "release.json", "browser_download_url": "https://github.com/r/release.json"},
+                {"name": "release.json.sig", "browser_download_url": "https://github.com/r/release.json.sig"},
             ],
         }).encode("utf-8")
 
@@ -137,18 +160,54 @@ class UpdaterTest(unittest.TestCase):
         pages = {LATEST: self.release_json()}
         release = updater.fetch_latest(url=LATEST, opener=self.opener(pages))
         with tempfile.TemporaryDirectory() as tmp:
-            good = {release.checksum_url: f"{self.digest}  x.exe\n".encode(), release.installer_url: self.installer}
+            good = self.files(release)
             progress = []
             path = updater.download_installer(release, Path(tmp), on_progress=lambda d, t: progress.append((d, t)),
                                               opener=self.opener(good))
             self.assertEqual(path.read_bytes(), self.installer)
             self.assertEqual(progress[-1], (len(self.installer), len(self.installer)))
 
-            bad = {release.checksum_url: ("0" * 64).encode(), release.installer_url: self.installer}
+            bad = self.files(release, checksum="0" * 64)
             with self.assertRaises(updater.UpdateError) as caught:
                 updater.download_installer(release, Path(tmp) / "b", opener=self.opener(bad))
             self.assertEqual(caught.exception.key, "update.checksum")
             self.assertEqual(list((Path(tmp) / "b").iterdir()), [])  # ništa neprovjereno ne ostaje
+
+    def test_unsigned_forged_or_swapped_update_is_refused(self):
+        from Cryptodome.PublicKey import ECC
+
+        release = updater.fetch_latest(url=LATEST, opener=self.opener({LATEST: self.release_json()}))
+        swapped = b"MZ tudji instaler" * 1000
+        cases = {
+            # potpisao neko drugi (napadač koji je preuzeo mjesto objave nema naš ključ)
+            "forged": self.files(release, signed=self.signed(key=ECC.generate(curve="ed25519"))),
+            # instaler zamijenjen, a .sha256 prepravljen da mu odgovara: potpis to ipak otkriva
+            "swapped": self.files(release, installer=swapped,
+                                  checksum=hashlib.sha256(swapped).hexdigest()),
+            # potpisan opis starije verzije podmetnut uz novu
+            "other_version": self.files(release, signed=self.signed(version="1.0.0")),
+            # oštećen potpis
+            "garbage": self.files(release, signed=(self.signed()[0], b"nije-hex")),
+        }
+        for name, files in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as tmp:
+                with self.assertRaises(updater.UpdateError) as caught:
+                    updater.download_installer(release, Path(tmp), opener=self.opener(files))
+                self.assertEqual(caught.exception.key, "update.unsigned")
+                self.assertEqual(list(Path(tmp).iterdir()), [])  # ništa se ne pokreće, ništa ne ostaje
+
+        unsigned = updater.Release("9.9.9", "", release.installer_name, release.installer_url, release.checksum_url, 1)
+        with tempfile.TemporaryDirectory() as tmp, self.assertRaises(updater.UpdateError) as caught:
+            updater.download_installer(unsigned, Path(tmp), opener=self.opener(self.files(release)))
+        self.assertEqual(caught.exception.key, "update.unsigned")
+
+    def test_real_public_key_is_embedded_and_signing_key_is_not_in_repo(self):
+        import videodl
+
+        repo = Path(videodl.__file__).resolve().parent.parent
+        text = (repo / "videodl" / "release_signing.py").read_text(encoding="utf-8")
+        self.assertRegex(text, r'PUBLIC_KEYS = \("[0-9a-f]{64}",\)')
+        self.assertFalse(list(repo.rglob("*signing-key*.pem")))  # privatni ključ nikad u repou
 
     def test_insecure_urls_are_refused(self):
         with self.assertRaises(updater.UpdateError):
@@ -170,8 +229,7 @@ class UpdaterTest(unittest.TestCase):
             self.assertEqual(release.version, "9.9.9")
             self.assertTrue(release.installer_url.startswith("https://github.com/"))  # preuzima se HTTPS-om
             with tempfile.TemporaryDirectory() as tmp:
-                files = {release.checksum_url: f"{self.digest}  x.exe\n".encode(), release.installer_url: self.installer}
-                path = updater.download_installer(release, Path(tmp), opener=self.opener(files))
+                path = updater.download_installer(release, Path(tmp), opener=self.opener(self.files(release)))
                 self.assertEqual(path.read_bytes(), self.installer)
         self.assertEqual(self.urls[0], updater.LATEST_URL)
 
@@ -193,6 +251,7 @@ class UpdaterTest(unittest.TestCase):
             with tempfile.TemporaryDirectory() as tmp:
                 target = Path(tmp)
                 installer = self.installer
+                manifest, signature = self.signed(release.version)
 
                 class FakeGh:
                     def __init__(self, args, **kwargs):
@@ -201,6 +260,8 @@ class UpdaterTest(unittest.TestCase):
                         (target / release.installer_name).write_bytes(installer)
                         digest = hashlib.sha256(installer).hexdigest()
                         (target / f"{release.installer_name}.sha256").write_text(f"{digest}  x\n")
+                        (target / "release.json").write_bytes(manifest)
+                        (target / "release.json.sig").write_bytes(signature)
 
                     def poll(self):
                         return 0

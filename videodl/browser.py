@@ -140,13 +140,41 @@ def _domain_matches(host: str | None, cookie: Cookie) -> bool:
     return host == bare or (not cookie.host_only and host.endswith(f".{bare}"))
 
 
+COOKIE_PREFIX = "videodl-cookies-"
+STALE_COOKIE_SECONDS = 60 * 60
+
+
+def remove_stale_cookie_files(folder: str | None = None, now: float | None = None) -> int:
+    """Nagli prekid programa (pad, gašenje računara) može ostaviti privremeni fajl s kolačićima.
+    Pri pokretanju se brišu samo NAŠI (po imenu) i stariji od sat vremena — aktivno preuzimanje
+    svoj fajl ima tek nekoliko sekundi/minuta i briše ga samo."""
+    import time
+
+    folder = folder or tempfile.gettempdir()
+    now = now if now is not None else time.time()
+    removed = 0
+    try:
+        names = os.listdir(folder)
+    except OSError:
+        return 0
+    for name in names:
+        if not (name.startswith(COOKIE_PREFIX) and name.endswith(".txt")):
+            continue
+        path = os.path.join(folder, name)
+        with contextlib.suppress(OSError):
+            if os.path.isfile(path) and now - os.path.getmtime(path) > STALE_COOKIE_SECONDS:
+                os.remove(path)
+                removed += 1
+    return removed
+
+
 @contextlib.contextmanager
 def cookie_file(cookies: tuple[Cookie, ...] | list[Cookie] | None) -> Iterator[str | None]:
     """Privremeni Netscape cookies fajl za yt-dlp; briše se čim se blok završi."""
     if not cookies:
         yield None
         return
-    handle, path = tempfile.mkstemp(prefix="videodl-cookies-", suffix=".txt")
+    handle, path = tempfile.mkstemp(prefix=COOKIE_PREFIX, suffix=".txt")
     try:
         with os.fdopen(handle, "w", encoding="utf-8", newline="\n") as file:
             file.write("# Netscape HTTP Cookie File\n")
