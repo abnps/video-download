@@ -47,6 +47,31 @@ class DownloadResult:
     already_existed: bool = False
 
 
+class RateBudget:
+    """Zajedničko ograničenje brzine: dijeli se na preuzimanja koja STVARNO rade.
+
+    Jedno preuzimanje dobija cijeli limit; kad krene drugo, oba dobijaju pola. yt-dlp za obična
+    HTTP preuzimanja čita `ratelimit` iz svojih postavki pri svakom dijelu, pa se udio mijenja
+    i usred preuzimanja (HLS dijelovi dobijaju udio koji važi kad počnu)."""
+
+    def __init__(self, bytes_per_second: int):
+        self.total = int(bytes_per_second)
+        self._active = 0
+        self._lock = threading.Lock()
+
+    def join(self) -> None:
+        with self._lock:
+            self._active += 1
+
+    def leave(self) -> None:
+        with self._lock:
+            self._active = max(0, self._active - 1)
+
+    def share(self) -> int:
+        with self._lock:
+            return max(1, self.total // max(1, self._active))
+
+
 class PartsProgress:
     """Spaja napredak više dijelova (video + zvuk) u jedan ukupan procenat."""
 
@@ -165,22 +190,37 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              subtitles: bool = False,
              subtitle_langs: list[str] | None = None,
              thumbnail: bool = False,
-             ratelimit: int | None = None,
+             ratelimit: "int | RateBudget | None" = None,
              name_template: str | None = None) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
+    if isinstance(ratelimit, RateBudget):
+        budget = ratelimit
+        budget.join()
+        try:
+            return download(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
+                            filename_title=filename_title, cookies=cookies, section=section, subtitles=subtitles,
+                            subtitle_langs=subtitle_langs, thumbnail=thumbnail, ratelimit=_LiveShare(budget),
+                            name_template=name_template)
+        finally:
+            budget.leave()
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     no_subtitles = False
     try:
         # Kolačići prijave postoje na disku samo dok radi ovo jedno preuzimanje.
         with cookie_file(cookies) as cookiefile:
+            live = ratelimit if isinstance(ratelimit, _LiveShare) else None
             opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
                                      filename_title=filename_title, source_url=url, cookiefile=cookiefile,
                                      section=section, subtitles=subtitles, subtitle_langs=subtitle_langs,
-                                     thumbnail=thumbnail, ratelimit=ratelimit, name_template=name_template)
+                                     thumbnail=thumbnail, ratelimit=live.budget.share() if live else ratelimit,
+                                     name_template=name_template)
             opts["progress_hooks"] = [attempt.progress_hook]
+            if live:
+                # Udio se osvježava pri svakom javljanju napretka (drugo preuzimanje počelo ili završilo).
+                opts["progress_hooks"].append(lambda _d: opts.__setitem__("ratelimit", live.budget.share()))
             opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
             with YoutubeDL(opts) as ydl:
                 ydl.add_post_processor(_PartsRecorderPP(attempt.record_parts), when="before_dl")
@@ -233,6 +273,13 @@ def _plain_name_for_first_subtitle(video: str, requested: dict) -> None:
     candidate = f"{base}.{first}.srt"
     if os.path.isfile(candidate):
         os.replace(candidate, plain)
+
+
+class _LiveShare:
+    """Oznaka da je limit iz zajedničkog budžeta (budžet je već prijavio ovo preuzimanje)."""
+
+    def __init__(self, budget: RateBudget):
+        self.budget = budget
 
 
 def _final_path(info: dict | None) -> str | None:

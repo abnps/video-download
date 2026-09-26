@@ -74,7 +74,7 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Firefox dodatak (26.9.2026, „nastaviti ekstenziju"): isti kod iz `extension/`, manifest pravi
   `python tools/build_firefox.py` (gecko ID `video-download@abnps.github.io`, background.scripts umjesto
-  service_worker, Firefox 128+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`
+  service_worker, Firefox 140+, Android 142+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`
   s posebnim manifestom (`allowed_extensions`). Chromium-only opcije (npr. webRequest `extraHeaders`) samo uz
   provjeru postojanja. Potpis: Ahmed predaje ZIP na addons.mozilla.org kao „On your own" (nelistano) sa
   svog naloga. Potpisan .xpi ide u `site/firefox/`, a unos (verzija, link, sha256) u
@@ -103,6 +103,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - Ažuriranje čita posljednje izdanje repoa `abnps/video-download` običnim HTTPS-om (od v0.6.2,
   bez GitHub naloga); `gh` prijava je samo rezerva ako GitHub odbije pristup (privatan repo)
   (bez tokena u .exe); izdanje mora imati `VideoDownload-Setup-<verzija>.exe` i `.exe.sha256`.
+- yt-dlp: verzija koja RADI se nikad ne briše (`prune` je uvijek čuva); nova se aktivira tek pri
+  sljedećem pokretanju i mora napraviti `YoutubeDL` (ne samo pročitati broj verzije). Ako ne može, briše
+  se, dobija oznaku `<verzija>.neispravna` (više se ne preuzima) i radi prethodna ispravna.
+- Stabilizaciono izdanje v0.9.4 (26.9.2026, Ahmed: „kreni" na pregled Codex-a): prije novih funkcija
+  ispravljaju se problemi iz pregleda (Paket 1 gotov; Paket 2: imena fajlova po kvalitetu, prekid
+  konverzije, provjera gotovog fajla; Paket 3: CI i potpisan opis izdanja).
 - yt-dlp se ažurira odvojeno od aplikacije (`videodl/ytdlp_update.py`): wheel sa PyPI-ja uz
   SHA-256, raspakuje se u `%LOCALAPPDATA%\VideoDownload\yt-dlp\<verzija>`, a `activate()` iz
   `pokreni.pyw` mora ostati PRIJE prvog `import yt_dlp` (inače radi verzija iz paketa).

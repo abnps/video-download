@@ -113,13 +113,34 @@ class YtdlpUpdateTest(unittest.TestCase):
         self.assertEqual(sorted(path.name for path in folder.iterdir()), ["yt_dlp"])
         self.assertFalse((ytdlp_update.store_dir() / "pobjegao.txt").exists())
 
-    def test_old_versions_are_removed(self):
-        for version in ("2098.1.1", "2099.1.1"):
+    def make_installed(self, *versions):
+        for version in versions:
             target = ytdlp_update.store_dir() / version / "yt_dlp"
             target.mkdir(parents=True)
             (target / "version.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
-        ytdlp_update.prune(keep=("2099.1.1",))
-        self.assertEqual(ytdlp_update.installed_versions(), ["2099.1.1"])
+
+    def test_old_versions_are_removed_but_never_the_active_one(self):
+        self.make_installed("2097.1.1", "2098.1.1", "2099.1.1")
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2098.1.1"):
+            ytdlp_update.prune(keep=("2099.1.1",))
+        self.assertEqual(ytdlp_update.installed_versions(), ["2099.1.1", "2098.1.1"])
+
+    def test_update_while_running_keeps_the_version_in_use(self):
+        # Program radi s ranije preuzetom verzijom; nova se preuzme, a ona u upotrebi ostaje
+        # (učitava module tek kad zatrebaju) i služi kao posljednja ispravna za povratak.
+        self.make_installed("2098.1.1")
+        pages = {PYPI: self.pypi_json(), WHEEL: self.wheel}
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2098.1.1"):
+            ytdlp_update.install(ytdlp_update.fetch_latest(opener=self.opener(pages)), opener=self.opener(pages))
+        self.assertEqual(ytdlp_update.installed_versions(), ["2099.1.1", "2098.1.1"])
+        self.assertTrue((ytdlp_update.store_dir() / "2098.1.1" / "yt_dlp" / "version.py").is_file())
+
+    def test_version_that_failed_at_startup_is_not_downloaded_again(self):
+        ytdlp_update.store_dir().mkdir(parents=True, exist_ok=True)
+        (ytdlp_update.store_dir() / f"2099.1.1{ytdlp_update.BAD_SUFFIX}").write_text("", encoding="utf-8")
+        pages = {PYPI: self.pypi_json(), WHEEL: self.wheel}
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2026.8.19"):
+            self.assertIsNone(ytdlp_update.fetch_latest(opener=self.opener(pages)))
 
     def test_insecure_url_is_refused(self):
         with self.assertRaises(ytdlp_update.YtdlpUpdateError):
@@ -142,13 +163,32 @@ class ActivationTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return result.stdout.strip()
 
+    @staticmethod
+    def make_package(store: Path, version: str, init_extra: str = "") -> Path:
+        package = store / version / "yt_dlp"
+        package.mkdir(parents=True)
+        (package / "__init__.py").write_text(
+            "from .version import __version__\n" + init_extra +
+            "class YoutubeDL:\n    def __init__(self, params=None): pass\n    def close(self): pass\n",
+            encoding="utf-8")
+        (package / "version.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
+        return package
+
+    def test_new_version_that_cannot_work_falls_back_to_last_good(self):
+        # Broj verzije je ispravan, ali paket ne radi s našim zavisnostima: radi prethodna ispravna.
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Path(tmp) / "yt-dlp"
+            self.make_package(store, "2098.1.1")
+            self.make_package(store, "2099.1.1", init_extra="import nepostojeca_zavisnost\n")
+            self.assertEqual(self.run_child(Path(tmp), "2098.1.1"), "2098.1.1")
+            self.assertFalse((store / "2099.1.1").exists())
+            self.assertTrue((store / "2099.1.1.neispravna").is_file())  # ne preuzima se ponovo
+            self.assertTrue((store / "2098.1.1").exists())
+
     def test_downloaded_version_wins_and_broken_one_is_dropped(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = Path(tmp) / "yt-dlp"
-            package = store / "2099.1.1" / "yt_dlp"
-            package.mkdir(parents=True)
-            (package / "__init__.py").write_text("from .version import __version__\n", encoding="utf-8")
-            (package / "version.py").write_text('__version__ = "2099.1.1"\n', encoding="utf-8")
+            package = self.make_package(store, "2099.1.1")
             self.assertEqual(self.run_child(Path(tmp), "2099.1.1"), "2099.1.1")
 
             # Neispravan paket: aplikacija se vraća na yt-dlp iz instalacije, a folder se briše.

@@ -95,6 +95,15 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
 
 ## Faza 2 — Dorada
 
+- [x] Stabilizacija, Paket 1 (26.9.2026, v0.9.4; iz pregleda Codex-a, sve tvrdnje provjerene u kodu):
+  isti link poslije „Zaustavi"; yt-dlp čuva aktivnu i posljednju ispravnu verziju; otporna istorija i
+  red (loše polje ne ruši, oštećen fajl se čuva kao `.ostecen`, neuspio upis se javlja); deinstalacija
+  briše Firefox ključ (test poredi s registracijom); limit brzine kao zajednički budžet; README/AGENTS
+  i SmartScreen tekst usklađeni sa stvarnim ponašanjem. Netačno u pregledu: Mutagen (nije u paketu) i
+  „Free/Pro" (odluka je besplatno + prilozi).
+- [ ] Paket 2: odvojena imena za 720p/1080p, jedinstvena privremena imena i prekid konverzije bez
+  izlaza ffmpeg-a, provjera gotovog fajla prije „Završeno", zatvaranje bez zamrzavanja.
+- [ ] Paket 3: GitHub Actions pokreće testove prije objave, zaključane verzije alata, potpisan opis izdanja.
 - [ ] Nova adresa (25.9.2026, v0.9.1): repo prelazi u organizaciju `abnps` (Ahmed je napravio organizaciju;
   prebacivanje repoa radi Ahmed u GitHub postavkama), sajt `abnps.github.io/video-download`.
 - [x] Udobnost (25.9.2026, v0.9.0; Ahmed: „23456", bez stavke 1 „Završeno · MB za s"):

@@ -27,10 +27,11 @@ izdanjima repoa `abnps/video-download` (GitHub → Releases).
 - Instalira se samo za tvog korisnika (`%LOCALAPPDATA%\Programs\Video Download`),
   bez administratorskih prava. Python, ffmpeg i Node su u paketu.
 - **Pomoć → Provjeri ažuriranje** ili tiha provjera pri pokretanju (najviše jednom
-  dnevno): nova verzija se preuzme preko GitHub CLI (`gh`) prijave na tom računaru,
-  provjeri SHA-256 i instalira preko postojeće. Bez `gh` prijave ažuriranje javlja grešku.
+  dnevno): nova verzija se preuzme običnim HTTPS-om sa javnih GitHub izdanja (bez naloga
+  i bez `gh`), provjeri SHA-256 i instalira preko postojeće.
 - Instaler nije digitalno potpisan, pa Windows SmartScreen može pitati
-  „Više informacija → Ipak pokreni".
+  „Više informacija → Ipak pokreni" — za svaki novi instaler preuzet iz browsera; ažuriranje
+  iz same aplikacije to ne traži.
 
 ## Sajt
 

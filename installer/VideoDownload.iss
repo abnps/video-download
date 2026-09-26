@@ -78,6 +78,7 @@ Root: HKCU; Subkey: "Software\VideoDownload\VideoDownload"; ValueType: string; V
 ; Registraciju za Chrome/Edge upisuje aplikacija pri pokretanju; deinstalacija je briše.
 Root: HKCU; Subkey: "Software\Google\Chrome\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
 Root: HKCU; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
+Root: HKCU; Subkey: "Software\Mozilla\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{localappdata}\VideoDownload\native-host"

@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.4", "26.9.2026", {
+        "bs": ["Stabilnost: isti link se može ponovo dodati odmah poslije „Zaustavi“.",
+               "Ažuriranje čitača sajtova (yt-dlp) više ne briše verziju koja radi; ako nova ne radi, program se sam vraća na prethodnu.",
+               "Oštećena istorija ili red ne obaraju program; ako čuvanje ne uspije, program to javi.",
+               "Deinstalacija uklanja i vezu s Firefoxom; ograničenje brzine se dijeli samo na preuzimanja koja stvarno rade."],
+        "en": ["Stability: the same link can be added again right after \u201cStop\u201d.",
+               "Updating the site reader (yt-dlp) no longer deletes the version in use; if the new one doesn't work, the app goes back to the previous one.",
+               "A damaged history or queue no longer crashes the app; if saving fails, the app tells you.",
+               "Uninstalling also removes the Firefox connection; the speed limit is shared only among downloads that are actually running."],
+        "de": ["Stabilität: Derselbe Link kann direkt nach \u201eStopp\u201c erneut hinzugefügt werden.",
+               "Das Aktualisieren des Seitenlesers (yt-dlp) löscht die laufende Version nicht mehr; funktioniert die neue nicht, kehrt das Programm zur vorherigen zurück.",
+               "Ein beschädigter Verlauf oder eine beschädigte Liste bringt das Programm nicht mehr zum Absturz; schlägt das Speichern fehl, meldet es das Programm.",
+               "Die Deinstallation entfernt auch die Firefox-Verbindung; das Tempolimit wird nur auf tatsächlich laufende Downloads verteilt."],
+        "es": ["Estabilidad: el mismo enlace se puede volver a añadir justo después de «Detener».",
+               "Actualizar el lector de sitios (yt-dlp) ya no borra la versión en uso; si la nueva no funciona, el programa vuelve a la anterior.",
+               "Un historial o una cola dañados ya no bloquean el programa; si no se puede guardar, el programa lo avisa.",
+               "La desinstalación también quita la conexión con Firefox; el límite de velocidad se reparte solo entre las descargas que realmente están en curso."],
+        "fr": ["Stabilité : le même lien peut être ajouté à nouveau juste après « Arrêter ».",
+               "La mise à jour du lecteur de sites (yt-dlp) ne supprime plus la version utilisée ; si la nouvelle ne fonctionne pas, le programme revient à la précédente.",
+               "Un historique ou une file endommagés ne font plus planter le programme ; si l'enregistrement échoue, le programme le signale.",
+               "La désinstallation supprime aussi la connexion à Firefox ; la limite de vitesse n'est partagée qu'entre les téléchargements réellement en cours."],
+    }),
     ("0.9.3", "26.9.2026", {
         "bs": ["Pomoć → Preuzimanje iz browsera: dugmad „Kopiraj putanju foldera“, „Otvori folder“ i otvaranje stranice dodataka u Edge-u ili Chrome-u; uputstvo sa slikama na sajtu.",
                "Priprema za dodatak u Firefoxu (bez developer moda)."],

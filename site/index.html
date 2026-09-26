@@ -35,11 +35,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
         Download for Windows
       </a>
-      <span class="meta"><!-- version -->Version 0.9.3 · 130 MB<!-- /version --> · Windows 10 and 11 (64-bit)</span>
+      <span class="meta"><!-- version -->Version 0.9.4 · 130 MB<!-- /version --> · Windows 10 and 11 (64-bit)</span>
     </div>
     <div class="smartscreen">
-      <p><b>First install: Windows may show a warning.</b> The installer isn't digitally signed yet, so Windows shows
-        “Windows protected your PC”. Click <b>More info</b>, then <b>Run anyway</b>. This happens only once, when installing.</p>
+      <p><b>Installing: Windows may show a warning.</b> The installer isn't digitally signed yet, so Windows may show
+        “Windows protected your PC”. Make sure the file comes from this site, then click <b>More info</b> and <b>Run anyway</b>.
+        Updates from inside the app don't show this warning.</p>
       <div class="ss-steps" aria-hidden="true">
         <div class="ss-dialog"><div class="ss-title">Windows protected your PC</div>
           <div class="ss-body">SmartScreen prevented an unrecognized app from starting.</div>
@@ -110,6 +111,11 @@
       <p class="sub">The same list as in the app (Help → What's new).</p>
       <div class="news">
 <!-- news -->
+        <div class="card"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
+          <li>Stability: the same link can be added again right after “Stop”.</li>
+          <li>Updating the site reader (yt-dlp) no longer deletes the version in use; if the new one doesn&#x27;t work, the app goes back to the previous one.</li>
+          <li>A damaged history or queue no longer crashes the app; if saving fails, the app tells you.</li>
+          <li>Uninstalling also removes the Firefox connection; the speed limit is shared only among downloads that are actually running.</li></ul></div>
         <div class="card"><h3>0.9.3 <span>26.9.2026</span></h3><ul>
           <li>Help → Downloading from the browser: buttons “Copy the folder path”, “Open the folder” and opening the extensions page in Edge or Chrome; illustrated guide on the website.</li>
           <li>Groundwork for the Firefox extension (without developer mode).</li></ul></div>
@@ -117,8 +123,6 @@
           <li>Subtitles: when a video has no manual subtitles, automatic ones are used; the subtitle is also saved as an .srt next to the video (same name, so players load it on their own), not only inside the MP4.</li>
           <li>If a subtitle can&#x27;t be downloaded, the video is still downloaded, marked “no subtitles”.</li>
           <li>In English, numbers use a decimal point (8.4 MB/s).</li></ul></div>
-        <div class="card"><h3>0.9.1 <span>25.9.2026</span></h3><ul>
-          <li>New project address: github.com/abnps/video-download and the website abnps.github.io/video-download.</li></ul></div>
 <!-- /news -->
       </div>
     </div>

@@ -3,6 +3,7 @@ import hashlib
 import http.client
 import io
 import json
+import re
 import os
 import tempfile
 import threading
@@ -266,3 +267,12 @@ class PresetFromExtensionTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class UninstallRegistryTest(unittest.TestCase):
+    def test_uninstaller_removes_every_key_the_app_registers(self):
+        # Svaki browser za koji program registruje host mora se i ukloniti pri deinstalaciji
+        # (inače ostaje zapis koji pokazuje na obrisan fajl).
+        iss = (PROJECT_ROOT / "installer" / "VideoDownload.iss").read_text(encoding="utf-8-sig")
+        removed = set(re.findall(r'Root: HKCU; Subkey: "([^"]+)"; Flags: uninsdeletekey', iss))
+        self.assertEqual(set(REGISTRY_PATHS) | set(FIREFOX_REGISTRY_PATHS), removed)

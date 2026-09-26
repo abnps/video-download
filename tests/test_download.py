@@ -2,6 +2,7 @@ import os
 import tempfile
 import threading
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from yt_dlp.postprocessor import FFmpegExtractAudioPP, FFmpegMergerPP
@@ -159,3 +160,57 @@ class DownloadErrorsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RateBudgetTest(unittest.TestCase):
+    """Limit brzine se dijeli na preuzimanja koja stvarno rade, i to uživo."""
+
+    def test_share_follows_running_downloads(self):
+        from videodl.download import RateBudget
+
+        budget = RateBudget(4_000_000)
+        self.assertEqual(budget.share(), 4_000_000)
+        budget.join()
+        self.assertEqual(budget.share(), 4_000_000)  # jedno preuzimanje: cijeli limit
+        budget.join()
+        self.assertEqual(budget.share(), 2_000_000)  # dva: pola-pola
+        budget.leave()
+        self.assertEqual(budget.share(), 4_000_000)  # drugo završilo: prvo opet dobija sve
+        budget.leave()
+        budget.leave()  # višak odjava ne ide ispod nule
+        self.assertEqual(budget.share(), 4_000_000)
+
+    def test_download_updates_its_limit_while_running(self):
+        from videodl import download as module
+        from videodl.download import RateBudget
+
+        budget = RateBudget(4_000_000)
+        seen = []
+
+        class FakeYDL:
+            def __init__(self, params):
+                self.params = params
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def add_post_processor(self, *args, **kwargs):
+                pass
+
+            def extract_info(self, url, download=True):
+                seen.append(self.params["ratelimit"])  # na početku: sam, cijeli limit
+                budget.join()  # usred preuzimanja krene još jedno
+                for hook in self.params["progress_hooks"]:
+                    hook({"status": "downloading", "info_dict": {}, "downloaded_bytes": 1})
+                seen.append(self.params["ratelimit"])
+                budget.leave()
+                return {"filepath": __file__}
+
+        with tempfile.TemporaryDirectory() as out, mock.patch.object(module, "YoutubeDL", FakeYDL):
+            result = module.download("https://v/1", get_preset("best"), out, ratelimit=budget)
+        self.assertEqual(result.status, ItemStatus.DONE)
+        self.assertEqual(seen, [4_000_000, 2_000_000])
+        self.assertEqual(budget.share(), 4_000_000)  # preuzimanje se odjavilo

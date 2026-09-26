@@ -28,6 +28,7 @@ WHEEL_NAME = re.compile(r"^yt_dlp-(\d+(?:\.\d+){1,3})-py3-none-any\.whl$")
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 MAX_WHEEL_BYTES = 64 * 1024 * 1024
 STORE_NAME = "yt-dlp"
+BAD_SUFFIX = ".neispravna"  # oznaka verzije koja se nije mogla pokrenuti: ne preuzima se ponovo
 
 
 class YtdlpUpdateError(Exception):
@@ -71,10 +72,13 @@ def activate() -> str | None:
 
     Verzija iz paketa se namjerno ne uvozi radi poređenja: prvi uvoz bi je fiksirao.
     Preuzima se samo ono što je novije od aktivne, pa je najnoviji folder uvijek pravi izbor.
+    Nova verzija mora proći i pravu provjeru (napraviti `YoutubeDL` sa zavisnostima iz paketa);
+    ako ne prođe, dobija oznaku da se više ne preuzima, a radi prethodna (posljednja ispravna).
     """
     if "yt_dlp" in sys.modules:
         return None  # prekasno: ostaje ono što je već uvezeno
-    for version in installed_versions():
+    versions = installed_versions()
+    for index, version in enumerate(versions):
         folder = store_dir() / version
         finder = _Finder(str(folder))
         sys.meta_path.insert(0, finder)  # ispred PyInstaller-ovog uvoznika iz paketa
@@ -82,6 +86,11 @@ def activate() -> str | None:
             import yt_dlp.version
 
             if yt_dlp.version.__version__ == version:
+                from yt_dlp import YoutubeDL
+
+                YoutubeDL({"quiet": True, "no_warnings": True}).close()
+                # Ostaju samo ova i jedna starija, ispravna, za povratak; sve ranije se briše.
+                prune(keep=tuple(versions[index:index + 2]))
                 return version
         except Exception:  # noqa: BLE001 - neispravno preuzimanje ne smije oboriti aplikaciju
             pass
@@ -89,7 +98,19 @@ def activate() -> str | None:
         for name in [name for name in sys.modules if name == "yt_dlp" or name.startswith("yt_dlp.")]:
             del sys.modules[name]
         shutil.rmtree(folder, ignore_errors=True)
+        _mark_bad(version)
     return None
+
+
+def _mark_bad(version: str) -> None:
+    try:
+        (store_dir() / f"{version}{BAD_SUFFIX}").write_text("", encoding="utf-8")
+    except OSError:
+        pass
+
+
+def is_marked_bad(version: str) -> bool:
+    return (store_dir() / f"{version}{BAD_SUFFIX}").is_file()
 
 
 class _Finder:
@@ -136,6 +157,8 @@ def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, timeout:
         return None
     if version in installed_versions():
         return None  # već preuzeto, primjenjuje se pri sljedećem pokretanju
+    if is_marked_bad(version):
+        return None  # ova verzija se kod nas već nije mogla pokrenuti; čeka se sljedeća
     return YtdlpRelease(version, wheel.get("url") or "", str((wheel.get("digests") or {}).get("sha256") or ""),
                         int(wheel.get("size") or 0))
 
@@ -162,12 +185,15 @@ def install(release: YtdlpRelease, on_progress: Callable[[int, int], None] | Non
         raise
     finally:
         wheel.unlink(missing_ok=True)
+    # Verzija koja upravo radi ostaje: program je koristi (i njene module učitava tek kad zatrebaju),
+    # a ujedno je posljednja ispravna, za povratak ako nova ne prođe provjeru pri pokretanju.
     prune(keep=(release.version,))
     return release.version
 
 
 def prune(keep: tuple[str, ...]) -> None:
-    """Briše starije raspakovane verzije; ostaje samo ono što radi sada i ono što čeka."""
+    """Briše nepotrebne raspakovane verzije; aktivna (ona koja radi sada) se nikad ne briše."""
+    keep = (*keep, active_version())
     for version in installed_versions():
         if version not in keep:
             shutil.rmtree(store_dir() / version, ignore_errors=True)

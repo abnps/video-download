@@ -104,3 +104,58 @@ class HistoryTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DamagedDataTest(unittest.TestCase):
+    """Loši podaci ne obaraju program, ispravni zapisi se čuvaju, a oštećen fajl se ne gubi."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.folder = Path(self.tmp.name)
+
+    def write(self, path, data):
+        path.write_text(data if isinstance(data, str) else json.dumps(data), encoding="utf-8")
+
+    def test_history_with_wrong_types_keeps_the_good_entries(self):
+        path = store.history_path(self.folder)
+        self.write(path, {"entries": [
+            {"url": "https://v/1", "title": "Dobar", "filepath": "C:/a.mp4", "size": 10, "finished_at": 5},
+            {"url": "https://v/2", "title": 7, "size": "bad", "finished_at": "juče"},
+            {"url": 3, "title": "Bez ispravnog linka"},
+            "smeće", None,
+        ]})
+        entries = store.load_history(path)
+        self.assertEqual([(e.title, e.size) for e in entries], [("Dobar", 10), ("", 0)])
+        for bad in ({"entries": 7}, {"entries": {"a": 1}}, [1, 2], "nije json"):
+            with self.subTest(bad=bad):
+                self.write(path, bad)
+                self.assertEqual(store.load_history(path), [])
+
+    def test_queue_with_wrong_types_keeps_the_good_fields(self):
+        path = store.queue_path(self.folder)
+        self.write(path, {"items": [
+            {"url": "https://v/1", "title": ["x"], "duration": "dugo", "section": ["a", 5],
+             "http_headers": {"Referer": "https://v/", "X": 5}, "custom_format": "da"},
+            {"url": "https://v/2", "duration": 61, "section": [2, 7], "subfolder": None},
+        ]})
+        first, second = store.load_queue(path)
+        self.assertEqual(first, {"url": "https://v/1", "http_headers": {"Referer": "https://v/"}})
+        self.assertEqual((second["duration"], second["section"], second["subfolder"]), (61.0, [2.0, 7.0], None))
+        self.write(path, {"items": 7})
+        self.assertEqual(store.load_queue(path), [])
+
+    def test_damaged_file_is_kept_aside_before_being_replaced(self):
+        path = store.history_path(self.folder)
+        self.write(path, "{oštećen json")
+        self.assertEqual(store.load_history(path), [])
+        kept = path.with_name(path.name + ".ostecen")
+        self.assertEqual(kept.read_text(encoding="utf-8"), "{oštećen json")
+
+    def test_failed_write_is_reported_not_hidden(self):
+        blocked = self.folder / "fajl-umjesto-foldera"
+        blocked.write_text("x", encoding="utf-8")  # folder podataka se ne može napraviti
+        item = DownloadQueue().add("https://v/1", "Video", "best", "C:/v")
+        self.assertFalse(store.append_history(item, blocked / "history.json", 1))
+        self.assertFalse(store.save_queue([item], blocked / "queue.json"))
+        self.assertTrue(store.save_queue([item], store.queue_path(self.folder)))

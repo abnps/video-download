@@ -290,6 +290,44 @@ class MainWindowTest(unittest.TestCase):
         app.processEvents()
         self.assertEqual(window._queue.items(), [])  # rezultat se više ne koristi
 
+    def test_same_link_can_be_added_again_right_after_stop(self):
+        calls = []
+        first_started = threading.Event()
+        first_release = threading.Event()
+
+        def probe(url, **access):
+            calls.append(url)
+            if len(calls) == 1:  # prvi pokušaj visi dok ga korisnik ne zaustavi
+                first_started.set()
+                first_release.wait(5)
+                return ProbeResult("Stari pokušaj", (Entry(url, "Stari pokušaj"),), is_playlist=False)
+            return ProbeResult("Novi pokušaj", (Entry(url, "Novi pokušaj"),), is_playlist=False)
+
+        window = self.make_window(self.quick_download, probe_fn=probe)
+        window.add_links_from_text("https://v/isti")
+        self.assertTrue(wait_until(first_started.is_set))
+        window.download_button.click()  # „Zaustavi" dok traje čitanje
+        window.add_links_from_text("https://v/isti")  # isti link odmah ponovo
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        self.assertEqual(len(calls), 2)
+        first_release.set()  # zakašnjeli odgovor prvog pokušaja ne smije ništa promijeniti
+        time.sleep(0.3)
+        app.processEvents()
+        self.assertEqual([item.title for item in window._queue.items()], ["Novi pokušaj"])
+        self.assertEqual(window._probing, set())
+
+    def test_failed_save_is_shown_not_hidden(self):
+        blocked = Path(self.tmp.name) / "nije-folder"
+        blocked.write_text("x", encoding="utf-8")  # folder podataka se ne može napraviti
+        window = MainWindow(settings=self.settings, probe_fn=fake_probe, download_fn=self.quick_download,
+                            thumbnail_fetch=lambda url: None, data_dir_path=str(blocked / "podaci"))
+        self.addCleanup(window.deleteLater)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        window._save_queue()
+        self.assertIn("nisu sačuvani", window.status_label.text())
+        self.assertTrue(any("nisu sačuvani" in error for error in window._errors))  # ide i u izvještaj
+
     def test_two_downloads_run_at_once_when_allowed(self):
         window = self.make_window(self.blocking_download, parallel=2)
         window.add_links_from_text("https://v/a https://v/b https://v/c")
@@ -479,11 +517,15 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(extra["section"], (150.0, 370.0))
         self.assertTrue(extra["subtitles"] and extra["thumbnail"])
         self.assertEqual(extra["subtitle_langs"][0], "bs")
-        self.assertEqual(extra["ratelimit"], 2 * 1024 * 1024)  # jedno preuzimanje dobija cijeli limit
+        budget = extra["ratelimit"]
+        self.assertEqual(budget.total, 2 * 1024 * 1024)
+        self.assertEqual(budget.share(), 2 * 1024 * 1024)  # jedno preuzimanje dobija cijeli limit
         self.assertTrue(window.subtitles_action.isChecked())
 
-        window.set_parallel(2)  # dva istovremena dijele ukupni limit
-        self.assertEqual(window._download_options(item)["ratelimit"], 1024 * 1024)
+        # Budžet je isti za sva preuzimanja; dijeli se tek kad dva stvarno rade (ne po podešavanju).
+        window.set_parallel(4)
+        self.assertIs(window._download_options(item)["ratelimit"], budget)
+        self.assertEqual(budget.share(), 2 * 1024 * 1024)
 
     def test_plain_download_gets_no_extra_options(self):
         window = self.make_window(self.quick_download)

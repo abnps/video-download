@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (
 from . import __version__
 from .bridge import BridgeServer
 from .browser import BrowserRequest
-from .download import PROCESSING, DownloadResult, Progress, download
+from .download import PROCESSING, DownloadResult, Progress, RateBudget, download
 from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
@@ -721,6 +721,7 @@ class MainWindow(QMainWindow):
         self._thumbnail_cover = False
         self._whole_playlist = False
         self._rate_limit = 0
+        self._rate_budget = None
         self._name_template = DEFAULT_NAME_TEMPLATE
         self._probing: set[str] = set()  # linkovi koji se upravo čitaju
         # Grupa preuzimanja od pokretanja dok sve ne stane: napredak u traci zadataka i obavještenje.
@@ -1081,7 +1082,14 @@ class MainWindow(QMainWindow):
         self._update_controls()
 
     def _save_queue(self) -> None:
-        store.save_queue(self._queue.items(), store.queue_path(self._data_dir))
+        self._report_save(store.save_queue(self._queue.items(), store.queue_path(self._data_dir)))
+
+    def _report_save(self, ok: bool) -> None:
+        """Neuspio upis reda ili istorije (pun disk, zabranjen folder) se ne prešućuje."""
+        if not ok:
+            message = tr("status.save_failed", folder=str(self._data_dir))
+            self._set_status(message)
+            self._note_error(message)
 
     # ---------- podrška (dobrovoljni prilog) ----------
 
@@ -1181,8 +1189,11 @@ class MainWindow(QMainWindow):
         if self._name_template != DEFAULT_NAME_TEMPLATE:
             options["name_template"] = self._name_template
         if self._rate_limit:
-            # Ukupno ograničenje se dijeli na preuzimanja koja mogu ići istovremeno.
-            options["ratelimit"] = self._rate_limit * 1024 * 1024 // max(1, self._parallel)
+            # Jedan zajednički budžet: dijeli se na preuzimanja koja stvarno rade (jedno dobija sve).
+            total = self._rate_limit * 1024 * 1024
+            if self._rate_budget is None or self._rate_budget.total != total:
+                self._rate_budget = RateBudget(total)
+            options["ratelimit"] = self._rate_budget
         return options
 
     def _set_option(self, name: str, value) -> None:
@@ -1479,7 +1490,8 @@ class MainWindow(QMainWindow):
             if result.filepath and os.path.isfile(result.filepath):
                 self._sizes[item_id] = os.path.getsize(result.filepath)
             if result.status == ItemStatus.DONE and result.filepath:
-                store.append_history(item, store.history_path(self._data_dir), self._sizes.get(item_id))
+                self._report_save(store.append_history(item, store.history_path(self._data_dir),
+                                                       self._sizes.get(item_id)))
                 if not result.already_existed:
                     self._support.count_download()
             if item_id in self._remove_when_done:
@@ -1580,6 +1592,12 @@ class MainWindow(QMainWindow):
     def _cancel_probes(self) -> None:
         for job in list(self._probe_jobs.values()):
             job.cancel()
+            # Zakašnjeli odgovor otkazanog čitanja ne smije stići do prozora (ni do novog pokušaja),
+            # a njegovi linkovi odmah smiju ponovo u red.
+            for signal in (job.probed, job.failed, job.finished):
+                with contextlib.suppress(RuntimeError, TypeError):
+                    signal.disconnect()
+            self._probing.difference_update(job.urls)
         self._probe_jobs.clear()
 
     def _auto_retry(self, item: QueueItem, result: DownloadResult) -> bool:
@@ -1673,7 +1691,7 @@ class MainWindow(QMainWindow):
         if path:
             item.convert_state, item.convert_path = "done", path
             mp3 = dataclasses.replace(item, filepath=path)
-            store.append_history(mp3, store.history_path(self._data_dir), os.path.getsize(path))
+            self._report_save(store.append_history(mp3, store.history_path(self._data_dir), os.path.getsize(path)))
         else:
             item.convert_state, item.convert_message = "failed", error
             self._note_error(error)
