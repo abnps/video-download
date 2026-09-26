@@ -1,5 +1,6 @@
 import { addMedia, classifyResponse, headerValue } from "./detect.js";
 import { pickLanguage, translate } from "./i18n.js";
+import { shouldWelcome } from "./install.js";
 import { MENU_ITEMS, menuTarget } from "./menus.js";
 import { findPlayingVideo } from "./playing.js";
 
@@ -137,7 +138,11 @@ async function setupMenus() {
   }
 }
 
-chrome.runtime.onInstalled.addListener(setupMenus);
+chrome.runtime.onInstalled.addListener((details) => {
+  setupMenus();
+  // Prvi put: stranica dobrodošlice iz samog dodatka (provjera veze s programom, kačenje ikone).
+  if (shouldWelcome(details)) chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") });
+});
 chrome.runtime.onStartup.addListener(setupMenus);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {

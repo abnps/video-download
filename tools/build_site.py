@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT))
 from videodl import __version__, changelog, legal  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import site_guides  # noqa: E402  (vodiči: MP3, isječak, plejlista…)
 import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
 
 SITE = ROOT / "site"
@@ -41,7 +42,8 @@ GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github
 FORBIDDEN = re.compile(r"youtube|\byt\b(?!-dlp)|tiktok|netflix|spotify|zaobi[đd]|crack|piratsk|besplatna muzika"
                        r"|free music|bypass|umgeh|kostenlose musik|eludir|música gratis|contourn|musique gratuite",
                        re.IGNORECASE)
-PROMO_PAGES = ("index.html", "extension.html")
+PROMO_PAGES = ("index.html", "extension.html", "changelog.html", "guides.html",
+               *(f"{slug}.html" for slug in site_guides.GUIDES))
 
 # Tekstovi stranica po jeziku. Prvi jezik je glavni (korijen sajta).
 TEXTS = {
@@ -426,7 +428,8 @@ def software_jsonld(lang: str) -> str:
     return f'<script type="application/ld+json">\n{text}\n</script>'
 
 
-SITEMAP_PAGES = ("index.html", "extension.html", "terms.html", "privacy.html", "licenses.html")
+SITEMAP_PAGES = ("index.html", "guides.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
+                 "extension.html", "terms.html", "privacy.html", "licenses.html")
 
 
 def sitemap_xml() -> str:
@@ -450,6 +453,7 @@ def footer_html(lang: str) -> str:
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">
+      <a href="guides.html">{site_guides.HUB[lang][0]}</a><a href="changelog.html">{site_home.HOME[lang]["nav"][3]}</a>
       <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>
       <a href="{REPO}">GitHub</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>
     </div>
@@ -758,6 +762,36 @@ MAC_TEXT = {
 }
 
 
+# Stranica sa svim verzijama (vlastita adresa, pa je Google može naći): (uvod, opis, link s početne, izdanja).
+CHANGELOG_TEXT = {
+    "en": ("Every version of the app, newest first.", "All changes to Video Download: new features and fixes by version.",
+           "All versions →", "Releases and installers on GitHub"),
+    "bs": ("Sve verzije programa, od najnovije.", "Sve izmjene u programu Video Download: nove funkcije i popravke po verzijama.",
+           "Sve verzije →", "Izdanja i instaleri na GitHubu"),
+    "de": ("Alle Versionen, die neueste zuerst.", "Alle Änderungen an Video Download: neue Funktionen und Korrekturen nach Version.",
+           "Alle Versionen →", "Veröffentlichungen und Installer auf GitHub"),
+    "es": ("Todas las versiones, de la más reciente a la más antigua.",
+           "Todos los cambios de Video Download: funciones nuevas y correcciones por versión.",
+           "Todas las versiones →", "Versiones e instaladores en GitHub"),
+    "fr": ("Toutes les versions, de la plus récente à la plus ancienne.",
+           "Toutes les modifications de Video Download : nouvelles fonctions et corrections par version.",
+           "Toutes les versions →", "Versions et installateurs sur GitHub"),
+}
+
+
+def page_changelog(lang: str) -> str:
+    intro, description, _more, releases = CHANGELOG_TEXT[lang]
+    title = site_home.HOME[lang]["nav"][3]
+    parts = [f"<h1>{html.escape(title)}</h1>",
+             f'<p class="lead">{html.escape(intro)} {site_home.HOME[lang]["news"][2]}</p>']
+    for version, date, items in changelog.entries(lang):
+        anchor = "v" + version.replace(".", "-")
+        points = "\n".join(f"<li>{html.escape(item)}</li>" for item in items)
+        parts.append(f'<h2 id="{anchor}">{html.escape(version)} <small>{html.escape(date)}</small></h2>\n<ul>\n{points}\n</ul>')
+    parts.append(f'<p><a href="{REPO}/releases">{html.escape(releases)}</a></p>')
+    return _page(lang, "changelog.html", title, description, "\n".join(parts))
+
+
 def news_html(lang: str) -> str:
     cards = []
     for version, date, items in changelog.entries(lang)[:NEWS_COUNT]:
@@ -787,7 +821,13 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
             meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])
-            + "\n" + software_jsonld(lang), page_url=page_url(lang))
+            + "\n" + software_jsonld(lang), page_url=page_url(lang), news_more=CHANGELOG_TEXT[lang][2],
+            guides_link=site_guides.HUB[lang][9])
+        pages[f"{prefix}changelog.html"] = page_changelog(lang)
+        pages[f"{prefix}guides.html"] = _page(lang, "guides.html", *site_guides.hub_body(lang))
+        for slug in site_guides.GUIDES:
+            pages[f"{prefix}{slug}.html"] = _page(lang, f"{slug}.html", *site_guides.guide_body(
+                lang, slug, issue_url=ISSUE_URL, installer_url=INSTALLER_URL, win_button=site_home.HOME[lang]["win_btn"]))
         pages[f"{prefix}terms.html"] = page_terms(lang)
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)

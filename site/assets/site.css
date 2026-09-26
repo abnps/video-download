@@ -105,7 +105,11 @@ header.past-hero .btn-mini { display: inline-flex; animation: rowin .3s var(--ea
 }
 .hero .lead { font-size: 20px; color: var(--muted); max-width: 520px; margin: 0 0 32px; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.promise { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; padding: 0; margin: 18px 0 0; font-size: 14.5px; }
+.promise li::before { content: "✓"; color: var(--green); font-weight: 700; margin-right: 6px; }
 .meta { font-size: 13.5px; color: var(--muted); margin-top: 14px; }
+section .more { text-align: center; margin-top: 26px; font-weight: 600; }
+.doc h2 small { font-size: 15px; font-weight: 400; color: var(--muted); margin-left: 8px; }
 .meta a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
 .note { font-size: 13px; color: var(--muted); max-width: 540px; margin: 16px 0 0; }
 
@@ -469,6 +473,17 @@ nav.mobile-nav { display: none; }
 .doc th { color: var(--muted); font-weight: 600; }
 .doc .box { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; margin: 24px 0; }
 .doc .btn { margin: 4px 0; }
+/* Vodiči: numerisani koraci u krugovima, poziv na preuzimanje, lista ostalih vodiča. */
+.doc .guide-steps { list-style: none; padding: 0; counter-reset: step; }
+.doc .guide-steps li { counter-increment: step; position: relative; padding: 4px 0 12px 46px; min-height: 34px; }
+.doc .guide-steps li::before {
+  content: counter(step); position: absolute; left: 0; top: 0; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; color: #fff; background: var(--blue);
+}
+.doc .guide-cta p { margin: 0 0 8px; font-weight: 600; }
+.doc .guide-list.cards { list-style: none; padding: 0; display: grid; gap: 12px; }
+.doc .guide-list.cards li { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin: 0; }
+.doc .guide-list.cards span { color: var(--muted); font-size: 15px; }
 .back { display: inline-block; margin-bottom: 22px; font-size: 14px; }
 .ss-hl { outline: 3px solid #ffca28; outline-offset: 2px; border-radius: 3px; }
 .ss-arrow { font-size: 22px; color: var(--muted); }

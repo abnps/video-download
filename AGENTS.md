@@ -87,6 +87,11 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   Demo je označen kao demonstracija, ima dugme za pauzu i čitaču ekrana javlja samo dodano/završeno; na uskom
   ekranu meni ☰ (i na podstranicama). Tvrdnje na sajtu moraju biti tačne za oba sistema (potpisana
   ažuriranja samo na Windowsu, Mac za sada ručno) — pregled 26.9.2026.
+  Vodiči (27.9.2026, SEO po uzoru na konkurenciju, bez imena platformi): `tools/site_guides.py` → `<slug>.html` +
+  `guides.html` na svih 5 jezika; nazivi menija/dugmadi se pune iz `videodl/i18n.py`, tvrdnje moraju odgovarati
+  programu (npr. kolačići se koriste samo za to preuzimanje — NE „samo u memoriji", program piše privremeni fajl).
+  Sve verzije su na `changelog.html` (iz `videodl/changelog.py`); početna nosi obećanje „bez naloga · bez dnevnog
+  ograničenja · linkovi ne idu nama".
   Bez Microsoftovih znakova i slika. Novi jezik = unos u HOME i TEXTS + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Kontakt na sajtu (Ahmedova odluka 26.9.2026): javno se prikazuje SAMO `abnpsdev@gmail.com`
@@ -113,6 +118,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   svog naloga. Potpisan .xpi ide u `site/firefox/`, a unos (verzija, link, sha256) u
   `site/firefox/updates.json` i `FIREFOX_XPI` u `tools/build_site.py`; test provjerava da se slažu.
   Nova verzija dodatka = veći `version` u `extension/manifest.json` (AMO ne prima isti broj dvaput).
+- Stranica dobrodošlice dodatka (27.9.2026): `extension/welcome.html` se otvara SAMO pri prvoj instalaciji
+  (`install.js` → `shouldWelcome`), spakovana je u dodatak (ništa s interneta, bez ID-a), stvarno pita program
+  za vezu (`app-status`) i daje uputstvo za kačenje ikone po browseru. E2E (`tools/e2e_browser/run.mjs`) je provjerava.
   Firefox nije instaliran na razvojnom računaru; provjereno 26.9.2026 raspakovanim Firefoxom 156 (Marionette,
   `-remote-allow-system-access`): dodatak aktivan i potpisan, popup preko native messaging-a javlja „aplikacija radi".
 - Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se

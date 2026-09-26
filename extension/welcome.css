@@ -1,0 +1,94 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #1f1f24;
+  --muted: #6b6b76;
+  --border: #e2e2e8;
+  --accent: #6c4ce0;
+  --ok: #2e7d32;
+  --ok-bg: #e8f5e9;
+  --warn: #b26a00;
+  --warn-bg: #fff4e0;
+  --pink: #d81b60;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318;
+    --card: #1c1c21;
+    --text: #ececf1;
+    --muted: #a0a0ab;
+    --border: #33333b;
+    --accent: #7c5cff;
+    --ok: #66bb6a;
+    --ok-bg: #1d2e1f;
+    --warn: #ffb74d;
+    --warn-bg: #33291a;
+    --pink: #ff8ab8;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.55 "Segoe UI", system-ui, sans-serif;
+}
+
+main { max-width: 640px; margin: 0 auto; padding: 48px 16px 40px; }
+
+header { text-align: center; margin-bottom: 28px; }
+header img { display: block; margin: 0 auto; border-radius: 16px; }
+h1 { margin: 6px 0 4px; font-size: 30px; }
+h2 { margin: 0 0 4px; font-size: 16px; }
+p { margin: 0; }
+.done { display: inline-block; margin-top: 14px; padding: 3px 12px; border-radius: 999px; color: var(--ok); background: var(--ok-bg); font-weight: 600; font-size: 13px; }
+.lead { color: var(--muted); font-size: 17px; }
+.muted { color: var(--muted); }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+
+.status { border-left: 4px solid var(--border); margin-bottom: 18px; }
+.status[data-state="ok"] { border-left-color: var(--ok); }
+.status[data-state="ok"] #status-text { color: var(--ok); font-weight: 600; }
+.status[data-state="offline"] { border-left-color: var(--warn); background: var(--warn-bg); }
+.status #status-more { margin-top: 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.actions:not(:has(:not([hidden]))) { display: none; }
+
+.button {
+  display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 999px; font: inherit; font-size: 14px;
+  font-weight: 600; cursor: pointer; text-decoration: none; color: var(--text); background: transparent; border: 1px solid var(--border);
+}
+.button.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+.button[hidden] { display: none; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.steps li { display: flex; gap: 16px; align-items: flex-start; }
+.n {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-weight: 700;
+}
+
+/* Mala slika trake browsera: ikona „uskoči" pored slagalice, kao kad se zakači. */
+.toolbar {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 6px 10px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg); max-width: 320px;
+}
+.address { flex: 1; height: 16px; border-radius: 8px; background: var(--border); }
+.puzzle { font-size: 16px; }
+.pinned img { display: block; width: 20px; height: 20px; animation: pin 3.2s ease-in-out infinite; }
+@keyframes pin {
+  0%, 25% { opacity: 0; transform: translateX(-24px) scale(.6); }
+  45%, 90% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .pinned img { animation: none; } }
+
+.privacy { margin: 22px 0 10px; text-align: center; font-size: 14px; }
+footer { display: flex; justify-content: center; gap: 18px; font-size: 14px; }
+a { color: var(--accent); }
+a.heart { color: var(--pink); }

@@ -145,6 +145,16 @@ async function run(cdp, report) {
     const { targetInfos } = await cdp.send("Target.getTargets");
     return targetInfos.some((t) => t.type === "service_worker" && t.url.startsWith(`chrome-extension://${EXT_ID}/`));
   }, 15000, "ekstenzija učitana");
+  // Prva instalacija otvara stranicu dobrodošlice, a ona stvarno provjeri vezu s programom.
+  const welcome = await waitFor(async () => {
+    const { targetInfos } = await cdp.send("Target.getTargets");
+    return targetInfos.find((t) => t.type === "page" && t.url === `chrome-extension://${EXT_ID}/welcome.html`);
+  }, 15000, "stranica dobrodošlice");
+  const { sessionId: welcomeSession } = await cdp.send("Target.attachToTarget", { targetId: welcome.targetId, flatten: true });
+  report.welcome = await waitFor(() => cdp.evaluate(welcomeSession,
+    `document.getElementById("connection").dataset.state === "ok" && document.getElementById("status-text").textContent`),
+  30000, "dobrodošlica: veza s programom");
+  log("dobrodošlica:", report.welcome);
   // Service worker se gasi kad miruje; stanje se čita sa stranice ekstenzije (isti API-ji).
   const helper = await cdp.openPage(`chrome-extension://${EXT_ID}/popup.html?helper=1`);
   await waitFor(() => cdp.evaluate(helper, `typeof chrome.storage?.session?.get === "function"`), 10000, "pomoćna stranica");

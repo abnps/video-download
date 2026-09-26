@@ -1,6 +1,7 @@
 """Zvanični sajt (site/, engleski glavni, ostali jezici u site/<jezik>/): usklađen s aplikacijom, bez zabranjenih
 izraza i pokvarenih linkova."""
 
+import html
 import posixpath
 import re
 import sys
@@ -11,11 +12,13 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
 import build_site  # noqa: E402
+import site_guides  # noqa: E402
 import site_home  # noqa: E402
 
 from videodl import __version__, changelog  # noqa: E402
 
-PAGES = ("index.html", "terms.html", "privacy.html", "licenses.html", "extension.html")
+PAGES = ("index.html", "guides.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
+         "terms.html", "privacy.html", "licenses.html", "extension.html")
 
 
 class SiteTest(unittest.TestCase):
@@ -106,6 +109,47 @@ class SiteTest(unittest.TestCase):
             with self.subTest(page=name):
                 self.assertNotRegex(text, r'<script[^>]+src="https?:|<link[^>]+href="https?:[^"]*"[^>]*stylesheet'
                                           r'|<link[^>]+stylesheet[^>]+href="https?:')
+
+    def test_guides_use_the_apps_own_labels_and_are_linked(self):
+        # Vodiči (SEO): nazivi menija i dugmadi iz programa, bez nepopunjenih mjesta, povezani s početne i iz podnožja.
+        from videodl import i18n
+
+        for lang in build_site.LANGUAGES:
+            prefix = build_site.TEXTS[lang]["dir"]
+            hub = self.pages[prefix + "guides.html"]
+            previous = i18n.get_language()
+            i18n.set_language(lang)
+            try:
+                downloads, section = i18n.tr("menu.downloads").replace("&", ""), i18n.tr("row.section").rstrip("…")
+            finally:
+                i18n.set_language(previous)
+            for slug in site_guides.GUIDES:
+                page = self.pages[f"{prefix}{slug}.html"]
+                with self.subTest(lang=lang, guide=slug):
+                    self.assertIn(f'href="{slug}.html"', hub)
+                    self.assertIn(f"<h1>{html.escape(site_guides.TEXT[lang][slug][0])}</h1>", page)
+                    self.assertNotRegex(re.sub(r"<script.*?</script>", "", page, flags=re.S), r"\{\w+\}")
+                    self.assertIn(build_site.INSTALLER_URL, page)
+            self.assertIn(f"<b>{html.escape(section)}</b>", self.pages[f"{prefix}video-clip.html"])
+            self.assertIn(f"<b>{html.escape(downloads)}</b>", self.pages[f"{prefix}subtitles.html"])
+            self.assertIn(build_site.ISSUE_URL, self.pages[f"{prefix}not-downloading.html"])
+            self.assertIn('href="guides.html"', self.pages[prefix + "index.html"])
+            self.assertIn('href="guides.html"', self.pages[prefix + "privacy.html"])  # podnožje svih stranica
+
+    def test_changelog_page_lists_every_version_and_home_links_to_it(self):
+        # Vlastita stranica sa svim verzijama (Google je može naći), a početna nosi obećanje o privatnosti.
+        for lang in build_site.LANGUAGES:
+            prefix = build_site.TEXTS[lang]["dir"]
+            page, index = self.pages[prefix + "changelog.html"], self.pages[prefix + "index.html"]
+            with self.subTest(lang=lang):
+                for version, _date, items in changelog.entries(lang):
+                    self.assertIn(f'<h2 id="v{version.replace(".", "-")}">{version} <small>', page)
+                    for item in items:
+                        self.assertIn(f"<li>{html.escape(item)}</li>", page)
+                self.assertIn('href="changelog.html"', index)
+                self.assertIn('<ul class="promise">', index)
+                for item in site_home.HOME[lang]["promise"]:
+                    self.assertIn(f"<li>{item}</li>", index)
 
     def test_demo_is_accessible_pausable_and_phones_get_a_menu(self):
         # Pregled 26.9.2026: demo nije „slika", ima oznaku i pauzu; čitač ekrana ne sluša procente;

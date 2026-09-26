@@ -30,6 +30,7 @@ DEMO_ROWS = (("12:34", 46.0, 9.6, "#3d7a5a", "#2b5a82", "best", False),
 
 HOME = {
     "en": {
+        "promise": ('No account', 'No daily limit', 'Your links never reach us'),
         "a11y": ('Demo', 'Pause animation', 'Play animation', 'Menu', 'Added: {t}', 'Finished: {t}', 'Demo of the app window (not a real download)'),
         "share": ('Share', 'Copy', 'Copied', 'Tell a friend who needs it.', 'Share Video Download', 'More…', 'Close'),
         "title": "Video Download — free video and audio downloader for Windows and Mac",
@@ -97,6 +98,7 @@ HOME = {
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
     },
     "bs": {
+        "promise": ('Bez naloga', 'Bez dnevnog ograničenja', 'Tvoji linkovi ne idu nama'),
         "a11y": ('Demonstracija', 'Pauziraj animaciju', 'Pokreni animaciju', 'Meni', 'Dodano: {t}', 'Završeno: {t}', 'Demonstracija prozora programa (nije pravo preuzimanje)'),
         "share": ('Podijeli', 'Kopiraj', 'Kopirano', 'Javi prijatelju kome treba.', 'Podijeli Video Download', 'Više…', 'Zatvori'),
         "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
@@ -166,6 +168,7 @@ HOME = {
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
     },
     "de": {
+        "promise": ('Kein Konto', 'Kein Tageslimit', 'Deine Links landen nicht bei uns'),
         "a11y": ('Demo', 'Animation anhalten', 'Animation abspielen', 'Menü', 'Hinzugefügt: {t}', 'Fertig: {t}', 'Demo des Programmfensters (kein echter Download)'),
         "share": ('Teilen', 'Kopieren', 'Kopiert', 'Erzähl es jemandem, der es braucht.', 'Video Download teilen', 'Mehr…', 'Schließen'),
         "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
@@ -239,6 +242,7 @@ HOME = {
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
     },
     "es": {
+        "promise": ('Sin cuenta', 'Sin límite diario', 'Tus enlaces no nos llegan'),
         "a11y": ('Demostración', 'Pausar animación', 'Reanudar animación', 'Menú', 'Añadido: {t}', 'Terminado: {t}', 'Demostración de la ventana del programa (no es una descarga real)'),
         "share": ('Compartir', 'Copiar', 'Copiado', 'Cuéntaselo a quien le sirva.', 'Compartir Video Download', 'Más…', 'Cerrar'),
         "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
@@ -311,6 +315,7 @@ HOME = {
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
     },
     "fr": {
+        "promise": ('Sans compte', 'Sans limite quotidienne', 'Vos liens ne nous parviennent pas'),
         "a11y": ('Démonstration', "Mettre l'animation en pause", "Relancer l'animation", 'Menu', 'Ajouté : {t}', 'Terminé : {t}', 'Démonstration de la fenêtre du programme (pas un vrai téléchargement)'),
         "share": ('Partager', 'Copier', 'Copié', "Parlez-en à quelqu'un qui en a besoin.", 'Partager Video Download', 'Plus…', 'Fermer'),
         "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
@@ -486,7 +491,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
 
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
-           page_url: str = "") -> str:
+           page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="#{anchor}">{label}</a>'
@@ -498,6 +503,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         f'        <div class="tile" data-reveal{f" style=\"--d:{d}\"" if d else ""}>\n          {_icon(k)}\n'
         f'          <h3>{tiles[k][0]}</h3>\n          <p>{tiles[k][1]}</p>\n        </div>' for k, d in small)
     chips = "".join(f"<span>{c}</span>" for c in h["chips"])
+    promise = "".join(f"<li>{item}</li>" for item in h["promise"])
     ext_kicker, ext_h2, ext_sub, ext_list, ext_link = h["extension"]
     running, playing, mp3, streams, ext_aria = h["popup"]
     how_kicker, how_h2, how_sub, steps = h["how"]
@@ -558,6 +564,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           </a>
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">{badge}</span></a>
         </div>
+        <ul class="promise">{promise}</ul>
         <div class="meta">{version_line} · {h["win_req"]} · <a href="#install">{h["install_help"]}</a></div>
         <p class="note">{h["note"]}</p>
       </div>
@@ -691,6 +698,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       <div class="news">
 {news}
       </div>
+      <p class="more" data-reveal><a href="changelog.html">{news_more}</a></p>
     </div>
   </section>
 
@@ -721,6 +729,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       <div class="faq" data-reveal>
 {faq}
       </div>
+      <p class="more" data-reveal><a href="guides.html">{guides_link}</a></p>
     </div>
   </section>
 </main>

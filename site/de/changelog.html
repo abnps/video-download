@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neuigkeiten — Video Download</title>
+<meta name="description" content="Alle Änderungen an Video Download: neue Funktionen und Korrekturen nach Version.">
+<link rel="canonical" href="https://abnps.github.io/video-download/de/changelog.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Video Download">
+<meta property="og:title" content="Neuigkeiten — Video Download">
+<meta property="og:description" content="Alle Änderungen an Video Download: neue Funktionen und Korrekturen nach Version.">
+<meta property="og:url" content="https://abnps.github.io/video-download/de/changelog.html">
+<meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-de.png">
+<meta property="og:image:width" content="860">
+<meta property="og:image:height" content="470">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/changelog.html">
+<link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/changelog.html">
+<link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/changelog.html">
+<link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/changelog.html">
+<link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/changelog.html">
+<link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/changelog.html">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><img src="../assets/icon.png" alt="">Video Download</a>
+    <nav>
+      <a href="index.html#features">Funktionen</a>
+      <a href="index.html#extension">Erweiterung</a>
+      <a href="index.html#install">Installation</a>
+      <a href="index.html#news">Neuigkeiten</a>
+      <a href="index.html#help">Hilfe</a>
+      <a class="heart" href="index.html#support">♥ Unterstützen</a>
+    </nav>
+    <span class="lang"><a href="../changelog.html">EN</a> · <a href="../bs/changelog.html">BS</a> · <a href="../de/changelog.html" aria-current="true">DE</a> · <a href="../es/changelog.html">ES</a> · <a href="../fr/changelog.html">FR</a></span>
+    <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menü" title="Menü"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Menü" hidden>
+      <a href="index.html#features">Funktionen</a>
+      <a href="index.html#extension">Erweiterung</a>
+      <a href="index.html#install">Installation</a>
+      <a href="index.html#news">Neuigkeiten</a>
+      <a href="index.html#help">Hilfe</a>
+      <a class="heart" href="index.html#support">♥ Unterstützen</a>
+    <div class="menu-lang"><span class="lang"><a href="../changelog.html">EN</a> · <a href="../bs/changelog.html">BS</a> · <a href="../de/changelog.html" aria-current="true">DE</a> · <a href="../es/changelog.html">ES</a> · <a href="../fr/changelog.html">FR</a></span></div>
+  </nav>
+</header>
+
+<main class="doc">
+<a class="back" href="index.html">← Startseite</a>
+<h1>Neuigkeiten</h1>
+<p class="lead">Alle Versionen, die neueste zuerst. Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
+<h2 id="v0-9-6">0.9.6 <small>26.9.2026</small></h2>
+<ul>
+<li>Updates sind digital signiert: Das Programm installiert nur eine von uns signierte neue Version, selbst wenn jemand die Datei am Veröffentlichungsort austauscht.</li>
+<li>Beim ersten Start ein kurzer Hinweis, dass das Programm kopierte Links beobachtet, mit einer Schaltfläche zum sofortigen Abschalten.</li>
+<li>Übrig gebliebene temporäre Cookie-Dateien (nach einem plötzlichen Abbruch) werden beim nächsten Start gelöscht; lange Listen brauchen weniger Speicher.</li>
+<li>Die Verbindung zum Browser-Add-on kommt besser mit langsamen oder hängenden Anfragen zurecht.</li>
+</ul>
+<h2 id="v0-9-5">0.9.5 <small>26.9.2026</small></h2>
+<ul>
+<li>1080p, 720p und 480p erhalten eine Markierung im Dateinamen, daher gilt eine andere Qualität desselben Videos nicht mehr als „bereits heruntergeladen“.</li>
+<li>Zwei Videos mit gleichem Titel (Dateiname ohne ID) werden nicht mehr verwechselt; dasselbe Video, das zweimal gleichzeitig startet, wartet auf das erste.</li>
+<li>„Fertig“ erst, wenn die Datei existiert und lesbar ist; die MP3-Umwandlung lässt sich immer abbrechen.</li>
+<li>Das Schließen friert das Fenster nicht mehr ein; das Update wartet auch auf MP3-Umwandlungen.</li>
+</ul>
+<h2 id="v0-9-4">0.9.4 <small>26.9.2026</small></h2>
+<ul>
+<li>Stabilität: Derselbe Link kann direkt nach „Stopp“ erneut hinzugefügt werden.</li>
+<li>Das Aktualisieren des Seitenlesers (yt-dlp) löscht die laufende Version nicht mehr; funktioniert die neue nicht, kehrt das Programm zur vorherigen zurück.</li>
+<li>Ein beschädigter Verlauf oder eine beschädigte Liste bringt das Programm nicht mehr zum Absturz; schlägt das Speichern fehl, meldet es das Programm.</li>
+<li>Die Deinstallation entfernt auch die Firefox-Verbindung; das Tempolimit wird nur auf tatsächlich laufende Downloads verteilt.</li>
+</ul>
+<h2 id="v0-9-3">0.9.3 <small>26.9.2026</small></h2>
+<ul>
+<li>Hilfe → Aus dem Browser herunterladen: Schaltflächen „Ordnerpfad kopieren“, „Ordner öffnen“ und Öffnen der Erweiterungsseite in Edge oder Chrome; bebilderte Anleitung auf der Website.</li>
+<li>Vorbereitung für die Firefox-Erweiterung (ohne Entwicklermodus).</li>
+</ul>
+<h2 id="v0-9-2">0.9.2 <small>26.9.2026</small></h2>
+<ul>
+<li>Untertitel: Hat ein Video keine manuellen Untertitel, werden automatische verwendet; der Untertitel wird auch als .srt neben dem Video gespeichert (gleicher Name, damit Player ihn selbst laden), nicht nur im MP4.</li>
+<li>Kann ein Untertitel nicht geladen werden, wird das Video trotzdem heruntergeladen, mit dem Hinweis „ohne Untertitel“.</li>
+<li>Im Englischen werden Zahlen mit Punkt geschrieben (8.4 MB/s).</li>
+</ul>
+<h2 id="v0-9-1">0.9.1 <small>25.9.2026</small></h2>
+<ul>
+<li>Neue Projektadresse: github.com/abnps/video-download und die Website abnps.github.io/video-download.</li>
+</ul>
+<h2 id="v0-9-0">0.9.0 <small>25.9.2026</small></h2>
+<ul>
+<li>Dunkles Design: Hilfe → Design (hell, dunkel oder wie Windows).</li>
+<li>Eine Windows-Benachrichtigung, wenn alle Downloads fertig sind (Downloads → Benachrichtigen…).</li>
+<li>Der Fortschritt ist auch auf der Schaltfläche in der Taskleiste zu sehen.</li>
+<li>Verlauf: Suche nach Titel, Link oder Dateiname und Filter nach Video, Audio oder gelöschten Dateien.</li>
+<li>Dateiname wählbar: Downloads → Dateiname (z. B. „Interpret - Titel“).</li>
+</ul>
+<h2 id="v0-8-0">0.8.0 <small>25.9.2026</small></h2>
+<ul>
+<li>Animierter Fortschrittsbalken: gleitet sanft mit wanderndem Glanz, blau für Video und lila für Audio, läuft beim Zusammenführen von Video und Audio hin und her und wird am Ende grün.</li>
+</ul>
+<h2 id="v0-7-9">0.7.9 <small>24.9.2026</small></h2>
+<ul>
+<li>Ein Link, der kein Video oder Audio ist, erzeugt nie mehr eine Karte, weder über „Einfügen“ noch aus dem Browser; die Meldung steht nur in der Statusleiste. Eine solche alte Karte wird beim Start nicht wiederhergestellt.</li>
+</ul>
+<h2 id="v0-7-8">0.7.8 <small>24.9.2026</small></h2>
+<ul>
+<li>Ein Link, der kein Video oder Audio ist (z. B. .exe, .zip, .pdf oder eine normale Seite), erzeugt beim bloßen Kopieren keine Karte mehr; fügst du ihn selbst ein, sagt die Meldung klar, warum. Direkte .mp3- und .mp4-Links funktionieren wie bisher.</li>
+</ul>
+<h2 id="v0-7-7">0.7.7 <small>24.9.2026</small></h2>
+<ul>
+<li>Das Fenster „Projekt unterstützen“ hat neben der Schaltfläche auch einen QR-Code für Beiträge per Handy.</li>
+</ul>
+<h2 id="v0-7-6">0.7.6 <small>24.9.2026</small></h2>
+<ul>
+<li>„Projekt unterstützen“ öffnet eine PayPal-Seite für Beiträge, auf der du den Betrag selbst wählst.</li>
+</ul>
+<h2 id="v0-7-5">0.7.5 <small>24.9.2026</small></h2>
+<ul>
+<li>„Projekt unterstützen“: freiwilliger Beitrag über PayPal (Statusleiste, Hilfe, gelegentliche ausblendbare Erinnerung). Ein Beitrag schaltet nichts frei.</li>
+</ul>
+<h2 id="v0-7-4">0.7.4 <small>24.9.2026</small></h2>
+<ul>
+<li>Lizenzvertrag, Nutzungsbedingungen und Datenschutzerklärung in 5 Sprachen, im Installer und unter Hilfe → Verträge und Lizenzen.</li>
+<li>Vollständige Lizenztexte der Komponenten (FFmpeg, Qt, Node.js, yt-dlp…) im Ordner „licenses“.</li>
+</ul>
+<h2 id="v0-7-3">0.7.3 <small>24.9.2026</small></h2>
+<ul>
+<li>Schaltfläche „MP3“ auf der Karte eines geladenen MP4-Videos, neben dem Ordner: wandelt in MP3 um, die MP4 bleibt.</li>
+</ul>
+<h2 id="v0-7-2">0.7.2 <small>24.9.2026</small></h2>
+<ul>
+<li>Nutzungsbedingungen: werden im Installer akzeptiert und stehen unter Hilfe → Nutzungsbedingungen.</li>
+</ul>
+<h2 id="v0-7-1">0.7.1 <small>23.9.2026</small></h2>
+<ul>
+<li>Hilfe → Was ist neu: kurze Hinweise zu den Änderungen jeder Version.</li>
+</ul>
+<h2 id="v0-7-0">0.7.0 <small>23.9.2026</small></h2>
+<ul>
+<li>Videoausschnitt (von–bis) über das Formatmenü einer Zeile.</li>
+<li>Untertitel zum Video und Vorschaubild als Cover.</li>
+<li>Geschwindigkeitslimit und Option, bei einem Videolink aus einer Playlist die ganze Playlist zu laden.</li>
+<li>MP3 im Rechtsklickmenü des Browsers.</li>
+<li>Das Installationsprogramm ist ein Drittel kleiner (136 MB statt 198 MB).</li>
+</ul>
+<h2 id="v0-6-2">0.6.2 <small>23.9.2026</small></h2>
+<ul>
+<li>Aktualisierung funktioniert ohne GitHub-Konto und ohne das Programm gh.</li>
+</ul>
+<h2 id="v0-6-1">0.6.1 <small>22.9.2026</small></h2>
+<ul>
+<li>Schaltfläche „Als MP3 herunterladen“ im Fenster der Browsererweiterung.</li>
+</ul>
+<h2 id="v0-6-0">0.6.0 <small>22.9.2026</small></h2>
+<ul>
+<li>Ein kopierter Link kommt von selbst in die Liste.</li>
+<li>Liste und Download-Verlauf bleiben zwischen Sitzungen erhalten.</li>
+<li>Hilfe → Problembericht speichern.</li>
+</ul>
+<h2 id="v0-5-7">0.5.7 <small>17.9.2026</small></h2>
+<ul>
+<li>Mehrere gleichzeitige Downloads (1–4).</li>
+<li>Bei Verbindungsabbruch wird der Download bis zu 3-mal wiederholt.</li>
+</ul>
+<h2 id="v0-5-6">0.5.6 <small>17.9.2026</small></h2>
+<ul>
+<li>„Stopp“ reagiert sofort, auch während ein Link noch gelesen wird.</li>
+</ul>
+<h2 id="v0-5-5">0.5.5 <small>17.9.2026</small></h2>
+<ul>
+<li>Herunterladen per Rechtsklick im Browser (Link, Video, laufendes Video).</li>
+</ul>
+<h2 id="v0-5-4">0.5.4 <small>17.9.2026</small></h2>
+<ul>
+<li>Der Seiten-Reader (yt-dlp) wird getrennt von der App aktualisiert.</li>
+</ul>
+<h2 id="v0-5-3">0.5.3 <small>17.9.2026</small></h2>
+<ul>
+<li>Livestreams werden nicht heruntergeladen, also kein endloses Laden.</li>
+</ul>
+<h2 id="v0-5-2">0.5.2 <small>17.9.2026</small></h2>
+<ul>
+<li>Symbole der Browsererweiterung korrigiert.</li>
+</ul>
+<h2 id="v0-5-1">0.5.1 <small>17.9.2026</small></h2>
+<ul>
+<li>Installationsprogramm in 5 Sprachen und automatische Updates (Hilfe → Nach Updates suchen).</li>
+</ul>
+<p><a href="https://github.com/abnps/video-download/releases">Veröffentlichungen und Installer auf GitHub</a></p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Video Download</span>
+    <div class="links">
+      <a href="guides.html">Anleitungen</a><a href="changelog.html">Neuigkeiten</a>
+      <a href="terms.html">Nutzungsbedingungen</a><a href="privacy.html">Datenschutz</a><a href="licenses.html">Lizenzen</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

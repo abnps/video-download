@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Download</title>
+  <link rel="icon" href="icons/icon32.png">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <main>
+    <header>
+      <img src="icons/icon128.png" alt="" width="64" height="64">
+      <p class="done">✓ <span data-i18n="welcome.title"></span></p>
+      <h1>Video Download</h1>
+      <p class="lead" data-i18n="welcome.lead"></p>
+    </header>
+
+    <section id="connection" class="card status" data-state="checking" aria-live="polite">
+      <h2 data-i18n="welcome.check"></h2>
+      <p id="status-text" data-i18n="welcome.checking"></p>
+      <p id="status-more" class="muted" hidden></p>
+      <div class="actions">
+        <a id="get-app" class="button primary" href="#" target="_blank" rel="noopener" data-i18n="welcome.no_app" hidden></a>
+        <button id="retry" class="button" type="button" data-i18n="welcome.retry" hidden></button>
+      </div>
+    </section>
+
+    <ol class="steps">
+      <li class="card">
+        <span class="n" aria-hidden="true">1</span>
+        <div>
+          <h2 data-i18n="welcome.pin_title"></h2>
+          <p id="pin-text"></p>
+          <div class="toolbar" aria-hidden="true">
+            <span class="address"></span><span class="puzzle">🧩</span><span class="pinned"><img src="icons/icon32.png" alt=""></span>
+          </div>
+        </div>
+      </li>
+      <li class="card">
+        <span class="n" aria-hidden="true">2</span>
+        <div>
+          <h2 data-i18n="welcome.play_title"></h2>
+          <p data-i18n="welcome.play_text"></p>
+        </div>
+      </li>
+      <li class="card">
+        <span class="n" aria-hidden="true">3</span>
+        <div>
+          <h2 data-i18n="welcome.click_title"></h2>
+          <p id="click-text"></p>
+        </div>
+      </li>
+    </ol>
+
+    <p class="privacy muted" data-i18n="welcome.privacy"></p>
+    <footer>
+      <a id="help" href="#" target="_blank" rel="noopener" data-i18n="welcome.help"></a>
+      <a id="support" class="heart" href="#" target="_blank" rel="noopener" data-i18n="welcome.support"></a>
+      <span id="version" class="muted"></span>
+    </footer>
+  </main>
+  <script type="module" src="welcome.js"></script>
+</body>
+</html>
