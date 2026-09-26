@@ -4,7 +4,7 @@ name: Mac paket
 
 on:
   push:
-    branches: [macos]
+    branches: [main, macos]
   workflow_dispatch:
 
 permissions:

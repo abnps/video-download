@@ -25,6 +25,9 @@ NEWS_COUNT = 3
 REPO = "https://github.com/abnps/video-download"
 CONTACT_EMAIL = "abnpsdev@gmail.com"  # javni kontakt projekta (Ahmedova odluka 26.9.2026); lični e-mail nikad
 INSTALLER_URL = f"{REPO}/releases/latest/download/VideoDownload-Setup.exe"
+# Mac (beta): stalna kopija .dmg-a uz posljednje izdanje (kao VideoDownload-Setup.exe za Windows).
+MAC_DMG_URL = f"{REPO}/releases/latest/download/VideoDownload-macOS-arm64.dmg"
+ISSUE_URL = f"{REPO}/issues/new?template=problem.yml"
 INSTALL_DIR = r"%LOCALAPPDATA%\Programs\Video Download\extension"
 GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
 
@@ -611,6 +614,70 @@ def page_extension(lang: str) -> str:
     return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], body)
 
 
+# (naslov, uvod s linkom {issue}, dugme, napomena, koraci) — nazivi iz macOS-a na tom jeziku.
+MAC_TEXT = {
+    "en": ("Beta", "<b>New: Video Download for Mac.</b> For Macs with an Apple chip (M1 or newer) and macOS 12 or later. "
+           "It works, but only a few people have tried it so far: please <a href=\"{issue}\">report anything that doesn't work</a>.",
+           "Download for Mac (beta)",
+           "The Mac version isn't signed by Apple yet, so the first start takes a few extra clicks:",
+           ("Open the downloaded .dmg and drag Video Download to Applications.",
+            "Open the app. macOS says it can't verify it: click <b>Done</b> (not “Move to Trash”).",
+            "Open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b> and enter your Mac password.",
+            "Open the app again and confirm <b>Open</b>. This is needed only once.")),
+    "bs": ("Beta", "<b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 12 ili noviji. "
+           "Radi, ali ga je probalo još malo ljudi: <a href=\"{issue}\">javi ako nešto ne radi</a>.",
+           "Preuzmi za Mac (beta)",
+           "Mac verzija još nema Appleov potpis, pa prvo pokretanje traži par klikova više:",
+           ("Otvori preuzeti .dmg i prevuci Video Download u Applications.",
+            "Otvori program. macOS kaže da ga ne može provjeriti: klikni <b>Done</b> (ne „Move to Trash“).",
+            "Otvori <b>System Settings → Privacy &amp; Security</b> (Postavke sistema → Privatnost i sigurnost), skroluj dolje, "
+            "klikni <b>Open Anyway</b> (Ipak otvori) i upiši lozinku Maca.",
+            "Ponovo otvori program i potvrdi <b>Open</b>. To treba samo jednom.")),
+    "de": ("Beta", "<b>Neu: Video Download für Mac.</b> Für Macs mit Apple-Chip (M1 oder neuer) und macOS 12 oder neuer. "
+           "Es funktioniert, aber bisher haben es erst wenige ausprobiert: <a href=\"{issue}\">melde bitte, was nicht klappt</a>.",
+           "Für Mac herunterladen (Beta)",
+           "Die Mac-Version ist noch nicht von Apple signiert, daher braucht der erste Start ein paar Klicks mehr:",
+           ("Öffne die geladene .dmg und ziehe Video Download in den Ordner „Programme“.",
+            "Öffne das Programm. macOS meldet, dass es nicht überprüft werden kann: Schließe die Meldung "
+            "(nicht „In den Papierkorb legen“).",
+            "Öffne <b>Systemeinstellungen → Datenschutz &amp; Sicherheit</b>, scrolle nach unten, klicke auf "
+            "<b>Dennoch öffnen</b> und gib dein Mac-Passwort ein.",
+            "Öffne das Programm erneut und bestätige mit <b>Öffnen</b>. Das ist nur einmal nötig.")),
+    "es": ("Beta", "<b>Novedad: Video Download para Mac.</b> Para Mac con chip de Apple (M1 o posterior) y macOS 12 o posterior. "
+           "Funciona, pero aún lo han probado pocas personas: <a href=\"{issue}\">avísanos si algo no funciona</a>.",
+           "Descargar para Mac (beta)",
+           "La versión para Mac aún no está firmada por Apple, así que el primer inicio requiere unos clics más:",
+           ("Abre el .dmg descargado y arrastra Video Download a Aplicaciones.",
+            "Abre la app. macOS dice que no puede verificarla: cierra el aviso (no «Trasladar a la papelera»).",
+            "Ve a <b>Ajustes del Sistema → Privacidad y seguridad</b>, desplázate hacia abajo, pulsa <b>Abrir igualmente</b> "
+            "e introduce la contraseña del Mac.",
+            "Vuelve a abrir la app y confirma <b>Abrir</b>. Solo hace falta una vez.")),
+    "fr": ("Bêta", "<b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 12 "
+           "ou plus récent. Il fonctionne, mais peu de personnes l'ont encore essayé : "
+           "<a href=\"{issue}\">signalez ce qui ne marche pas</a>.",
+           "Télécharger pour Mac (bêta)",
+           "La version Mac n'est pas encore signée par Apple, le premier lancement demande donc quelques clics de plus :",
+           ("Ouvrez le .dmg téléchargé et glissez Video Download dans Applications.",
+            "Ouvrez l'app. macOS indique qu'il ne peut pas la vérifier : fermez le message (pas « Placer dans la corbeille »).",
+            "Allez dans <b>Réglages Système → Confidentialité et sécurité</b>, faites défiler vers le bas, cliquez sur "
+            "<b>Ouvrir quand même</b> et saisissez le mot de passe du Mac.",
+            "Rouvrez l'app et confirmez <b>Ouvrir</b>. Cela n'est nécessaire qu'une fois.")),
+}
+
+
+def mac_html(lang: str) -> str:
+    badge, lead, button, note, steps = MAC_TEXT[lang]
+    items = "\n".join(f"        <li>{step}</li>" for step in steps)
+    return f"""    <div class="smartscreen mac">
+      <p><span class="badge">{badge}</span> {lead.format(issue=ISSUE_URL)}</p>
+      <p><a class="btn btn-small" href="{MAC_DMG_URL}">{button}</a></p>
+      <p>{note}</p>
+      <ol>
+{items}
+      </ol>
+    </div>"""
+
+
 def news_html(lang: str) -> str:
     cards = []
     for version, date, items in changelog.entries(lang)[:NEWS_COUNT]:
@@ -646,6 +713,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         size = size_mb or current_size_mb(index) or 0
         index = _replace(index, "version", f"{TEXTS[lang]['version']} {__version__} · {size} MB")
         index = _replace(index, "news", news_html(lang), newlines=True)
+        index = _replace(index, "mac", mac_html(lang), newlines=True)
         index = _LANG_SWITCH.sub(lambda _m: switcher(lang), index, count=1)
         index = _ALTERNATES.sub(lambda _m: alternates(lang, "index.html") + "\n", index, count=1)
         pages[f"{prefix}index.html"] = index

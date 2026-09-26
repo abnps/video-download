@@ -115,3 +115,11 @@ footer a { color: var(--muted); }
 .mock-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; }
 .mock-toggle i { width: 26px; height: 14px; border-radius: 7px; background: var(--blue); position: relative; }
 .mock-toggle i::after { content: ""; position: absolute; right: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+
+/* Mac (beta) ispod Windows uputstva */
+.mac ol { margin: 0; padding-left: 22px; }
+.mac li { margin: 4px 0; }
+.badge { display: inline-block; background: var(--pink); color: #fff; font-size: 12px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px; vertical-align: 1px; letter-spacing: .02em; }
+@media (prefers-color-scheme: dark) { .badge { color: #2b0b18; } }
+.btn-small { font-size: 15px; padding: 9px 18px; }

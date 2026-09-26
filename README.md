@@ -56,7 +56,16 @@ Glavni jezik je engleski; bosanski, njemački, španski i francuski su u `site/b
 gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\release.json" "<folder instalera>\release.json.sig" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
-4. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
+4. **Mac (beta) ide uz svako izdanje**, inače link „Preuzmi za Mac" na sajtu
+   (`releases/latest/download/VideoDownload-macOS-arm64.dmg`) prestaje raditi. GitHub posao „Mac paket"
+   (`.github/workflows/macos.yml`) na svaki push na `main` napravi `.dmg`; preuzmi artefakt tog commita
+   (`gh run download <id>`) i dodaj ga izdanju, uz kopiju bez verzije:
+
+```
+gh release upload v<verzija> "VideoDownload-macOS-arm64-<verzija>.dmg" "VideoDownload-macOS-arm64-<verzija>.dmg.sha256" "VideoDownload-macOS-arm64.dmg" --repo abnps/video-download
+```
+
+5. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
 
 ```
 gh release edit v<prethodna_verzija> --repo abnps/video-download --draft=true
@@ -166,6 +175,7 @@ izlaz u `%TEMP%\videodl-e2e`); pokreće i gasi test instancu aplikacije.
 - `videodl/dialogs.py`, `videodl/desktop.py` — pomoćni prozori (istorija, podrška, ugovori, uputstvo
   za dodatak) i otvaranje fajlova/foldera u Windowsu
 - `videodl/release_signing.py` — potpis i provjera opisa izdanja (Ed25519)
+- `tools/build_macos.py`, `.github/workflows/macos.yml` — Mac (Apple Silicon, beta) paket `.dmg`
 - `videodl/widgets.py`, `videodl/icons.py` — red sa sličicom, prazan ekran, ikone
 - `videodl/browser.py` — provjera zahtjeva iz browsera
 - `videodl/bridge.py` — lokalni most u aplikaciji (127.0.0.1 + token)

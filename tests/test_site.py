@@ -51,6 +51,11 @@ class SiteTest(unittest.TestCase):
                 self.assertIn(more_info, index)
                 self.assertIn(run_anyway, index)
                 self.assertIn(f"screenshot-light-{lang}.png", index)
+                # Mac (beta): stalni link na .dmg, jasna oznaka i uputstvo za prvo pokretanje
+                self.assertIn(build_site.MAC_DMG_URL, index)
+                self.assertIn(f'<span class="badge">{build_site.MAC_TEXT[lang][0]}</span>', index)
+                self.assertEqual(index.count("<li>", index.index('class="smartscreen mac"')), len(build_site.MAC_TEXT[lang][4]) +
+                                 index.count("<li>", index.index('<div class="pills">')))
                 # prekidač jezika i hreflang vode na sve jezike
                 for other in build_site.LANGUAGES:
                     self.assertIn(f'hreflang="{other}"', index)
