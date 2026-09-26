@@ -30,5 +30,26 @@
       "sha256": "58e74bf02fc5bbacc41dcb8bef089961cd5bddd37830b87784e4fc624d145d1f",
       "source": "https://nodejs.org/dist/v24.14.1/"
     }
+  },
+  "macos_tools": {
+    "comment": "Mac (arm64) paket: arhive se preuzimaju na GitHub Mac računaru i provjeravaju po SHA-256 prije raspakivanja.",
+    "ffmpeg": {
+      "version": "9.0.2 (Martin Riedl, macOS arm64)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffmpeg.zip",
+      "sha256": "c8ed4c4e6978a03c485edbfe4e0a5dc2380f8a30bba5150531b31b094492d924",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "ffprobe": {
+      "version": "9.0.2 (Martin Riedl, macOS arm64)",
+      "url": "https://ffmpeg.martin-riedl.de/download/macos/arm64/1789931890_9.0.2/ffprobe.zip",
+      "sha256": "fcbe839537485eaee7a7a8bc5cbc0f90d53617e80943e8a5b2e31cb851197ea6",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "node": {
+      "version": "v24.14.1",
+      "url": "https://nodejs.org/dist/v24.14.1/node-v24.14.1-darwin-arm64.tar.gz",
+      "sha256": "25495ff85bd89e2d8a24d88566d7e2f827c6b0d3d872b2cebf75371f93fcb1fe",
+      "source": "https://nodejs.org/dist/v24.14.1/"
+    }
   }
 }

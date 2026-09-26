@@ -16,6 +16,8 @@ import sys
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
+# Samo Windows ima %LOCALAPPDATA%; zamjena da se modul može uvesti i na Macu (testovi, build_macos.py).
+LOCALAPPDATA = Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local")
 sys.path.insert(0, str(PROJECT))
 
 from videodl import __version__  # noqa: E402
@@ -23,11 +25,11 @@ from videodl import __version__  # noqa: E402
 # Claude desktop (MSIX) preusmjerava agentove upise u %LOCALAPPDATA%, pa ih Ahmed ne vidi; zato „Build" pored projekta.
 _SIBLING_BUILD = PROJECT.parent / "Build"
 BUILD = Path(os.environ.get("VIDEODL_BUILD_DIR")
-             or (_SIBLING_BUILD if _SIBLING_BUILD.is_dir() else Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-build"))
+             or (_SIBLING_BUILD if _SIBLING_BUILD.is_dir() else LOCALAPPDATA / "VideoDownload-build"))
 DIST = BUILD / "dist"
 APP = DIST / "VideoDownload"
 INSTALLER_OUT = BUILD / "installer"
-ISCC = Path(os.environ["LOCALAPPDATA"]) / "Programs" / "Inno Setup 6" / "ISCC.exe"
+ISCC = LOCALAPPDATA / "Programs" / "Inno Setup 6" / "ISCC.exe"
 ICON_SIZES = (16, 24, 32, 48, 64, 128, 256)
 
 
@@ -77,7 +79,7 @@ def ffmpeg_dir() -> Path | None:
     override = os.environ.get("VIDEODL_FFMPEG_DIR")
     if override:
         return Path(override)
-    for cache in (BUILD / "ffmpeg", Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-ffmpeg"):
+    for cache in (BUILD / "ffmpeg", LOCALAPPDATA / "VideoDownload-ffmpeg"):
         candidates = sorted(cache.glob("x-ffmpeg-*-essentials_build/*/bin"))
         if candidates:
             return candidates[-1]
@@ -189,14 +191,16 @@ def write_manifest(lock: dict) -> None:
     (APP / "BUILD-MANIFEST.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def write_legal() -> None:
-    """Licence komponenti (puni tekstovi), pravni dokumenti na 5 jezika i stranica ugovora za instaler."""
+def write_legal(target: Path | None = None, installer_documents: bool = True) -> None:
+    """Licence komponenti (puni tekstovi), pravni dokumenti na 5 jezika i stranica ugovora za instaler.
+    `target` je folder paketa (Windows: APP; Mac: priprema za .app); Mac nema Inno instaler pa ni njegove dokumente."""
     import importlib.metadata
 
     from videodl import legal
     from videodl.i18n import LANGUAGES
 
-    licenses = APP / "licenses"
+    target = target or APP
+    licenses = target / "licenses"
     licenses.mkdir(parents=True, exist_ok=True)
     for source in (PROJECT / "installer" / "licenses").iterdir():
         shutil.copy2(source, licenses / source.name)  # GPL-3.0, LGPL-3.0, Node.js
@@ -210,9 +214,11 @@ def write_legal() -> None:
     missing = [component.name for component in legal.COMPONENTS if not legal.license_files(component, licenses)]
     if missing:
         raise SystemExit(f"Nedostaje tekst licence za: {', '.join(missing)}")
-    (APP / "THIRD-PARTY-NOTICES.txt").write_text(legal.notices_text(licenses), encoding="utf-8")
+    (target / "THIRD-PARTY-NOTICES.txt").write_text(legal.notices_text(licenses), encoding="utf-8")
 
-    documents = APP / "legal"
+    if not installer_documents:
+        return
+    documents = target / "legal"
     documents.mkdir(parents=True, exist_ok=True)
     for language in LANGUAGES:
         for kind, _key in legal.DOCUMENTS:

@@ -520,6 +520,17 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                      "Für Updates wird die GitHub CLI (gh) mit angemeldetem Konto benötigt.",
                      "Para actualizar se necesita GitHub CLI (gh) con tu cuenta iniciada.",
                      "La mise à jour nécessite GitHub CLI (gh) connecté à votre compte."),
+    "update.open_download": (
+        "Nova verzija {new} se preuzima u browseru. Otvori preuzeti .dmg, prevuci Video Download u Applications "
+        "(zamijeni staru) i ponovo pokreni program.",
+        "Version {new} is downloading in your browser. Open the downloaded .dmg, drag Video Download to Applications "
+        "(replace the old one) and start the app again.",
+        "Version {new} wird im Browser heruntergeladen. Öffne die geladene .dmg, ziehe Video Download in den Ordner "
+        "Programme (die alte ersetzen) und starte das Programm neu.",
+        "La versión {new} se está descargando en el navegador. Abre el .dmg descargado, arrastra Video Download a "
+        "Aplicaciones (sustituye la anterior) y vuelve a abrir el programa.",
+        "La version {new} se télécharge dans le navigateur. Ouvrez le .dmg téléchargé, glissez Video Download dans "
+        "Applications (remplacez l'ancienne) et relancez le programme."),
     "update.busy": ("Sačekaj da se završe preuzimanja i pretvaranja u MP3 (ili ih zaustavi), pa pokušaj ponovo.",
                     "Wait for downloads and MP3 conversions to finish (or stop them), then try again.",
                     "Warte, bis Downloads und MP3-Umwandlungen fertig sind (oder stoppe sie), und versuche es dann erneut.",

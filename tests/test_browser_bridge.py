@@ -279,7 +279,7 @@ class NativeMessagingInstallTest(unittest.TestCase):
             manifest_path = install_native_host(
                 folder, python_exe=r"C:\Python314\python.exe",
                 launch_command=[r"C:\Python314\pythonw.exe", r"C:\Прилози\pokreni.pyw"],
-                set_registry=lambda keys, value: written.update(dict.fromkeys(keys, value)))
+                set_registry=lambda keys, value: written.update(dict.fromkeys(keys, value)), platform="win32")
 
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             firefox = json.loads(Path(written[FIREFOX_REGISTRY_PATHS[0]]).read_text(encoding="utf-8"))

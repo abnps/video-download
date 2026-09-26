@@ -1,0 +1,45 @@
+# Mac (Apple Silicon) paket: svi testovi na Macu, pa .app → .dmg (bez Appleovog potpisa, beta).
+# Rezultat je artefakt ovog pokretanja (ne javno izdanje); izdanje se objavljuje ručno kad Mac proba prođe.
+name: Mac paket
+
+on:
+  push:
+    branches: [macos]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos-arm64:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONIOENCODING: utf-8
+      VIDEODL_BUILD_DIR: ${{ runner.temp }}/build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Zavisnosti (zaključane verzije)
+        run: python -m pip install -r requirements-lock.txt
+      - name: ffmpeg za testove (paket dobija svoj, zaključan u build-lock.json)
+        run: brew install ffmpeg
+      - name: Testovi i paket
+        run: python tools/build_macos.py
+      - name: Rezultat
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoDownload-macOS-arm64
+          path: |
+            ${{ runner.temp }}/build/macos/*.dmg
+            ${{ runner.temp }}/build/macos/*.dmg.sha256
+            ${{ runner.temp }}/build/macos/self-test.json
+            ${{ runner.temp }}/build/checks.txt
+          if-no-files-found: warn

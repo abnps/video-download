@@ -34,6 +34,9 @@ LATEST_URL = f"https://api.github.com/repos/{RELEASES_REPO}/releases/latest"
 # Odgovori koji znače „bez prijave ne može" (privatan repo): tada ima smisla probati gh.
 _NEEDS_LOGIN = (401, 403, 404)
 INSTALLER_NAME = re.compile(r"^VideoDownload-Setup-(\d+(?:\.\d+){1,3})\.exe$")
+# Mac (beta): disk image uz izdanje; program ga ne instalira sam nego otvara njegov link.
+MAC_INSTALLER_NAME = re.compile(r"^VideoDownload-macOS-arm64-(\d+(?:\.\d+){1,3})\.dmg$")
+PLATFORM = sys.platform  # testovi ga postavljaju da bi isti test važio na svakom sistemu
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 MAX_NOTES = 800
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)  # prozor aplikacije ne smije bljeskati konzolom
@@ -75,12 +78,18 @@ def is_installed_app() -> bool:
     return bool(getattr(sys, "frozen", False))
 
 
+def can_self_install(platform: str | None = None) -> bool:
+    """Samo Windows verzija sama preuzima i pokreće instaler; Mac otvara link za preuzimanje."""
+    return (platform or PLATFORM) == "win32"
+
+
 def parse_release(data) -> Release | None:
     if not isinstance(data, dict) or data.get("draft") or data.get("prerelease"):
         return None
     assets = {asset.get("name"): asset for asset in data.get("assets") or [] if isinstance(asset, dict)}
+    pattern = INSTALLER_NAME if PLATFORM == "win32" else MAC_INSTALLER_NAME
     for name, asset in assets.items():
-        match = INSTALLER_NAME.match(name or "")
+        match = pattern.match(name or "")
         checksum = assets.get(f"{name}.sha256")
         if match and checksum:
             notes = (data.get("body") or "").strip()
@@ -95,6 +104,8 @@ def parse_release(data) -> Release | None:
                 manifest_url=(assets.get(release_signing.MANIFEST_NAME) or {}).get("browser_download_url") or "",
                 signature_url=(assets.get(release_signing.SIGNATURE_NAME) or {}).get("browser_download_url") or "",
             )
+    if PLATFORM != "win32":
+        return None  # izdanje bez Mac verzije: za ovaj sistem nema ništa novo
     raise UpdateError("Release has no installer", key="update.no_asset")
 
 

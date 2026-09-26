@@ -143,10 +143,22 @@ SITE_URL = "https://abnps.github.io/video-download/"
 # Stranica dodataka u browseru; otvara se pokretanjem browsera s tom adresom.
 BROWSERS = (("msedge.exe", "edge://extensions", "help.open_edge"),
             ("chrome.exe", "chrome://extensions", "help.open_chrome"))
+# Mac: isti browseri u /Applications; izvršni fajl u paketu prima adresu kao i na Windowsu.
+MAC_BROWSERS = {"msedge.exe": "Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+                "chrome.exe": "Google Chrome.app/Contents/MacOS/Google Chrome"}
 
-def browser_exe(name: str) -> str | None:
-    """Putanja browsera iz „App Paths" registra (tako ga nalazi i Windows), ili None."""
-    if sys.platform != "win32":
+
+def browser_exe(name: str, platform: str = sys.platform, applications: tuple[Path, ...] | None = None) -> str | None:
+    """Putanja browsera: na Windowsu iz „App Paths" registra (tako ga nalazi i Windows),
+    na Macu iz /Applications ili ~/Applications; None ako ga nema."""
+    if platform == "darwin":
+        inside = MAC_BROWSERS.get(name)
+        folders = applications or (Path("/Applications"), Path.home() / "Applications")
+        for folder in folders if inside else ():
+            if (folder / inside).is_file():
+                return str(folder / inside)
+        return None
+    if platform != "win32":
         return None
     import winreg
 

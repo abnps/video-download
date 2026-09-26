@@ -23,6 +23,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .runtime import user_data_base
+
 PYPI_URL = "https://pypi.org/pypi/yt-dlp/json"
 WHEEL_NAME = re.compile(r"^yt_dlp-(\d+(?:\.\d+){1,3})-py3-none-any\.whl$")
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
@@ -50,8 +52,7 @@ class YtdlpRelease:
 def store_dir() -> Path:
     """Folder podataka korisnika (isti kao za bridge.json), van instalacije koju piše instaler."""
     override = os.environ.get("VIDEODL_DATA_DIR")
-    base = Path(override) if override else Path(os.environ.get("LOCALAPPDATA")
-                                                or Path.home() / "AppData" / "Local") / "VideoDownload"
+    base = Path(override) if override else user_data_base() / "VideoDownload"
     return base / STORE_NAME
 
 

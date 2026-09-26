@@ -67,8 +67,9 @@ DEFAULT_PARALLEL = 2
 
 
 
-def default_output_dir() -> str:
-    return str(Path.home() / "Videos" / "Video Download")
+def default_output_dir(platform: str = sys.platform) -> str:
+    # Mac nema „Videos"; tamo je folder za video „Movies" (u Finderu „Filmovi").
+    return str(Path.home() / ("Movies" if platform == "darwin" else "Videos") / "Video Download")
 
 
 def format_speed(bytes_per_second: float) -> str:
@@ -1765,6 +1766,11 @@ class MainWindow(QMainWindow):
             return
         if not updater.is_installed_app():
             QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
+            return
+        if not updater.can_self_install():
+            # Mac (beta): nova verzija se preuzima kao .dmg u browseru i prevuče u Applications.
+            QDesktopServices.openUrl(QUrl(release.installer_url))
+            QMessageBox.information(self, tr("update.available_title"), tr("update.open_download", new=release.version))
             return
         if self._busy_for_update():
             QMessageBox.information(self, tr("update.available_title"), tr("update.busy"))

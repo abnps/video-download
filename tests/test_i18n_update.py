@@ -90,6 +90,10 @@ class FakeResponse(io.BytesIO):
 
 class UpdaterTest(unittest.TestCase):
     def setUp(self):
+        # Testovi opisuju Windows izdanje (.exe); isti moraju proći i na Mac računaru u CI-ju.
+        platform = mock.patch.object(updater, "PLATFORM", "win32")
+        platform.start()
+        self.addCleanup(platform.stop)
         self.installer = b"MZ fake installer" * 1000
         self.digest = hashlib.sha256(self.installer).hexdigest()
         self.urls = []

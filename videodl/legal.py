@@ -8,7 +8,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from .runtime import PROJECT_ROOT, app_dir, is_frozen
+from .runtime import PROJECT_ROOT, bundle_dir, is_frozen
 
 ASSETS = Path(__file__).resolve().parent / "assets"
 # (vrsta, ključ prevoda za naslov); isti redoslijed kao kartice u aplikaciji
@@ -42,14 +42,25 @@ class Component:
 PYTHON_DISTRIBUTIONS = ("yt-dlp", "yt-dlp-ejs", "curl_cffi", "certifi", "brotli", "requests", "urllib3",
                         "pycryptodomex")
 
+# FFmpeg u paketu zavisi od sistema: Windows koristi gyan.dev build, Mac (beta) build Martina Riedla.
+FFMPEG_WINDOWS = Component(
+    "FFmpeg 9.0.2 (essentials build by gyan.dev)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
+    "Bundled binaries: ffmpeg/ffprobe version 9.0.2-essentials_build-www.gyan.dev (SHA-256 in "
+    "BUILD-MANIFEST.json). Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; "
+    "build configuration: https://www.gyan.dev/ffmpeg/builds/ and https://github.com/GyanD/codexffmpeg . "
+    "A copy of the complete corresponding source code is available on request for three years.")
+FFMPEG_MAC = Component(
+    "FFmpeg 9.0.2 (macOS arm64 build by Martin Riedl)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
+    "Bundled binaries: ffmpeg/ffprobe 9.0.2 from https://ffmpeg.martin-riedl.de/ (SHA-256 in BUILD-MANIFEST.json). "
+    "Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; build script: "
+    "https://git.martin-riedl.de/ffmpeg/build-script . "
+    "A copy of the complete corresponding source code is available on request for three years.")
+FFMPEG = FFMPEG_MAC if sys.platform == "darwin" else FFMPEG_WINDOWS
+
 COMPONENTS = (
     Component("yt-dlp", "Unlicense", "https://github.com/yt-dlp/yt-dlp", ("yt-dlp-LICENSE",)),
     Component("yt-dlp-ejs", "Unlicense, MIT, ISC", "https://github.com/yt-dlp/ejs", ("yt-dlp-ejs-LICENSE",)),
-    Component("FFmpeg 9.0.2 (essentials build by gyan.dev)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
-              "Bundled binaries: ffmpeg/ffprobe version 9.0.2-essentials_build-www.gyan.dev (SHA-256 in "
-              "BUILD-MANIFEST.json). Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; "
-              "build configuration: https://www.gyan.dev/ffmpeg/builds/ and https://github.com/GyanD/codexffmpeg . "
-              "A copy of the complete corresponding source code is available on request for three years."),
+    FFMPEG,
     Component("Qt for Python (PySide6, Shiboken6)", "LGPL-3.0", "https://doc.qt.io/qtforpython/",
               ("LGPL-3.0.txt", "GPL-3.0.txt"),
               "Source code: https://code.qt.io/ . The Qt libraries are separate files and can be replaced."),
@@ -87,9 +98,14 @@ def notices_text(folder: Path | None = None) -> str:
 
 
 def licenses_dir() -> Path:
-    """Instalirana verzija: pored .exe-a; razvoj: installer/licenses (samo statički tekstovi)."""
-    return app_dir() / "licenses" if is_frozen() else PROJECT_ROOT / "installer" / "licenses"
+    """Instalirana verzija: pored .exe-a (Mac: u paketu, Contents/Frameworks); razvoj: installer/licenses."""
+    return bundle_dir() / "licenses" if is_frozen() else PROJECT_ROOT / "installer" / "licenses"
 
 
 def python_license_path() -> Path:
+    # Windows ga drži u korijenu instalacije, Mac/Linux u lib/pythonX.Y.
+    version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+    for candidate in (Path(sys.base_prefix) / "LICENSE.txt", Path(sys.base_prefix) / "lib" / version / "LICENSE.txt"):
+        if candidate.is_file():
+            return candidate
     return Path(sys.base_prefix) / "LICENSE.txt"

@@ -31,11 +31,23 @@ class BuildLockTest(unittest.TestCase):
                 self.assertTrue(spec["version"] and spec["source"].startswith("https://"))
 
     def test_legal_notice_names_the_exact_ffmpeg_build_and_source(self):
-        ffmpeg = next(c for c in legal.COMPONENTS if c.name.startswith("FFmpeg"))
+        ffmpeg = legal.FFMPEG_WINDOWS
         spec = self.lock["tools"]["ffmpeg"]
         self.assertIn(spec["version"], ffmpeg.note)
         self.assertIn(spec["source"], ffmpeg.note)
         self.assertIn(spec["version"].split("-")[0], ffmpeg.name)
+        self.assertIn(legal.FFMPEG, legal.COMPONENTS)  # tačno jedan FFmpeg, onaj za ovaj sistem
+
+    def test_mac_tools_are_pinned_by_url_and_hash(self):
+        mac = self.lock["macos_tools"]
+        self.assertEqual({k for k in mac if k != "comment"}, {"ffmpeg", "ffprobe", "node"})
+        for name in ("ffmpeg", "ffprobe", "node"):
+            with self.subTest(tool=name):
+                self.assertRegex(mac[name]["sha256"], r"^[0-9a-f]{64}$")
+                self.assertTrue(mac[name]["url"].startswith("https://"))
+        self.assertIn(mac["ffmpeg"]["source"], legal.FFMPEG_MAC.note)
+        self.assertIn(mac["ffmpeg"]["version"].split()[0], legal.FFMPEG_MAC.name)
+        self.assertEqual(mac["node"]["version"], self.lock["tools"]["node"]["version"])  # isti Node na oba sistema
 
     def test_packaged_python_components_are_listed(self):
         listed = {name.lower() for name in legal.PYTHON_DISTRIBUTIONS}

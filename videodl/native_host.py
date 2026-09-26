@@ -26,8 +26,14 @@ def data_dir() -> Path:
     override = os.environ.get("VIDEODL_DATA_DIR")
     if override:
         return Path(override)
-    base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
-    return Path(base) / "VideoDownload"
+    # Isto kao runtime.user_data_base(); ponovljeno jer ovaj fajl mora raditi i sam (bez paketa projekta).
+    if sys.platform == "win32":
+        base = Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local")
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share")
+    return base / "VideoDownload"
 
 
 def bridge_path() -> Path:
@@ -110,6 +116,8 @@ def saved_language() -> str | None:
         except OSError:
             return None
         return None
+    if sys.platform == "darwin":
+        return _mac_saved_language()
     if sys.platform != "win32":
         return None
     import winreg
@@ -120,6 +128,25 @@ def saved_language() -> str | None:
             return str(value) or None
     except OSError:
         return None
+
+
+# QSettings("VideoDownload", "VideoDownload") na Macu piše plist u ~/Library/Preferences.
+MAC_SETTINGS_FILES = ("com.videodownload.VideoDownload.plist", "VideoDownload.VideoDownload.plist")
+
+
+def _mac_saved_language(preferences: Path | None = None) -> str | None:
+    import plistlib
+
+    folder = preferences or Path.home() / "Library" / "Preferences"
+    for name in MAC_SETTINGS_FILES:
+        try:
+            with open(folder / name, "rb") as file:
+                value = plistlib.load(file).get("language")
+        except (OSError, ValueError, plistlib.InvalidFileException):
+            continue
+        if value:
+            return str(value)
+    return None
 
 
 def launch_app(command: list[str]) -> None:
@@ -176,10 +203,23 @@ def load_config(folder: Path) -> dict:
     return json.loads((folder / "host-config.json").read_text(encoding="utf-8"))
 
 
+def is_browser_launch(argv: list[str]) -> bool:
+    """Da li je program pokrenut kao native messaging host. Chrome/Edge dodaju porijeklo
+    („chrome-extension://…/"), Firefox putanju manifesta i ID dodatka. Na Macu je host isti
+    izvršni fajl kao aplikacija, pa pokretač po ovome zna šta da radi."""
+    return any(arg.startswith("chrome-extension://") or arg == "video-download@abnps.github.io" for arg in argv[1:])
+
+
 def current_config() -> dict:
     if getattr(sys, "frozen", False):
-        # Instalirana verzija: videodl-host.exe stoji pored VideoDownload.exe.
-        return {"launch": [str(Path(sys.executable).resolve().with_name("VideoDownload.exe"))]}
+        executable = Path(sys.executable).resolve()
+        if sys.platform == "darwin":
+            # Mac: host je sama aplikacija (…/Video Download.app/Contents/MacOS/Video Download);
+            # „open" pokreće paket kao da ga je korisnik otvorio (ikona u Docku, jedan primjerak).
+            bundle = next((parent for parent in executable.parents if parent.suffix == ".app"), executable)
+            return {"launch": ["open", str(bundle)]}
+        # Windows: videodl-host.exe stoji pored VideoDownload.exe.
+        return {"launch": [str(executable.with_name("VideoDownload.exe"))]}
     return load_config(Path(__file__).resolve().parent)
 
 
