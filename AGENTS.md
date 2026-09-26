@@ -82,6 +82,13 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   (`CONTACT_EMAIL` u `tools/build_site.py`, podnožje svih stranica + stavka u privatnosti). Ahmedov lični
   e-mail, ime i adresa ne idu na sajt; test pada ako se lični e-mail pojavi. Pun Impressum (ime + adresa,
   § 5 DDG) Ahmed za sada ne želi; stranica se zato NE zove „Impressum". Commiti idu s GitHub noreply adresom.
+- Mac verzija (beta, grana `macos`, 26.9.2026; Ahmed: bez Appleovog potpisa za sada): isti kod, razlike su
+  u `runtime.py` (user_data_base, bundle_dir = Contents/Frameworks), `native_messaging.py` (manifest u
+  ~/Library/Application Support/<browser>/NativeMessagingHosts, samo za postojeće browsere), `native_host.py`
+  (na Macu je host SAMA aplikacija: pokreni.pyw prepozna poziv browsera), Finder (`open -R`), ~/Movies,
+  ažuriranje otvara .dmg link. Build: `tools/build_macos.py` (samo na arm64 Macu; alati iz `macos_tools` u
+  lock-u), CI `.github/workflows/macos.yml` pravi .dmg kao artefakt. Ad-hoc potpis poslije izmjene Info.plist-a
+  je obavezan. Testovi koji zavise od sistema zadaju `platform=`/`updater.PLATFORM` sami.
 - Firefox dodatak (26.9.2026, „nastaviti ekstenziju"): isti kod iz `extension/`, manifest pravi
   `python tools/build_firefox.py` (gecko ID `video-download@abnps.github.io`, background.scripts umjesto
   service_worker, Firefox 140+, Android 142+). Native host se registruje i pod `HKCU\Software\Mozilla\NativeMessagingHosts`
