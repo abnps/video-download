@@ -273,6 +273,39 @@ class MainWindowTest(unittest.TestCase):
         window._rows[item.id].action_button.click()
         self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
 
+    def test_download_all_while_link_is_read_starts_when_ready(self):
+        # „Preuzmi sve" dok se link još čita ne smije propasti: preuzimanje kreće čim link stigne.
+        started = threading.Event()
+
+        def slow_probe(url, **access):
+            started.set()
+            self.release.wait(5)
+            return ProbeResult("V", (Entry(url, "V"),), is_playlist=False)
+
+        window = self.make_window(self.quick_download, probe_fn=slow_probe)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(started.is_set))
+        window._start_all()
+        self.assertIn("još čita", window.status_label.text())  # korisnik zna da klik nije propao
+        self.release.set()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE]))
+
+    def test_failed_read_after_download_all_does_not_start_later_links(self):
+        def failing_probe(url, **access):
+            if url.endswith("/lose"):
+                raise RuntimeError("ne postoji")
+            return ProbeResult("V", (Entry(url, "V"),), is_playlist=False)
+
+        window = self.make_window(self.quick_download, probe_fn=failing_probe)
+        window.add_links_from_text("https://v/lose")
+        window._start_all()  # dok se čita
+        self.assertTrue(wait_until(lambda: not window._probe_jobs))
+        window.add_links_from_text("https://v/b")  # kasnije zalijepljen link samo čeka dugme
+        self.assertTrue(wait_until(lambda: any(i.url.endswith("/b") for i in window._queue.items())))
+        time.sleep(0.2)
+        app.processEvents()
+        self.assertEqual([i.status for i in window._queue.items() if i.url.endswith("/b")], [ItemStatus.WAITING])
+
     def test_stop_while_reading_links_drops_pending_results(self):
         started = threading.Event()
 

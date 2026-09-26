@@ -106,8 +106,9 @@ class SupportWindowTest(unittest.TestCase):
         return window
 
     def download(self, window, count):
-        window.add_links_from_text(" ".join(f"https://v/{i}" for i in range(count)))
-        self.assertTrue(wait_until(lambda: len(window._queue.items()) >= count))
+        before = len(window._queue.items())  # stavke od ranije ne smiju „ispuniti" čekanje prije novih
+        window.add_links_from_text(" ".join(f"https://v/{before + i}" for i in range(count)))
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) >= before + count))
         window._start_all()
         self.assertTrue(wait_until(lambda: all(i.status == ItemStatus.DONE for i in window._queue.items())))
 

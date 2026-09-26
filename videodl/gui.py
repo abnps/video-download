@@ -410,6 +410,8 @@ class MainWindow(QMainWindow):
         self._rows: dict[int, QueueRow] = {}
         self._sizes: dict[int, int] = {}
         self._running = False  # „Preuzmi" je pokrenut: red se obrađuje dok ima stavki koje čekaju
+        # „Preuzmi" kliknut dok se link još čita: red kreće čim čitanje završi (inače bi klik propao).
+        self._start_when_read = False
         self._manual: list[int] = []  # pojedinačno pokrenute stavke (dugme u redu, browser)
         self._remove_when_done: set[int] = set()
         self._download_jobs: dict[int, DownloadJob] = {}  # stavka -> posao u toku
@@ -1140,6 +1142,9 @@ class MainWindow(QMainWindow):
             self._set_status(tr("status.from_browser", title=result.title))
         else:
             self._set_status(tr("status.added", title=result.title))
+        if self._start_when_read:
+            self._start_when_read = False
+            self._running = True
         self._start_next()
 
     @Slot(str, str, str, object, object)
@@ -1166,6 +1171,8 @@ class MainWindow(QMainWindow):
         if job is not None:
             self._probing.difference_update(job.urls)
             job.deleteLater()
+        if not self._probe_jobs:
+            self._start_when_read = False  # nijedan link nije stigao (npr. greška): ništa ne kreće kasnije samo
         self._update_controls()
 
     # ---------- red preuzimanja ----------
@@ -1328,6 +1335,10 @@ class MainWindow(QMainWindow):
     @Slot()
     def _start_all(self) -> None:
         if self._queue.next_waiting() is None:
+            if self._probe_jobs:
+                self._start_when_read = True
+                self._set_status(tr("status.start_after_read"))
+                return
             self._set_status(tr("status.nothing_to_download"))
             return
         self._running = True
@@ -1405,6 +1416,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def _stop_all(self) -> None:
         self._running = False
+        self._start_when_read = False
         self._manual.clear()
         for item in self._queue.items():
             if item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY:
