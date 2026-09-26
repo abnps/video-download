@@ -167,7 +167,7 @@ header.past-hero .btn-mini { display: inline-flex; animation: rowin .3s var(--ea
 .stage-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 14px; }
 
 /* ---------- traka s brojevima ---------- */
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 56px 0 8px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 56px auto 8px; }  /* auto: centrirano kao i ostatak */
 .stat { text-align: center; padding: 18px 8px; }
 .stat b { display: block; font: 700 clamp(28px, 3.4vw, 40px)/1.1 "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; letter-spacing: -.02em; }
 .stat span { color: var(--muted); font-size: 14px; }

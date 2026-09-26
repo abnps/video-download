@@ -103,6 +103,14 @@ class SiteTest(unittest.TestCase):
                 self.assertNotRegex(text, r'<script[^>]+src="https?:|<link[^>]+href="https?:[^"]*"[^>]*stylesheet'
                                           r'|<link[^>]+stylesheet[^>]+href="https?:')
 
+    def test_menu_anchors_point_to_existing_sections(self):
+        for name, text in self.pages.items():
+            index = self.pages[posixpath.join(posixpath.dirname(name), "index.html").lstrip("/")]
+            ids = set(re.findall(r'id="([a-z-]+)"', index))
+            for anchor in re.findall(r'href="(?:index\.html)?#([a-z-]+)"', text):
+                with self.subTest(page=name, anchor=anchor):
+                    self.assertIn(anchor, ids)
+
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():
             folder = posixpath.dirname(name)

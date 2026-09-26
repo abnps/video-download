@@ -529,6 +529,17 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                      "Für Updates wird die GitHub CLI (gh) mit angemeldetem Konto benötigt.",
                      "Para actualizar se necesita GitHub CLI (gh) con tu cuenta iniciada.",
                      "La mise à jour nécessite GitHub CLI (gh) connecté à votre compte."),
+    "mac.move_to_applications": (
+        "Prevuci Video Download u folder Applications i otvori ga odatle. Ovako (iz .dmg-a ili Downloads) dodatak "
+        "za browser ne može pokrenuti program.",
+        "Drag Video Download to the Applications folder and open it from there. Opened like this (from the .dmg or "
+        "Downloads), the browser extension can't start the app.",
+        "Ziehe Video Download in den Ordner „Programme“ und öffne es von dort. So geöffnet (aus der .dmg oder "
+        "Downloads) kann die Browser-Erweiterung das Programm nicht starten.",
+        "Arrastra Video Download a la carpeta Aplicaciones y ábrelo desde allí. Abierto así (desde el .dmg o "
+        "Descargas), la extensión del navegador no puede iniciar el programa.",
+        "Glissez Video Download dans le dossier Applications et ouvrez-le depuis là. Ouvert ainsi (depuis le .dmg ou "
+        "Téléchargements), l'extension du navigateur ne peut pas lancer le programme."),
     "update.open_download": (
         "Nova verzija {new} se preuzima u browseru. Otvori preuzeti .dmg, prevuci Video Download u Applications "
         "(zamijeni staru) i ponovo pokreni program.",

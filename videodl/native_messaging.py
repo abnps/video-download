@@ -30,6 +30,16 @@ MAC_CHROMIUM_DIRS = ("Google/Chrome", "Microsoft Edge", "Chromium", "BraveSoftwa
 MAC_FIREFOX_DIR = "Mozilla"
 
 
+class TemporaryLocationError(OSError):
+    """Mac program radi s privremenog mjesta (otvoren iz .dmg-a ili preko App Translocation): registracija bi
+    pokazivala na putanju koja nestaje kad se program zatvori."""
+
+
+def mac_location_is_temporary(path: Path | str) -> bool:
+    text = Path(path).as_posix()  # i na Windowsu (testovi) sa kosim crtama kao na Macu
+    return "/AppTranslocation/" in text or text.startswith("/Volumes/")
+
+
 def default_install_dir(platform: str = sys.platform) -> Path:
     # Namjerno ne prati VIDEODL_DATA_DIR: registracija je jedna za korisnika.
     return user_data_base(platform) / "VideoDownload" / "native-host"
@@ -48,6 +58,8 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
             frozen_app_dir = app_dir()
 
     if host_executable is not None:
+        if platform == "darwin" and mac_location_is_temporary(host_executable):
+            raise TemporaryLocationError(str(host_executable))
         script = Path(host_executable)
     elif frozen_app_dir is not None:
         # Instalirana Windows verzija: host je poseban .exe pored aplikacije i sam zna gdje je aplikacija.

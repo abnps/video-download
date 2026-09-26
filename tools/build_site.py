@@ -607,15 +607,33 @@ def firefox_section(lang: str) -> str:
 <h2>Edge / Chrome</h2>"""
 
 
+# Mac (beta): folder dodatka je unutar programa, pa se putanja kopira iz programa i lijepi s ⌘⇧G.
+MAC_EXTENSION_NOTE = {
+    "en": "<b>Mac (beta):</b> the folder is inside the app. In the app use Help → Downloading from the browser → "
+          "<b>Copy the folder path</b>, then in the folder picker press <b>⌘⇧G</b>, paste (⌘V) and press Return.",
+    "bs": "<b>Mac (beta):</b> folder je unutar programa. U programu Pomoć → Preuzimanje iz browsera → "
+          "<b>Kopiraj putanju foldera</b>, pa u prozoru za izbor foldera pritisni <b>⌘⇧G</b>, zalijepi (⌘V) i Enter.",
+    "de": "<b>Mac (Beta):</b> Der Ordner liegt im Programm. In der App Hilfe → Aus dem Browser herunterladen → "
+          "<b>Ordnerpfad kopieren</b>, dann im Ordnerdialog <b>⌘⇧G</b> drücken, einfügen (⌘V) und Return drücken.",
+    "es": "<b>Mac (beta):</b> la carpeta está dentro de la aplicación. En la aplicación, Ayuda → Descargar desde el "
+          "navegador → <b>Copiar la ruta de la carpeta</b>; luego, en el selector de carpetas, pulsa <b>⌘⇧G</b>, pega (⌘V) "
+          "y pulsa Intro.",
+    "fr": "<b>Mac (bêta) :</b> le dossier se trouve dans l'application. Dans l'application, Aide → Télécharger depuis le "
+          "navigateur → <b>Copier le chemin du dossier</b>, puis dans le sélecteur de dossier appuyez sur <b>⌘⇧G</b>, "
+          "collez (⌘V) et appuyez sur Entrée.",
+}
+
+
 def page_extension(lang: str) -> str:
     t = TEXTS[lang]
-    body = f"<h1>{t['ext_title']}</h1>\n{firefox_section(lang)}\n{extension_mock(lang)}\n{t['ext_body']}"
+    body = (f"<h1>{t['ext_title']}</h1>\n{firefox_section(lang)}\n{extension_mock(lang)}\n{t['ext_body']}"
+            f'\n<div class="box">{MAC_EXTENSION_NOTE[lang]}</div>')
     return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], body)
 
 
 # (naslov, uvod s linkom {issue}, dugme, napomena, koraci) — nazivi iz macOS-a na tom jeziku.
 MAC_TEXT = {
-    "en": ("Beta", "<b>New: Video Download for Mac.</b> For Macs with an Apple chip (M1 or newer) and macOS 12 or later. "
+    "en": ("Beta", "<b>New: Video Download for Mac.</b> For Macs with an Apple chip (M1 or newer) and macOS 13 or later. "
            "It works, but only a few people have tried it so far: please <a href=\"{issue}\">report anything that doesn't work</a>.",
            "Download for Mac (beta)",
            "The Mac version isn't signed by Apple yet, so the first start takes a few extra clicks:",
@@ -623,7 +641,7 @@ MAC_TEXT = {
             "Open the app. macOS says it can't verify it: click <b>Done</b> (not “Move to Trash”).",
             "Open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b> and enter your Mac password.",
             "Open the app again and confirm <b>Open</b>. This is needed only once.")),
-    "bs": ("Beta", "<b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 12 ili noviji. "
+    "bs": ("Beta", "<b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 13 ili noviji. "
            "Radi, ali ga je probalo još malo ljudi: <a href=\"{issue}\">javi ako nešto ne radi</a>.",
            "Preuzmi za Mac (beta)",
            "Mac verzija još nema Appleov potpis, pa prvo pokretanje traži par klikova više:",
@@ -632,7 +650,7 @@ MAC_TEXT = {
             "Otvori <b>System Settings → Privacy &amp; Security</b> (Postavke sistema → Privatnost i sigurnost), skroluj dolje, "
             "klikni <b>Open Anyway</b> (Ipak otvori) i upiši lozinku Maca.",
             "Ponovo otvori program i potvrdi <b>Open</b>. To treba samo jednom.")),
-    "de": ("Beta", "<b>Neu: Video Download für Mac.</b> Für Macs mit Apple-Chip (M1 oder neuer) und macOS 12 oder neuer. "
+    "de": ("Beta", "<b>Neu: Video Download für Mac.</b> Für Macs mit Apple-Chip (M1 oder neuer) und macOS 13 oder neuer. "
            "Es funktioniert, aber bisher haben es erst wenige ausprobiert: <a href=\"{issue}\">melde bitte, was nicht klappt</a>.",
            "Für Mac herunterladen (Beta)",
            "Die Mac-Version ist noch nicht von Apple signiert, daher braucht der erste Start ein paar Klicks mehr:",
@@ -642,7 +660,7 @@ MAC_TEXT = {
             "Öffne <b>Systemeinstellungen → Datenschutz &amp; Sicherheit</b>, scrolle nach unten, klicke auf "
             "<b>Dennoch öffnen</b> und gib dein Mac-Passwort ein.",
             "Öffne das Programm erneut und bestätige mit <b>Öffnen</b>. Das ist nur einmal nötig.")),
-    "es": ("Beta", "<b>Novedad: Video Download para Mac.</b> Para Mac con chip de Apple (M1 o posterior) y macOS 12 o posterior. "
+    "es": ("Beta", "<b>Novedad: Video Download para Mac.</b> Para Mac con chip de Apple (M1 o posterior) y macOS 13 o posterior. "
            "Funciona, pero aún lo han probado pocas personas: <a href=\"{issue}\">avísanos si algo no funciona</a>.",
            "Descargar para Mac (beta)",
            "La versión para Mac aún no está firmada por Apple, así que el primer inicio requiere unos clics más:",
@@ -651,7 +669,7 @@ MAC_TEXT = {
             "Ve a <b>Ajustes del Sistema → Privacidad y seguridad</b>, desplázate hacia abajo, pulsa <b>Abrir igualmente</b> "
             "e introduce la contraseña del Mac.",
             "Vuelve a abrir la app y confirma <b>Abrir</b>. Solo hace falta una vez.")),
-    "fr": ("Bêta", "<b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 12 "
+    "fr": ("Bêta", "<b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 13 "
            "ou plus récent. Il fonctionne, mais peu de personnes l'ont encore essayé : "
            "<a href=\"{issue}\">signalez ce qui ne marche pas</a>.",
            "Télécharger pour Mac (bêta)",

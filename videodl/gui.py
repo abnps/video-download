@@ -32,7 +32,7 @@ from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
-from .native_messaging import install_native_host, uninstall_native_host
+from .native_messaging import TemporaryLocationError, install_native_host, uninstall_native_host
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import (
     DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
@@ -1952,6 +1952,10 @@ def main() -> int:
         problems.append(tr("startup.bridge", error=exc))
     try:
         install_native_host()
+    except TemporaryLocationError:
+        # Mac: pokrenut iz .dmg-a ili iz Downloads — veza s pretraživačem bi nestala kad se program zatvori.
+        problems.append(tr("mac.move_to_applications"))
+        QTimer.singleShot(0, lambda: QMessageBox.information(window, "Video Download", tr("mac.move_to_applications")))
     except OSError as exc:
         problems.append(tr("startup.register", error=exc))
     if problems:

@@ -73,6 +73,20 @@ class MacNativeMessagingTest(unittest.TestCase):
             self.assertEqual(json.loads(chrome.read_text())["path"], str(app))
             self.assertFalse((Path(tmp) / "native-host" / "host.py").exists())  # nema kopije skripte
 
+    def test_temporary_location_is_not_registered(self):
+        # Iz .dmg-a ili preko App Translocation putanja nestaje kad se program zatvori: ne registrovati.
+        from videodl.native_messaging import TemporaryLocationError, mac_location_is_temporary
+
+        for path in ("/Volumes/Video Download/Video Download.app/Contents/MacOS/Video Download",
+                     "/private/var/folders/x/T/AppTranslocation/ABC/d/Video Download.app/Contents/MacOS/Video Download"):
+            with self.subTest(path=path), tempfile.TemporaryDirectory() as tmp:
+                self.assertTrue(mac_location_is_temporary(path))
+                (Path(tmp) / "Google" / "Chrome").mkdir(parents=True)
+                with self.assertRaises(TemporaryLocationError):
+                    self.install(Path(tmp), Path(tmp) / "native-host", host_executable=Path(path))
+                self.assertFalse((Path(tmp) / "Google" / "Chrome" / "NativeMessagingHosts").exists())
+        self.assertFalse(mac_location_is_temporary("/Applications/Video Download.app/Contents/MacOS/Video Download"))
+
     def test_every_supported_browser_has_a_target(self):
         targets = [target for target, _ in mac_manifest_targets(Path("/S"))]
         self.assertEqual(len(targets), len(MAC_CHROMIUM_DIRS) + 1)

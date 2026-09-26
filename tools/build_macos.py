@@ -32,7 +32,7 @@ from videodl import __version__  # noqa: E402
 
 APP_NAME = "Video Download"
 BUNDLE_ID = "io.github.abnps.videodownload"
-MIN_MACOS = "12.0"
+MIN_MACOS = "13.0"  # PySide6 6.11 (Qt) ima Mac pakete samo za macOS 13+
 WORK = build_release.BUILD / "macos"
 STAGE = WORK / "stage"  # sve što ide u paket, prije PyInstallera
 DIST = WORK / "dist"
