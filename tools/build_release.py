@@ -157,8 +157,8 @@ def run_checks() -> None:
                             capture_output=True, text=True, encoding="utf-8", errors="replace")
     node = subprocess.run(["node", "--test", "tests/extension/*.test.mjs"], cwd=PROJECT, env=env,
                           capture_output=True, text=True, encoding="utf-8", errors="replace", shell=False)
-    report.write_text(f"Python testovi (izlaz {python.returncode}):\n{python.stderr[-4000:]}\n\n"
-                      f"JS testovi (izlaz {node.returncode}):\n{node.stdout[-4000:]}\n", encoding="utf-8")
+    report.write_text(f"Python testovi (izlaz {python.returncode}):\n{python.stderr}\n\n"
+                      f"JS testovi (izlaz {node.returncode}):\n{node.stdout}\n", encoding="utf-8")
     if python.returncode != 0 or node.returncode != 0:
         raise SystemExit(f"Testovi nisu prošli; vidi {report}")
     print("› testovi prošli", flush=True)

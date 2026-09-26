@@ -499,7 +499,7 @@ def page_privacy(lang: str) -> str:
 def page_licenses(lang: str) -> str:
     t = TEXTS[lang]
     rows = []
-    for component in legal.COMPONENTS:
+    for component in legal.site_components():
         note = f"<br><small>{_inline(component.note)}</small>" if component.note else ""
         rows.append(f"<tr><td><a href=\"{html.escape(component.url)}\">{html.escape(component.name)}</a>{note}</td>"
                     f"<td>{html.escape(component.license)}</td></tr>")

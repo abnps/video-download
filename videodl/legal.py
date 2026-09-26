@@ -56,6 +56,7 @@ FFMPEG_MAC = Component(
     "https://git.martin-riedl.de/ffmpeg/build-script . "
     "A copy of the complete corresponding source code is available on request for three years.")
 FFMPEG = FFMPEG_MAC if sys.platform == "darwin" else FFMPEG_WINDOWS
+FFMPEG_BUILDS = (FFMPEG_WINDOWS, FFMPEG_MAC)
 
 COMPONENTS = (
     Component("yt-dlp", "Unlicense", "https://github.com/yt-dlp/yt-dlp", ("yt-dlp-LICENSE",)),
@@ -74,6 +75,16 @@ COMPONENTS = (
               ("pycryptodomex-LICENSE",)),
     Component("Python", "PSF-2.0", "https://www.python.org/", ("Python-LICENSE.txt",)),
 )
+
+
+def site_components(published_mac: bool = False) -> tuple[Component, ...]:
+    """Komponente za stranicu licenci na sajtu: ista lista bez obzira na kom sistemu se sajt pravi.
+    Mac build ffmpeg-a se dodaje tek kad Mac verzija bude javno objavljena."""
+    builds = FFMPEG_BUILDS if published_mac else (FFMPEG_WINDOWS,)
+    result = []
+    for component in COMPONENTS:
+        result.extend(builds if component is FFMPEG else (component,))
+    return tuple(result)
 
 
 def license_files(component: Component, folder: Path | None) -> list[str]:
