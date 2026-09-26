@@ -92,7 +92,9 @@ class ComponentsTest(unittest.TestCase):
         for component in legal.COMPONENTS:
             self.assertIn(component.name, text)
         self.assertIn("licenses/requests-LICENSE, licenses/requests-NOTICE", text)
-        self.assertIn("gyan.dev", text)  # GPL: gdje je izvorni kod ffmpeg-a
+        # GPL: gdje je izvorni kod ffmpeg-a (build zavisi od sistema: gyan.dev ili Martin Riedl)
+        self.assertIn("https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz", text)
+        self.assertIn(legal.FFMPEG.name, text)
 
     def test_python_license_is_available_for_the_build(self):
         self.assertTrue(legal.python_license_path().is_file())

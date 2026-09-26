@@ -4,6 +4,7 @@ Red se pamti da se pri zatvaranju ili padu ne izgubi ono što čeka, a istorija 
 šta je i kada preuzeto. Kolačići prijave se NIKAD ne upisuju — ostaju samo u memoriji.
 """
 
+import contextlib
 import json
 import os
 import time
@@ -159,5 +160,8 @@ def _write(path: Path, data: dict) -> bool:
         os.replace(temporary, path)  # prekid usred pisanja ne smije ostaviti pola fajla
         return True
     except OSError:
-        temporary.unlink(missing_ok=True)
+        # Na Macu brisanje u nepostojećem folderu javlja „nije folder" (ne FileNotFoundError):
+        # čišćenje ne smije srušiti program, samo se javi da čuvanje nije uspjelo.
+        with contextlib.suppress(OSError):
+            temporary.unlink(missing_ok=True)
         return False
