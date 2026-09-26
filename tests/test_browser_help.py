@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from videodl.gui import BrowserHelpDialog  # noqa: E402
-from videodl.i18n import set_language  # noqa: E402
+from videodl.i18n import set_language, tr  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 FOLDER = r"C:\Users\x\AppData\Local\Programs\Video Download\extension"
@@ -30,7 +30,7 @@ class BrowserHelpDialogTest(unittest.TestCase):
         dialog = self.dialog()
         dialog.copy_button.click()
         self.assertEqual(QApplication.clipboard().text(), FOLDER)
-        self.assertIn("Ctrl+V", dialog.note.text())
+        self.assertEqual(tr("help.copied"), dialog.note.text())  # Ctrl+V na Windowsu, ⌘⇧G/⌘V na Macu
 
     def test_buttons_open_the_extensions_page_of_each_installed_browser(self):
         dialog = self.dialog()
