@@ -42,6 +42,18 @@ class DetectionTest(unittest.TestCase):
         self.assertTrue(_entry({"title": "x", "age_limit": 18}, "https://v/x").adult)
         self.assertFalse(_entry({"title": "x"}, "https://v/x").adult)
 
+    def test_youtube_is_never_treated_as_adult_content(self):
+        for info, url in (({"age_limit": 18, "extractor_key": "Youtube"}, "https://www.youtube.com/watch?v=x"),
+                          ({"age_limit": 18}, "https://youtu.be/x"),
+                          ({"age_limit": 18}, "https://music.youtube.com/watch?v=x"),
+                          ({"age_limit": 18, "ie_key": "YoutubeTab"}, "https://example.test/x"),
+                          ({"age_limit": 18, "webpage_url": "https://m.youtube.com/watch?v=x"}, None)):
+            with self.subTest(url=url):
+                self.assertFalse(is_adult(info, url))
+        self.assertFalse(_entry({"title": "x", "age_limit": 18}, "https://www.youtube.com/watch?v=x").adult)
+        # sličan naziv nije YouTube
+        self.assertTrue(is_adult({"age_limit": 18}, "https://notyoutube.com.example/x"))
+
     def test_mark_survives_saved_queue_but_confirmation_does_not(self):
         queue = DownloadQueue()
         item = queue.add("https://v/a", "A", "best", "C:/x", adult=True)

@@ -2,6 +2,7 @@
 
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
+from urllib.parse import urlsplit
 
 from yt_dlp import YoutubeDL
 
@@ -28,9 +29,23 @@ class Entry:
 ADULT_AGE = 18
 
 
-def is_adult(info: dict) -> bool:
+# YouTube je izuzet iz 18+ provjere (Ahmed 26.9.2026): tamo „age_limit" znači starosno ograničen video,
+# ne sadržaj za odrasle, pa nema ni prozora ni zamućene sličice.
+YOUTUBE_HOSTS = ("youtube.com", "youtu.be", "youtube-nocookie.com")
+
+
+def is_youtube(info: dict, url: str | None = None) -> bool:
+    extractor = str(info.get("extractor_key") or info.get("ie_key") or info.get("extractor") or "")
+    if extractor.lower().startswith("youtube"):
+        return True
+    host = (urlsplit(url or info.get("webpage_url") or info.get("url") or "").hostname or "").lower()
+    return any(host == domain or host.endswith("." + domain) for domain in YOUTUBE_HOSTS)
+
+
+def is_adult(info: dict, url: str | None = None) -> bool:
     age = info.get("age_limit")
-    return isinstance(age, int) and not isinstance(age, bool) and age >= ADULT_AGE
+    marked = isinstance(age, int) and not isinstance(age, bool) and age >= ADULT_AGE
+    return marked and not is_youtube(info, url)
 
 
 @dataclass(frozen=True)
@@ -94,7 +109,7 @@ def _entry(info: dict, url: str) -> Entry:
     duration = info.get("duration")
     return Entry(url, _title(info, url), pick_thumbnail(info),
                  float(duration) if isinstance(duration, (int, float)) and duration > 0 else None,
-                 adult=is_adult(info))
+                 adult=is_adult(info, url))
 
 
 def pick_thumbnail(info: dict) -> str | None:
