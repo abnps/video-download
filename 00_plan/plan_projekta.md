@@ -115,8 +115,8 @@ fajl još ne postoji). Sama nit se gasi kad čitanje završi; njen zakašnjeli o
   obavijest o praćenju clipboarda; šablon za prijavu problema; privatnost pominje GitHub Issues i PayPal;
   dijalozi izdvojeni iz `gui.py` u `dialogs.py`/`desktop.py`. Ostaje: zaštita grane `main` (postavka
   repoa, radi Ahmed ako želi), Impressum (čeka Ahmedovu odluku).
-- [ ] Nova adresa (25.9.2026, v0.9.1): repo prelazi u organizaciju `abnps` (Ahmed je napravio organizaciju;
-  prebacivanje repoa radi Ahmed u GitHub postavkama), sajt `abnps.github.io/video-download`.
+- [x] Nova adresa (25.9.2026, v0.9.1): repo prelazi u organizaciju `abnps` (Ahmed je napravio organizaciju;
+  prebacivanje repoa radi Ahmed u GitHub postavkama), sajt `abnps.github.io/video-download`. Urađeno: repo i sajt rade na novoj adresi.
 - [x] Udobnost (25.9.2026, v0.9.0; Ahmed: „23456", bez stavke 1 „Završeno · MB za s"):
   2) obavještenje u Windowsu kad se cijela grupa završi (samo ako prozor nije u fokusu, ne poslije
   ručnog „Zaustavi"; isključivo u meniju); 3) istorija: pretraga (sve riječi, naslov/link/ime fajla)
