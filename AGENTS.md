@@ -47,7 +47,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   SVAKOM preuzimanju (dugme Preuzmi, dugme u redu, Pokušaj ponovo, dodatak); više videa = jedan prozor; bez
   potvrde video čeka, ostali idu. Potvrda (`adult_ok`) važi samo za to preuzimanje i nikad se ne čuva na disku;
   oznaka (`adult`) se čuva u redu. Sličica 18+ je uvijek zamućena s oznakom „18+". NE ide u bilješke o verziji
-  (Ahmedova odluka). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita
+  (Ahmedova odluka). YouTube je IZUZET (Ahmed: „YT treba isključiti“; `probe.is_youtube`: adresa ili
+  yt-dlp extractor). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita
   (blokada 18+, po želji PIN) je sljedeći korak, poslije ovoga.
 
 ## Okruženje
