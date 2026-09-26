@@ -122,6 +122,30 @@ class MacDesktopTest(unittest.TestCase):
             self.assertIsNone(dialogs.browser_exe("msedge.exe", "darwin", (Path(tmp),)))
 
 
+class MacTextsTest(unittest.TestCase):
+    def test_shortcuts_and_windows_wording_follow_the_system(self):
+        from videodl import i18n
+
+        language = i18n.get_language()
+        self.addCleanup(i18n.set_language, language)
+        i18n.set_language("de")
+        with mock.patch.object(i18n, "PLATFORM", "darwin"):
+            self.assertIn("⌘V", i18n.tr("toolbar.paste_tip"))
+            self.assertNotIn("Strg", i18n.tr("toolbar.paste_tip"))
+            self.assertEqual(i18n.tr("theme.system"), "Wie macOS")
+            self.assertIn("⌘⇧G", i18n.tr("help.copied"))
+        with mock.patch.object(i18n, "PLATFORM", "win32"):
+            self.assertIn("Strg+V", i18n.tr("toolbar.paste_tip"))
+            self.assertEqual(i18n.tr("theme.system"), "Wie Windows")
+
+    def test_every_mac_variant_exists_in_all_languages(self):
+        from videodl import i18n
+
+        for key in i18n.MAC_VARIANTS:
+            with self.subTest(key=key):
+                self.assertEqual(len(i18n.TEXTS[key + "_mac"]), len(i18n.LANGUAGES))
+
+
 class MacUpdateTest(unittest.TestCase):
     def release(self, *names):
         return {"tag_name": "v9.9.9", "body": "x", "assets": [

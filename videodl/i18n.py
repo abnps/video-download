@@ -1,5 +1,7 @@
 """Prevodi aplikacije: bosanski, engleski, njemački, španski, francuski (jednostavan dict, bez Qt Linguista)."""
 
+import sys
+
 LANGUAGES = {"bs": "Bosanski", "en": "English", "de": "Deutsch", "es": "Español", "fr": "Français"}
 _ORDER = ("bs", "en", "de", "es", "fr")
 FALLBACK = "en"
@@ -414,6 +416,13 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "Abrir extensiones en Edge", "Ouvrir les extensions dans Edge"),
     "help.open_chrome": ("Otvori dodatke u Chrome-u", "Open extensions in Chrome", "Erweiterungen in Chrome öffnen",
                          "Abrir extensiones en Chrome", "Ouvrir les extensions dans Chrome"),
+    "theme.system_mac": ("Kao sistem", "Same as macOS", "Wie macOS", "Como macOS", "Comme macOS"),
+    "help.copied_mac": (
+        "Putanja je kopirana: u koraku 3, u prozoru za izbor foldera pritisni ⌘⇧G, zalijepi je (⌘V) i pritisni Enter.",
+        "Path copied: in step 3, in the folder picker press ⌘⇧G, paste it (⌘V) and press Return.",
+        "Pfad kopiert: In Schritt 3 im Ordnerdialog ⌘⇧G drücken, einfügen (⌘V) und Return drücken.",
+        "Ruta copiada: en el paso 3, en el selector de carpetas pulsa ⌘⇧G, pégala (⌘V) y pulsa Intro.",
+        "Chemin copié : à l'étape 3, dans le sélecteur de dossier, appuyez sur ⌘⇧G, collez-le (⌘V) puis Entrée."),
     "help.copied": ("Putanja je kopirana: u koraku 3 je zalijepi u prozor za izbor foldera (Ctrl+V).",
                     "Path copied: in step 3 paste it into the folder picker (Ctrl+V).",
                     "Pfad kopiert: in Schritt 3 in die Ordnerauswahl einfügen (Strg+V).",
@@ -557,9 +566,19 @@ def get_language() -> str:
     return _current
 
 
+PLATFORM = sys.platform  # testovi ga postavljaju da provjere Mac tekstove i na Windowsu
+# Mac: tekst koji pominje Windows ili njegove prečice ima svoju varijantu (ključ + "_mac").
+MAC_VARIANTS = {"theme.system", "help.copied"}
+
+
 def tr(key: str, **values) -> str:
+    mac = PLATFORM == "darwin"
+    if mac and key in MAC_VARIANTS:
+        key += "_mac"
     texts = TEXTS.get(key)
     if texts is None:
         return key
     text = texts[_ORDER.index(_current)]
+    if mac:
+        text = text.replace("Ctrl+", "⌘").replace("Strg+", "⌘")  # prečice na Macu idu preko Cmd tipke
     return text.format(**values) if values else text
