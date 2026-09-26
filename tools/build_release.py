@@ -1,7 +1,8 @@
 """Pravi instaler: PyInstaller (aplikacija + host) → alati i dodatak → self-test → Inno Setup → SHA-256.
 
 Pokretanje iz foldera projekta:  python tools/build_release.py
-Izlaz ide van OneDrive-a: %LOCALAPPDATA%\\VideoDownload-build (ili VIDEODL_BUILD_DIR).
+Izlaz: folder „Build" pored projekta ako postoji (C:\\Video Downloader\\Build, vidljiv Ahmedu), inače
+%LOCALAPPDATA%\\VideoDownload-build; VIDEODL_BUILD_DIR ima prednost. Nikad u OneDrive.
 """
 
 import filecmp
@@ -19,7 +20,10 @@ sys.path.insert(0, str(PROJECT))
 
 from videodl import __version__  # noqa: E402
 
-BUILD = Path(os.environ.get("VIDEODL_BUILD_DIR") or Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-build")
+# Claude desktop (MSIX) preusmjerava agentove upise u %LOCALAPPDATA%, pa ih Ahmed ne vidi; zato „Build" pored projekta.
+_SIBLING_BUILD = PROJECT.parent / "Build"
+BUILD = Path(os.environ.get("VIDEODL_BUILD_DIR")
+             or (_SIBLING_BUILD if _SIBLING_BUILD.is_dir() else Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-build"))
 DIST = BUILD / "dist"
 APP = DIST / "VideoDownload"
 INSTALLER_OUT = BUILD / "installer"
@@ -68,13 +72,16 @@ def pyinstaller(*args: str) -> None:
 
 def ffmpeg_dir() -> Path | None:
     """Folder sa ffmpeg buildom za paket: VIDEODL_FFMPEG_DIR ili najnoviji raspakovani
-    „essentials" u %LOCALAPPDATA%\\VideoDownload-ffmpeg. Upola je manji od „full" builda sa PATH-a,
+    „essentials" u BUILD\\ffmpeg (ili ranije %LOCALAPPDATA%\\VideoDownload-ffmpeg). Upola je manji od „full" builda sa PATH-a,
     a ima sve što aplikacija koristi (lame, x264, aac, mov_text, webp, hls, dash)."""
     override = os.environ.get("VIDEODL_FFMPEG_DIR")
     if override:
         return Path(override)
-    candidates = sorted((Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-ffmpeg").glob("x-ffmpeg-*-essentials_build/*/bin"))
-    return candidates[-1] if candidates else None
+    for cache in (BUILD / "ffmpeg", Path(os.environ["LOCALAPPDATA"]) / "VideoDownload-ffmpeg"):
+        candidates = sorted(cache.glob("x-ffmpeg-*-essentials_build/*/bin"))
+        if candidates:
+            return candidates[-1]
+    return None
 
 
 LOCK = PROJECT / "tools" / "build-lock.json"
@@ -99,7 +106,7 @@ def tool_source(name: str) -> Path:
         path = folder / f"{name}.exe" if folder else None
         if not path or not path.is_file():
             raise SystemExit(f"{name} iz pripremljenog builda nije pronađen (VIDEODL_FFMPEG_DIR ili "
-                             "%LOCALAPPDATA%\\VideoDownload-ffmpeg); build ne uzima drugi sa PATH-a.")
+                             "Build\\ffmpeg); build ne uzima drugi sa PATH-a.")
         return path
     found = shutil.which(name)
     if not found:

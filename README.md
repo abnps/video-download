@@ -43,7 +43,8 @@ Glavni jezik je engleski; bosanski, njemački, španski i francuski su u `site/b
 ## Izdavanje nove verzije
 
 1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
-2. `python tools/build_release.py` (build van OneDrive-a u `%LOCALAPPDATA%\VideoDownload-build`;
+2. `python tools/build_release.py` (build u folder `Build` pored projekta, npr. `C:\Video Downloader\Build`;
+   gotovi instaler je u `Build\installer`;
    uključuje self-test spakovane aplikacije). Build odbija da radi ako se paketi ili alati ne slažu
    sa `tools/build-lock.json`, prvo pokreće sve testove, a na kraju potpisuje `release.json` ključem
    `%USERPROFILE%\.videodl\release-signing-key.pem` (ključ nikad ne ide u repo; bez njega nema izdanja).

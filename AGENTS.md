@@ -12,6 +12,10 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   (Obsidian vault `C:/Users/ahmed/OneDrive/AHMED STUF/Ahmed Stuf`).
 - Projektna memorija u vaultu: `02 Posao/Video Download.md` — status, odluke,
   sledeći korak. Dopuni je poslije materijalne odluke ili verifikovanog rezultata.
+- Lokacija (Ahmed, 26.9.2026): `C:\Video Downloader\` — `Projekat\` (ovaj repo), `Build\` (gotovi
+  instaleri u `Build\installer`, pripremljeni ffmpeg u `Build\ffmpeg`, radni fajlovi), `Rezervne kopije\`
+  (git bundle-ovi), `PROCITAJ.txt`. Van OneDrive-a i van AppData (Claude desktop je MSIX i agentove upise u
+  %LOCALAPPDATA% sakrije od Ahmeda). Privatni ključ za potpis ostaje u `%USERPROFILE%\.videodl`, NIKAD ovdje.
 - `00_plan/plan_projekta.md` je izvor istine za faze, Definition of Done i exit
   gate-ove. Faza se ne proglašava završenom bez dokaza ili Ahmedovog izuzetka.
 
@@ -42,20 +46,20 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 ## Okruženje
 
-- Globalni Python 3.14 (paketi iz `requirements.txt`). Ne praviti `.venv` u ovom
-  OneDrive folderu — hiljade fajlova bi se sinhronizovale.
+- Globalni Python 3.14 (paketi iz `requirements.txt`). Ne praviti `.venv` u folderu projekta
+  (nepotrebno; globalni Python je dovoljan i zaključan u `tools/build-lock.json`).
 - Potrebni su `ffmpeg` i JavaScript runtime (Node.js ili Deno) na PATH-u; bez JS
   runtime-a YouTube često ne radi.
-- Preuzeti mediji nikad ne idu u ovaj folder (OneDrive). Živi testovi preuzimaju
-  u privremeni folder van OneDrive-a.
+- Preuzeti mediji nikad ne idu u folder projekta. Živi testovi preuzimaju u privremeni
+  folder van projekta.
 
 ## Jezici, instaler i ažuriranje
 
 - 5 jezika (bs, en, de, es, fr): svaki novi tekst ide u `videodl/i18n.py` i, za popup,
   u `extension/i18n.js`, na svih 5 jezika; testovi padaju ako prevod fali.
   Tekstovi iz radnih niti su ključevi prevoda, prevode se tek pri prikazu.
-- Instaler: `python tools/build_release.py` (PyInstaller + Inno Setup, build van
-  OneDrive-a). `installer/Bosnian.isl` i `.iss` moraju ostati UTF-8 sa BOM-om.
+- Instaler: `python tools/build_release.py` (PyInstaller + Inno Setup); izlaz u
+  `C:\Video Downloader\Build` (folder `Build` pored projekta; bez njega `%LOCALAPPDATA%\VideoDownload-build`). `installer/Bosnian.isl` i `.iss` moraju ostati UTF-8 sa BOM-om.
 - Repo je JAVAN (Ahmedova odluka 22.9.2026, mijenja odluku od 17.9.2026): kod i izdanja su
   javno dostupni. Sajt i prodaja i dalje traže novu odluku i pravnu provjeru
   (§95a UrhG, LG Hamburg/Uberspace). Program se ne prilagođava piratskim izvorima ni DRM-u.

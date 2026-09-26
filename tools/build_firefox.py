@@ -3,7 +3,8 @@
 Pravi ZIP za predaju na addons.mozilla.org („On your own" = nije u katalogu, Mozilla ga samo potpiše).
 Potpisan .xpi Firefox instalira trajno, bez developer moda. Predaju i potpis radi vlasnik Firefox naloga.
 
-    python tools/build_firefox.py            → %LOCALAPPDATA%\\VideoDownload-build\\firefox\\video-download-firefox-<verzija>.zip
+    python tools/build_firefox.py            → <build folder>\\firefox\\video-download-firefox-<verzija>.zip
+                                               (isti build folder kao build_release.py: C:\\Video Downloader\\Build)
 """
 
 import json
@@ -45,7 +46,10 @@ def firefox_manifest(chrome: dict) -> dict:
 def build(out_dir: Path | None = None) -> Path:
     chrome = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
     manifest = firefox_manifest(chrome)
-    base = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "VideoDownload-build" / "firefox"
+    sibling = Path(__file__).resolve().parent.parent.parent / "Build"  # isti izbor foldera kao build_release.py
+    root = os.environ.get("VIDEODL_BUILD_DIR") or (
+        sibling if sibling.is_dir() else Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "VideoDownload-build")
+    base = Path(root) / "firefox"
     out_dir = Path(out_dir or base)
     out_dir.mkdir(parents=True, exist_ok=True)
     target = out_dir / f"video-download-firefox-{manifest['version']}.zip"
