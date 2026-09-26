@@ -70,7 +70,17 @@
     </nav>
     <span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html">BS</a> · <a href="../de/index.html">DE</a> · <a href="../es/index.html" aria-current="true">ES</a> · <a href="../fr/index.html">FR</a></span>
     <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Descargar</a>
+    <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menú" title="Menú"><span></span><span></span><span></span></button>
   </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Menú" hidden>
+      <a href="#features">Funciones</a>
+      <a href="#extension">Extensión</a>
+      <a href="#install">Instalación</a>
+      <a href="#news">Novedades</a>
+      <a href="#help">Ayuda</a>
+      <a class="heart" href="#support">♥ Apoyar</a>
+    <div class="menu-lang"><span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html">BS</a> · <a href="../de/index.html">DE</a> · <a href="../es/index.html" aria-current="true">ES</a> · <a href="../fr/index.html">FR</a></span></div>
+  </nav>
 </header>
 
 <main>
@@ -93,15 +103,21 @@
       </div>
 
       <div class="stage" data-reveal style="--d:.15s">
-        <div class="app" role="img" aria-label="La ventana de Video Download descargando vídeos">
-          <div class="app-title"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+        <div class="stage-label">
+          <span class="badge">Demostración</span>
+          <button class="anim-toggle" type="button" aria-pressed="false" data-pause="Pausar animación"
+                  data-play="Reanudar animación"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg><span>Pausar animación</span></button>
+        </div>
+        <div class="app" role="region" aria-label="Demostración de la ventana del programa (no es una descarga real)">
+          <div class="app-title" aria-hidden="true"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
           <div class="app-tools">
             <button class="paste" type="button">+ Pegar</button>
-            <div class="fmt">Vídeo – mejor calidad (MP4)</div>
-            <div class="go">↓ Descargar</div>
+            <div class="fmt" aria-hidden="true">Vídeo – mejor calidad (MP4)</div>
+            <div class="go" aria-hidden="true">↓ Descargar</div>
           </div>
-          <div class="rows" aria-live="polite"></div>
-          <div class="app-foot"><span>Carpeta: Video Download</span><span class="heart">♥ Apoyar el proyecto</span></div>
+          <div class="rows" aria-hidden="true"></div>
+          <p class="sr" role="status" aria-live="polite" data-announce></p>
+          <div class="app-foot" aria-hidden="true"><span>Carpeta: Video Download</span><span class="heart">♥ Apoyar el proyecto</span></div>
         </div>
         <p class="stage-note">Pruébalo: pulsa <b>+ Pegar</b>.</p>
       </div>
@@ -124,7 +140,7 @@
         <div class="tile wide tall shot" data-reveal>
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
           <h3>MP4 hasta la mejor calidad</h3>
-          <p>La mejor, 1080p, 720p o 480p. Imagen y sonido se unen en un MP4 que se reproduce en todas partes.</p>
+          <p>La mejor, 1080p, 720p o 480p. Imagen y sonido se unen en un MP4 (H.264/AAC si el sitio lo ofrece) que se reproduce en la mayoría de los dispositivos.</p>
           <picture>
             <source srcset="../assets/screenshot-dark-es.png" media="(prefers-color-scheme: dark)">
             <img src="../assets/screenshot-light-es.png" alt="La ventana de Video Download con cuatro descargas" width="860" height="470" loading="lazy">
@@ -158,8 +174,8 @@
         <div class="tile full" data-reveal>
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
           <h3>Siempre al día y seguro</h3>
-          <p>La aplicación busca nuevas versiones por sí sola, actualiza la parte que lee los sitios web sin reinstalar e instala solo actualizaciones firmadas digitalmente por nosotros.</p>
-          <div class="chips"><span>5 idiomas</span><span>Sin cuenta</span><span>Sin anuncios</span><span>Sin rastreo</span><span>Actualizaciones firmadas</span></div>
+          <p>La aplicación busca nuevas versiones por sí sola, actualiza la parte que lee los sitios web sin reinstalar. En Windows instala solo actualizaciones firmadas digitalmente por nosotros; en Mac (beta) las nuevas versiones se descargan a mano por ahora.</p>
+          <div class="chips"><span>5 idiomas</span><span>Sin cuenta</span><span>Sin anuncios</span><span>Sin rastreo</span><span>Actualizaciones firmadas en Windows</span></div>
         </div>
       </div>
     </div>
@@ -196,7 +212,7 @@
   <section id="how">
     <div class="wrap center">
       <div class="kicker" data-reveal>Cómo funciona</div>
-      <h2 data-reveal>Tu primer archivo en menos de un minuto.</h2>
+      <h2 data-reveal>Tu primer archivo en pocos minutos.</h2>
       <p class="sub" data-reveal>Instala una vez y luego solo copia enlaces.</p>
       <div class="steps">
         <div class="step"><div class="n">1</div><h3>Instalar</h3><p>No necesita administrador y no añade nada más a tu ordenador.</p></div>
@@ -273,7 +289,7 @@
           <div class="support-actions">
             <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">♥ Apoyar con PayPal</a>
             <div class="share" data-url="https://abnps.github.io/video-download/es/" data-title="Video Download — descargador gratuito de vídeo y audio para Windows y Mac" data-copied="Copiado">
-              <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="Cuéntaselo a quien le sirva."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg> Compartir</button>
+              <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="Cuéntaselo a quien le sirva."><svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg> Compartir</button>
               <dialog class="share-sheet" aria-label="Compartir Video Download">
                 <div class="sheet-head"><h3>Compartir Video Download</h3><button class="sheet-close" type="button" aria-label="Cerrar">✕</button></div>
                 <div class="sheet-preview"><img src="../assets/icon.png" alt=""><div><b>Video Download</b><span>https://abnps.github.io/video-download/es/</span></div></div>
@@ -284,7 +300,7 @@
             <a class="sheet-app" style="--c:#1877F2" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.5H16l.4-3H13.5V8.7c0-.9.3-1.4 1.5-1.4h1.5V4.6A20 20 0 0 0 14.3 4.5c-2.2 0-3.8 1.3-3.8 3.8v2.2H8v3h2.5V21z"/></svg></i><span>Facebook</span></a>
             <a class="sheet-app" style="--c:#111111" href="https://x.com/intent/post?url=https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F&amp;text=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.8 3.5h3l-6.6 7.5 7.8 9.5h-6.1l-4.8-5.9-5.4 5.9h-3l7-7.9L2.3 3.5h6.2l4.3 5.4zm-1 15.3h1.7L7.3 5.1H5.5z"/></svg></i><span>X</span></a>
             <a class="sheet-app" style="--c:#6B7280" href="mailto:?subject=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac&amp;body=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac%20https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></i><span>E-mail</span></a>
-            <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></i><span>Más…</span></button>
+            <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i><svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></i><span>Más…</span></button>
                 </div>
                 <div class="sheet-copy"><input type="text" readonly value="https://abnps.github.io/video-download/es/" aria-label="URL"><button type="button" data-copy data-label="Copiar">Copiar</button></div>
               </dialog>
@@ -307,7 +323,7 @@
         <details><summary>De repente un vídeo no se descarga.</summary><p>Los sitios web cambian a menudo. Ayuda → Actualizar el lector de sitios (yt-dlp) y vuelve a intentarlo.</p></details>
         <details><summary>¿Por qué no se descargan las emisiones en directo?</summary><p>Una emisión en directo no tiene fin, así que la descarga nunca terminaría. Descárgala cuando acabe y se publique la grabación.</p></details>
         <details><summary>¿Qué envía la aplicación a internet?</summary><p>Solo lo necesario: el enlace que descargas va a ese sitio web y la búsqueda de actualizaciones, a GitHub y PyPI. Sin cuentas, estadísticas ni rastreo.</p></details>
-        <details><summary>¿Es segura?</summary><p>El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo instala actualizaciones firmadas digitalmente por nosotros.</p></details>
+        <details><summary>¿Es segura?</summary><p>El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo instala en Windows actualizaciones firmadas digitalmente por nosotros (en Mac, beta, por ahora a mano).</p></details>
       </div>
     </div>
   </section>
@@ -323,7 +339,7 @@
   </div>
 </footer>
 
-<script>window.VD_TEXT = {"progress": "Descargando · {p}% · {v} MB/s · quedan {s} s", "done": "Terminado · {m} MB", "decimal": ",", "finished": [{"title": "Clase: fundamentos de fotografía", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Pódcast #12 – una charla sobre viajes", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Ruta de montaña – lago Prokoško (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 mejor", "audio": false}, {"title": "Mi concierto en directo – grabado desde el público", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Clase: fundamentos de fotografía", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Pódcast #12 – una charla sobre viajes", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}]};</script>
+<script>window.VD_TEXT = {"progress": "Descargando · {p}% · {v} MB/s · quedan {s} s", "done": "Terminado · {m} MB", "decimal": ",", "finished": [{"title": "Clase: fundamentos de fotografía", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Pódcast #12 – una charla sobre viajes", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Ruta de montaña – lago Prokoško (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 mejor", "audio": false}, {"title": "Mi concierto en directo – grabado desde el público", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Clase: fundamentos de fotografía", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Pódcast #12 – una charla sobre viajes", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Añadido: {t}", "ended": "Terminado: {t}"};</script>
 <script src="../assets/site.js" defer></script>
 </body>
 </html>

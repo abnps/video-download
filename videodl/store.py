@@ -6,6 +6,7 @@ Red se pamti da se pri zatvaranju ili padu ne izgubi ono što čeka, a istorija 
 
 import contextlib
 import json
+import math
 import os
 import time
 from dataclasses import dataclass
@@ -108,7 +109,7 @@ def load_history(path: Path) -> list[HistoryEntry]:
         title, filepath = row.get("title"), row.get("filepath")
         entries.append(HistoryEntry(url, title if isinstance(title, str) else "",
                                     filepath if isinstance(filepath, str) else "",
-                                    int(_number(row.get("size")) or 0), float(_number(row.get("finished_at")) or 0)))
+                                    _count(row.get("size")), float(_number(row.get("finished_at")) or 0)))
     return entries
 
 
@@ -118,11 +119,24 @@ def clear_history(path: Path) -> None:
 
 # ---------- interno ----------
 
+MAX_COUNT = 2 ** 53  # veće od ovoga nije stvarna veličina fajla (i više nije tačno kao broj u JSON-u)
+
+
 def _number(value) -> float | None:
-    """Broj iz JSON-a; bool, tekst i ostalo nisu broj."""
+    """Konačan broj iz JSON-a; bool, tekst, NaN i beskonačnost (npr. 1e999) nisu broj."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    return float(value) if value == value else None  # NaN nije broj
+    try:
+        number = float(value)
+    except OverflowError:
+        return None  # ogroman cijeli broj
+    return number if math.isfinite(number) else None
+
+
+def _count(value) -> int:
+    """Nenegativan cijeli broj (npr. veličina fajla); sve ostalo je 0."""
+    number = _number(value)
+    return int(number) if number is not None and 0 <= number <= MAX_COUNT else 0
 
 
 def _rows(data: dict, key: str) -> list[dict]:
@@ -132,11 +146,11 @@ def _rows(data: dict, key: str) -> list[dict]:
 
 def _read(path: Path) -> dict:
     try:
-        text = path.read_text(encoding="utf-8")
+        raw = path.read_bytes()
     except OSError:
         return {}  # nema fajla: počinje se od praznog
     try:
-        data = json.loads(text)
+        data = json.loads(raw.decode("utf-8"))  # i pokvarena slova (neispravan UTF-8) znače oštećen fajl
     except ValueError:
         data = None
     if not isinstance(data, dict):

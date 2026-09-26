@@ -11,18 +11,38 @@ import re
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from . import __version__, runtime, ytdlp_update
 
-_URL = re.compile(r"\bhttps?://([^\s/]+)\S*", re.IGNORECASE)
-_TOKEN = re.compile(r"(token|cookie|authorization|password|key)\s*[=:]\s*\S+", re.IGNORECASE)
+_URL = re.compile(r"\b[a-z][a-z0-9+.-]*://[^\s<>\"']+", re.IGNORECASE)
+# Zaglavlja čija je cijela vrijednost tajna (npr. „Cookie: a=1; b=2", „Authorization: Basic …"): do kraja reda.
+_HEADER = re.compile(r"\b(proxy-authorization|authorization|set-cookie|cookie)\b\s*[=:]\s*[^\r\n]*", re.IGNORECASE)
+# Ime=vrijednost / ime: vrijednost / "ime": "vrijednost" za tajne (i u JSON-u i u argumentima).
+_SECRET_NAMES = r"(?:access[_-]?token|refresh[_-]?token|id[_-]?token|token|api[_-]?key|apikey|client[_-]?secret|secret|" \
+                r"password|passwd|pwd|pass|session(?:id)?|sid|auth|key)"
+_JSON_SECRET = re.compile(rf"(\"{_SECRET_NAMES}\")\s*:\s*\"[^\"]*\"", re.IGNORECASE)
+_SECRET = re.compile(rf"\b({_SECRET_NAMES})\b\s*[=:]\s*(?:\"[^\"]*\"|'[^']*'|[^\s&;,]+)", re.IGNORECASE)
+_SCHEME_TOKEN = re.compile(r"\b(Bearer|Basic|Token)\s+[A-Za-z0-9._~+/=-]{4,}", re.IGNORECASE)
 MAX_ERRORS = 20
 
 
+def _site(match: re.Match) -> str:
+    """Od linka ostaje samo ime sajta — bez korisnika, lozinke, putanje i parametara."""
+    try:
+        host = urlsplit(match.group(0)).hostname
+    except ValueError:
+        host = None
+    return f"<{host}>" if host else "<link>"
+
+
 def redact(text: str) -> str:
-    """Od linka ostaje samo ime sajta; ime korisnika i tajne se zamjenjuju."""
-    clean = _URL.sub(lambda match: f"<{match.group(1)}>", text or "")
-    clean = _TOKEN.sub(lambda match: f"{match.group(1)}=<sakriveno>", clean)
+    """Od linka ostaje samo ime sajta; ime korisnika i tajne (tokeni, kolačići, lozinke) se zamjenjuju u cjelini."""
+    clean = _URL.sub(_site, text or "")
+    clean = _HEADER.sub(lambda match: f"{match.group(1)}: <sakriveno>", clean)
+    clean = _JSON_SECRET.sub(lambda match: f'{match.group(1)}: "<sakriveno>"', clean)
+    clean = _SECRET.sub(lambda match: f"{match.group(1)}=<sakriveno>", clean)
+    clean = _SCHEME_TOKEN.sub(lambda match: f"{match.group(1)} <sakriveno>", clean)
     user = getpass.getuser()
     if user:
         clean = re.sub(rf"\b{re.escape(user)}\b", "<korisnik>", clean)

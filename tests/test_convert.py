@@ -176,6 +176,45 @@ class ConvertButtonTest(unittest.TestCase):
         self.assertIn("nije uspjelo", row.status_label.text())
         self.assertFalse(row.convert_button.isHidden())
 
+    def slow_convert(self):
+        started = threading.Event()
+
+        def convert_fn(source, on_progress=None, cancel_event=None, duration=None):
+            started.set()
+            while not cancel_event.is_set():
+                time.sleep(0.01)
+            raise convert.ConvertError("Prekinuto.")
+
+        return started, convert_fn
+
+    def test_main_stop_also_stops_mp3_conversion(self):
+        started, convert_fn = self.slow_convert()
+        window, item = self.window(convert_fn=convert_fn)
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        window._rows[item.id].convert_button.click()
+        self.assertTrue(wait_until(started.is_set))
+        self.assertEqual(window.download_button.text(), "Zaustavi")  # konverzija je posao u toku
+        window.download_button.click()
+        self.assertTrue(wait_until(lambda: not window._convert_jobs))
+        self.assertEqual(item.convert_state, "")  # ručno zaustavljeno nije greška; MP3 se može ponoviti
+        self.assertFalse(window._rows[item.id].convert_button.isHidden())
+        self.assertEqual(window.download_button.text(), "Preuzmi")
+
+    def test_clear_finished_keeps_a_row_while_it_converts(self):
+        started, convert_fn = self.slow_convert()
+        window, item = self.window(convert_fn=convert_fn)
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        window._rows[item.id].convert_button.click()
+        self.assertTrue(wait_until(started.is_set))
+        window._clear_finished()
+        self.assertIsNotNone(window._queue.get(item.id))  # red ostaje dok MP3 ne bude gotov
+        window._stop_all()
+        self.assertTrue(wait_until(lambda: not window._convert_jobs))
+        window._clear_finished()
+        self.assertIsNone(window._queue.get(item.id))
+
 
 if __name__ == "__main__":
     unittest.main()

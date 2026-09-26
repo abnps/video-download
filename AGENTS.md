@@ -84,6 +84,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   NE piše ručno: pravi je šablon `tools/site_home.py` (HOME = tekstovi po jeziku; nazivi dugmadi u demou iz
   `videodl/i18n.py`), ostale stranice `tools/build_site.py` (TEXTS). Stil i animacije: `site/assets/site.css` +
   `site.js` (bez biblioteka, kolačića i tuđih skripti; `prefers-reduced-motion` gasi pokret; sadržaj vidljiv i bez JS).
+  Demo je označen kao demonstracija, ima dugme za pauzu i čitaču ekrana javlja samo dodano/završeno; na uskom
+  ekranu meni ☰ (i na podstranicama). Tvrdnje na sajtu moraju biti tačne za oba sistema (potpisana
+  ažuriranja samo na Windowsu, Mac za sada ručno) — pregled 26.9.2026.
   Bez Microsoftovih znakova i slika. Novi jezik = unos u HOME i TEXTS + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Kontakt na sajtu (Ahmedova odluka 26.9.2026): javno se prikazuje SAMO `abnpsdev@gmail.com`

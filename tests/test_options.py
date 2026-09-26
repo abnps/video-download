@@ -46,6 +46,12 @@ class OptionsTest(unittest.TestCase):
         self.assertEqual((ranges[0]["start_time"], ranges[0]["end_time"]), (150, 370))
         self.assertNotIn("download_ranges", build_ydl_options(get_preset("best"), r"C:\v"))
 
+    def test_sections_within_the_same_second_get_different_names(self):
+        first = build_ydl_options(get_preset("best"), r"C:\v", section=(1.1, 2.1))["outtmpl"]
+        second = build_ydl_options(get_preset("best"), r"C:\v", section=(1.9, 2.9))["outtmpl"]
+        self.assertNotEqual(first, second)
+        self.assertIn(" (0.01.1\u20130.02.1).%(ext)s", first)
+
     def test_subtitles_only_for_video_and_thumbnail_after_audio(self):
         video = build_ydl_options(get_preset("best"), r"C:\v", subtitles=True, subtitle_langs=["bs", "en"],
                                   thumbnail=True)

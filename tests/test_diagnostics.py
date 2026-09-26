@@ -21,6 +21,31 @@ class RedactTest(unittest.TestCase):
         user = getpass.getuser()
         self.assertNotIn(user, diagnostics.redact(rf"C:\Users\{user}\Videos\film.mp4"))
 
+    def test_no_part_of_a_secret_survives(self):
+        # Izmišljene tajne (pregled 26.9.2026): ništa od vrijednosti ne smije ostati u izvještaju.
+        secret = "SYNTHETIC_SECRET"
+        cases = [
+            f"Authorization: Bearer {secret}",
+            f"authorization=Basic {secret}==",
+            f"Proxy-Authorization: Basic {secret}",
+            f"Cookie: a=1; b={secret}; c=3",
+            f"set-cookie: sid={secret}; Path=/; HttpOnly",
+            f"https://demo:{secret}@example.org/private?x=1",
+            f"ftp://demo:{secret}@files.example.org/x",
+            f'{{"access_token": "{secret}", "ok": true}}',
+            f"password={secret}",
+            f"api_key: '{secret}'",
+            f"greška Bearer {secret} odbijen",
+            f"client_secret={secret}&x=1",
+        ]
+        for text in cases:
+            with self.subTest(text=text):
+                self.assertNotIn(secret, diagnostics.redact(text))
+                self.assertNotIn("SYNTHETIC", diagnostics.redact(text))
+        self.assertEqual(diagnostics.redact(f"https://demo:{secret}@example.org/p"), "<example.org>")
+        # obična poruka ostaje čitljiva
+        self.assertEqual(diagnostics.redact("HTTP Error 403: Forbidden"), "HTTP Error 403: Forbidden")
+
 
 class ReportTest(unittest.TestCase):
     def test_report_has_versions_tools_and_errors(self):

@@ -315,9 +315,57 @@ footer a { color: var(--muted); }
 .app { max-width: 100%; }
 .app-tools .fmt { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* ---------- oznaka demonstracije i pauza animacije ---------- */
+.stage-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.stage-label .badge {
+  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px;
+}
+.anim-toggle {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; color: var(--muted);
+  background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 8px; cursor: pointer;
+}
+.anim-toggle:hover { color: var(--text); }
+.anim-toggle svg { width: 14px; height: 14px; }
+.anim-toggle .i-play, .anim-toggle[aria-pressed="true"] .i-pause { display: none; }
+.anim-toggle[aria-pressed="true"] .i-play { display: inline; }
+html:not(.js) .anim-toggle { display: none; }  /* bez skripte nema ni animacije demoa */
+/* Pauzirano: stoje pozadina, sjaj trake, puls i sve ostale petlje. */
+.paused *, .paused *::before, .paused *::after { animation-play-state: paused !important; }
+.paused .app { transform: none; }
+
+/* ---------- meni na telefonu (☰) ---------- */
+.menu-btn {
+  display: none; flex-direction: column; justify-content: center; gap: 4px; width: 40px; height: 40px; flex: none;
+  border-radius: 50%; border: 1px solid var(--line); background: var(--bg-2); cursor: pointer; padding: 0 11px;
+}
+.menu-btn span { display: block; height: 2px; border-radius: 1px; background: var(--text); transition: transform .25s var(--ease), opacity .2s; }
+.menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+nav.mobile-nav { display: none; }
+.menu-lang { display: none; }
+
 /* ---------- telefon i tablet ---------- */
 @media (max-width: 1180px) { nav { gap: 16px; font-size: 14px; } .bar { gap: 20px; } }
-@media (max-width: 1040px) { nav { display: none; } .lang { margin-left: auto; } }
+@media (max-width: 1040px) {
+  nav { display: none; } .lang { margin-left: auto; }
+  .js .menu-btn { display: inline-flex; }
+  nav.mobile-nav:not([hidden]) {
+    display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 8px 16px 16px; font-size: 16px;
+    background: var(--bg-2); border-bottom: 1px solid var(--line); box-shadow: var(--shadow-2);
+    animation: rowin .25s var(--ease);
+  }
+  nav.mobile-nav a { padding: 12px 8px; border-radius: 10px; color: var(--text); }
+  nav.mobile-nav a:hover { background: var(--bg); }
+  nav.mobile-nav a.heart { color: var(--pink); }
+}
+@media (max-width: 480px) {
+  .bar > .lang { display: none; }  /* jezici prelaze u meni, da zaglavlje stane */
+  .menu-btn { margin-left: auto; }
+  .menu-lang { display: block; padding: 10px 8px 0; }
+  .menu-lang .lang { display: inline-block; font-size: 14px; padding: 6px 14px; }
+}
 @media (max-width: 960px) {
   .hero-grid, .split { grid-template-columns: 1fr; gap: 40px; }
   .app { --rx: 0deg; --ry: 0deg; }

@@ -1,3 +1,3 @@
-from videodl.gui import main
+from videodl.launch import run
 
-raise SystemExit(main())
+raise SystemExit(run())

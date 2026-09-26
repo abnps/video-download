@@ -407,6 +407,55 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(item.filepath, os.path.join(self.tmp.name, "Film [id2].mp4"))
         self.assertNotEqual(item.message, "@exists")
 
+    def test_existing_file_with_unknown_owner_is_not_claimed_as_already_downloaded(self):
+        # Istorija ne zna čiji je „Film.mp4" (obrisana ili prestara): ne tvrditi „već preuzeto" — ID u ime.
+        existing = os.path.join(self.tmp.name, "Film.mp4")
+        with open(existing, "wb") as file:
+            file.write(b"x")
+
+        def download(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            self.extras.append(extra)
+            if extra.get("name_template") == "title_id":
+                return DownloadResult(ItemStatus.DONE, filepath=os.path.join(output_dir, "Film [id].mp4"))
+            return DownloadResult(ItemStatus.DONE, filepath=existing, already_existed=True)
+
+        window = self.make_window(download)
+        window._set_option("_name_template", "title")
+        window.add_links_from_text("https://v/film")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and len(self.extras) == 2))
+        self.assertTrue(item.force_id_name)
+
+    def test_two_videos_with_the_same_title_never_write_one_file_at_once(self):
+        # Različiti linkovi, isti naslov, šablon „Samo naslov": isto ime fajla → drugi čeka.
+        def same_title(url, **access):
+            return ProbeResult("Film", (Entry(url, "Film"),), is_playlist=False)
+
+        window = self.make_window(self.blocking_download, probe_fn=same_title, parallel=2)
+        window._set_option("_name_template", "title")
+        window.add_links_from_text("https://v/a https://v/b")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: len(self.calls) >= 1))
+        time.sleep(0.3)
+        app.processEvents()
+        self.assertEqual(len(self.calls), 1)  # drugi ne kreće dok prvi piše „Film.mp4"
+        self.release.set()
+        self.assertTrue(wait_until(lambda: self.statuses(window) == [ItemStatus.DONE, ItemStatus.DONE]))
+
+        # Uz ID u imenu (podrazumijevano) isti naslovi ne smetaju: oba idu odjednom.
+        self.release.clear()
+        self.calls.clear()
+        window2 = self.make_window(self.blocking_download, probe_fn=same_title, parallel=2)
+        window2._set_option("_name_template", "title_id")
+        window2.add_links_from_text("https://v/c https://v/d")
+        self.assertTrue(wait_until(lambda: len(window2._queue.items()) == 2))
+        window2._start_all()
+        self.assertTrue(wait_until(lambda: len(self.calls) == 2))
+        self.release.set()
+
     def test_stopping_all_jobs_has_one_shared_deadline(self):
         stubborn_started = threading.Event()
 

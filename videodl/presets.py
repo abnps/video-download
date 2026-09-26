@@ -213,12 +213,25 @@ def _with_quality(template: str, preset: Preset) -> str:
     return template.replace(".%(ext)s", f" [{preset.key}].%(ext)s")
 
 
+def _clock_precise(value: float) -> str:
+    """Kao _clock, ali s dijelom sekunde kad ga ima (1.1 s → 0:01.1), da dva isječka unutar iste sekunde
+    ne dobiju isto ime. Cijele sekunde izgledaju kao i ranije."""
+    text = _clock(value)
+    fraction = round(value - int(value), 3)
+    if fraction > 0:
+        text += f"{fraction:.3f}"[1:].rstrip("0")
+    return text
+
+
+def section_label(section: tuple[float, float] | None) -> str:
+    return "–".join(_clock_precise(value) for value in section).replace(":", ".") if section else ""
+
+
 def _with_section(template: str, section: tuple[float, float] | None) -> str:
     """Isječak dobija svoje ime, da ne zamijeni cijeli video niti se s njim pomiješa."""
     if not section:
         return template
-    label = format_section(section).replace(":", ".")
-    return template.replace(".%(ext)s", f" ({label}).%(ext)s")
+    return template.replace(".%(ext)s", f" ({section_label(section)}).%(ext)s")
 
 
 def _output_name(filename_title: str | None, source_url: str | None, name_template: str | None = None) -> str:

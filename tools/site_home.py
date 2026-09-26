@@ -30,6 +30,7 @@ DEMO_ROWS = (("12:34", 46.0, 9.6, "#3d7a5a", "#2b5a82", "best", False),
 
 HOME = {
     "en": {
+        "a11y": ('Demo', 'Pause animation', 'Play animation', 'Menu', 'Added: {t}', 'Finished: {t}', 'Demo of the app window (not a real download)'),
         "share": ('Share', 'Copy', 'Copied', 'Tell a friend who needs it.', 'Share Video Download', 'More…', 'Close'),
         "title": "Video Download — free video and audio downloader for Windows and Mac",
         "description": "Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.",
@@ -40,21 +41,22 @@ HOME = {
         "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
         "note": "The app is meant for your own videos, content you have the author's permission for, and content under a free "
                 "license. By downloading you accept the <a href=\"terms.html\">Terms of use</a>. DRM-protected content is not downloaded.",
-        "app_aria": "The Video Download window downloading videos", "try_it": "Try it: click <b>{paste}</b>.",
+        "try_it": "Try it: click <b>{paste}</b>.",
         "stats": ("supported sites", "languages", "ads and trackers", "downloads at once"),
         "features": ("Features", "Everything you need,<br>nothing you don't.",
                      "A simple window, with everything you expect from a good downloader underneath."),
         "tiles": {
-            "mp4": ("MP4 up to the best quality", "Best, 1080p, 720p or 480p. Picture and sound are merged into an MP4 that plays everywhere."),
+            "mp4": ("MP4 up to the best quality", "Best, 1080p, 720p or 480p. Picture and sound are merged into an MP4 (H.264/AAC when the site offers it) that plays on most devices."),
             "audio": ("Audio only: MP3 or M4A", "For lectures, podcasts and music. A finished MP4 turns into an MP3 with one button."),
             "copy": ("Copy a link, done", "The app notices a copied link and adds it to the queue."),
             "playlists": ("Playlists, several at once", "Whole playlists, up to 4 downloads at the same time, automatic retry when the connection drops."),
             "clips": ("Clips, subtitles, cover art", "Just a part of a video, subtitles in the MP4 and the thumbnail as the file's cover."),
             "theme": ("Light and dark theme", "Or same as your system. Progress on the taskbar and a notification at the end."),
             "safe": ("Always up to date, and safe", "The app checks for new versions itself, updates the part that reads websites without "
-                     "reinstalling, and installs only updates digitally signed by us."),
+                     "reinstalling. On Windows it installs only updates digitally signed by us; on Mac (beta) new versions are "
+                     "downloaded by hand for now."),
         },
-        "chips": ("5 languages", "No account", "No ads", "No tracking", "Signed updates"),
+        "chips": ("5 languages", "No account", "No ads", "No tracking", "Signed updates on Windows"),
         "shot_alt": "The Video Download window with four downloads",
         "extension": ("Browser extension", "Download what's playing.",
                       "Play a video, click the icon, done. Or right-click any link or video. The app starts by itself if it isn't running.",
@@ -64,7 +66,7 @@ HOME = {
                       "How to install the extension →"),
         "popup": ("the app is running", "Download the playing video", "Download as MP3 (audio only)", "Detected video streams",
                   "Video Download extension"),
-        "how": ("How it works", "Your first file in under a minute.", "Install once, then just copy links.",
+        "how": ("How it works", "Your first file in a few minutes.", "Install once, then just copy links.",
                 (("Install", "No administrator needed, adds nothing else to your computer."),
                  ("Add a link", "Copy a link, click “Paste”, or use the extension."),
                  ("Download", "MP4 or MP3, then “Download”. The file waits in the Video&nbsp;Download folder."))),
@@ -89,12 +91,13 @@ HOME = {
                 ("What does the app send to the internet?", "Only what's needed: the link you download goes to that website, and "
                  "update checks go to GitHub and PyPI. No accounts, statistics or tracking."),
                 ("Is it safe?", "The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only "
-                 "updates digitally signed by us.")),
+                 "updates digitally signed by us on Windows (on Mac, beta, you download new versions by hand for now).")),
         "demo_titles": ("Mountain hike – Prokosko lake (4K)", "My live concert – filmed from the crowd",
                         "Lecture: photography basics", "Podcast #12 – a talk about travel"),
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
     },
     "bs": {
+        "a11y": ('Demonstracija', 'Pauziraj animaciju', 'Pokreni animaciju', 'Meni', 'Dodano: {t}', 'Završeno: {t}', 'Demonstracija prozora programa (nije pravo preuzimanje)'),
         "share": ('Podijeli', 'Kopiraj', 'Kopirano', 'Javi prijatelju kome treba.', 'Podijeli Video Download', 'Više…', 'Zatvori'),
         "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
         "description": "Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.",
@@ -105,21 +108,22 @@ HOME = {
         "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
         "note": "Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. "
                 "Preuzimanjem prihvataš <a href=\"terms.html\">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.",
-        "app_aria": "Prozor programa Video Download dok preuzima video", "try_it": "Probaj: klikni <b>{paste}</b>.",
+        "try_it": "Probaj: klikni <b>{paste}</b>.",
         "stats": ("podržanih sajtova", "jezika", "reklama i praćenja", "preuzimanja odjednom"),
         "features": ("Funkcije", "Sve što treba,<br>ništa viška.",
                      "Jednostavan prozor, a ispod njega sve što očekuješ od dobrog programa za preuzimanje."),
         "tiles": {
-            "mp4": ("MP4 do najboljeg kvaliteta", "Najbolji, 1080p, 720p ili 480p. Slika i zvuk se sami spajaju u MP4 koji radi svuda."),
+            "mp4": ("MP4 do najboljeg kvaliteta", "Najbolji, 1080p, 720p ili 480p. Slika i zvuk se sami spajaju u MP4 (H.264/AAC kad ga sajt nudi) koji se pušta na većini uređaja."),
             "audio": ("Samo zvuk: MP3 ili M4A", "Za predavanja, podcaste i muziku. Gotov MP4 se jednim dugmetom pretvara u MP3."),
             "copy": ("Kopiraj link i gotovo", "Program sam primijeti kopiran link i doda ga u red."),
             "playlists": ("Plejliste, više odjednom", "Cijele plejliste, do 4 preuzimanja istovremeno, automatski novi pokušaj kad pukne veza."),
             "clips": ("Isječak, titlovi, omot", "Samo dio videa, titlovi u MP4 i sličica kao omot fajla."),
             "theme": ("Svijetla i tamna tema", "Ili kao sistem. Napredak na traci zadataka i obavještenje na kraju."),
             "safe": ("Uvijek ažuran i siguran", "Program sam provjerava nove verzije, ažurira dio koji čita sajtove bez ponovne "
-                     "instalacije i instalira samo ažuriranja koja smo mi digitalno potpisali."),
+                     "instalacije. Na Windowsu instalira samo ažuriranja koja smo mi digitalno potpisali; na Macu (beta) se nova "
+                     "verzija za sada preuzima ručno."),
         },
-        "chips": ("5 jezika", "Bez naloga", "Bez reklama", "Bez praćenja", "Potpisana ažuriranja"),
+        "chips": ("5 jezika", "Bez naloga", "Bez reklama", "Bez praćenja", "Potpisana ažuriranja na Windowsu"),
         "shot_alt": "Prozor programa Video Download sa četiri preuzimanja",
         "extension": ("Dodatak za browser", "Preuzmi ono što se pušta.",
                       "Pusti video, klikni ikonu i gotovo. Ili desni klik na bilo koji link ili video. Program se sam pokrene ako nije otvoren.",
@@ -129,7 +133,7 @@ HOME = {
                       "Kako se instalira dodatak →"),
         "popup": ("aplikacija radi", "Preuzmi video koji se pušta", "Preuzmi kao MP3 (samo zvuk)", "Pronađeni video tokovi",
                   "Dodatak Video Download"),
-        "how": ("Kako radi", "Prvi fajl za manje od minute.", "Instaliraj jednom, pa samo kopiraj linkove.",
+        "how": ("Kako radi", "Prvi fajl za par minuta.", "Instaliraj jednom, pa samo kopiraj linkove.",
                 (("Instaliraj", "Ne traži administratora i ne dodaje ništa drugo na računar."),
                  ("Dodaj link", "Kopiraj link, klikni „Zalijepi“ ili koristi dodatak."),
                  ("Preuzmi", "MP4 ili MP3, pa „Preuzmi“. Fajl čeka u folderu Video&nbsp;Download."))),
@@ -156,12 +160,13 @@ HOME = {
                 ("Šta program šalje na internet?", "Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera "
                  "ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja."),
                 ("Da li je siguran?", "Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo "
-                 "ažuriranja koja smo mi digitalno potpisali.")),
+                 "ažuriranja koja smo mi digitalno potpisali na Windowsu (na Macu, beta, nova verzija se za sada preuzima ručno).")),
         "demo_titles": ("Planinarska tura – Prokoško jezero (4K)", "Moj koncert uživo – snimak iz publike",
                         "Predavanje: osnove fotografije", "Podcast #12 – razgovor o putovanjima"),
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
     },
     "de": {
+        "a11y": ('Demo', 'Animation anhalten', 'Animation abspielen', 'Menü', 'Hinzugefügt: {t}', 'Fertig: {t}', 'Demo des Programmfensters (kein echter Download)'),
         "share": ('Teilen', 'Kopieren', 'Kopiert', 'Erzähl es jemandem, der es braucht.', 'Video Download teilen', 'Mehr…', 'Schließen'),
         "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
         "description": "Kostenlose App für Windows und Mac zum Herunterladen von Video (MP4) und Audio (MP3). Ohne Werbung, ohne Tracking, in 5 Sprachen.",
@@ -173,21 +178,22 @@ HOME = {
         "note": "Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte "
                 "unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href=\"terms.html\">Nutzungsbedingungen</a>. "
                 "DRM-geschützte Inhalte werden nicht heruntergeladen.",
-        "app_aria": "Das Fenster von Video Download beim Herunterladen", "try_it": "Probier's aus: klicke auf <b>{paste}</b>.",
+        "try_it": "Probier's aus: klicke auf <b>{paste}</b>.",
         "stats": ("unterstützte Seiten", "Sprachen", "Werbung und Tracker", "Downloads gleichzeitig"),
         "features": ("Funktionen", "Alles, was du brauchst.<br>Nichts, was du nicht brauchst.",
                      "Ein einfaches Fenster – und darunter alles, was du von einem guten Downloader erwartest."),
         "tiles": {
-            "mp4": ("MP4 bis zur besten Qualität", "Beste, 1080p, 720p oder 480p. Bild und Ton werden zu einer MP4 zusammengeführt, die überall läuft."),
+            "mp4": ("MP4 bis zur besten Qualität", "Beste, 1080p, 720p oder 480p. Bild und Ton werden zu einer MP4 zusammengeführt (H.264/AAC, wenn die Seite es anbietet), die auf den meisten Geräten läuft."),
             "audio": ("Nur Ton: MP3 oder M4A", "Für Vorträge, Podcasts und Musik. Eine fertige MP4 wird mit einem Knopf zur MP3."),
             "copy": ("Link kopieren, fertig", "Die App bemerkt einen kopierten Link und fügt ihn der Liste hinzu."),
             "playlists": ("Playlists, mehrere gleichzeitig", "Ganze Playlists, bis zu 4 Downloads gleichzeitig, automatisch ein neuer Versuch, wenn die Verbindung abbricht."),
             "clips": ("Ausschnitte, Untertitel, Cover", "Nur ein Teil eines Videos, Untertitel in der MP4 und das Vorschaubild als Cover der Datei."),
             "theme": ("Helles und dunkles Design", "Oder wie das System. Fortschritt in der Taskleiste und eine Benachrichtigung am Ende."),
             "safe": ("Immer aktuell – und sicher", "Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten "
-                     "liest, ohne Neuinstallation und installiert nur Updates, die wir digital signiert haben."),
+                     "liest, ohne Neuinstallation. Unter Windows installiert sie nur Updates, die wir digital signiert haben; auf dem "
+                     "Mac (Beta) werden neue Versionen vorerst von Hand geladen."),
         },
-        "chips": ("5 Sprachen", "Kein Konto", "Keine Werbung", "Kein Tracking", "Signierte Updates"),
+        "chips": ("5 Sprachen", "Kein Konto", "Keine Werbung", "Kein Tracking", "Signierte Updates unter Windows"),
         "shot_alt": "Das Fenster von Video Download mit vier Downloads",
         "extension": ("Browser-Erweiterung", "Lade herunter, was gerade läuft.",
                       "Video abspielen, auf das Symbol klicken, fertig. Oder Rechtsklick auf einen Link oder ein Video. Läuft die "
@@ -198,7 +204,7 @@ HOME = {
                       "So installierst du die Erweiterung →"),
         "popup": ("App läuft", "Laufendes Video herunterladen", "Als MP3 herunterladen (nur Ton)", "Gefundene Videostreams",
                   "Erweiterung Video Download"),
-        "how": ("So funktioniert's", "Die erste Datei in unter einer Minute.", "Einmal installieren, dann nur noch Links kopieren.",
+        "how": ("So funktioniert's", "Die erste Datei in wenigen Minuten.", "Einmal installieren, dann nur noch Links kopieren.",
                 (("Installieren", "Keine Administratorrechte nötig, installiert nichts anderes auf deinem Computer."),
                  ("Link hinzufügen", "Link kopieren, auf „Einfügen“ klicken oder die Erweiterung nutzen."),
                  ("Herunterladen", "MP4 oder MP3, dann „Herunterladen“. Die Datei wartet im Ordner Video&nbsp;Download."))),
@@ -227,12 +233,13 @@ HOME = {
                 ("Was sendet die App ins Internet?", "Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und "
                  "die Update-Prüfung an GitHub und PyPI. Keine Konten, Statistiken oder Tracking."),
                 ("Ist die App sicher?", "Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die "
-                 "App installiert nur Updates, die wir digital signiert haben.")),
+                 "App installiert unter Windows nur Updates, die wir digital signiert haben (auf dem Mac, Beta, vorerst von Hand).")),
         "demo_titles": ("Bergwanderung – Prokoško-See (4K)", "Mein Live-Konzert – aus dem Publikum gefilmt",
                         "Vortrag: Grundlagen der Fotografie", "Podcast #12 – ein Gespräch übers Reisen"),
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
     },
     "es": {
+        "a11y": ('Demostración', 'Pausar animación', 'Reanudar animación', 'Menú', 'Añadido: {t}', 'Terminado: {t}', 'Demostración de la ventana del programa (no es una descarga real)'),
         "share": ('Compartir', 'Copiar', 'Copiado', 'Cuéntaselo a quien le sirva.', 'Compartir Video Download', 'Más…', 'Cerrar'),
         "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
         "description": "Aplicación gratuita para Windows y Mac para descargar vídeo (MP4) y audio (MP3). Sin anuncios, sin rastreo, en 5 idiomas.",
@@ -244,21 +251,22 @@ HOME = {
         "note": "La aplicación está pensada para tus propios vídeos, contenido para el que tienes permiso del autor y contenido con "
                 "licencia libre. Al descargar aceptas las <a href=\"terms.html\">Condiciones de uso</a>. El contenido protegido con "
                 "DRM no se descarga.",
-        "app_aria": "La ventana de Video Download descargando vídeos", "try_it": "Pruébalo: pulsa <b>{paste}</b>.",
+        "try_it": "Pruébalo: pulsa <b>{paste}</b>.",
         "stats": ("sitios compatibles", "idiomas", "anuncios y rastreadores", "descargas a la vez"),
         "features": ("Funciones", "Todo lo que necesitas,<br>nada que sobre.",
                      "Una ventana sencilla y, por debajo, todo lo que esperas de un buen descargador."),
         "tiles": {
-            "mp4": ("MP4 hasta la mejor calidad", "La mejor, 1080p, 720p o 480p. Imagen y sonido se unen en un MP4 que se reproduce en todas partes."),
+            "mp4": ("MP4 hasta la mejor calidad", "La mejor, 1080p, 720p o 480p. Imagen y sonido se unen en un MP4 (H.264/AAC si el sitio lo ofrece) que se reproduce en la mayoría de los dispositivos."),
             "audio": ("Solo audio: MP3 o M4A", "Para clases, pódcasts y música. Un MP4 terminado se convierte en MP3 con un botón."),
             "copy": ("Copia un enlace y listo", "La aplicación detecta un enlace copiado y lo añade a la cola."),
             "playlists": ("Listas, varias a la vez", "Listas de reproducción completas, hasta 4 descargas a la vez y reintento automático si se corta la conexión."),
             "clips": ("Fragmentos, subtítulos, portada", "Solo una parte del vídeo, subtítulos en el MP4 y la miniatura como portada del archivo."),
             "theme": ("Tema claro y oscuro", "O igual que el sistema. Progreso en la barra de tareas y un aviso al final."),
             "safe": ("Siempre al día y seguro", "La aplicación busca nuevas versiones por sí sola, actualiza la parte que lee los "
-                     "sitios web sin reinstalar e instala solo actualizaciones firmadas digitalmente por nosotros."),
+                     "sitios web sin reinstalar. En Windows instala solo actualizaciones firmadas digitalmente por nosotros; en Mac "
+                     "(beta) las nuevas versiones se descargan a mano por ahora."),
         },
-        "chips": ("5 idiomas", "Sin cuenta", "Sin anuncios", "Sin rastreo", "Actualizaciones firmadas"),
+        "chips": ("5 idiomas", "Sin cuenta", "Sin anuncios", "Sin rastreo", "Actualizaciones firmadas en Windows"),
         "shot_alt": "La ventana de Video Download con cuatro descargas",
         "extension": ("Extensión para el navegador", "Descarga lo que se está reproduciendo.",
                       "Reproduce un vídeo, pulsa el icono y listo. O clic derecho en cualquier enlace o vídeo. La aplicación se "
@@ -269,7 +277,7 @@ HOME = {
                       "Cómo instalar la extensión →"),
         "popup": ("aplicación abierta", "Descargar el vídeo en reproducción", "Descargar como MP3 (solo audio)",
                   "Flujos de vídeo detectados", "Extensión Video Download"),
-        "how": ("Cómo funciona", "Tu primer archivo en menos de un minuto.", "Instala una vez y luego solo copia enlaces.",
+        "how": ("Cómo funciona", "Tu primer archivo en pocos minutos.", "Instala una vez y luego solo copia enlaces.",
                 (("Instalar", "No necesita administrador y no añade nada más a tu ordenador."),
                  ("Añadir un enlace", "Copia un enlace, pulsa «Pegar» o usa la extensión."),
                  ("Descargar", "MP4 o MP3 y luego «Descargar». El archivo te espera en la carpeta Video&nbsp;Download."))),
@@ -297,12 +305,13 @@ HOME = {
                 ("¿Qué envía la aplicación a internet?", "Solo lo necesario: el enlace que descargas va a ese sitio web y la "
                  "búsqueda de actualizaciones, a GitHub y PyPI. Sin cuentas, estadísticas ni rastreo."),
                 ("¿Es segura?", "El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo "
-                 "instala actualizaciones firmadas digitalmente por nosotros.")),
+                 "instala en Windows actualizaciones firmadas digitalmente por nosotros (en Mac, beta, por ahora a mano).")),
         "demo_titles": ("Ruta de montaña – lago Prokoško (4K)", "Mi concierto en directo – grabado desde el público",
                         "Clase: fundamentos de fotografía", "Pódcast #12 – una charla sobre viajes"),
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
     },
     "fr": {
+        "a11y": ('Démonstration', "Mettre l'animation en pause", "Relancer l'animation", 'Menu', 'Ajouté : {t}', 'Terminé : {t}', 'Démonstration de la fenêtre du programme (pas un vrai téléchargement)'),
         "share": ('Partager', 'Copier', 'Copié', "Parlez-en à quelqu'un qui en a besoin.", 'Partager Video Download', 'Plus…', 'Fermer'),
         "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
         "description": "Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.",
@@ -314,21 +323,22 @@ HOME = {
         "note": "L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur "
                 "et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href=\"terms.html\">Conditions "
                 "d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.",
-        "app_aria": "La fenêtre de Video Download pendant un téléchargement", "try_it": "Essayez : cliquez sur <b>{paste}</b>.",
+        "try_it": "Essayez : cliquez sur <b>{paste}</b>.",
         "stats": ("sites pris en charge", "langues", "publicités et traqueurs", "téléchargements simultanés"),
         "features": ("Fonctions", "Tout ce qu'il faut,<br>rien de superflu.",
                      "Une fenêtre simple, et en dessous tout ce qu'on attend d'un bon téléchargeur."),
         "tiles": {
-            "mp4": ("MP4 jusqu'à la meilleure qualité", "Meilleure, 1080p, 720p ou 480p. L'image et le son sont réunis dans un MP4 lisible partout."),
+            "mp4": ("MP4 jusqu'à la meilleure qualité", "Meilleure, 1080p, 720p ou 480p. L'image et le son sont réunis dans un MP4 (H.264/AAC si le site le propose) lisible sur la plupart des appareils."),
             "audio": ("Son uniquement : MP3 ou M4A", "Pour les cours, les podcasts et la musique. Un MP4 terminé devient un MP3 d'un seul bouton."),
             "copy": ("Copiez un lien, c'est tout", "L'application repère un lien copié et l'ajoute à la file."),
             "playlists": ("Playlists, plusieurs à la fois", "Des playlists entières, jusqu'à 4 téléchargements simultanés, nouvelle tentative automatique si la connexion coupe."),
             "clips": ("Extraits, sous-titres, pochette", "Seulement une partie d'une vidéo, les sous-titres dans le MP4 et la miniature comme pochette du fichier."),
             "theme": ("Thème clair et sombre", "Ou comme le système. La progression dans la barre des tâches et une notification à la fin."),
             "safe": ("Toujours à jour, et sûr", "L'application cherche elle-même les nouvelles versions, met à jour la partie qui "
-                     "lit les sites sans réinstallation et n'installe que des mises à jour signées numériquement par nous."),
+                     "lit les sites sans réinstallation. Sous Windows, elle n'installe que des mises à jour signées numériquement par "
+                     "nous ; sur Mac (bêta), les nouvelles versions se téléchargent à la main pour l'instant."),
         },
-        "chips": ("5 langues", "Sans compte", "Sans publicité", "Sans pistage", "Mises à jour signées"),
+        "chips": ("5 langues", "Sans compte", "Sans publicité", "Sans pistage", "Mises à jour signées sous Windows"),
         "shot_alt": "La fenêtre de Video Download avec quatre téléchargements",
         "extension": ("Extension pour le navigateur", "Téléchargez ce qui est en lecture.",
                       "Lancez une vidéo, cliquez sur l'icône, c'est fait. Ou clic droit sur n'importe quel lien ou vidéo. "
@@ -339,7 +349,7 @@ HOME = {
                       "Comment installer l'extension →"),
         "popup": ("application ouverte", "Télécharger la vidéo en cours", "Télécharger en MP3 (son uniquement)",
                   "Flux vidéo détectés", "Extension Video Download"),
-        "how": ("Comment ça marche", "Votre premier fichier en moins d'une minute.", "Installez une fois, puis copiez simplement des liens.",
+        "how": ("Comment ça marche", "Votre premier fichier en quelques minutes.", "Installez une fois, puis copiez simplement des liens.",
                 (("Installer", "Pas besoin d'administrateur, rien d'autre n'est ajouté à votre ordinateur."),
                  ("Ajouter un lien", "Copiez un lien, cliquez sur « Coller » ou utilisez l'extension."),
                  ("Télécharger", "MP4 ou MP3, puis « Télécharger ». Le fichier vous attend dans le dossier Video&nbsp;Download."))),
@@ -369,7 +379,7 @@ HOME = {
                 ("Qu'envoie l'application sur Internet ?", "Seulement le nécessaire : le lien que vous téléchargez va vers ce "
                  "site, et la recherche de mises à jour vers GitHub et PyPI. Ni compte, ni statistiques, ni pistage."),
                 ("Est-ce sûr ?", "Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et "
-                 "l'application n'installe que des mises à jour signées numériquement par nous.")),
+                 "l'application n'installe sous Windows que des mises à jour signées par nous (sur Mac, bêta, à la main pour l'instant).")),
         "demo_titles": ("Randonnée en montagne – lac de Prokoško (4K)", "Mon concert en direct – filmé depuis le public",
                         "Cours : les bases de la photographie", "Podcast #12 – une discussion sur le voyage"),
         "demo": ("Téléchargement · {p}% · {v} MB/s · encore {s} s", ","),
@@ -404,12 +414,23 @@ def demo_script(lang: str) -> str:
              "fmt": labels["short"][preset], "audio": audio}
             for title, (length, mb, speed, c1, c2, preset, audio) in zip(h["demo_titles"], DEMO_ROWS)]
     data = {"progress": progress, "done": labels["done"] + " · {m} MB", "decimal": decimal,
-            "finished": [rows[2], rows[3]], "demos": rows}
+            "finished": [rows[2], rows[3]], "demos": rows, "added": h["a11y"][4], "ended": h["a11y"][5]}
     # </ u JSON-u ne smije zatvoriti <script>
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
-SHARE_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+PAUSE_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" '
+              'd="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg>')
+
+
+def menu_button(lang: str) -> str:
+    """☰ za telefone i uske prozore: otvara #mobile-nav (isti linkovi kao gornji meni)."""
+    label = html.escape(HOME[lang]["a11y"][3])
+    return (f'<button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" '
+            f'aria-label="{label}" title="{label}"><span></span><span></span><span></span></button>')
+
+
+SHARE_ICON = ('<svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
               'stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>'
               '<path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>')
 
@@ -514,7 +535,12 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
     </nav>
     {switcher}
     <a class="btn btn-mini" href="{installer_url}">{h["download_short"]}</a>
+    {menu_button(lang)}
   </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="{esc(h["a11y"][3])}" hidden>
+{nav}
+    <div class="menu-lang">{switcher}</div>
+  </nav>
 </header>
 
 <main>
@@ -537,15 +563,21 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       </div>
 
       <div class="stage" data-reveal style="--d:.15s">
-        <div class="app" role="img" aria-label="{esc(h["app_aria"])}">
-          <div class="app-title"><img src="{up}assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+        <div class="stage-label">
+          <span class="badge">{h["a11y"][0]}</span>
+          <button class="anim-toggle" type="button" aria-pressed="false" data-pause="{esc(h["a11y"][1])}"
+                  data-play="{esc(h["a11y"][2])}">{PAUSE_ICON}<span>{h["a11y"][1]}</span></button>
+        </div>
+        <div class="app" role="region" aria-label="{esc(h["a11y"][6])}">
+          <div class="app-title" aria-hidden="true"><img src="{up}assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
           <div class="app-tools">
             <button class="paste" type="button">{esc(labels["paste"])}</button>
-            <div class="fmt">{esc(labels["format"])}</div>
-            <div class="go">{esc(labels["download"])}</div>
+            <div class="fmt" aria-hidden="true">{esc(labels["format"])}</div>
+            <div class="go" aria-hidden="true">{esc(labels["download"])}</div>
           </div>
-          <div class="rows" aria-live="polite"></div>
-          <div class="app-foot"><span>{esc(labels["folder"])} Video Download</span><span class="heart">{esc(labels["support"])}</span></div>
+          <div class="rows" aria-hidden="true"></div>
+          <p class="sr" role="status" aria-live="polite" data-announce></p>
+          <div class="app-foot" aria-hidden="true"><span>{esc(labels["folder"])} Video Download</span><span class="heart">{esc(labels["support"])}</span></div>
         </div>
         <p class="stage-note">{h["try_it"].format(paste=esc(labels["paste"]))}</p>
       </div>

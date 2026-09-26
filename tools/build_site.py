@@ -372,7 +372,12 @@ HEAD = """<!doctype html>
 {nav}
     </nav>
     {switcher}
+    {menu}
   </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="{menu_label}" hidden>
+{nav}
+    <div class="menu-lang">{switcher}</div>
+  </nav>
 </header>
 
 <main class="doc">
@@ -536,7 +541,8 @@ def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
                     for anchor, label in zip(site_home.ANCHORS, site_home.HOME[lang]["nav"]))
     head = HEAD.format(lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
                        nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name),
-                       meta=meta_tags(lang, name, f"{title} — Video Download", description))
+                       meta=meta_tags(lang, name, f"{title} — Video Download", description),
+                       menu=site_home.menu_button(lang), menu_label=html.escape(site_home.HOME[lang]["a11y"][3]))
     return (head + body + "\n</main>\n\n" + footer_html(lang) +
             f'\n\n<script src="{_up(lang)}assets/site.js" defer></script>\n</body>\n</html>\n')
 

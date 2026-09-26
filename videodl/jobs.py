@@ -119,7 +119,8 @@ class DownloadQueue:
                 changed.append(item.id)
         return changed
 
-    def clear_finished(self) -> list[int]:
-        removed = [item.id for item in self._items if item.status == ItemStatus.DONE]
-        self._items = [item for item in self._items if item.status != ItemStatus.DONE]
+    def clear_finished(self, keep: set[int] = frozenset()) -> list[int]:
+        """Uklanja završene stavke, osim onih u `keep` (npr. MP3 konverzija još radi); vraća uklonjene ID-e."""
+        removed = [item.id for item in self._items if item.status == ItemStatus.DONE and item.id not in keep]
+        self._items = [item for item in self._items if item.id not in removed]
         return removed

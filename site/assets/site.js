@@ -16,6 +16,30 @@
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  // Meni na telefonu (☰): otvara iste linkove; zatvara se na link, Esc ili kad se prozor raširi.
+  const menuBtn = $(".menu-btn"), menu = $("#mobile-nav");
+  if (menuBtn && menu) {
+    const setMenu = (open) => { menu.hidden = !open; menuBtn.setAttribute("aria-expanded", open); };
+    menuBtn.addEventListener("click", () => setMenu(menu.hidden));
+    menu.addEventListener("click", (e) => e.target.closest("a") && setMenu(false));
+    addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !menu.hidden) { setMenu(false); menuBtn.focus(); }
+    });
+    matchMedia("(min-width: 1041px)").addEventListener("change", (e) => e.matches && setMenu(false));
+  }
+
+  // Pauza animacije (demo, pozadina, sjaj). Sajt ništa ne pamti u pregledniku, pa važi dok je stranica otvorena.
+  const toggle = $(".anim-toggle");
+  let paused = false;
+  const setPaused = (on) => {
+    paused = on;
+    document.documentElement.classList.toggle("paused", on);
+    if (!toggle) return;
+    toggle.setAttribute("aria-pressed", on);
+    $("span", toggle).textContent = on ? toggle.dataset.play : toggle.dataset.pause;
+  };
+  if (toggle && calm) toggle.hidden = true;  // ko ne želi pokret, ionako ništa ne teče samo
+
   // Pojavljivanje pri skrolu (i „crtanje" linije koraka). Ako posmatranje ne proradi (stari
   // preglednik, pozadinska kartica), sve postaje vidljivo najkasnije poslije 2,5 s.
   const showAll = () => $$("[data-reveal], .steps").forEach((el) => el.classList.add("in"));
@@ -55,6 +79,7 @@
   const stage = $(".stage"), app = $(".app");
   if (stage && app && !calm && matchMedia("(pointer: fine)").matches) {
     stage.addEventListener("pointermove", (e) => {
+      if (paused) return;
       const r = stage.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
       app.style.setProperty("--ry", `${x * 12}deg`);
@@ -64,11 +89,13 @@
   }
 
   // Živi demo: „Zalijepi" doda red koji se preuzme kao u pravom programu.
-  const rows = $(".rows"), paste = $(".paste");
+  const rows = $(".rows"), paste = $(".paste"), announce = $("[data-announce]");
   const demos = T.demos || [];
+  // Čitaču ekrana javljamo samo ono što je posjetilac sam pokrenuo (bez procenata i bez samostalnih redova).
+  const say = (text, title) => { if (announce && text) announce.textContent = text.replace("{t}", title); };
   let next = 0, busy = false, idle;
   const svgDone = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>';
-  const addRow = () => {
+  const addRow = (byUser = false) => {
     if (!rows || busy || !demos.length) return;
     busy = true; paste.classList.remove("pulse");
     const d = demos[next++ % demos.length];
@@ -79,6 +106,7 @@
       <div class="ico" aria-hidden="true">■</div>`;
     row.querySelector(".t").textContent = d.title;
     rows.prepend(row);
+    if (byUser) say(T.added, d.title);
     while (rows.children.length > 4) rows.lastElementChild.remove();
     const s = row.querySelector(".s"), bar = row.querySelector(".bar-p b"), ico = row.querySelector(".ico");
     const total = d.mb, speed = d.speed;
@@ -94,6 +122,7 @@
       s.textContent = `${d.fmt}   ${T.done.replace("{m}", num(total))}`;
       s.classList.add("done");
       ico.className = "ico ok"; ico.innerHTML = svgDone;
+      if (byUser) say(T.ended, d.title);
       busy = false;
       scheduleIdle();
     };
@@ -102,7 +131,7 @@
   };
   const scheduleIdle = () => {
     clearTimeout(idle);
-    if (!calm) idle = setTimeout(() => { if (!document.hidden) addRow(); scheduleIdle(); }, 6500);
+    if (!calm) idle = setTimeout(() => { if (!document.hidden && !paused) addRow(); scheduleIdle(); }, 6500);
   };
   // Na početku dva već gotova preuzimanja, da prozor izgleda kao pravi program.
   for (const d of (T.finished || [])) {
@@ -117,9 +146,16 @@
     rows && rows.append(row);
   }
   if (paste) {
-    paste.addEventListener("click", () => { clearTimeout(idle); addRow(); });
-    setTimeout(addRow, calm ? 0 : 900);
+    paste.addEventListener("click", () => { clearTimeout(idle); addRow(true); });
+    setTimeout(() => (calm || !paused) && addRow(), calm ? 0 : 900);
     setTimeout(() => !busy && paste.classList.add("pulse"), 5000);
+  }
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      setPaused(!paused);
+      if (paused && app) { app.style.removeProperty("--ry"); app.style.removeProperty("--rx"); }
+      if (!paused) scheduleIdle();
+    });
   }
 
   // Dodatak: popup se otvori kad sekcija dođe na ekran (i na klik ikone).

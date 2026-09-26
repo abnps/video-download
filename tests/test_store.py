@@ -114,6 +114,24 @@ class DamagedDataTest(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.folder = Path(self.tmp.name)
 
+    def test_broken_utf8_is_a_damaged_file_not_a_crash(self):
+        path = self.folder / "queue.json"
+        path.write_bytes(b'{"format":1,"items":[{"url":"https://v/\xff"}]}')
+        self.assertEqual(store.load_queue(path), [])
+        self.assertTrue((self.folder / "queue.json.ostecen").is_file())  # sačuvan za ručno spašavanje
+
+    def test_infinite_or_negative_numbers_do_not_crash_history(self):
+        path = self.folder / "history.json"
+        path.write_text('{"format":1,"entries":['
+                        '{"url":"https://v/a","title":"A","filepath":"a","size":1e999,"finished_at":1e999},'
+                        '{"url":"https://v/b","title":"B","filepath":"b","size":-5,"finished_at":2},'
+                        '{"url":"https://v/c","title":"C","filepath":"c","size":' + "9" * 400 + ',"finished_at":3}]}',
+                        encoding="utf-8")
+        entries = store.load_history(path)
+        self.assertEqual([entry.url for entry in entries], ["https://v/a", "https://v/b", "https://v/c"])
+        self.assertEqual([entry.size for entry in entries], [0, 0, 0])
+        self.assertEqual(entries[0].finished_at, 0)
+
     def write(self, path, data):
         path.write_text(data if isinstance(data, str) else json.dumps(data), encoding="utf-8")
 

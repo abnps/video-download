@@ -36,8 +36,9 @@ from .native_messaging import TemporaryLocationError, install_native_host, unins
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import (
     DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
-    subtitle_languages,
+    section_label, subtitle_languages,
 )
+from yt_dlp.utils import sanitize_filename
 from .probe import ProbeResult, probe
 from . import convert, diagnostics, release_signing, store, support, theme, winshell
 from . import updater, ytdlp_update
@@ -350,6 +351,10 @@ class ConvertJob(QObject):
 
     def is_alive(self) -> bool:
         return self._thread.is_alive()
+
+    @property
+    def cancelled(self) -> bool:
+        return self._cancel.is_set()
 
     def _run(self) -> None:
         try:
@@ -830,8 +835,10 @@ class MainWindow(QMainWindow):
         for row in rows:
             if is_obviously_not_media(row["url"]):
                 continue  # npr. kartica za .exe iz starije verzije: nema šta da se preuzme
-            item = self._queue.add(row["url"], row.get("title") or row["url"],
-                                   row.get("preset_key") or DEFAULT_PRESET_KEY,
+            preset_key = row.get("preset_key")
+            if preset_key not in {preset.key for preset in PRESETS}:
+                preset_key = DEFAULT_PRESET_KEY  # nepoznat format (oštećen ili stariji fajl): podrazumijevani
+            item = self._queue.add(row["url"], row.get("title") or row["url"], preset_key,
                                    row.get("output_dir") or self._output_dir, row.get("subfolder"),
                                    http_headers=row.get("http_headers") or {},
                                    filename_title=row.get("filename_title"), thumbnail=row.get("thumbnail"),
@@ -1208,14 +1215,22 @@ class MainWindow(QMainWindow):
 
     # ---------- red preuzimanja ----------
 
+    def _output_key(self, item: QueueItem) -> tuple:
+        """Šta određuje ime izlaznog fajla: folder, format (kvalitet je u imenu), isječak i — kad šablon imena
+        nema ID — naslov. Dva RAZLIČITA linka istog naslova uz „Samo naslov" tako dobijaju isti ključ."""
+        folder = os.path.normcase(os.path.normpath(os.path.join(item.output_dir, item.subfolder or "")))
+        by_id = item.force_id_name or self._name_template == DEFAULT_NAME_TEMPLATE or item.filename_title
+        # sa ID-om (ili otiskom toka) u imenu je link dovoljan; bez njega ime daje naslov
+        identity = item.url if by_id else sanitize_filename(item.title or item.url).casefold().strip()
+        return folder, item.preset_key, section_label(item.section), bool(by_id), identity
+
     def _same_output_running(self, item: QueueItem) -> bool:
-        """Isti link, format i isječak već se preuzima (npr. jednom iz prozora, jednom iz browsera):
-        drugi posao čeka, da dva procesa ne pišu isti fajl."""
-        key = (item.url, item.preset_key, item.section, item.output_dir, item.subfolder)
+        """Posao koji bi pisao ISTI fajl već radi (isti link dvaput, ili dva videa istog naslova uz šablon bez ID-a):
+        drugi čeka, da dva procesa ne pišu isti fajl."""
+        key = self._output_key(item)
         for item_id in self._download_jobs:
             other = self._queue.get(item_id)
-            if other is not None and other.id != item.id and \
-                    (other.url, other.preset_key, other.section, other.output_dir, other.subfolder) == key:
+            if other is not None and other.id != item.id and self._output_key(other) == key:
                 return True
         return False
 
@@ -1359,7 +1374,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _toggle_running(self) -> None:
-        if self._download_jobs or self._running or self._probe_jobs:
+        if self._download_jobs or self._running or self._probe_jobs or self._convert_jobs:
             self._stop_all()
         else:
             self._start_all()
@@ -1427,10 +1442,14 @@ class MainWindow(QMainWindow):
         dva videa istog naslova): isti posao se ponovi s ID-om u imenu umjesto lažnog „već preuzeto"."""
         if not result.already_existed or not result.filepath or item.force_id_name:
             return False
+        if self._name_template == DEFAULT_NAME_TEMPLATE or item.filename_title:
+            return False  # ID (ili otisak toka) je već u imenu: postojeći fajl je stvarno taj video
         owner = next((entry.url for entry in store.load_history(store.history_path(self._data_dir))
                       if entry.filepath == result.filepath), None)
-        if owner is None or owner == item.url:
+        if owner == item.url:
             return False
+        # Vlasnik je drugi link ILI nepoznat (istorija obrisana ili prestara): ne tvrditi „već preuzeto" za
+        # možda tuđi fajl — preuzeti s ID-om u imenu. Najgore je duplikat, nikad pogrešno „već preuzeto".
         item.force_id_name = True
         item.status = ItemStatus.WAITING
         item.message = ""
@@ -1460,6 +1479,8 @@ class MainWindow(QMainWindow):
                 self._refresh_row(item)
         self._cancel_probes()
         self._batch_stopped = True  # ručno zaustavljeno: bez obavještenja „sve je gotovo"
+        for job in list(self._convert_jobs.values()):
+            job.cancel()  # i pretvaranje u MP3: „Zaustavi" znači zaustavi SVE što radi
         if self._download_jobs:
             self._set_status(tr("status.stopping"))
             self._cancel_active()
@@ -1500,6 +1521,7 @@ class MainWindow(QMainWindow):
         job.progress.connect(self._on_convert_progress)
         job.finished.connect(self._on_convert_finished)
         self._convert_jobs[item_id] = job
+        self._update_controls()  # dok traje konverzija, glavno dugme nudi „Zaustavi"
         job.start()
 
     @Slot(int, object)
@@ -1517,7 +1539,9 @@ class MainWindow(QMainWindow):
         item = self._queue.get(item_id)
         if item is None:
             return
-        if path:
+        if not path and job is not None and job.cancelled:
+            item.convert_state, item.convert_message = "", ""  # ručno zaustavljeno: nije greška, MP3 se može ponoviti
+        elif path:
             item.convert_state, item.convert_path = "done", path
             mp3 = dataclasses.replace(item, filepath=path)
             self._report_save(store.append_history(mp3, store.history_path(self._data_dir), os.path.getsize(path)))
@@ -1528,6 +1552,7 @@ class MainWindow(QMainWindow):
         if row is not None:
             row.progress.hide()
         self._refresh_row(item)
+        self._update_controls()  # glavno dugme više ne nudi „Zaustavi" kad je ovo bio zadnji posao
 
     @Slot(int)
     def _on_row_play(self, item_id: int) -> None:
@@ -1595,7 +1620,8 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _clear_finished(self) -> None:
-        for item_id in self._queue.clear_finished():
+        # Red čije se pretvaranje u MP3 još radi ostaje: inače rezultat ne bi stigao u istoriju.
+        for item_id in self._queue.clear_finished(keep=set(self._convert_jobs)):
             self._drop_row(item_id)
         self._update_controls()
 
@@ -1700,8 +1726,8 @@ class MainWindow(QMainWindow):
         waiting = sum(item.status == ItemStatus.WAITING for item in items)
         done = sum(item.status == ItemStatus.DONE for item in items)
         failed = sum(item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED) for item in items)
-        # Čitanje linkova je takođe posao u toku: dugme mora nuditi „Zaustavi".
-        busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
+        # Čitanje linkova i pretvaranje u MP3 su takođe posao u toku: dugme mora nuditi „Zaustavi".
+        busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs) or bool(self._convert_jobs)
 
         self.stack.setCurrentIndex(1 if items else 0)
         if busy:
@@ -1904,7 +1930,7 @@ class MainWindow(QMainWindow):
             QApplication.restoreOverrideCursor()
 
     def closeEvent(self, event) -> None:
-        if self._download_jobs:
+        if self._download_jobs or self._convert_jobs:  # i nedovršeno pretvaranje u MP3 bi se izgubilo
             answer = QMessageBox.question(
                 self, tr("close.title"), tr("close.text"))
             if answer != QMessageBox.StandardButton.Yes:

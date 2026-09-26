@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
 import build_site  # noqa: E402
+import site_home  # noqa: E402
 
 from videodl import __version__, changelog  # noqa: E402
 
@@ -105,6 +106,28 @@ class SiteTest(unittest.TestCase):
             with self.subTest(page=name):
                 self.assertNotRegex(text, r'<script[^>]+src="https?:|<link[^>]+href="https?:[^"]*"[^>]*stylesheet'
                                           r'|<link[^>]+stylesheet[^>]+href="https?:')
+
+    def test_demo_is_accessible_pausable_and_phones_get_a_menu(self):
+        # Pregled 26.9.2026: demo nije „slika", ima oznaku i pauzu; čitač ekrana ne sluša procente;
+        # na telefonu meni ☰ (na početnoj i na podstranicama).
+        for name, text in self.pages.items():
+            if not name.endswith(".html") or name.startswith("google"):
+                continue
+            with self.subTest(page=name):
+                self.assertIn('class="menu-btn"', text)
+                self.assertIn('aria-controls="mobile-nav"', text)
+                self.assertIn('id="mobile-nav"', text)
+        for lang in build_site.LANGUAGES:
+            index = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            with self.subTest(lang=lang):
+                self.assertNotIn('role="img"', index)
+                self.assertIn('class="anim-toggle"', index)
+                self.assertIn('aria-pressed="false"', index)
+                self.assertIn('class="rows" aria-hidden="true"', index)
+                self.assertIn('role="status"', index)
+                self.assertIn(site_home.HOME[lang]["a11y"][0], index)  # vidljiva oznaka „Demonstracija"
+        css = (build_site.SITE / "assets" / "site.css").read_text(encoding="utf-8")
+        self.assertIn(".paused", css)
 
     def test_menu_anchors_point_to_existing_sections(self):
         for name, text in self.pages.items():
