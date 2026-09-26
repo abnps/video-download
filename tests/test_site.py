@@ -144,6 +144,8 @@ class SiteTest(unittest.TestCase):
                 self.assertIn('class="share"', home)
                 self.assertIn("https://wa.me/?text=", home)
                 self.assertIn("data-copy", home)
+                self.assertIn('<dialog class="share-sheet"', home)  # prozor kao u aplikacijama, ne padajući meni
+                self.assertEqual(home.count('class="sheet-app"'), 6)  # WhatsApp, Viber, Telegram, Facebook, X, E-mail
                 self.assertNotIn("<iframe", home)  # nikakvi „widgeti" društvenih mreža
 
     def test_local_links_and_images_exist(self):

@@ -30,7 +30,7 @@ DEMO_ROWS = (("12:34", 46.0, 9.6, "#3d7a5a", "#2b5a82", "best", False),
 
 HOME = {
     "en": {
-        "share": ('Share', 'Copy link', 'Link copied', 'Tell a friend who needs it.'),
+        "share": ('Share', 'Copy', 'Copied', 'Tell a friend who needs it.', 'Share Video Download', 'More…', 'Close'),
         "title": "Video Download — free video and audio downloader for Windows and Mac",
         "description": "Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
@@ -95,7 +95,7 @@ HOME = {
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
     },
     "bs": {
-        "share": ('Podijeli', 'Kopiraj link', 'Link je kopiran', 'Javi prijatelju kome treba.'),
+        "share": ('Podijeli', 'Kopiraj', 'Kopirano', 'Javi prijatelju kome treba.', 'Podijeli Video Download', 'Više…', 'Zatvori'),
         "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
         "description": "Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
@@ -162,7 +162,7 @@ HOME = {
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
     },
     "de": {
-        "share": ('Teilen', 'Link kopieren', 'Link kopiert', 'Erzähl es jemandem, der es braucht.'),
+        "share": ('Teilen', 'Kopieren', 'Kopiert', 'Erzähl es jemandem, der es braucht.', 'Video Download teilen', 'Mehr…', 'Schließen'),
         "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
         "description": "Kostenlose App für Windows und Mac zum Herunterladen von Video (MP4) und Audio (MP3). Ohne Werbung, ohne Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
@@ -233,7 +233,7 @@ HOME = {
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
     },
     "es": {
-        "share": ('Compartir', 'Copiar enlace', 'Enlace copiado', 'Cuéntaselo a quien le sirva.'),
+        "share": ('Compartir', 'Copiar', 'Copiado', 'Cuéntaselo a quien le sirva.', 'Compartir Video Download', 'Más…', 'Cerrar'),
         "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
         "description": "Aplicación gratuita para Windows y Mac para descargar vídeo (MP4) y audio (MP3). Sin anuncios, sin rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
@@ -303,7 +303,7 @@ HOME = {
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
     },
     "fr": {
-        "share": ('Partager', 'Copier le lien', 'Lien copié', "Parlez-en à quelqu'un qui en a besoin."),
+        "share": ('Partager', 'Copier', 'Copié', "Parlez-en à quelqu'un qui en a besoin.", 'Partager Video Download', 'Plus…', 'Fermer'),
         "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
         "description": "Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
@@ -414,28 +414,52 @@ SHARE_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
               '<path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>')
 
 
-def share_html(lang: str, url: str) -> str:
-    """Dugme „Podijeli": na telefonu dijeljenje uređaja, na računaru meni s običnim linkovima (bez tuđih skripti;
-    mreža dobija link tek kad posjetilac sam klikne)."""
+# Ikone mreža: pojednostavljeni znakovi (bijelo na boji mreže), bez tuđih slika i skripti.
+SHARE_APPS = (
+    ("WhatsApp", "#25D366", '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" '
+     'd="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.2A8.5 8.5 0 1 0 12 3.5z"/><path fill="currentColor" '
+     'd="M9.2 7.8c.3 0 .5 0 .7.5l.7 1.6c.1.3 0 .5-.1.7l-.5.6c-.2.2-.2.4 0 .7.6 1 1.4 1.8 2.4 2.4.3.2.5.1.7 0l.6-.6c.2-.2.4-.2.7-.1l1.6.8c.4.2.4.4.3.8-.2.9-1.1 1.6-2 1.6-3.3-.3-6.2-3.2-6.5-6.5 0-.9.6-1.8 1.4-2.1z"/>'),
+    ("Viber", "#7360F2", '<path fill="currentColor" d="M8 4.5c.5 0 .9.3 1.1.8l1 2.6c.2.4 0 .9-.3 1.2l-.9.8a9 9 0 0 0 '
+     '5.2 5.2l.8-.9c.3-.3.8-.5 1.2-.3l2.6 1c.5.2.8.6.8 1.1v1.5c0 1.2-1 2.2-2.2 2A13.5 13.5 0 0 1 4.5 8.3C4.3 7.1 5.3 6 6.5 6z"/>'),
+    ("Telegram", "#229ED9", '<path fill="currentColor" d="M20.6 4.2 3.4 10.8c-1 .4-1 1 0 1.3l4.3 1.4 1.7 5c.2.6.5.8 1 .3l2.4-2.3 '
+     '4.6 3.4c.8.5 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.3-1.2zM9.5 13.3l7.7-5-6 5.6-.3 3.4z"/>'),
+    ("Facebook", "#1877F2", '<path fill="currentColor" d="M13.5 21v-7.5H16l.4-3H13.5V8.7c0-.9.3-1.4 1.5-1.4h1.5V4.6'
+     'A20 20 0 0 0 14.3 4.5c-2.2 0-3.8 1.3-3.8 3.8v2.2H8v3h2.5V21z"/>'),
+    ("X", "#111111", '<path fill="currentColor" d="M17.8 3.5h3l-6.6 7.5 7.8 9.5h-6.1l-4.8-5.9-5.4 5.9h-3l7-7.9L2.3 3.5'
+     'h6.2l4.3 5.4zm-1 15.3h1.7L7.3 5.1H5.5z"/>'),
+    ("E-mail", "#6B7280", '<rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" '
+     'stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>'),
+)
+
+
+def share_html(lang: str, url: str, up: str = "") -> str:
+    """Dugme „Podijeli" i prozor za dijeljenje kao u aplikacijama: pregled, okrugla dugmad mreža, kopiranje adrese
+    i „Više…" (dijeljenje sistema). Obični linkovi, bez tuđih skripti: mreža dobija link tek kad posjetilac klikne."""
     from urllib.parse import quote
 
-    label, copy, copied, hint = HOME[lang]["share"]
-    title = HOME[lang]["title"]
-    u, text = quote(url, safe=""), quote(f"{title} {url}", safe="")
-    links = (("WhatsApp", f"https://wa.me/?text={text}"), ("Viber", f"viber://forward?text={text}"),
-             ("Telegram", f"https://t.me/share/url?url={u}&text={quote(title, safe='')}"),
-             ("Facebook", f"https://www.facebook.com/sharer/sharer.php?u={u}"),
-             ("X", f"https://x.com/intent/post?url={u}&text={quote(title, safe='')}"),
-             ("E-mail", f"mailto:?subject={quote(title, safe='')}&body={u}"))
-    items = "\n".join(f'              <a href="{html.escape(href)}" target="_blank" rel="noopener noreferrer">{name}</a>'
-                      for name, href in links)
-    return f"""            <div class="share" data-url="{html.escape(url)}" data-title="{html.escape(title)}" data-copied="{html.escape(copied)}">
-              <button class="btn ghost share-btn" type="button" aria-haspopup="true" aria-expanded="false" title="{html.escape(hint)}">{SHARE_ICON} {label}</button>
-              <div class="share-menu" hidden>
-              <button type="button" data-copy>{copy}</button>
-{items}
-              <span class="share-note" role="status" aria-live="polite"></span>
-              </div>
+    label, copy, copied, hint, title, more, close = HOME[lang]["share"]
+    page_title = HOME[lang]["title"]
+    u, text, t = quote(url, safe=""), quote(f"{page_title} {url}", safe=""), quote(page_title, safe="")
+    hrefs = {"WhatsApp": f"https://wa.me/?text={text}", "Viber": f"viber://forward?text={text}",
+             "Telegram": f"https://t.me/share/url?url={u}&text={t}",
+             "Facebook": f"https://www.facebook.com/sharer/sharer.php?u={u}",
+             "X": f"https://x.com/intent/post?url={u}&text={t}", "E-mail": f"mailto:?subject={t}&body={text}"}
+    apps = "\n".join(
+        f'            <a class="sheet-app" style="--c:{color}" href="{html.escape(hrefs[name])}" target="_blank" '
+        f'rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true">{icon}</svg></i><span>{name}</span></a>'
+        for name, color, icon in SHARE_APPS)
+    esc = html.escape
+    return f"""            <div class="share" data-url="{esc(url)}" data-title="{esc(page_title)}" data-copied="{esc(copied)}">
+              <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="{esc(hint)}">{SHARE_ICON} {label}</button>
+              <dialog class="share-sheet" aria-label="{esc(title)}">
+                <div class="sheet-head"><h3>{title}</h3><button class="sheet-close" type="button" aria-label="{esc(close)}">✕</button></div>
+                <div class="sheet-preview"><img src="{up}assets/icon.png" alt=""><div><b>Video Download</b><span>{esc(url)}</span></div></div>
+                <div class="sheet-grid">
+{apps}
+            <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i>{SHARE_ICON}</i><span>{more}</span></button>
+                </div>
+                <div class="sheet-copy"><input type="text" readonly value="{esc(url)}" aria-label="URL"><button type="button" data-copy data-label="{esc(copy)}">{copy}</button></div>
+              </dialog>
             </div>"""
 
 
@@ -647,7 +671,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <p class="sub" style="margin-bottom:26px">{s_text}</p>
           <div class="support-actions">
             <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">{s_btn}</a>
-{share_html(lang, page_url)}
+{share_html(lang, page_url, up)}
           </div>
         </div>
         <div class="qr"><img src="{up}assets/support-qr.png" alt="{esc(s_qr)}">{s_scan}</div>

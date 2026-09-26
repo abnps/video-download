@@ -131,23 +131,38 @@
     $(".ext", browser).addEventListener("click", () => browser.classList.toggle("open"));
   }
 
-  // „Podijeli": na telefonu ugrađeno dijeljenje uređaja, inače meni s linkovima i kopiranjem.
+  // „Podijeli": prozor kao u aplikacijama (mreže, kopiranje adrese, „Više…" = dijeljenje sistema).
   $$(".share").forEach((box) => {
-    const button = $(".share-btn", box), menu = $(".share-menu", box), note = $(".share-note", box);
-    const toggle = (open) => { menu.hidden = !open; button.setAttribute("aria-expanded", open); };
-    button.addEventListener("click", async () => {
-      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-        try { await navigator.share({ title: box.dataset.title, url: box.dataset.url }); return; } catch (e) { /* otkazano */ }
+    const button = $(".share-btn", box), sheet = $(".share-sheet", box);
+    const copy = $("[data-copy]", box), input = $(".sheet-copy input", box), more = $(".sheet-more", box);
+    const url = box.dataset.url, title = box.dataset.title;
+    if (!sheet || typeof sheet.showModal !== "function") {  // vrlo stari preglednik: bar sistemsko dijeljenje ili adresa
+      button.addEventListener("click", () => (navigator.share ? navigator.share({ title, url }).catch(() => {}) : prompt("", url)));
+      return;
+    }
+    button.addEventListener("click", () => sheet.showModal());
+    $(".sheet-close", box).addEventListener("click", () => sheet.close());
+    // Klik na zamućenu pozadinu (van samog prozora) zatvara; Esc zatvara sam <dialog>.
+    sheet.addEventListener("click", (e) => {
+      const r = sheet.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) sheet.close();
+    });
+    if (navigator.share) {
+      more.hidden = false;
+      more.addEventListener("click", () => navigator.share({ title, url }).catch(() => {}));
+    }
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch (e) {
+        input.select();
+        document.execCommand("copy");  // stariji preglednici bez clipboard dozvole
       }
-      toggle(menu.hidden);
+      copy.textContent = `${box.dataset.copied} ✓`;
+      copy.classList.add("done");
+      setTimeout(() => { copy.textContent = copy.dataset.label; copy.classList.remove("done"); }, 2200);
     });
-    $("[data-copy]", box).addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(box.dataset.url); } catch (e) { prompt("", box.dataset.url); return; }
-      note.textContent = box.dataset.copied;
-      setTimeout(() => { note.textContent = ""; }, 2500);
-    });
-    document.addEventListener("click", (e) => { if (!box.contains(e.target)) toggle(false); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") toggle(false); });
+    input.addEventListener("focus", () => input.select());
   });
 
   // Kartice Windows / Mac u uputstvu za instalaciju (strelice mijenjaju karticu).
