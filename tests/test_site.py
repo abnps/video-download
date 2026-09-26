@@ -54,8 +54,14 @@ class SiteTest(unittest.TestCase):
                 # Mac (beta): stalni link na .dmg, jasna oznaka i uputstvo za prvo pokretanje
                 self.assertIn(build_site.MAC_DMG_URL, index)
                 self.assertIn(f'<span class="badge">{build_site.MAC_TEXT[lang][0]}</span>', index)
-                self.assertEqual(index.count("<li>", index.index('class="smartscreen mac"')), len(build_site.MAC_TEXT[lang][4]) +
-                                 index.count("<li>", index.index('<div class="pills">')))
+                for step in build_site.MAC_TEXT[lang][4]:
+                    self.assertIn(step, index)
+                # Redizajn: namjena i uslovi ostaju vidljivi, demo nosi nazive iz programa, animacije iz site.js
+                self.assertIn('<p class="note">', index)
+                self.assertIn('href="terms.html"', index)
+                self.assertIn("window.VD_TEXT", index)
+                self.assertIn(build_site.site_home.app_labels(lang)["paste"], index)
+                self.assertIn("assets/site.js", index)
                 # prekidač jezika i hreflang vode na sve jezike
                 for other in build_site.LANGUAGES:
                     self.assertIn(f'hreflang="{other}"', index)
@@ -84,6 +90,18 @@ class SiteTest(unittest.TestCase):
                 self.assertNotIn("bisevac", text.lower())  # lični e-mail nikad na sajtu
         for lang in build_site.LANGUAGES:
             self.assertIn(build_site.CONTACT_EMAIL, self.pages[build_site.TEXTS[lang]["dir"] + "privacy.html"])
+
+    def test_no_third_party_code_and_motion_can_be_turned_off(self):
+        # Privatnost: bez tuđih skripti, fontova i stilova; pristupačnost: animacije se gase na zahtjev sistema.
+        css = (build_site.SITE / "assets" / "site.css").read_text(encoding="utf-8")
+        js = (build_site.SITE / "assets" / "site.js").read_text(encoding="utf-8")
+        self.assertIn("prefers-reduced-motion", css)
+        self.assertIn("prefers-reduced-motion", js)
+        self.assertNotRegex(css + js, r"https?://|@import|fetch\(|XMLHttpRequest|localStorage|document\.cookie")
+        for name, text in self.pages.items():
+            with self.subTest(page=name):
+                self.assertNotRegex(text, r'<script[^>]+src="https?:|<link[^>]+href="https?:[^"]*"[^>]*stylesheet'
+                                          r'|<link[^>]+stylesheet[^>]+href="https?:')
 
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():

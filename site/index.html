@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Download — free video and audio downloader for Windows</title>
-<meta name="description" content="Free Windows app for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.">
+<title>Video Download — free video and audio downloader for Windows and Mac</title>
+<meta name="description" content="Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.">
 <link rel="icon" href="assets/icon.png">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="index.html">
 <link rel="alternate" hreflang="bs" href="bs/index.html">
 <link rel="alternate" hreflang="de" href="de/index.html">
@@ -20,140 +21,214 @@
     <a class="brand" href="index.html"><img src="assets/icon.png" alt="">Video Download</a>
     <nav>
       <a href="#features">Features</a>
-      <a href="#how">How it works</a>
+      <a href="#extension">Extension</a>
+      <a href="#install">Install</a>
       <a href="#news">What's new</a>
       <a href="#help">Help</a>
       <a class="heart" href="#support">♥ Support</a>
     </nav>
     <span class="lang"><a href="index.html" aria-current="true">EN</a> · <a href="bs/index.html">BS</a> · <a href="de/index.html">DE</a> · <a href="es/index.html">ES</a> · <a href="fr/index.html">FR</a></span>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Download</a>
   </div>
 </header>
 
 <main>
-  <div class="wrap hero">
-    <h1>Video and audio on your PC.<br>In one click.</h1>
-    <p class="lead">A free Windows app: MP4 in full quality or MP3, straight from your browser or from a copied link.</p>
-    <div class="cta">
-      <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-        Download for Windows
-      </a>
-      <span class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 and 11 (64-bit)</span>
-    </div>
-    <div class="smartscreen">
-      <p><b>Installing: Windows may show a warning.</b> The installer isn't digitally signed yet, so Windows may show
-        “Windows protected your PC”. Make sure the file comes from this site, then click <b>More info</b> and <b>Run anyway</b>.
-        Updates from inside the app don't show this warning.</p>
-      <div class="ss-steps" aria-hidden="true">
-        <div class="ss-dialog"><div class="ss-title">Windows protected your PC</div>
-          <div class="ss-body">SmartScreen prevented an unrecognized app from starting.</div>
-          <span class="ss-link ss-hl">More info</span>
-          <div class="ss-btns"><span class="ss-btn">Don't run</span></div></div>
-        <div class="ss-arrow">→</div>
-        <div class="ss-dialog"><div class="ss-title">Windows protected your PC</div>
-          <div class="ss-body">App: VideoDownload-Setup.exe<br>Publisher: Unknown publisher</div>
-          <div class="ss-btns"><span class="ss-btn ss-hl">Run anyway</span><span class="ss-btn">Don't run</span></div></div>
+  <div class="hero">
+    <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="wrap hero-grid">
+      <div data-reveal>
+        <div class="eyebrow"><span class="badge">New</span> <b>Mac version</b> in beta</div>
+        <h1>Video and audio.<br><span class="grad">In one click.</span></h1>
+        <p class="lead">A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.</p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
+        </div>
+        <div class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 and 11 (64-bit) · <a href="#install">installation help</a></div>
+        <p class="note">The app is meant for your own videos, content you have the author's permission for, and content under a free license. By downloading you accept the <a href="terms.html">Terms of use</a>. DRM-protected content is not downloaded.</p>
+      </div>
+
+      <div class="stage" data-reveal style="--d:.15s">
+        <div class="app" role="img" aria-label="The Video Download window downloading videos">
+          <div class="app-title"><img src="assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-tools">
+            <button class="paste" type="button">+ Paste</button>
+            <div class="fmt">Video – best quality (MP4)</div>
+            <div class="go">↓ Download</div>
+          </div>
+          <div class="rows" aria-live="polite"></div>
+          <div class="app-foot"><span>Folder: Video Download</span><span class="heart">♥ Support the project</span></div>
+        </div>
+        <p class="stage-note">Try it: click <b>+ Paste</b>.</p>
       </div>
     </div>
-<!-- mac -->
-    <div class="smartscreen mac">
-      <p><span class="badge">Beta</span> <b>New: Video Download for Mac.</b> For Macs with an Apple chip (M1 or newer) and macOS 12 or later. It works, but only a few people have tried it so far: please <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report anything that doesn't work</a>.</p>
-      <p><a class="btn btn-small" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Download for Mac (beta)</a></p>
-      <p>The Mac version isn't signed by Apple yet, so the first start takes a few extra clicks:</p>
-      <ol>
-        <li>Open the downloaded .dmg and drag Video Download to Applications.</li>
-        <li>Open the app. macOS says it can't verify it: click <b>Done</b> (not “Move to Trash”).</li>
-        <li>Open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b> and enter your Mac password.</li>
-        <li>Open the app again and confirm <b>Open</b>. This is needed only once.</li>
-      </ol>
-    </div>
-<!-- /mac -->
-    <div class="pills">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Free</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>No ads</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>No tracking</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>5 languages</span>
-    </div>
-    <p class="note">The app is meant for your own videos, content you have the author's permission for, and content under a free license.
-      By downloading you accept the <a href="terms.html">Terms of use</a>. DRM-protected content is not downloaded.</p>
-    <div class="shot">
-      <picture>
-        <source srcset="assets/screenshot-dark-en.png" media="(prefers-color-scheme: dark)">
-        <img src="assets/screenshot-light-en.png" alt="The Video Download window with four downloads" width="860" height="470">
-      </picture>
+
+    <div class="wrap stats" data-reveal>
+      <div class="stat"><b data-count="1800" data-suffix="+">1800+</b><span>supported sites</span></div>
+      <div class="stat"><b data-count="5">5</b><span>languages</span></div>
+      <div class="stat"><b data-count="0">0</b><span>ads and trackers</span></div>
+      <div class="stat"><b data-count="4">4</b><span>downloads at once</span></div>
     </div>
   </div>
 
-  <section id="features" class="soft">
+  <section id="features">
     <div class="wrap">
-      <h2>Everything you need, nothing you don't</h2>
-      <p class="sub">A simple window, with everything you expect from a good downloader underneath.</p>
-      <div class="grid">
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
-          <h3>MP4 up to the best quality</h3><p>Best, 1080p, 720p or 480p. Picture and sound are merged into an MP4 that plays everywhere.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
-          <h3>Audio only: MP3 or M4A</h3><p>For lectures, podcasts and music. A finished MP4 turns into an MP3 with one button.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
-          <h3>Browser extension</h3><p>A “Download the playing video” button and a right-click on any link or video in Firefox, Edge and Chrome. <a href="extension.html">How to install</a></p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
-          <h3>Copy a link, done</h3><p>The app notices a copied link and adds it to the queue. Dragging a link into the window works too.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-          <h3>Queue, playlists, several at once</h3><p>Whole playlists, up to 4 downloads at the same time, automatic retry when the connection drops.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
-          <h3>Clips, subtitles, cover art</h3><p>Just a part of a video from–to, subtitles embedded in the MP4 and the thumbnail as the file's cover.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
-          <h3>Light and dark theme</h3><p>Or same as Windows. Progress also shows on the taskbar button, and a notification arrives at the end.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
-          <h3>Always up to date</h3><p>The app checks for new versions itself and updates the part that reads websites, without reinstalling.</p></div>
+      <div class="kicker" data-reveal>Features</div>
+      <h2 data-reveal>Everything you need,<br>nothing you don't.</h2>
+      <p class="sub" data-reveal>A simple window, with everything you expect from a good downloader underneath.</p>
+      <div class="bento">
+        <div class="tile wide tall shot" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
+          <h3>MP4 up to the best quality</h3>
+          <p>Best, 1080p, 720p or 480p. Picture and sound are merged into an MP4 that plays everywhere.</p>
+          <picture>
+            <source srcset="assets/screenshot-dark-en.png" media="(prefers-color-scheme: dark)">
+            <img src="assets/screenshot-light-en.png" alt="The Video Download window with four downloads" width="860" height="470" loading="lazy">
+          </picture>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+          <h3>Audio only: MP3 or M4A</h3>
+          <p>For lectures, podcasts and music. A finished MP4 turns into an MP3 with one button.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
+          <h3>Copy a link, done</h3>
+          <p>The app notices a copied link and adds it to the queue.</p>
+        </div>
+        <div class="tile" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <h3>Playlists, several at once</h3>
+          <p>Whole playlists, up to 4 downloads at the same time, automatic retry when the connection drops.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
+          <h3>Clips, subtitles, cover art</h3>
+          <p>Just a part of a video, subtitles in the MP4 and the thumbnail as the file's cover.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
+          <h3>Light and dark theme</h3>
+          <p>Or same as your system. Progress on the taskbar and a notification at the end.</p>
+        </div>
+        <div class="tile full" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+          <h3>Always up to date, and safe</h3>
+          <p>The app checks for new versions itself, updates the part that reads websites without reinstalling, and installs only updates digitally signed by us.</p>
+          <div class="chips"><span>5 languages</span><span>No account</span><span>No ads</span><span>No tracking</span><span>Signed updates</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="extension">
+    <div class="wrap split">
+      <div data-reveal>
+        <div class="kicker">Browser extension</div>
+        <h2>Download what's playing.</h2>
+        <p class="sub">Play a video, click the icon, done. Or right-click any link or video. The app starts by itself if it isn't running.</p>
+        <ul class="list">
+          <li>Firefox: one click, signed by Mozilla, updates itself</li>
+          <li>Edge and Chrome: loaded once from the app folder</li>
+          <li>Live streams and DRM-protected video are not downloaded</li>
+        </ul>
+        <p><a href="extension.html">How to install the extension →</a></p>
+      </div>
+      <div class="browser" data-reveal style="--d:.1s">
+        <div class="top"><i></i><i></i><i></i><span class="url">example-video-site.test/watch</span><button class="ext" type="button" aria-label="Video Download extension"></button></div>
+        <div class="page">
+          <div class="video"></div>
+          <div class="popup" aria-hidden="true">
+            <b>Video Download</b> · the app is running
+            <span class="pb">⬇ Download the playing video</span>
+            <span class="pb alt">♪ Download as MP3 (audio only)</span>
+            <small>Detected video streams: 1</small>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="how">
-    <div class="wrap">
-      <h2>How it works</h2>
-      <p class="sub">From installing to your first file in under a minute.</p>
+    <div class="wrap center">
+      <div class="kicker" data-reveal>How it works</div>
+      <h2 data-reveal>Your first file in under a minute.</h2>
+      <p class="sub" data-reveal>Install once, then just copy links.</p>
       <div class="steps">
-        <div class="card step"><h3 style="margin:0 0 4px">Install</h3><p style="margin:0;color:var(--muted)">Run the installer. It doesn't need an administrator and adds nothing else to your PC.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Add a link</h3><p style="margin:0;color:var(--muted)">Copy a link, click “Paste”, or download straight from the browser with the extension.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Choose and download</h3><p style="margin:0;color:var(--muted)">MP4 or MP3, then “Download”. The file waits in the Video&nbsp;Download folder.</p></div>
+        <div class="step"><div class="n">1</div><h3>Install</h3><p>No administrator needed, adds nothing else to your computer.</p></div>
+        <div class="step"><div class="n">2</div><h3>Add a link</h3><p>Copy a link, click “Paste”, or use the extension.</p></div>
+        <div class="step"><div class="n">3</div><h3>Download</h3><p>MP4 or MP3, then “Download”. The file waits in the Video&nbsp;Download folder.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="news" class="soft">
+  <section id="install">
     <div class="wrap">
-      <h2>What's new</h2>
-      <p class="sub">The same list as in the app (Help → What's new).</p>
+      <div class="kicker" data-reveal>Install</div>
+      <h2 data-reveal>First start, step by step.</h2>
+      <p class="sub" data-reveal>The app isn't signed with a paid certificate yet, so your system asks once. Updates from inside the app don't.</p>
+      <div class="tabs" role="tablist" aria-label="System">
+        <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Beta</span></button>
+      </div>
+      <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+        <p><b>Windows may show “Windows protected your PC”.</b> Make sure the file comes from this site, then click <b>More info</b> and <b>Run anyway</b>.</p>
+        <div class="dialogs" aria-hidden="true">
+          <div class="dlg"><div class="h">Windows protected your PC</div><div>SmartScreen prevented an unrecognized app from starting.</div><div style="margin-top:8px"><span class="hl" style="text-decoration:underline">More info</span></div><div class="btns"><span>Don't run</span></div></div>
+          <div class="arrow">→</div>
+          <div class="dlg"><div class="h">Windows protected your PC</div><div>App: VideoDownload-Setup.exe<br>Publisher: Unknown publisher</div><div class="btns"><span class="hl">Run anyway</span><span>Don't run</span></div></div>
+        </div>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Download for Windows</a></p>
+      </div>
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+        <p><span class="badge">Beta</span> <b>New: Video Download for Mac.</b> For Macs with an Apple chip (M1 or newer) and macOS 12 or later. It works, but only a few people have tried it so far: please <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report anything that doesn't work</a>.</p>
+        <p>The Mac version isn't signed by Apple yet, so the first start takes a few extra clicks:</p>
+        <ol>
+          <li>Open the downloaded .dmg and drag Video Download to Applications.</li>
+          <li>Open the app. macOS says it can't verify it: click <b>Done</b> (not “Move to Trash”).</li>
+          <li>Open <b>System Settings → Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b> and enter your Mac password.</li>
+          <li>Open the app again and confirm <b>Open</b>. This is needed only once.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Download for Mac (beta)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="news">
+    <div class="wrap">
+      <div class="kicker" data-reveal>What's new</div>
+      <h2 data-reveal>Better every week.</h2>
+      <p class="sub" data-reveal>The same list as in the app (Help → What's new).</p>
       <div class="news">
-<!-- news -->
-        <div class="card"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Updates are digitally signed: the app installs only a new version signed by us, even if someone swaps the file where it is published.</li>
           <li>On first start, a short notice that the app watches copied links, with a button to turn it off right away.</li>
           <li>Leftover temporary cookie files (after a sudden shutdown) are removed on the next start; long lists use less memory.</li>
           <li>The connection with the browser add-on copes better with slow or stuck requests.</li></ul></div>
-        <div class="card"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p and 480p get a tag in the file name, so a different quality of the same video is no longer “already downloaded”.</li>
           <li>Two videos with the same title (file name without ID) no longer get mixed up; the same video started twice at once waits for the first one.</li>
           <li>“Finished” only when the file exists and can be read; MP3 conversion can always be stopped.</li>
           <li>Closing the app no longer freezes the window; updating also waits for MP3 conversions.</li></ul></div>
-        <div class="card"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
           <li>Stability: the same link can be added again right after “Stop”.</li>
           <li>Updating the site reader (yt-dlp) no longer deletes the version in use; if the new one doesn&#x27;t work, the app goes back to the previous one.</li>
           <li>A damaged history or queue no longer crashes the app; if saving fails, the app tells you.</li>
           <li>Uninstalling also removes the Firefox connection; the speed limit is shared only among downloads that are actually running.</li></ul></div>
-<!-- /news -->
       </div>
     </div>
   </section>
 
   <section id="support">
     <div class="wrap">
-      <div class="support">
+      <div class="support-card" data-reveal>
         <div>
-          <h2 style="text-align:left">The app is free</h2>
-          <p style="color:var(--muted)">No ads, no tracking and no “premium” version. If it's useful to you, you can support its
-            development voluntarily. A contribution unlocks nothing: the app is the same for everyone.</p>
+          <div class="kicker" style="color:var(--pink)">Free, for everyone</div>
+          <h2>The app is free.</h2>
+          <p class="sub" style="margin-bottom:26px">No ads, no tracking and no “premium” version. If it's useful to you, you can support its development voluntarily. A contribution unlocks nothing: the app is the same for everyone.</p>
           <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">♥ Support via PayPal</a>
         </div>
         <div class="qr"><img src="assets/support-qr.png" alt="QR code for a PayPal contribution">Scan with your phone camera</div>
@@ -161,20 +236,18 @@
     </div>
   </section>
 
-  <section id="help" class="soft">
+  <section id="help">
     <div class="wrap">
-      <h2>Help</h2>
-      <p class="sub">The most common questions. If something doesn't work: in the app use Help → Save a problem report, then
-        <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report the problem</a> and attach it. Reports are public: don't include passwords or personal data.</p>
-      <div class="faq">
-        <details><summary>Windows says “Windows protected your PC”. What now?</summary>
-          <p>The app doesn't have a paid digital signature yet. Click “More info” → “Run anyway”. The installer's SHA-256 checksum is listed with every release on GitHub.</p></details>
-        <details><summary>A video suddenly won't download.</summary>
-          <p>Websites change often. Help → Update the site reader (yt-dlp), then try again.</p></details>
-        <details><summary>Why aren't live streams downloaded?</summary>
-          <p>A live stream has no end, so the download would never finish. Download it after it ends and the recording is published.</p></details>
-        <details><summary>What does the app send to the internet?</summary>
-          <p>Only what's needed: the link you download goes to that website, and update checks go to GitHub and PyPI. No accounts, statistics or tracking.</p></details>
+      <div class="center">
+        <div class="kicker" data-reveal>Help</div>
+        <h2 data-reveal>Questions?</h2>
+        <p class="sub" data-reveal>If something doesn't work: in the app use Help → Save a problem report, then <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report the problem</a>. Reports are public: don't include passwords or personal data.</p>
+      </div>
+      <div class="faq" data-reveal>
+        <details><summary>A video suddenly won't download.</summary><p>Websites change often. Help → Update the site reader (yt-dlp), then try again.</p></details>
+        <details><summary>Why aren't live streams downloaded?</summary><p>A live stream has no end, so the download would never finish. Download it after it ends and the recording is published.</p></details>
+        <details><summary>What does the app send to the internet?</summary><p>Only what's needed: the link you download goes to that website, and update checks go to GitHub and PyPI. No accounts, statistics or tracking.</p></details>
+        <details><summary>Is it safe?</summary><p>The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only updates digitally signed by us.</p></details>
       </div>
     </div>
   </section>
@@ -184,14 +257,13 @@
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">
-      <a href="terms.html">Terms of use</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="licenses.html">Licenses</a>
-      <a href="https://github.com/abnps/video-download">GitHub</a>
-      <a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+      <a href="terms.html">Terms of use</a><a href="privacy.html">Privacy</a><a href="licenses.html">Licenses</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
     </div>
   </div>
 </footer>
 
+<script>window.VD_TEXT = {"progress": "Downloading · {p}% · {v} MB/s · {s} s left", "done": "Finished · {m} MB", "decimal": ".", "finished": [{"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Mountain hike – Prokosko lake (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 best", "audio": false}, {"title": "My live concert – filmed from the crowd", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}]};</script>
+<script src="assets/site.js" defer></script>
 </body>
 </html>

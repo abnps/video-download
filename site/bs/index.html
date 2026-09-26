@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Download — besplatan program za video i zvuk</title>
-<meta name="description" content="Besplatan Windows program za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.">
+<title>Video Download — besplatan program za video i zvuk za Windows i Mac</title>
+<meta name="description" content="Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.">
 <link rel="icon" href="../assets/icon.png">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="../index.html">
 <link rel="alternate" hreflang="bs" href="../bs/index.html">
 <link rel="alternate" hreflang="de" href="../de/index.html">
@@ -20,140 +21,214 @@
     <a class="brand" href="index.html"><img src="../assets/icon.png" alt="">Video Download</a>
     <nav>
       <a href="#features">Funkcije</a>
-      <a href="#how">Kako radi</a>
+      <a href="#extension">Dodatak</a>
+      <a href="#install">Instalacija</a>
       <a href="#news">Šta je novo</a>
       <a href="#help">Pomoć</a>
       <a class="heart" href="#support">♥ Podrži</a>
     </nav>
     <span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html" aria-current="true">BS</a> · <a href="../de/index.html">DE</a> · <a href="../es/index.html">ES</a> · <a href="../fr/index.html">FR</a></span>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Preuzmi</a>
   </div>
 </header>
 
 <main>
-  <div class="wrap hero">
-    <h1>Video i zvuk na tvom računaru.<br>Jednim klikom.</h1>
-    <p class="lead">Besplatan program za Windows: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.</p>
-    <div class="cta">
-      <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-        Preuzmi za Windows
-      </a>
-      <span class="meta"><!-- version -->Verzija 0.9.6 · 130 MB<!-- /version --> · Windows 10 i 11 (64-bit)</span>
-    </div>
-    <div class="smartscreen">
-      <p><b>Instalacija: Windows može upozoriti.</b> Instaler još nije digitalno potpisan, pa Windows može prikazati
-        „Windows je zaštitio vaš računar". Provjeri da je fajl sa ovog sajta, pa klikni <b>Više informacija</b> i <b>Ipak pokreni</b>.
-        Ažuriranje iz samog programa ne pokazuje ovo upozorenje.</p>
-      <div class="ss-steps" aria-hidden="true">
-        <div class="ss-dialog"><div class="ss-title">Windows je zaštitio vaš računar</div>
-          <div class="ss-body">SmartScreen je spriječio pokretanje neprepoznate aplikacije.</div>
-          <span class="ss-link ss-hl">Više informacija</span>
-          <div class="ss-btns"><span class="ss-btn">Ne pokreći</span></div></div>
-        <div class="ss-arrow">→</div>
-        <div class="ss-dialog"><div class="ss-title">Windows je zaštitio vaš računar</div>
-          <div class="ss-body">Aplikacija: VideoDownload-Setup.exe<br>Izdavač: Nepoznat izdavač</div>
-          <div class="ss-btns"><span class="ss-btn ss-hl">Ipak pokreni</span><span class="ss-btn">Ne pokreći</span></div></div>
+  <div class="hero">
+    <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="wrap hero-grid">
+      <div data-reveal>
+        <div class="eyebrow"><span class="badge">Novo</span> <b>Mac verzija</b> u probnoj fazi</div>
+        <h1>Video i zvuk.<br><span class="grad">Jednim klikom.</span></h1>
+        <p class="lead">Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.</p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+            Preuzmi za Windows
+          </a>
+          <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
+        </div>
+        <div class="meta"><!-- version -->Verzija 0.9.6 · 130 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
+        <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
+      </div>
+
+      <div class="stage" data-reveal style="--d:.15s">
+        <div class="app" role="img" aria-label="Prozor programa Video Download dok preuzima video">
+          <div class="app-title"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-tools">
+            <button class="paste" type="button">+ Zalijepi</button>
+            <div class="fmt">Video – najbolji kvalitet (MP4)</div>
+            <div class="go">↓ Preuzmi</div>
+          </div>
+          <div class="rows" aria-live="polite"></div>
+          <div class="app-foot"><span>Folder: Video Download</span><span class="heart">♥ Podrži projekat</span></div>
+        </div>
+        <p class="stage-note">Probaj: klikni <b>+ Zalijepi</b>.</p>
       </div>
     </div>
-<!-- mac -->
-    <div class="smartscreen mac">
-      <p><span class="badge">Beta</span> <b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 12 ili noviji. Radi, ali ga je probalo još malo ljudi: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">javi ako nešto ne radi</a>.</p>
-      <p><a class="btn btn-small" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Preuzmi za Mac (beta)</a></p>
-      <p>Mac verzija još nema Appleov potpis, pa prvo pokretanje traži par klikova više:</p>
-      <ol>
-        <li>Otvori preuzeti .dmg i prevuci Video Download u Applications.</li>
-        <li>Otvori program. macOS kaže da ga ne može provjeriti: klikni <b>Done</b> (ne „Move to Trash“).</li>
-        <li>Otvori <b>System Settings → Privacy &amp; Security</b> (Postavke sistema → Privatnost i sigurnost), skroluj dolje, klikni <b>Open Anyway</b> (Ipak otvori) i upiši lozinku Maca.</li>
-        <li>Ponovo otvori program i potvrdi <b>Open</b>. To treba samo jednom.</li>
-      </ol>
-    </div>
-<!-- /mac -->
-    <div class="pills">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Besplatno</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Bez reklama</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Bez praćenja</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>5 jezika</span>
-    </div>
-    <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom.
-      Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
-    <div class="shot">
-      <picture>
-        <source srcset="../assets/screenshot-dark-bs.png" media="(prefers-color-scheme: dark)">
-        <img src="../assets/screenshot-light-bs.png" alt="Prozor programa Video Download sa četiri preuzimanja" width="860" height="470">
-      </picture>
+
+    <div class="wrap stats" data-reveal>
+      <div class="stat"><b data-count="1800" data-suffix="+">1800+</b><span>podržanih sajtova</span></div>
+      <div class="stat"><b data-count="5">5</b><span>jezika</span></div>
+      <div class="stat"><b data-count="0">0</b><span>reklama i praćenja</span></div>
+      <div class="stat"><b data-count="4">4</b><span>preuzimanja odjednom</span></div>
     </div>
   </div>
 
-  <section id="features" class="soft">
+  <section id="features">
     <div class="wrap">
-      <h2>Sve što treba, ništa viška</h2>
-      <p class="sub">Jednostavan prozor, a ispod njega sve što očekuješ od dobrog programa za preuzimanje.</p>
-      <div class="grid">
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
-          <h3>MP4 do najboljeg kvaliteta</h3><p>Najbolji, 1080p, 720p ili 480p. Slika i zvuk se sami spajaju u MP4 koji radi svuda.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
-          <h3>Samo zvuk: MP3 ili M4A</h3><p>Za predavanja, podcaste i muziku. Gotov MP4 se jednim dugmetom pretvara u MP3.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
-          <h3>Dodatak za browser</h3><p>Dugme „Preuzmi video koji se pušta" i desni klik na link ili video u Firefoxu, Edge-u i Chrome-u. <a href="extension.html">Kako se instalira</a></p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
-          <h3>Kopiraj link i gotovo</h3><p>Program sam primijeti kopiran link i doda ga u red. Radi i prevlačenje linka u prozor.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-          <h3>Red, plejliste, više odjednom</h3><p>Cijele plejliste, do 4 preuzimanja istovremeno, automatski novi pokušaj kad pukne veza.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
-          <h3>Isječak, titlovi, omot</h3><p>Samo dio videa od–do, titlovi ugrađeni u MP4 i sličica kao omot fajla.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
-          <h3>Svijetla i tamna tema</h3><p>Ili kao Windows. Napredak se vidi i na dugmetu u traci zadataka, a na kraju stiže obavještenje.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
-          <h3>Uvijek ažuran</h3><p>Program sam provjerava nove verzije i ažurira dio koji čita sajtove, bez ponovne instalacije.</p></div>
+      <div class="kicker" data-reveal>Funkcije</div>
+      <h2 data-reveal>Sve što treba,<br>ništa viška.</h2>
+      <p class="sub" data-reveal>Jednostavan prozor, a ispod njega sve što očekuješ od dobrog programa za preuzimanje.</p>
+      <div class="bento">
+        <div class="tile wide tall shot" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
+          <h3>MP4 do najboljeg kvaliteta</h3>
+          <p>Najbolji, 1080p, 720p ili 480p. Slika i zvuk se sami spajaju u MP4 koji radi svuda.</p>
+          <picture>
+            <source srcset="../assets/screenshot-dark-bs.png" media="(prefers-color-scheme: dark)">
+            <img src="../assets/screenshot-light-bs.png" alt="Prozor programa Video Download sa četiri preuzimanja" width="860" height="470" loading="lazy">
+          </picture>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+          <h3>Samo zvuk: MP3 ili M4A</h3>
+          <p>Za predavanja, podcaste i muziku. Gotov MP4 se jednim dugmetom pretvara u MP3.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
+          <h3>Kopiraj link i gotovo</h3>
+          <p>Program sam primijeti kopiran link i doda ga u red.</p>
+        </div>
+        <div class="tile" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <h3>Plejliste, više odjednom</h3>
+          <p>Cijele plejliste, do 4 preuzimanja istovremeno, automatski novi pokušaj kad pukne veza.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
+          <h3>Isječak, titlovi, omot</h3>
+          <p>Samo dio videa, titlovi u MP4 i sličica kao omot fajla.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
+          <h3>Svijetla i tamna tema</h3>
+          <p>Ili kao sistem. Napredak na traci zadataka i obavještenje na kraju.</p>
+        </div>
+        <div class="tile full" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+          <h3>Uvijek ažuran i siguran</h3>
+          <p>Program sam provjerava nove verzije, ažurira dio koji čita sajtove bez ponovne instalacije i instalira samo ažuriranja koja smo mi digitalno potpisali.</p>
+          <div class="chips"><span>5 jezika</span><span>Bez naloga</span><span>Bez reklama</span><span>Bez praćenja</span><span>Potpisana ažuriranja</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="extension">
+    <div class="wrap split">
+      <div data-reveal>
+        <div class="kicker">Dodatak za browser</div>
+        <h2>Preuzmi ono što se pušta.</h2>
+        <p class="sub">Pusti video, klikni ikonu i gotovo. Ili desni klik na bilo koji link ili video. Program se sam pokrene ako nije otvoren.</p>
+        <ul class="list">
+          <li>Firefox: jedan klik, potpisala Mozilla, sam se ažurira</li>
+          <li>Edge i Chrome: učitava se jednom iz foldera programa</li>
+          <li>Prenos uživo i video zaštićen DRM-om se ne preuzimaju</li>
+        </ul>
+        <p><a href="extension.html">Kako se instalira dodatak →</a></p>
+      </div>
+      <div class="browser" data-reveal style="--d:.1s">
+        <div class="top"><i></i><i></i><i></i><span class="url">example-video-site.test/watch</span><button class="ext" type="button" aria-label="Dodatak Video Download"></button></div>
+        <div class="page">
+          <div class="video"></div>
+          <div class="popup" aria-hidden="true">
+            <b>Video Download</b> · aplikacija radi
+            <span class="pb">⬇ Preuzmi video koji se pušta</span>
+            <span class="pb alt">♪ Preuzmi kao MP3 (samo zvuk)</span>
+            <small>Pronađeni video tokovi: 1</small>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="how">
-    <div class="wrap">
-      <h2>Kako radi</h2>
-      <p class="sub">Od instalacije do prvog fajla za manje od minute.</p>
+    <div class="wrap center">
+      <div class="kicker" data-reveal>Kako radi</div>
+      <h2 data-reveal>Prvi fajl za manje od minute.</h2>
+      <p class="sub" data-reveal>Instaliraj jednom, pa samo kopiraj linkove.</p>
       <div class="steps">
-        <div class="card step"><h3 style="margin:0 0 4px">Instaliraj</h3><p style="margin:0;color:var(--muted)">Pokreni instaler. Ne traži administratora i ne dodaje ništa drugo na računar.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Dodaj link</h3><p style="margin:0;color:var(--muted)">Kopiraj link, klikni „Zalijepi" ili preuzmi direktno iz browsera preko dodatka.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Izaberi i preuzmi</h3><p style="margin:0;color:var(--muted)">MP4 ili MP3, pa „Preuzmi". Fajl čeka u folderu Video&nbsp;Download.</p></div>
+        <div class="step"><div class="n">1</div><h3>Instaliraj</h3><p>Ne traži administratora i ne dodaje ništa drugo na računar.</p></div>
+        <div class="step"><div class="n">2</div><h3>Dodaj link</h3><p>Kopiraj link, klikni „Zalijepi“ ili koristi dodatak.</p></div>
+        <div class="step"><div class="n">3</div><h3>Preuzmi</h3><p>MP4 ili MP3, pa „Preuzmi“. Fajl čeka u folderu Video&nbsp;Download.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="news" class="soft">
+  <section id="install">
     <div class="wrap">
-      <h2>Šta je novo</h2>
-      <p class="sub">Isti spisak kao u programu (Pomoć → Šta je novo).</p>
+      <div class="kicker" data-reveal>Instalacija</div>
+      <h2 data-reveal>Prvo pokretanje, korak po korak.</h2>
+      <p class="sub" data-reveal>Program još nema plaćeni certifikat, pa sistem jednom pita. Ažuriranja iz programa ne pitaju.</p>
+      <div class="tabs" role="tablist" aria-label="Sistem">
+        <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Beta</span></button>
+      </div>
+      <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+        <p><b>Windows može prikazati „Windows je zaštitio vaš računar“.</b> Provjeri da je fajl sa ovog sajta, pa klikni <b>Više informacija</b> i <b>Ipak pokreni</b>.</p>
+        <div class="dialogs" aria-hidden="true">
+          <div class="dlg"><div class="h">Windows je zaštitio vaš računar</div><div>SmartScreen je spriječio pokretanje neprepoznate aplikacije.</div><div style="margin-top:8px"><span class="hl" style="text-decoration:underline">Više informacija</span></div><div class="btns"><span>Ne pokreći</span></div></div>
+          <div class="arrow">→</div>
+          <div class="dlg"><div class="h">Windows je zaštitio vaš računar</div><div>Aplikacija: VideoDownload-Setup.exe<br>Izdavač: Nepoznat izdavač</div><div class="btns"><span class="hl">Ipak pokreni</span><span>Ne pokreći</span></div></div>
+        </div>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Preuzmi za Windows</a></p>
+      </div>
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+        <p><span class="badge">Beta</span> <b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 12 ili noviji. Radi, ali ga je probalo još malo ljudi: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">javi ako nešto ne radi</a>.</p>
+        <p>Mac verzija još nema Appleov potpis, pa prvo pokretanje traži par klikova više:</p>
+        <ol>
+          <li>Otvori preuzeti .dmg i prevuci Video Download u Applications.</li>
+          <li>Otvori program. macOS kaže da ga ne može provjeriti: klikni <b>Done</b> (ne „Move to Trash“).</li>
+          <li>Otvori <b>System Settings → Privacy &amp; Security</b> (Postavke sistema → Privatnost i sigurnost), skroluj dolje, klikni <b>Open Anyway</b> (Ipak otvori) i upiši lozinku Maca.</li>
+          <li>Ponovo otvori program i potvrdi <b>Open</b>. To treba samo jednom.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Preuzmi za Mac (beta)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="news">
+    <div class="wrap">
+      <div class="kicker" data-reveal>Šta je novo</div>
+      <h2 data-reveal>Svake sedmice bolje.</h2>
+      <p class="sub" data-reveal>Ista lista kao u programu (Pomoć → Šta je novo).</p>
       <div class="news">
-<!-- news -->
-        <div class="card"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Ažuriranja su digitalno potpisana: program instalira samo novu verziju koju smo mi potpisali, čak i ako neko podmetne drugi fajl na mjesto objave.</li>
           <li>Pri prvom pokretanju kratka obavijest da program prati kopirane linkove, s dugmetom da se to odmah isključi.</li>
           <li>Zaostali privremeni fajlovi s kolačićima (poslije naglog prekida) brišu se pri sljedećem pokretanju; duge liste troše manje memorije.</li>
           <li>Veza s dodatkom u pretraživaču otpornija je na spore i zaglavljene zahtjeve.</li></ul></div>
-        <div class="card"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p i 480p dobijaju oznaku u imenu fajla, pa različit kvalitet istog videa više nije „već preuzeto“.</li>
           <li>Dva videa istog naslova (ime fajla bez ID-a) više se ne miješaju; isti video pokrenut dvaput istovremeno čeka da prvi završi.</li>
           <li>„Završeno“ tek kad gotov fajl postoji i može se pročitati; pretvaranje u MP3 se uvijek može prekinuti.</li>
           <li>Zatvaranje programa ne zamrzava prozor; ažuriranje čeka i pretvaranja u MP3.</li></ul></div>
-        <div class="card"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
           <li>Stabilnost: isti link se može ponovo dodati odmah poslije „Zaustavi“.</li>
           <li>Ažuriranje čitača sajtova (yt-dlp) više ne briše verziju koja radi; ako nova ne radi, program se sam vraća na prethodnu.</li>
           <li>Oštećena istorija ili red ne obaraju program; ako čuvanje ne uspije, program to javi.</li>
           <li>Deinstalacija uklanja i vezu s Firefoxom; ograničenje brzine se dijeli samo na preuzimanja koja stvarno rade.</li></ul></div>
-<!-- /news -->
       </div>
     </div>
   </section>
 
   <section id="support">
     <div class="wrap">
-      <div class="support">
+      <div class="support-card" data-reveal>
         <div>
-          <h2 style="text-align:left">Program je besplatan</h2>
-          <p style="color:var(--muted)">Bez reklama, bez praćenja i bez „premium" verzije. Ako ti koristi, možeš dobrovoljno podržati
-            razvoj. Prilog ništa ne otključava: program je isti za sve.</p>
+          <div class="kicker" style="color:var(--pink)">Besplatno, za sve</div>
+          <h2>Program je besplatan.</h2>
+          <p class="sub" style="margin-bottom:26px">Bez reklama, bez praćenja i bez „premium“ verzije. Ako ti koristi, možeš dobrovoljno podržati razvoj. Prilog ništa ne otključava: program je isti za sve.</p>
           <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">♥ Podrži preko PayPal-a</a>
         </div>
         <div class="qr"><img src="../assets/support-qr.png" alt="QR kod za PayPal prilog">Skeniraj kamerom telefona</div>
@@ -161,20 +236,18 @@
     </div>
   </section>
 
-  <section id="help" class="soft">
+  <section id="help">
     <div class="wrap">
-      <h2>Pomoć</h2>
-      <p class="sub">Najčešća pitanja. Ako nešto ne radi: u programu Pomoć → Sačuvaj izvještaj o problemu, pa
-        <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">prijavi problem</a> i priloži ga. Prijave su javne: ne upisuj lozinke ni lične podatke.</p>
-      <div class="faq">
-        <details><summary>Windows kaže „Windows je zaštitio računar". Šta sad?</summary>
-          <p>Program još nema plaćeni digitalni potpis. Klikni „Više informacija" → „Ipak pokreni". SHA-256 zbir instalera je naveden uz svako izdanje na GitHub-u.</p></details>
-        <details><summary>Video se odjednom ne preuzima.</summary>
-          <p>Sajtovi često mijenjaju način rada. Pomoć → Ažuriraj čitač sajtova, pa pokušaj ponovo.</p></details>
-        <details><summary>Zašto se prenos uživo ne preuzima?</summary>
-          <p>Prenos uživo nema kraja, pa bi preuzimanje trajalo beskonačno. Preuzmi ga kad se završi i snimak bude objavljen.</p></details>
-        <details><summary>Šta program šalje na internet?</summary>
-          <p>Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja.</p></details>
+      <div class="center">
+        <div class="kicker" data-reveal>Pomoć</div>
+        <h2 data-reveal>Pitanja?</h2>
+        <p class="sub" data-reveal>Ako nešto ne radi: u programu Pomoć → Sačuvaj izvještaj o problemu, pa <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">prijavi problem</a>. Prijave su javne: ne upisuj lozinke ni lične podatke.</p>
+      </div>
+      <div class="faq" data-reveal>
+        <details><summary>Video se odjednom ne preuzima.</summary><p>Sajtovi često mijenjaju način rada. Pomoć → Ažuriraj čitač sajtova (yt-dlp), pa pokušaj ponovo.</p></details>
+        <details><summary>Zašto se prenos uživo ne preuzima?</summary><p>Prenos uživo nema kraja, pa bi preuzimanje trajalo beskonačno. Preuzmi ga kad se završi i snimak bude objavljen.</p></details>
+        <details><summary>Šta program šalje na internet?</summary><p>Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja.</p></details>
+        <details><summary>Da li je siguran?</summary><p>Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo ažuriranja koja smo mi digitalno potpisali.</p></details>
       </div>
     </div>
   </section>
@@ -184,14 +257,13 @@
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">
-      <a href="terms.html">Uslovi korištenja</a>
-      <a href="privacy.html">Privatnost</a>
-      <a href="licenses.html">Licence</a>
-      <a href="https://github.com/abnps/video-download">GitHub</a>
-      <a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+      <a href="terms.html">Uslovi korištenja</a><a href="privacy.html">Privatnost</a><a href="licenses.html">Licence</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
     </div>
   </div>
 </footer>
 
+<script>window.VD_TEXT = {"progress": "Preuzimanje · {p}% · {v} MB/s · još {s} s", "done": "Završeno · {m} MB", "decimal": ",", "finished": [{"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Planinarska tura – Prokoško jezero (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 najbolji", "audio": false}, {"title": "Moj koncert uživo – snimak iz publike", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}]};</script>
+<script src="../assets/site.js" defer></script>
 </body>
 </html>

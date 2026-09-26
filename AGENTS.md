@@ -73,10 +73,11 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   da GitHub-ovo preusmjeravanje starih linkova za programe v0.9.0 i starije ostane sigurno; u nalogu
   `npgamy` se NIKAD ne smije napraviti repo `video-download`).
 - Sajt je na više jezika: ENGLESKI je glavni (`site/`, Ahmedova odluka 25.9.2026), ostali su u
-  `site/{bs,de,es,fr}/` (26.9.2026, isti jezici kao program). `index.html` svakog jezika se piše ručno (isti
-  raspored); prekidač jezika, hreflang, verziju i „Šta je novo" u njemu popunjava, a ostale stranice pravi
-  `tools/build_site.py` (TEXTS po jeziku). Nazivi menija i dugmadi na sajtu = tačni prevodi iz `videodl/i18n.py`
-  i `extension/i18n.js`. Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
+  `site/{bs,de,es,fr}/` (26.9.2026, isti jezici kao program). Početna stranica (redizajn 26.9.2026, Ahmed: „po uzoru na windows.com, interaktivan sa animacijama") se
+  NE piše ručno: pravi je šablon `tools/site_home.py` (HOME = tekstovi po jeziku; nazivi dugmadi u demou iz
+  `videodl/i18n.py`), ostale stranice `tools/build_site.py` (TEXTS). Stil i animacije: `site/assets/site.css` +
+  `site.js` (bez biblioteka, kolačića i tuđih skripti; `prefers-reduced-motion` gasi pokret; sadržaj vidljiv i bez JS).
+  Bez Microsoftovih znakova i slika. Novi jezik = unos u HOME i TEXTS + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Kontakt na sajtu (Ahmedova odluka 26.9.2026): javno se prikazuje SAMO `abnpsdev@gmail.com`
   (`CONTACT_EMAIL` u `tools/build_site.py`, podnožje svih stranica + stavka u privatnosti). Ahmedov lični

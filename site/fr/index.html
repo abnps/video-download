@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows</title>
-<meta name="description" content="Application Windows gratuite pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.">
+<title>Video Download — téléchargeur gratuit de vidéo et d&#x27;audio pour Windows et Mac</title>
+<meta name="description" content="Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l&#x27;audio (MP3). Sans publicité, sans pistage, en 5 langues.">
 <link rel="icon" href="../assets/icon.png">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="../index.html">
 <link rel="alternate" hreflang="bs" href="../bs/index.html">
 <link rel="alternate" hreflang="de" href="../de/index.html">
@@ -20,142 +21,214 @@
     <a class="brand" href="index.html"><img src="../assets/icon.png" alt="">Video Download</a>
     <nav>
       <a href="#features">Fonctions</a>
-      <a href="#how">Comment ça marche</a>
+      <a href="#extension">Extension</a>
+      <a href="#install">Installation</a>
       <a href="#news">Nouveautés</a>
       <a href="#help">Aide</a>
       <a class="heart" href="#support">♥ Soutenir</a>
     </nav>
     <span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html">BS</a> · <a href="../de/index.html">DE</a> · <a href="../es/index.html">ES</a> · <a href="../fr/index.html" aria-current="true">FR</a></span>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Télécharger</a>
   </div>
 </header>
 
 <main>
-  <div class="wrap hero">
-    <h1>La vidéo et le son sur votre PC.<br>En un clic.</h1>
-    <p class="lead">Une application Windows gratuite : MP4 en pleine qualité ou MP3, directement depuis le navigateur ou depuis un lien copié.</p>
-    <div class="cta">
-      <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-        Télécharger pour Windows
-      </a>
-      <span class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
-    </div>
-    <div class="smartscreen">
-      <p><b>Installation : Windows peut afficher un avertissement.</b> Le programme d'installation n'est pas encore signé
-        numériquement, Windows peut donc afficher « Windows a protégé votre ordinateur ». Vérifiez que le fichier provient de ce site,
-        puis cliquez sur <b>Informations complémentaires</b> et <b>Exécuter quand même</b>. Les mises à jour depuis l'application
-        n'affichent pas cet avertissement.</p>
-      <div class="ss-steps" aria-hidden="true">
-        <div class="ss-dialog"><div class="ss-title">Windows a protégé votre ordinateur</div>
-          <div class="ss-body">Microsoft Defender SmartScreen a empêché le démarrage d'une application non reconnue.</div>
-          <span class="ss-link ss-hl">Informations complémentaires</span>
-          <div class="ss-btns"><span class="ss-btn">Ne pas exécuter</span></div></div>
-        <div class="ss-arrow">→</div>
-        <div class="ss-dialog"><div class="ss-title">Windows a protégé votre ordinateur</div>
-          <div class="ss-body">Application : VideoDownload-Setup.exe<br>Éditeur : Éditeur inconnu</div>
-          <div class="ss-btns"><span class="ss-btn ss-hl">Exécuter quand même</span><span class="ss-btn">Ne pas exécuter</span></div></div>
+  <div class="hero">
+    <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="wrap hero-grid">
+      <div data-reveal>
+        <div class="eyebrow"><span class="badge">Nouveau</span> <b>Version Mac</b> en bêta</div>
+        <h1>La vidéo et le son.<br><span class="grad">En un clic.</span></h1>
+        <p class="lead">Une application gratuite pour Windows et Mac : MP4 en pleine qualité ou MP3, directement depuis le navigateur ou depuis un lien copié.</p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+            Télécharger pour Windows
+          </a>
+          <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Bêta</span></a>
+        </div>
+        <div class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 et 11 (64 bits) · <a href="#install">aide à l'installation</a></div>
+        <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.</p>
+      </div>
+
+      <div class="stage" data-reveal style="--d:.15s">
+        <div class="app" role="img" aria-label="La fenêtre de Video Download pendant un téléchargement">
+          <div class="app-title"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-tools">
+            <button class="paste" type="button">+ Coller</button>
+            <div class="fmt">Vidéo – meilleure qualité (MP4)</div>
+            <div class="go">↓ Télécharger</div>
+          </div>
+          <div class="rows" aria-live="polite"></div>
+          <div class="app-foot"><span>Dossier : Video Download</span><span class="heart">♥ Soutenir le projet</span></div>
+        </div>
+        <p class="stage-note">Essayez : cliquez sur <b>+ Coller</b>.</p>
       </div>
     </div>
-<!-- mac -->
-    <div class="smartscreen mac">
-      <p><span class="badge">Bêta</span> <b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 12 ou plus récent. Il fonctionne, mais peu de personnes l'ont encore essayé : <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez ce qui ne marche pas</a>.</p>
-      <p><a class="btn btn-small" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Télécharger pour Mac (bêta)</a></p>
-      <p>La version Mac n'est pas encore signée par Apple, le premier lancement demande donc quelques clics de plus :</p>
-      <ol>
-        <li>Ouvrez le .dmg téléchargé et glissez Video Download dans Applications.</li>
-        <li>Ouvrez l'app. macOS indique qu'il ne peut pas la vérifier : fermez le message (pas « Placer dans la corbeille »).</li>
-        <li>Allez dans <b>Réglages Système → Confidentialité et sécurité</b>, faites défiler vers le bas, cliquez sur <b>Ouvrir quand même</b> et saisissez le mot de passe du Mac.</li>
-        <li>Rouvrez l'app et confirmez <b>Ouvrir</b>. Cela n'est nécessaire qu'une fois.</li>
-      </ol>
-    </div>
-<!-- /mac -->
-    <div class="pills">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Gratuit</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Sans publicité</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>Sans pistage</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>5 langues</span>
-    </div>
-    <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur
-      et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>.
-      Les contenus protégés par DRM ne sont pas téléchargés.</p>
-    <div class="shot">
-      <picture>
-        <source srcset="../assets/screenshot-dark-fr.png" media="(prefers-color-scheme: dark)">
-        <img src="../assets/screenshot-light-fr.png" alt="La fenêtre de Video Download avec quatre téléchargements" width="860" height="470">
-      </picture>
+
+    <div class="wrap stats" data-reveal>
+      <div class="stat"><b data-count="1800" data-suffix="+">1800+</b><span>sites pris en charge</span></div>
+      <div class="stat"><b data-count="5">5</b><span>langues</span></div>
+      <div class="stat"><b data-count="0">0</b><span>publicités et traqueurs</span></div>
+      <div class="stat"><b data-count="4">4</b><span>téléchargements simultanés</span></div>
     </div>
   </div>
 
-  <section id="features" class="soft">
+  <section id="features">
     <div class="wrap">
-      <h2>Tout ce qu'il faut, rien de superflu</h2>
-      <p class="sub">Une fenêtre simple, et en dessous tout ce qu'on attend d'un bon téléchargeur.</p>
-      <div class="grid">
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
-          <h3>MP4 jusqu'à la meilleure qualité</h3><p>Meilleure, 1080p, 720p ou 480p. L'image et le son sont réunis dans un MP4 lisible partout.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
-          <h3>Son uniquement : MP3 ou M4A</h3><p>Pour les cours, les podcasts et la musique. Un MP4 terminé devient un MP3 d'un seul bouton.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
-          <h3>Extension pour le navigateur</h3><p>Un bouton « Télécharger la vidéo en cours » et un clic droit sur n'importe quel lien ou vidéo dans Firefox, Edge et Chrome. <a href="extension.html">Comment l'installer</a></p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
-          <h3>Copiez un lien, c'est tout</h3><p>L'application repère un lien copié et l'ajoute à la file. Glisser un lien dans la fenêtre fonctionne aussi.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
-          <h3>File, playlists, plusieurs à la fois</h3><p>Des playlists entières, jusqu'à 4 téléchargements simultanés, nouvelle tentative automatique si la connexion coupe.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
-          <h3>Extraits, sous-titres, pochette</h3><p>Seulement une partie d'une vidéo, de–à, les sous-titres intégrés au MP4 et la miniature comme pochette du fichier.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
-          <h3>Thème clair et sombre</h3><p>Ou comme Windows. La progression s'affiche aussi sur le bouton de la barre des tâches, et une notification arrive à la fin.</p></div>
-        <div class="card"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
-          <h3>Toujours à jour</h3><p>L'application cherche elle-même les nouvelles versions et met à jour la partie qui lit les sites, sans réinstallation.</p></div>
+      <div class="kicker" data-reveal>Fonctions</div>
+      <h2 data-reveal>Tout ce qu'il faut,<br>rien de superflu.</h2>
+      <p class="sub" data-reveal>Une fenêtre simple, et en dessous tout ce qu'on attend d'un bon téléchargeur.</p>
+      <div class="bento">
+        <div class="tile wide tall shot" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
+          <h3>MP4 jusqu'à la meilleure qualité</h3>
+          <p>Meilleure, 1080p, 720p ou 480p. L'image et le son sont réunis dans un MP4 lisible partout.</p>
+          <picture>
+            <source srcset="../assets/screenshot-dark-fr.png" media="(prefers-color-scheme: dark)">
+            <img src="../assets/screenshot-light-fr.png" alt="La fenêtre de Video Download avec quatre téléchargements" width="860" height="470" loading="lazy">
+          </picture>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+          <h3>Son uniquement : MP3 ou M4A</h3>
+          <p>Pour les cours, les podcasts et la musique. Un MP4 terminé devient un MP3 d'un seul bouton.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
+          <h3>Copiez un lien, c'est tout</h3>
+          <p>L'application repère un lien copié et l'ajoute à la file.</p>
+        </div>
+        <div class="tile" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <h3>Playlists, plusieurs à la fois</h3>
+          <p>Des playlists entières, jusqu'à 4 téléchargements simultanés, nouvelle tentative automatique si la connexion coupe.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.05s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></div>
+          <h3>Extraits, sous-titres, pochette</h3>
+          <p>Seulement une partie d'une vidéo, les sous-titres dans le MP4 et la miniature comme pochette du fichier.</p>
+        </div>
+        <div class="tile" data-reveal style="--d:.1s">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></div>
+          <h3>Thème clair et sombre</h3>
+          <p>Ou comme le système. La progression dans la barre des tâches et une notification à la fin.</p>
+        </div>
+        <div class="tile full" data-reveal>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+          <h3>Toujours à jour, et sûr</h3>
+          <p>L'application cherche elle-même les nouvelles versions, met à jour la partie qui lit les sites sans réinstallation et n'installe que des mises à jour signées numériquement par nous.</p>
+          <div class="chips"><span>5 langues</span><span>Sans compte</span><span>Sans publicité</span><span>Sans pistage</span><span>Mises à jour signées</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="extension">
+    <div class="wrap split">
+      <div data-reveal>
+        <div class="kicker">Extension pour le navigateur</div>
+        <h2>Téléchargez ce qui est en lecture.</h2>
+        <p class="sub">Lancez une vidéo, cliquez sur l'icône, c'est fait. Ou clic droit sur n'importe quel lien ou vidéo. L'application démarre toute seule si elle n'est pas ouverte.</p>
+        <ul class="list">
+          <li>Firefox : un clic, signée par Mozilla, se met à jour toute seule</li>
+          <li>Edge et Chrome : chargée une fois depuis le dossier de l'application</li>
+          <li>Les directs et les vidéos protégées par DRM ne sont pas téléchargés</li>
+        </ul>
+        <p><a href="extension.html">Comment installer l'extension →</a></p>
+      </div>
+      <div class="browser" data-reveal style="--d:.1s">
+        <div class="top"><i></i><i></i><i></i><span class="url">example-video-site.test/watch</span><button class="ext" type="button" aria-label="Extension Video Download"></button></div>
+        <div class="page">
+          <div class="video"></div>
+          <div class="popup" aria-hidden="true">
+            <b>Video Download</b> · application ouverte
+            <span class="pb">⬇ Télécharger la vidéo en cours</span>
+            <span class="pb alt">♪ Télécharger en MP3 (son uniquement)</span>
+            <small>Flux vidéo détectés: 1</small>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="how">
-    <div class="wrap">
-      <h2>Comment ça marche</h2>
-      <p class="sub">De l'installation au premier fichier en moins d'une minute.</p>
+    <div class="wrap center">
+      <div class="kicker" data-reveal>Comment ça marche</div>
+      <h2 data-reveal>Votre premier fichier en moins d'une minute.</h2>
+      <p class="sub" data-reveal>Installez une fois, puis copiez simplement des liens.</p>
       <div class="steps">
-        <div class="card step"><h3 style="margin:0 0 4px">Installer</h3><p style="margin:0;color:var(--muted)">Lancez le programme d'installation. Il ne demande pas d'administrateur et n'ajoute rien d'autre à votre PC.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Ajouter un lien</h3><p style="margin:0;color:var(--muted)">Copiez un lien, cliquez sur « Coller » ou téléchargez directement depuis le navigateur avec l'extension.</p></div>
-        <div class="card step"><h3 style="margin:0 0 4px">Choisir et télécharger</h3><p style="margin:0;color:var(--muted)">MP4 ou MP3, puis « Télécharger ». Le fichier vous attend dans le dossier Video&nbsp;Download.</p></div>
+        <div class="step"><div class="n">1</div><h3>Installer</h3><p>Pas besoin d'administrateur, rien d'autre n'est ajouté à votre ordinateur.</p></div>
+        <div class="step"><div class="n">2</div><h3>Ajouter un lien</h3><p>Copiez un lien, cliquez sur « Coller » ou utilisez l'extension.</p></div>
+        <div class="step"><div class="n">3</div><h3>Télécharger</h3><p>MP4 ou MP3, puis « Télécharger ». Le fichier vous attend dans le dossier Video&nbsp;Download.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="news" class="soft">
+  <section id="install">
     <div class="wrap">
-      <h2>Nouveautés</h2>
-      <p class="sub">La même liste que dans l'application (Aide → Nouveautés).</p>
+      <div class="kicker" data-reveal>Installation</div>
+      <h2 data-reveal>Premier lancement, pas à pas.</h2>
+      <p class="sub" data-reveal>L'application n'a pas encore de certificat payant, votre système demande donc une fois. Les mises à jour depuis l'application ne demandent rien.</p>
+      <div class="tabs" role="tablist" aria-label="Système">
+        <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
+        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Bêta</span></button>
+      </div>
+      <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+        <p><b>Windows peut afficher « Windows a protégé votre ordinateur ».</b> Vérifiez que le fichier provient de ce site, puis cliquez sur <b>Informations complémentaires</b> et <b>Exécuter quand même</b>.</p>
+        <div class="dialogs" aria-hidden="true">
+          <div class="dlg"><div class="h">Windows a protégé votre ordinateur</div><div>Microsoft Defender SmartScreen a empêché le démarrage d'une application non reconnue.</div><div style="margin-top:8px"><span class="hl" style="text-decoration:underline">Informations complémentaires</span></div><div class="btns"><span>Ne pas exécuter</span></div></div>
+          <div class="arrow">→</div>
+          <div class="dlg"><div class="h">Windows a protégé votre ordinateur</div><div>Application : VideoDownload-Setup.exe<br>Éditeur : Éditeur inconnu</div><div class="btns"><span class="hl">Exécuter quand même</span><span>Ne pas exécuter</span></div></div>
+        </div>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Télécharger pour Windows</a></p>
+      </div>
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+        <p><span class="badge">Bêta</span> <b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 12 ou plus récent. Il fonctionne, mais peu de personnes l'ont encore essayé : <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez ce qui ne marche pas</a>.</p>
+        <p>La version Mac n'est pas encore signée par Apple, le premier lancement demande donc quelques clics de plus :</p>
+        <ol>
+          <li>Ouvrez le .dmg téléchargé et glissez Video Download dans Applications.</li>
+          <li>Ouvrez l'app. macOS indique qu'il ne peut pas la vérifier : fermez le message (pas « Placer dans la corbeille »).</li>
+          <li>Allez dans <b>Réglages Système → Confidentialité et sécurité</b>, faites défiler vers le bas, cliquez sur <b>Ouvrir quand même</b> et saisissez le mot de passe du Mac.</li>
+          <li>Rouvrez l'app et confirmez <b>Ouvrir</b>. Cela n'est nécessaire qu'une fois.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Télécharger pour Mac (bêta)</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="news">
+    <div class="wrap">
+      <div class="kicker" data-reveal>Nouveautés</div>
+      <h2 data-reveal>Meilleur chaque semaine.</h2>
+      <p class="sub" data-reveal>La même liste que dans l'application (Aide → Nouveautés).</p>
       <div class="news">
-<!-- news -->
-        <div class="card"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Les mises à jour sont signées numériquement : le programme n&#x27;installe qu&#x27;une nouvelle version signée par nous, même si quelqu&#x27;un remplace le fichier publié.</li>
           <li>Au premier démarrage, un court avis indiquant que le programme surveille les liens copiés, avec un bouton pour le désactiver tout de suite.</li>
           <li>Les fichiers temporaires de cookies restants (après un arrêt brutal) sont supprimés au démarrage suivant ; les longues listes utilisent moins de mémoire.</li>
           <li>La connexion avec le module du navigateur résiste mieux aux requêtes lentes ou bloquées.</li></ul></div>
-        <div class="card"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p et 480p reçoivent une marque dans le nom du fichier : une autre qualité de la même vidéo n&#x27;est plus « déjà téléchargée ».</li>
           <li>Deux vidéos du même titre (nom sans ID) ne se mélangent plus ; la même vidéo lancée deux fois en même temps attend la première.</li>
           <li>« Terminé » seulement quand le fichier existe et est lisible ; la conversion en MP3 peut toujours être arrêtée.</li>
           <li>La fermeture ne fige plus la fenêtre ; la mise à jour attend aussi les conversions en MP3.</li></ul></div>
-        <div class="card"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
           <li>Stabilité : le même lien peut être ajouté à nouveau juste après « Arrêter ».</li>
           <li>La mise à jour du lecteur de sites (yt-dlp) ne supprime plus la version utilisée ; si la nouvelle ne fonctionne pas, le programme revient à la précédente.</li>
           <li>Un historique ou une file endommagés ne font plus planter le programme ; si l&#x27;enregistrement échoue, le programme le signale.</li>
           <li>La désinstallation supprime aussi la connexion à Firefox ; la limite de vitesse n&#x27;est partagée qu&#x27;entre les téléchargements réellement en cours.</li></ul></div>
-<!-- /news -->
       </div>
     </div>
   </section>
 
   <section id="support">
     <div class="wrap">
-      <div class="support">
+      <div class="support-card" data-reveal>
         <div>
-          <h2 style="text-align:left">L'application est gratuite</h2>
-          <p style="color:var(--muted)">Sans publicité, sans pistage et sans version « premium ». Si elle vous est utile, vous pouvez soutenir son
-            développement librement. Une contribution ne débloque rien : l'application est la même pour tous.</p>
+          <div class="kicker" style="color:var(--pink)">Gratuit, pour tous</div>
+          <h2>L'application est gratuite.</h2>
+          <p class="sub" style="margin-bottom:26px">Sans publicité, sans pistage et sans version « premium ». Si elle vous est utile, vous pouvez soutenir son développement librement. Une contribution ne débloque rien : l'application est la même pour tous.</p>
           <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">♥ Soutenir via PayPal</a>
         </div>
         <div class="qr"><img src="../assets/support-qr.png" alt="Code QR pour une contribution PayPal">Scannez avec l'appareil photo du téléphone</div>
@@ -163,21 +236,18 @@
     </div>
   </section>
 
-  <section id="help" class="soft">
+  <section id="help">
     <div class="wrap">
-      <h2>Aide</h2>
-      <p class="sub">Les questions les plus fréquentes. Si quelque chose ne marche pas : dans l'application, Aide → Enregistrer un rapport de
-        problème, puis <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez le problème</a> en le joignant. Les signalements sont publics : n'y mettez ni mots de passe
-        ni données personnelles.</p>
-      <div class="faq">
-        <details><summary>Windows affiche « Windows a protégé votre ordinateur ». Que faire ?</summary>
-          <p>L'application n'a pas encore de signature numérique payante. Cliquez sur « Informations complémentaires » → « Exécuter quand même ». La somme SHA-256 du programme d'installation figure avec chaque version sur GitHub.</p></details>
-        <details><summary>Une vidéo ne se télécharge soudain plus.</summary>
-          <p>Les sites changent souvent. Aide → Mettre à jour le lecteur de sites (yt-dlp), puis réessayez.</p></details>
-        <details><summary>Pourquoi les directs ne sont-ils pas téléchargés ?</summary>
-          <p>Un direct n'a pas de fin, le téléchargement ne se terminerait donc jamais. Téléchargez-le une fois terminé, quand l'enregistrement est publié.</p></details>
-        <details><summary>Qu'envoie l'application sur Internet ?</summary>
-          <p>Seulement le nécessaire : le lien que vous téléchargez va vers ce site, et la recherche de mises à jour vers GitHub et PyPI. Ni compte, ni statistiques, ni pistage.</p></details>
+      <div class="center">
+        <div class="kicker" data-reveal>Aide</div>
+        <h2 data-reveal>Des questions ?</h2>
+        <p class="sub" data-reveal>Si quelque chose ne marche pas : dans l'application, Aide → Enregistrer un rapport de problème, puis <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez le problème</a>. Les signalements sont publics : n'y mettez ni mots de passe ni données personnelles.</p>
+      </div>
+      <div class="faq" data-reveal>
+        <details><summary>Une vidéo ne se télécharge soudain plus.</summary><p>Les sites changent souvent. Aide → Mettre à jour le lecteur de sites (yt-dlp), puis réessayez.</p></details>
+        <details><summary>Pourquoi les directs ne sont-ils pas téléchargés ?</summary><p>Un direct n'a pas de fin, le téléchargement ne se terminerait donc jamais. Téléchargez-le une fois terminé, quand l'enregistrement est publié.</p></details>
+        <details><summary>Qu'envoie l'application sur Internet ?</summary><p>Seulement le nécessaire : le lien que vous téléchargez va vers ce site, et la recherche de mises à jour vers GitHub et PyPI. Ni compte, ni statistiques, ni pistage.</p></details>
+        <details><summary>Est-ce sûr ?</summary><p>Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et l'application n'installe que des mises à jour signées numériquement par nous.</p></details>
       </div>
     </div>
   </section>
@@ -187,14 +257,13 @@
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">
-      <a href="terms.html">Conditions d'utilisation</a>
-      <a href="privacy.html">Confidentialité</a>
-      <a href="licenses.html">Licences</a>
-      <a href="https://github.com/abnps/video-download">GitHub</a>
-      <a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+      <a href="terms.html">Conditions d'utilisation</a><a href="privacy.html">Confidentialité</a><a href="licenses.html">Licences</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
     </div>
   </div>
 </footer>
 
+<script>window.VD_TEXT = {"progress": "Téléchargement · {p}% · {v} MB/s · encore {s} s", "done": "Terminé · {m} MB", "decimal": ",", "finished": [{"title": "Cours : les bases de la photographie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – une discussion sur le voyage", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Randonnée en montagne – lac de Prokoško (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 meilleure", "audio": false}, {"title": "Mon concert en direct – filmé depuis le public", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Cours : les bases de la photographie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – une discussion sur le voyage", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}]};</script>
+<script src="../assets/site.js" defer></script>
 </body>
 </html>

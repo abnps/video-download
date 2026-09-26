@@ -19,6 +19,9 @@ sys.path.insert(0, str(ROOT))
 
 from videodl import __version__, changelog, legal  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
+
 SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
 NEWS_COUNT = 3
@@ -348,7 +351,8 @@ HEAD = """<!doctype html>
 <title>{title} — Video Download</title>
 <meta name="description" content="{description}">
 <link rel="icon" href="{up}assets/icon.png">
-<link rel="stylesheet" href="{up}assets/style.css">
+<link rel="stylesheet" href="{up}assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
 {alternates}
 </head>
 <body>
@@ -367,24 +371,19 @@ HEAD = """<!doctype html>
 <a class="back" href="index.html">{home}</a>
 """
 
-FOOT = """</main>
 
-<footer>
+def footer_html(lang: str) -> str:
+    terms, privacy, licenses = TEXTS[lang]["footer"]
+    return f"""<footer>
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">
-      <a href="terms.html">{terms}</a>
-      <a href="privacy.html">{privacy}</a>
-      <a href="licenses.html">{licenses}</a>
-      <a href="https://github.com/abnps/video-download">GitHub</a>
-      <a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+      <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>
+      <a href="{REPO}">GitHub</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>
     </div>
   </div>
-</footer>
+</footer>"""
 
-</body>
-</html>
-"""
 
 _URL = re.compile(r"(https?://[^\s<>()\"]+[^\s<>()\".,;:])")
 _NUMBERED = re.compile(r"^\d+\.\s+\S")
@@ -464,12 +463,12 @@ def alternates(lang: str, page: str) -> str:
 
 def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
     t = TEXTS[lang]
-    nav = "\n".join(f'      <a{" class=\"heart\"" if i == 4 else ""} href="index.html#{anchor}">{label}</a>'
-                    for i, (label, anchor) in enumerate(zip(t["nav"], t["anchors"])))
+    nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="index.html#{anchor}">{label}</a>'
+                    for anchor, label in zip(site_home.ANCHORS, site_home.HOME[lang]["nav"]))
     head = HEAD.format(lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
                        nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name))
-    foot = FOOT.format(terms=t["footer"][0], privacy=t["footer"][1], licenses=t["footer"][2])
-    return head + body + "\n" + foot
+    return (head + body + "\n</main>\n\n" + footer_html(lang) +
+            f'\n\n<script src="{_up(lang)}assets/site.js" defer></script>\n</body>\n</html>\n')
 
 
 def page_terms(lang: str) -> str:
@@ -665,38 +664,14 @@ MAC_TEXT = {
 }
 
 
-def mac_html(lang: str) -> str:
-    badge, lead, button, note, steps = MAC_TEXT[lang]
-    items = "\n".join(f"        <li>{step}</li>" for step in steps)
-    return f"""    <div class="smartscreen mac">
-      <p><span class="badge">{badge}</span> {lead.format(issue=ISSUE_URL)}</p>
-      <p><a class="btn btn-small" href="{MAC_DMG_URL}">{button}</a></p>
-      <p>{note}</p>
-      <ol>
-{items}
-      </ol>
-    </div>"""
-
-
 def news_html(lang: str) -> str:
     cards = []
     for version, date, items in changelog.entries(lang)[:NEWS_COUNT]:
         points = "".join(f"\n          <li>{html.escape(item)}</li>" for item in items)
-        cards.append(f'        <div class="card"><h3>{html.escape(version)} <span>{html.escape(date)}</span></h3><ul>'
-                     f"{points}</ul></div>")
+        delay = f' style="--d:{len(cards) * 0.05:.2f}s"' if cards else ""
+        cards.append(f'        <div class="card" data-reveal{delay}><h3>{html.escape(version)} <span>{html.escape(date)}</span>'
+                     f"</h3><ul>{points}</ul></div>")
     return "\n".join(cards)
-
-
-def _replace(text: str, name: str, value: str, newlines: bool = False) -> str:
-    sep = "\n" if newlines else ""
-    pattern = re.compile(rf"(<!-- {name} -->).*?(<!-- /{name} -->)", re.DOTALL)
-    if not pattern.search(text):
-        raise SystemExit(f"U index.html nedostaje <!-- {name} -->")
-    return pattern.sub(lambda m: m.group(1) + sep + value + sep + m.group(2), text, count=1)
-
-
-_LANG_SWITCH = re.compile(r'<span class="lang">.*?</span>', re.DOTALL)
-_ALTERNATES = re.compile(r'(?:<link rel="alternate" hreflang="[a-z]+" href="[^"]*">\n)+')
 
 
 def current_size_mb(index: str) -> int | None:
@@ -709,14 +684,14 @@ def build(size_mb: int | None = None) -> dict[str, str]:
     pages = {}
     for lang in LANGUAGES:
         prefix = TEXTS[lang]["dir"]
-        index = (SITE / prefix / "index.html").read_text(encoding="utf-8")
-        size = size_mb or current_size_mb(index) or 0
-        index = _replace(index, "version", f"{TEXTS[lang]['version']} {__version__} · {size} MB")
-        index = _replace(index, "news", news_html(lang), newlines=True)
-        index = _replace(index, "mac", mac_html(lang), newlines=True)
-        index = _LANG_SWITCH.sub(lambda _m: switcher(lang), index, count=1)
-        index = _ALTERNATES.sub(lambda _m: alternates(lang, "index.html") + "\n", index, count=1)
-        pages[f"{prefix}index.html"] = index
+        existing = SITE / prefix / "index.html"
+        # Veličinu instalera zna samo build; između izdanja ostaje ona iz postojeće stranice.
+        size = size_mb or (current_size_mb(existing.read_text(encoding="utf-8")) if existing.is_file() else None) or 0
+        pages[f"{prefix}index.html"] = site_home.render(
+            lang, up=_up(lang), switcher=switcher(lang), alternates=alternates(lang, "index.html"),
+            footer=footer_html(lang), news=news_html(lang),
+            version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
+            installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang])
         pages[f"{prefix}terms.html"] = page_terms(lang)
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
