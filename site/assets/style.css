@@ -97,12 +97,12 @@ footer a { color: var(--muted); }
 .smartscreen p { margin: 0 0 12px; }
 .smartscreen b { color: var(--text); }
 .ss-steps { display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.ss-dialog { width: 260px; background: #3b5a86; color: #fff; border-radius: 6px; padding: 12px 14px; font: 12px/1.45 "Segoe UI", system-ui, sans-serif; }
+.ss-dialog { width: 300px; max-width: 100%; background: #3b5a86; color: #fff; border-radius: 6px; padding: 12px 14px; font: 12px/1.45 "Segoe UI", system-ui, sans-serif; }
 .ss-title { font-size: 15px; margin-bottom: 6px; }
 .ss-body { opacity: .9; margin-bottom: 6px; }
 .ss-link { text-decoration: underline; display: inline-block; padding: 1px 3px; }
-.ss-btns { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
-.ss-btn { background: #fff; color: #1f2328; padding: 3px 12px; font-weight: 600; border-radius: 2px; }
+.ss-btns { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; flex-wrap: wrap; }
+.ss-btn { background: #fff; color: #1f2328; padding: 3px 10px; white-space: nowrap; font-weight: 600; border-radius: 2px; }
 .ss-hl { outline: 3px solid #ffca28; outline-offset: 2px; border-radius: 3px; }
 .ss-arrow { font-size: 22px; color: var(--muted); }
 .mock-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 28px; }

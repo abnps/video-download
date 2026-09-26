@@ -10,8 +10,8 @@ MESSAGE_DRM = "@drm"
 MESSAGE_LIVE = "@live"
 MESSAGE_RETRY = "@retry"
 MESSAGE_NOT_MEDIA = "@not_media"
-MESSAGE_NO_SUBS = "@no_subs"
-MESSAGE_NO_OUTPUT = "@no_output"  # yt-dlp javio uspjeh, a gotovog fajla nema ili je neispravan  # gotovo, ali video nema titlove (ili ih sajt nije dao)
+MESSAGE_NO_SUBS = "@no_subs"  # gotovo, ali video nema titlove (ili ih sajt nije dao)
+MESSAGE_NO_OUTPUT = "@no_output"  # yt-dlp javio uspjeh, a gotovog fajla nema ili je neispravan
 
 _current = FALLBACK
 

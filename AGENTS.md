@@ -68,9 +68,11 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - 25.9.2026 Ahmed: repo je prebačen iz naloga `npgamy` u organizaciju `abnps` (nalog `npgamy` ostaje,
   da GitHub-ovo preusmjeravanje starih linkova za programe v0.9.0 i starije ostane sigurno; u nalogu
   `npgamy` se NIKAD ne smije napraviti repo `video-download`).
-- Sajt je na više jezika: ENGLESKI je glavni (`site/`, Ahmedova odluka 25.9.2026), bosanski je u
-  `site/bs/`. `index.html` svakog jezika se piše ručno (isti raspored); ostale stranice pravi
-  `tools/build_site.py` (TEXTS po jeziku). Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
+- Sajt je na više jezika: ENGLESKI je glavni (`site/`, Ahmedova odluka 25.9.2026), ostali su u
+  `site/{bs,de,es,fr}/` (26.9.2026, isti jezici kao program). `index.html` svakog jezika se piše ručno (isti
+  raspored); prekidač jezika, hreflang, verziju i „Šta je novo" u njemu popunjava, a ostale stranice pravi
+  `tools/build_site.py` (TEXTS po jeziku). Nazivi menija i dugmadi na sajtu = tačni prevodi iz `videodl/i18n.py`
+  i `extension/i18n.js`. Novi jezik = unos u TEXTS + `site/<jezik>/index.html` + snimci
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Firefox dodatak (26.9.2026, „nastaviti ekstenziju"): isti kod iz `extension/`, manifest pravi
   `python tools/build_firefox.py` (gecko ID `video-download@abnps.github.io`, background.scripts umjesto

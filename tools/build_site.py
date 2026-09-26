@@ -30,7 +30,8 @@ GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github
 # Riječi koje reklamne stranice ne smiju sadržavati (plan sajta: bez tuđih znakova i „zaobiđi zaštitu").
 # Pravni tekstovi se ne provjeravaju: moraju biti doslovno isti kao u programu i instaleru.
 FORBIDDEN = re.compile(r"youtube|\byt\b(?!-dlp)|tiktok|netflix|spotify|zaobi[đd]|crack|piratsk|besplatna muzika"
-                       r"|free music|bypass", re.IGNORECASE)
+                       r"|free music|bypass|umgeh|kostenlose musik|eludir|música gratis|contourn|musique gratuite",
+                       re.IGNORECASE)
 PROMO_PAGES = ("index.html", "extension.html")
 
 # Tekstovi stranica po jeziku. Prvi jezik je glavni (korijen sajta).
@@ -146,6 +147,181 @@ Browser zato ponekad podsjeti na „Developer mode"; to je očekivano i dodatak 
 </ul>
 <h2>Poslije ažuriranja programa</h2>
 <p>Ako dodatak prestane reagovati, u <code>edge://extensions</code> klikni <b>Reload</b> (Ponovo učitaj) kod dodatka.</p>""",
+    },
+    "de": {
+        "dir": "de/", "nav": ("Funktionen", "So funktioniert's", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
+        "anchors": ("features", "how", "news", "help", "support"),
+        "home": "← Startseite", "version": "Version",
+        "footer": ("Nutzungsbedingungen", "Datenschutz", "Lizenzen"),
+        "terms_title": "Nutzungsbedingungen",
+        "terms_lead": "Derselbe Text, den du im Installer akzeptierst (auch in der App: Hilfe → Verträge und Lizenzen).",
+        "terms_desc": "Nutzungsbedingungen und Lizenzvertrag von Video Download.",
+        "privacy_title": "Datenschutz", "privacy_lead": "Weder die Webseite noch die App sammeln Daten über dich.",
+        "privacy_desc": "Datenschutzerklärung der Webseite und der App Video Download.",
+        "privacy_site": "Diese Webseite", "privacy_app": "Die App",
+        "privacy_items": (
+            "Die Webseite hat keine Cookies, keine Analyse, keine Werbung und keine Formulare und speichert nichts in deinem Browser.",
+            "Die Webseite liegt auf GitHub Pages (GitHub, Inc.). Wie jeder Server erfasst GitHub technische Daten wie deine "
+            f"IP-Adresse für Sicherheit und Betrieb; siehe die <a href=\"{GITHUB_PRIVACY}\">Datenschutzerklärung von GitHub</a>.",
+            "Der Installer wird von GitHub heruntergeladen (gleiche Bedingungen wie oben).",
+            "Der Knopf zum Unterstützen führt zu PayPal; PayPal erhält Daten erst, wenn du ihn öffnest, nach eigenen Regeln.",
+            "<b>Problemmeldungen</b> gehen an GitHub Issues und sind <b>öffentlich</b> (ein GitHub-Konto ist nötig). Der "
+            "Problembericht der App kürzt Links auf den Namen der Seite und verbirgt deinen Windows-Benutzernamen; füge keine "
+            "Passwörter, Cookies oder persönlichen Daten hinzu.",
+            "<b>Beiträge</b> werden über PayPal abgewickelt. Als Empfänger sieht der Autor, was PayPal zu jeder Zahlung anzeigt "
+            "(z. B. Name und E-Mail des Zahlenden), und nutzt es nur für die Buchhaltung, nie für Werbung oder etwas anderes.",
+        ),
+        "licenses_title": "Lizenzen",
+        "licenses_lead": "Video Download nutzt die folgende Software anderer Autoren. Für sie gelten ihre eigenen Lizenzen; die "
+                         "vollständigen Lizenztexte liegen im Ordner <code>licenses</code> neben der installierten App.",
+        "licenses_desc": "Lizenzen der Komponenten, die Video Download nutzt.",
+        "licenses_cols": ("Komponente", "Lizenz"),
+        "licenses_note": "FFmpeg steht unter GPL-3.0: Der Quellcode genau des Builds im Installer ist unter den Links oben, "
+                         "und eine Kopie des Quellcodes gibt es auch auf Anfrage.",
+        "ext_title": "Browser-Erweiterung",
+        "ext_desc": "So installierst du die Erweiterung Video Download für Edge und Chrome.",
+        "ext_body": f"""<p class="lead">Mit der Erweiterung lädst du das laufende Video mit einem Klick herunter oder per Rechtsklick
+auf einen Link oder ein Video. Funktioniert in Firefox, Edge und Chrome.</p>
+<h2>Installation (einmalig)</h2>
+<ol>
+<li>Installiere die App (die Erweiterung ist dabei).</li>
+<li>Öffne im Browser <code>edge://extensions</code> (Edge) oder <code>chrome://extensions</code> (Chrome).</li>
+<li>Schalte den <b>Entwicklermodus</b> (Developer mode) ein und klicke auf <b>Entpackte Erweiterung laden</b> (Load unpacked).</li>
+<li>Wähle den Ordner <code>{html.escape(INSTALL_DIR)}</code>. Am einfachsten: in der App
+Hilfe → Aus dem Browser herunterladen öffnen, auf <b>Ordnerpfad kopieren</b> klicken und den Pfad (Strg+V) im Ordnerdialog einfügen.
+Im selben Fenster öffnet ein Knopf die Erweiterungsseite in Edge oder Chrome.</li>
+<li>Hefte das Symbol von Video Download an die Symbolleiste (Puzzle-Symbol → Anheften).</li>
+</ol>
+<div class="box">Die Erweiterung wird vorerst von Hand geladen, weil Erweiterungs-Stores solche Programme nicht aufnehmen.
+Der Browser erinnert deshalb manchmal an den „Entwicklermodus“; das ist normal, und die Erweiterung funktioniert trotzdem.</div>
+<h2>Benutzung</h2>
+<ul>
+<li>Spiele ein Video auf der Seite ab und klicke auf das Symbol von Video Download: <b>Laufendes Video herunterladen</b> oder
+<b>Als MP3 herunterladen</b>.</li>
+<li>Rechtsklick auf einen Link oder ein Video: <b>Diesen Link mit Video Download laden</b> oder <b>…als MP3</b>.</li>
+<li>Läuft die App nicht, startet der Klick sie.</li>
+<li>Livestreams und DRM-geschützte Videos werden nicht heruntergeladen.</li>
+</ul>
+<h2>Nach einem Update der App</h2>
+<p>Reagiert die Erweiterung nicht mehr, klicke in <code>edge://extensions</code> bei ihr auf <b>Neu laden</b> (Reload).</p>""",
+    },
+    "es": {
+        "dir": "es/", "nav": ("Funciones", "Cómo funciona", "Novedades", "Ayuda", "♥ Apoyar"),
+        "anchors": ("features", "how", "news", "help", "support"),
+        "home": "← Inicio", "version": "Versión",
+        "footer": ("Condiciones de uso", "Privacidad", "Licencias"),
+        "terms_title": "Condiciones de uso",
+        "terms_lead": "El mismo texto que el instalador te pide aceptar (también en la aplicación: Ayuda → Contratos y licencias).",
+        "terms_desc": "Condiciones de uso y contrato de licencia de Video Download.",
+        "privacy_title": "Privacidad", "privacy_lead": "Ni el sitio web ni la aplicación recogen datos sobre ti.",
+        "privacy_desc": "Política de privacidad del sitio web y de la aplicación Video Download.",
+        "privacy_site": "Este sitio web", "privacy_app": "La aplicación",
+        "privacy_items": (
+            "El sitio web no tiene cookies, analítica, anuncios ni formularios, y no guarda nada en tu navegador.",
+            "El sitio web está alojado en GitHub Pages (GitHub, Inc.). Como cualquier servidor, GitHub registra datos técnicos "
+            f"como tu dirección IP por seguridad y funcionamiento; consulta la <a href=\"{GITHUB_PRIVACY}\">declaración de "
+            "privacidad de GitHub</a>.",
+            "El instalador se descarga de GitHub (mismas condiciones que arriba).",
+            "El botón de apoyo lleva a PayPal; PayPal solo recibe datos cuando lo abres, según sus propias normas.",
+            "<b>Los informes de problemas</b> van a GitHub Issues y son <b>públicos</b> (hace falta una cuenta de GitHub). El "
+            "informe de la aplicación acorta los enlaces al nombre del sitio y oculta tu nombre de usuario de Windows; no añadas "
+            "contraseñas, cookies ni datos personales.",
+            "<b>Las contribuciones</b> las procesa PayPal. Como destinatario, el autor ve lo que PayPal muestra de cada pago "
+            "(p. ej., el nombre y el correo de quien paga) y lo usa solo para la contabilidad, nunca para publicidad ni nada más.",
+        ),
+        "licenses_title": "Licencias",
+        "licenses_lead": "Video Download usa el siguiente software de otros autores. Se rige por sus propias licencias; los textos "
+                         "completos están en la carpeta <code>licenses</code> junto a la aplicación instalada.",
+        "licenses_desc": "Licencias de los componentes que usa Video Download.",
+        "licenses_cols": ("Componente", "Licencia"),
+        "licenses_note": "FFmpeg tiene licencia GPL-3.0: el código fuente de la compilación exacta del instalador está en los "
+                         "enlaces de arriba, y también puedes pedir una copia del código fuente.",
+        "ext_title": "Extensión para el navegador",
+        "ext_desc": "Cómo instalar la extensión Video Download para Edge y Chrome.",
+        "ext_body": f"""<p class="lead">Con la extensión descargas el vídeo en reproducción con un clic, o con clic derecho en un enlace
+o un vídeo. Funciona en Firefox, Edge y Chrome.</p>
+<h2>Instalación (una vez)</h2>
+<ol>
+<li>Instala la aplicación (la extensión viene con ella).</li>
+<li>En el navegador abre <code>edge://extensions</code> (Edge) o <code>chrome://extensions</code> (Chrome).</li>
+<li>Activa el <b>Modo de desarrollador</b> (Developer mode) y pulsa <b>Cargar descomprimida</b> (Load unpacked).</li>
+<li>Elige la carpeta <code>{html.escape(INSTALL_DIR)}</code>. Lo más fácil: en la aplicación abre
+Ayuda → Descargar desde el navegador, pulsa <b>Copiar la ruta de la carpeta</b> y pégala (Ctrl+V) en la ventana de selección de carpeta.
+En la misma ventana hay un botón que abre la página de extensiones en Edge o Chrome.</li>
+<li>Fija el icono de Video Download en la barra del navegador (icono de pieza de puzle → fijar).</li>
+</ol>
+<div class="box">Por ahora la extensión se carga a mano, porque las tiendas de extensiones no aceptan programas como este.
+Por eso el navegador a veces recuerda el «Modo de desarrollador»; es lo esperado y la extensión funciona con normalidad.</div>
+<h2>Uso</h2>
+<ul>
+<li>Reproduce un vídeo en la página y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o
+<b>Descargar como MP3</b>.</li>
+<li>Clic derecho en un enlace o vídeo: <b>Descargar este enlace con Video Download</b> o <b>…como MP3</b>.</li>
+<li>Si la aplicación no está abierta, el clic la inicia.</li>
+<li>Las emisiones en directo y el vídeo protegido con DRM no se descargan.</li>
+</ul>
+<h2>Después de actualizar la aplicación</h2>
+<p>Si la extensión deja de responder, pulsa <b>Volver a cargar</b> (Reload) junto a ella en <code>edge://extensions</code>.</p>""",
+    },
+    "fr": {
+        "dir": "fr/", "nav": ("Fonctions", "Comment ça marche", "Nouveautés", "Aide", "♥ Soutenir"),
+        "anchors": ("features", "how", "news", "help", "support"),
+        "home": "← Accueil", "version": "Version",
+        "footer": ("Conditions d'utilisation", "Confidentialité", "Licences"),
+        "terms_title": "Conditions d'utilisation",
+        "terms_lead": "Le même texte que le programme d'installation vous demande d'accepter (aussi dans l'application : "
+                      "Aide → Contrats et licences).",
+        "terms_desc": "Conditions d'utilisation et contrat de licence de Video Download.",
+        "privacy_title": "Confidentialité", "privacy_lead": "Ni le site ni l'application ne collectent de données sur vous.",
+        "privacy_desc": "Politique de confidentialité du site et de l'application Video Download.",
+        "privacy_site": "Ce site", "privacy_app": "L'application",
+        "privacy_items": (
+            "Le site n'a ni cookies, ni mesure d'audience, ni publicité, ni formulaire, et n'enregistre rien dans votre navigateur.",
+            "Le site est hébergé sur GitHub Pages (GitHub, Inc.). Comme tout serveur, GitHub enregistre des données techniques "
+            "telles que votre adresse IP pour la sécurité et le fonctionnement ; voir la "
+            f"<a href=\"{GITHUB_PRIVACY}\">déclaration de confidentialité de GitHub</a>.",
+            "Le programme d'installation est téléchargé depuis GitHub (mêmes conditions que ci-dessus).",
+            "Le bouton de soutien mène à PayPal ; PayPal ne reçoit des données que lorsque vous l'ouvrez, selon ses propres règles.",
+            "<b>Les signalements de problème</b> vont dans GitHub Issues et sont <b>publics</b> (un compte GitHub est nécessaire). "
+            "Le rapport de l'application raccourcit les liens au nom du site et masque votre nom d'utilisateur Windows ; "
+            "n'ajoutez ni mots de passe, ni cookies, ni données personnelles.",
+            "<b>Les contributions</b> sont traitées par PayPal. En tant que destinataire, l'auteur voit ce que PayPal affiche pour "
+            "chaque paiement (p. ex. le nom et l'e-mail du payeur) et ne l'utilise que pour la comptabilité, jamais pour la "
+            "publicité ni autre chose.",
+        ),
+        "licenses_title": "Licences",
+        "licenses_lead": "Video Download utilise les logiciels suivants d'autres auteurs. Leurs propres licences s'appliquent ; "
+                         "les textes complets se trouvent dans le dossier <code>licenses</code> à côté de l'application installée.",
+        "licenses_desc": "Licences des composants utilisés par Video Download.",
+        "licenses_cols": ("Composant", "Licence"),
+        "licenses_note": "FFmpeg est sous licence GPL-3.0 : le code source de la version exacte incluse dans le programme "
+                         "d'installation se trouve aux liens ci-dessus, et une copie du code source est aussi disponible sur demande.",
+        "ext_title": "Extension pour le navigateur",
+        "ext_desc": "Comment installer l'extension Video Download pour Edge et Chrome.",
+        "ext_body": f"""<p class="lead">Avec l'extension, vous téléchargez la vidéo en cours d'un clic, ou d'un clic droit sur un lien
+ou une vidéo. Fonctionne dans Firefox, Edge et Chrome.</p>
+<h2>Installation (une seule fois)</h2>
+<ol>
+<li>Installez l'application (l'extension est fournie avec).</li>
+<li>Dans le navigateur, ouvrez <code>edge://extensions</code> (Edge) ou <code>chrome://extensions</code> (Chrome).</li>
+<li>Activez le <b>Mode développeur</b> (Developer mode) et cliquez sur <b>Charger l'extension non empaquetée</b> (Load unpacked).</li>
+<li>Choisissez le dossier <code>{html.escape(INSTALL_DIR)}</code>. Le plus simple : dans l'application, ouvrez
+Aide → Télécharger depuis le navigateur, cliquez sur <b>Copier le chemin du dossier</b> et collez-le (Ctrl+V) dans la fenêtre de choix
+du dossier. La même fenêtre a un bouton qui ouvre la page des extensions dans Edge ou Chrome.</li>
+<li>Épinglez l'icône de Video Download dans la barre du navigateur (icône de pièce de puzzle → épingler).</li>
+</ol>
+<div class="box">Pour l'instant, l'extension se charge à la main, car les boutiques d'extensions n'acceptent pas ce genre de
+programme. Le navigateur peut donc rappeler le « Mode développeur » ; c'est normal et l'extension fonctionne quand même.</div>
+<h2>Utilisation</h2>
+<ul>
+<li>Lancez une vidéo sur la page et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou
+<b>Télécharger en MP3</b>.</li>
+<li>Clic droit sur un lien ou une vidéo : <b>Télécharger ce lien avec Video Download</b> ou <b>…en MP3</b>.</li>
+<li>Si l'application n'est pas lancée, le clic la démarre.</li>
+<li>Les directs et les vidéos protégées par DRM ne sont pas téléchargés.</li>
+</ul>
+<h2>Après une mise à jour de l'application</h2>
+<p>Si l'extension ne répond plus, cliquez sur <b>Actualiser</b> (Reload) à côté d'elle dans <code>edge://extensions</code>.</p>""",
     },
 }
 LANGUAGES = tuple(TEXTS)
@@ -332,6 +508,15 @@ MOCK_LABELS = {
     "bs": ("Dodaci", "Developer mode", "Load unpacked", "Pack extension", "Izaberi folder", "Izaberi folder",
            "Pomoć → Preuzimanje iz browsera", "Kopiraj putanju foldera", "Otvori dodatke u Edge-u",
            ""),
+    "de": ("Erweiterungen", "Entwicklermodus", "Entpackte Erweiterung laden", "Erweiterung packen", "Ordner auswählen",
+           "Ordner auswählen", "Hilfe → Aus dem Browser herunterladen", "Ordnerpfad kopieren",
+           "Erweiterungen in Edge öffnen", ""),
+    "es": ("Extensiones", "Modo de desarrollador", "Cargar descomprimida", "Empaquetar extensión", "Seleccionar carpeta",
+           "Seleccionar carpeta", "Ayuda → Descargar desde el navegador", "Copiar la ruta de la carpeta",
+           "Abrir extensiones en Edge", ""),
+    "fr": ("Extensions", "Mode développeur", "Charger l'extension non empaquetée", "Empaqueter l'extension",
+           "Sélectionner un dossier", "Sélectionner un dossier", "Aide → Télécharger depuis le navigateur",
+           "Copier le chemin du dossier", "Ouvrir les extensions dans Edge", ""),
 }
 MOCK_FOLDER = r"...\Programs\Video Download\extension"
 
@@ -372,6 +557,25 @@ FIREFOX_TEXT = {
             "Otvori ovu stranicu u Firefoxu 140 ili novijem i klikni <b>Dodaj u Firefox</b>.",
             "Firefox pita da dozvoliš instalaciju s ovog sajta: klikni <b>Continue to installation</b>, pa <b>Add</b>.",
             "Prikvači ikonu Video Download (ikona slagalice → pribadača).")),
+    "de": ("Firefox", "Installation in Firefox – ohne Entwicklermodus. Die Erweiterung ist von Mozilla signiert und "
+           "aktualisiert sich selbst.", "Zu Firefox hinzufügen",
+           ("Installiere zuerst die App (die Erweiterung arbeitet mit ihr).",
+            "Öffne diese Seite in Firefox 140 oder neuer und klicke auf <b>Zu Firefox hinzufügen</b>.",
+            "Firefox fragt, ob die Installation von dieser Seite erlaubt werden soll: erlaube sie und bestätige mit "
+            "<b>Hinzufügen</b>.",
+            "Hefte das Symbol von Video Download an (Puzzle-Symbol → Anheften).")),
+    "es": ("Firefox", "Instalación en Firefox, sin modo de desarrollador. La extensión está firmada por Mozilla y se "
+           "actualiza sola.", "Añadir a Firefox",
+           ("Instala primero la aplicación (la extensión trabaja con ella).",
+            "Abre esta página en Firefox 140 o posterior y pulsa <b>Añadir a Firefox</b>.",
+            "Firefox pide permiso para instalar desde este sitio: permítelo y confirma con <b>Añadir</b>.",
+            "Fija el icono de Video Download (icono de pieza de puzle → fijar).")),
+    "fr": ("Firefox", "Installation dans Firefox, sans mode développeur. L'extension est signée par Mozilla et se met à "
+           "jour toute seule.", "Ajouter à Firefox",
+           ("Installez d'abord l'application (l'extension fonctionne avec elle).",
+            "Ouvrez cette page dans Firefox 140 ou plus récent et cliquez sur <b>Ajouter à Firefox</b>.",
+            "Firefox demande d'autoriser l'installation depuis ce site : autorisez-la puis confirmez avec <b>Ajouter</b>.",
+            "Épinglez l'icône de Video Download (icône de pièce de puzzle → épingler).")),
 }
 
 
@@ -412,6 +616,10 @@ def _replace(text: str, name: str, value: str, newlines: bool = False) -> str:
     return pattern.sub(lambda m: m.group(1) + sep + value + sep + m.group(2), text, count=1)
 
 
+_LANG_SWITCH = re.compile(r'<span class="lang">.*?</span>', re.DOTALL)
+_ALTERNATES = re.compile(r'(?:<link rel="alternate" hreflang="[a-z]+" href="[^"]*">\n)+')
+
+
 def current_size_mb(index: str) -> int | None:
     match = re.search(r"<!-- version -->\w+ [\d.]+ · (\d+) MB<!-- /version -->", index)
     return int(match.group(1)) if match else None
@@ -426,6 +634,8 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         size = size_mb or current_size_mb(index) or 0
         index = _replace(index, "version", f"{TEXTS[lang]['version']} {__version__} · {size} MB")
         index = _replace(index, "news", news_html(lang), newlines=True)
+        index = _LANG_SWITCH.sub(lambda _m: switcher(lang), index, count=1)
+        index = _ALTERNATES.sub(lambda _m: alternates(lang, "index.html") + "\n", index, count=1)
         pages[f"{prefix}index.html"] = index
         pages[f"{prefix}terms.html"] = page_terms(lang)
         pages[f"{prefix}privacy.html"] = page_privacy(lang)

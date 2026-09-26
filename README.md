@@ -38,7 +38,7 @@ izdanjima repoa `abnps/video-download` (GitHub → Releases).
 
 Zvanični sajt: https://abnps.github.io/video-download/ (folder `site/`, objavljuje ga GitHub Actions
 pri svakoj izmjeni). Poslije izmjene changeloga ili pravnih tekstova: `python tools/build_site.py`.
-Glavni jezik je engleski, bosanski je u `site/bs/`. Lokalni pregled: `python -m http.server 8765 --directory site`.
+Glavni jezik je engleski; bosanski, njemački, španski i francuski su u `site/bs/`, `site/de/`, `site/es/`, `site/fr/`. Lokalni pregled: `python -m http.server 8765 --directory site`.
 
 ## Izdavanje nove verzije
 

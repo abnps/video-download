@@ -1,4 +1,4 @@
-"""Zvanični sajt (site/, engleski glavni, bosanski u site/bs/): usklađen s aplikacijom, bez zabranjenih
+"""Zvanični sajt (site/, engleski glavni, ostali jezici u site/<jezik>/): usklađen s aplikacijom, bez zabranjenih
 izraza i pokvarenih linkova."""
 
 import posixpath
@@ -36,7 +36,10 @@ class SiteTest(unittest.TestCase):
 
     def test_front_pages_show_current_version_news_and_smartscreen_help(self):
         for lang, label, more_info, run_anyway in (("en", "Version", "More info", "Run anyway"),
-                                                   ("bs", "Verzija", "Više informacija", "Ipak pokreni")):
+                                                   ("bs", "Verzija", "Više informacija", "Ipak pokreni"),
+                                                   ("de", "Version", "Weitere Informationen", "Trotzdem ausführen"),
+                                                   ("es", "Versión", "Más información", "Ejecutar de todas formas"),
+                                                   ("fr", "Version", "Informations complémentaires", "Exécuter quand même")):
             index = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
             with self.subTest(lang=lang):
                 self.assertIn(f"<html lang=\"{lang}\">", index)
@@ -47,17 +50,25 @@ class SiteTest(unittest.TestCase):
                 self.assertIn(build_site.INSTALLER_URL, index)
                 self.assertIn(more_info, index)
                 self.assertIn(run_anyway, index)
+                self.assertIn(f"screenshot-light-{lang}.png", index)
+                # prekidač jezika i hreflang vode na sve jezike
+                for other in build_site.LANGUAGES:
+                    self.assertIn(f'hreflang="{other}"', index)
+                    self.assertIn(f">{other.upper()}</a>", index)
 
     def test_no_forbidden_words_on_promo_pages(self):
         self.assertEqual(build_site.forbidden_words(self.pages), [])
         self.assertTrue(build_site.forbidden_words({"index.html": "<p>Preuzmi sa YouTube-a</p>"}))
         self.assertTrue(build_site.forbidden_words({"bs/extension.html": "<p>bypass protection</p>"}))
+        self.assertTrue(build_site.forbidden_words({"de/index.html": "<p>Schutz umgehen</p>"}))
+        self.assertTrue(build_site.forbidden_words({"fr/index.html": "<p>contourner la protection</p>"}))
         self.assertFalse(build_site.forbidden_words({"index.html": "<p>the site reader yt-dlp</p>"}))
 
     def test_legal_pages_carry_the_same_text_as_the_app(self):
         self.assertIn("vlastitih videa", self.pages["bs/terms.html"])
         self.assertIn("TERMS OF USE".title().split()[0], self.pages["terms.html"])
-        for prefix in ("", "bs/"):
+        self.assertEqual(set(build_site.LANGUAGES), {"en", "bs", "de", "es", "fr"})  # isti jezici kao u programu
+        for prefix in (build_site.TEXTS[lang]["dir"] for lang in build_site.LANGUAGES):
             self.assertIn("GitHub Pages", self.pages[prefix + "privacy.html"])
             self.assertIn("GPL-3.0", self.pages[prefix + "licenses.html"])
 
