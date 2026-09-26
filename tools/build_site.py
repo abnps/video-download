@@ -28,6 +28,8 @@ NEWS_COUNT = 3
 REPO = "https://github.com/abnps/video-download"
 CONTACT_EMAIL = "abnpsdev@gmail.com"  # javni kontakt projekta (Ahmedova odluka 26.9.2026); lični e-mail nikad
 INSTALLER_URL = f"{REPO}/releases/latest/download/VideoDownload-Setup.exe"
+PUBLIC_URL = "https://abnps.github.io/video-download/"  # javna adresa sajta (kanonske adrese, mapa sajta)
+OG_LOCALES = {"en": "en_US", "bs": "bs_BA", "de": "de_DE", "es": "es_ES", "fr": "fr_FR"}
 # Mac (beta): stalna kopija .dmg-a uz posljednje izdanje (kao VideoDownload-Setup.exe za Windows).
 MAC_DMG_URL = f"{REPO}/releases/latest/download/VideoDownload-macOS-arm64.dmg"
 ISSUE_URL = f"{REPO}/issues/new?template=problem.yml"
@@ -66,6 +68,7 @@ TEXTS = {
             "<b>Contributions</b> are processed by PayPal. As the recipient, the author sees what PayPal shows for every "
             "payment (e.g. the payer's name and e-mail) and uses it only for bookkeeping, never for advertising or "
             "anything else.",
+            "The <b>Share</b> button uses your device's own sharing or opens the network you choose; that network gets the link only when you click it.",
             "Messages to <b>abnpsdev@gmail.com</b> (the project's contact address, a Gmail mailbox at Google) are used "
             "only to reply to you and are never passed on or used for anything else.",
         ),
@@ -123,6 +126,7 @@ The browser may therefore remind you about “Developer mode”; that is expecte
             "skraćuje linkove na ime sajta i skriva tvoje korisničko ime u Windowsu; ne dodaj lozinke, kolačiće ni lične podatke.",
             "<b>Prilozi</b> idu preko PayPal-a. Kao primalac, autor vidi ono što PayPal pokazuje za svaku uplatu (npr. ime i "
             "e-mail uplatioca) i koristi to samo za evidenciju, nikad za reklame ni bilo šta drugo.",
+            "Dugme <b>Podijeli</b> koristi dijeljenje tvog uređaja ili otvara mrežu koju izabereš; ta mreža dobija link tek kad klikneš.",
             "Poruke na <b>abnpsdev@gmail.com</b> (kontakt adresa projekta, Gmail sanduče kod Google-a) koriste se samo za "
             "odgovor tebi i nikad se ne prosljeđuju niti koriste za bilo šta drugo.",
         ),
@@ -181,6 +185,7 @@ Browser zato ponekad podsjeti na „Developer mode"; to je očekivano i dodatak 
             "Passwörter, Cookies oder persönlichen Daten hinzu.",
             "<b>Beiträge</b> werden über PayPal abgewickelt. Als Empfänger sieht der Autor, was PayPal zu jeder Zahlung anzeigt "
             "(z. B. Name und E-Mail des Zahlenden), und nutzt es nur für die Buchhaltung, nie für Werbung oder etwas anderes.",
+            "Der Knopf <b>Teilen</b> nutzt das Teilen deines Geräts oder öffnet das gewählte Netzwerk; dieses erhält den Link erst, wenn du klickst.",
             "Nachrichten an <b>abnpsdev@gmail.com</b> (die Kontaktadresse des Projekts, ein Gmail-Postfach bei Google) "
             "werden nur genutzt, um dir zu antworten, und nie weitergegeben oder anders verwendet.",
         ),
@@ -241,6 +246,7 @@ Der Browser erinnert deshalb manchmal an den „Entwicklermodus“; das ist norm
             "contraseñas, cookies ni datos personales.",
             "<b>Las contribuciones</b> las procesa PayPal. Como destinatario, el autor ve lo que PayPal muestra de cada pago "
             "(p. ej., el nombre y el correo de quien paga) y lo usa solo para la contabilidad, nunca para publicidad ni nada más.",
+            "El botón <b>Compartir</b> usa el uso compartido de tu dispositivo o abre la red que elijas; esa red recibe el enlace solo cuando pulsas.",
             "Los mensajes a <b>abnpsdev@gmail.com</b> (la dirección de contacto del proyecto, un buzón de Gmail en Google) "
             "se usan solo para responderte y nunca se comparten ni se usan para nada más.",
         ),
@@ -303,6 +309,7 @@ Por eso el navegador a veces recuerda el «Modo de desarrollador»; es lo espera
             "<b>Les contributions</b> sont traitées par PayPal. En tant que destinataire, l'auteur voit ce que PayPal affiche pour "
             "chaque paiement (p. ex. le nom et l'e-mail du payeur) et ne l'utilise que pour la comptabilité, jamais pour la "
             "publicité ni autre chose.",
+            "Le bouton <b>Partager</b> utilise le partage de votre appareil ou ouvre le réseau choisi ; ce réseau ne reçoit le lien que lorsque vous cliquez.",
             "Les messages envoyés à <b>abnpsdev@gmail.com</b> (l'adresse de contact du projet, une boîte Gmail chez "
             "Google) servent uniquement à vous répondre et ne sont jamais transmis ni utilisés à d'autres fins.",
         ),
@@ -350,6 +357,7 @@ HEAD = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} — Video Download</title>
 <meta name="description" content="{description}">
+{meta}
 <link rel="icon" href="{up}assets/icon.png">
 <link rel="stylesheet" href="{up}assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
@@ -370,6 +378,65 @@ HEAD = """<!doctype html>
 <main class="doc">
 <a class="back" href="index.html">{home}</a>
 """
+
+
+def page_url(lang: str, page: str = "index.html") -> str:
+    """Javna adresa stranice; početna bez „index.html" (tako je i Google vodi)."""
+    return PUBLIC_URL + TEXTS[lang]["dir"] + ("" if page == "index.html" else page)
+
+
+def meta_tags(lang: str, page: str, title: str, description: str) -> str:
+    """Kanonska adresa i pregled za dijeljenje (WhatsApp, Viber, Facebook…): naslov, opis i snimak programa."""
+    esc = html.escape
+    image = f"{PUBLIC_URL}assets/screenshot-light-{lang}.png"
+    tags = [f'<link rel="canonical" href="{page_url(lang, page)}">',
+            '<meta property="og:type" content="website">',
+            '<meta property="og:site_name" content="Video Download">',
+            f'<meta property="og:title" content="{esc(title)}">',
+            f'<meta property="og:description" content="{esc(description)}">',
+            f'<meta property="og:url" content="{page_url(lang, page)}">',
+            f'<meta property="og:image" content="{image}">',
+            '<meta property="og:image:width" content="860">',
+            '<meta property="og:image:height" content="470">',
+            f'<meta property="og:locale" content="{OG_LOCALES[lang]}">',
+            '<meta name="twitter:card" content="summary_large_image">']
+    return "\n".join(tags)
+
+
+def software_jsonld(lang: str) -> str:
+    """Strukturirani podaci za Google: besplatan program za Windows i Mac (može dati bogatiji rezultat pretrage)."""
+    import json
+
+    home = site_home.HOME[lang]
+    data = {
+        "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Video Download",
+        "description": home["description"], "url": page_url(lang), "inLanguage": lang,
+        "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, macOS 13",
+        "softwareVersion": __version__, "downloadUrl": INSTALLER_URL, "isAccessibleForFree": True,
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+        "image": f"{PUBLIC_URL}assets/icon.png", "screenshot": f"{PUBLIC_URL}assets/screenshot-light-{lang}.png",
+        "availableLanguage": ["en", "bs", "de", "es", "fr"],
+    }
+    text = json.dumps(data, ensure_ascii=False, indent=1).replace("</", "<\\/")
+    return f'<script type="application/ld+json">\n{text}\n</script>'
+
+
+SITEMAP_PAGES = ("index.html", "extension.html", "terms.html", "privacy.html", "licenses.html")
+
+
+def sitemap_xml() -> str:
+    """Mapa sajta za Google/Bing: svaka stranica na svakom jeziku, uz veze među jezicima (hreflang)."""
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
+    for page in SITEMAP_PAGES:
+        for lang in LANGUAGES:
+            lines.append(f"  <url><loc>{page_url(lang, page)}</loc>")
+            for other in LANGUAGES:
+                lines.append(f'    <xhtml:link rel="alternate" hreflang="{other}" href="{page_url(other, page)}"/>')
+            lines.append(f'    <xhtml:link rel="alternate" hreflang="x-default" href="{page_url("en", page)}"/>')
+            lines.append("  </url>")
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
 
 
 def footer_html(lang: str) -> str:
@@ -457,8 +524,10 @@ def switcher(lang: str, page: str = "index.html") -> str:
 
 
 def alternates(lang: str, page: str) -> str:
-    return "\n".join(f'<link rel="alternate" hreflang="{other}" href="{_up(lang)}{TEXTS[other]["dir"]}{page}">'
-                     for other in LANGUAGES)
+    # Google traži pune adrese; x-default = engleska (glavna) verzija.
+    links = [f'<link rel="alternate" hreflang="{other}" href="{page_url(other, page)}">' for other in LANGUAGES]
+    links.append(f'<link rel="alternate" hreflang="x-default" href="{page_url("en", page)}">')
+    return "\n".join(links)
 
 
 def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
@@ -466,7 +535,8 @@ def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="index.html#{anchor}">{label}</a>'
                     for anchor, label in zip(site_home.ANCHORS, site_home.HOME[lang]["nav"]))
     head = HEAD.format(lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
-                       nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name))
+                       nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name),
+                       meta=meta_tags(lang, name, f"{title} — Video Download", description))
     return (head + body + "\n</main>\n\n" + footer_html(lang) +
             f'\n\n<script src="{_up(lang)}assets/site.js" defer></script>\n</body>\n</html>\n')
 
@@ -709,11 +779,14 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             lang, up=_up(lang), switcher=switcher(lang), alternates=alternates(lang, "index.html"),
             footer=footer_html(lang), news=news_html(lang),
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
-            installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang])
+            installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
+            meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])
+            + "\n" + software_jsonld(lang), page_url=page_url(lang))
         pages[f"{prefix}terms.html"] = page_terms(lang)
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
         pages[f"{prefix}extension.html"] = page_extension(lang)
+    pages["sitemap.xml"] = sitemap_xml()
     return pages
 
 

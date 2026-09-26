@@ -30,6 +30,7 @@ DEMO_ROWS = (("12:34", 46.0, 9.6, "#3d7a5a", "#2b5a82", "best", False),
 
 HOME = {
     "en": {
+        "share": ('Share', 'Copy link', 'Link copied', 'Tell a friend who needs it.'),
         "title": "Video Download — free video and audio downloader for Windows and Mac",
         "description": "Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
@@ -94,6 +95,7 @@ HOME = {
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
     },
     "bs": {
+        "share": ('Podijeli', 'Kopiraj link', 'Link je kopiran', 'Javi prijatelju kome treba.'),
         "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
         "description": "Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
@@ -160,6 +162,7 @@ HOME = {
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
     },
     "de": {
+        "share": ('Teilen', 'Link kopieren', 'Link kopiert', 'Erzähl es jemandem, der es braucht.'),
         "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
         "description": "Kostenlose App für Windows und Mac zum Herunterladen von Video (MP4) und Audio (MP3). Ohne Werbung, ohne Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
@@ -230,6 +233,7 @@ HOME = {
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
     },
     "es": {
+        "share": ('Compartir', 'Copiar enlace', 'Enlace copiado', 'Cuéntaselo a quien le sirva.'),
         "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
         "description": "Aplicación gratuita para Windows y Mac para descargar vídeo (MP4) y audio (MP3). Sin anuncios, sin rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
@@ -299,6 +303,7 @@ HOME = {
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
     },
     "fr": {
+        "share": ('Partager', 'Copier le lien', 'Lien copié', "Parlez-en à quelqu'un qui en a besoin."),
         "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
         "description": "Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
@@ -404,8 +409,39 @@ def demo_script(lang: str) -> str:
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
+SHARE_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+              'stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>'
+              '<path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>')
+
+
+def share_html(lang: str, url: str) -> str:
+    """Dugme „Podijeli": na telefonu dijeljenje uređaja, na računaru meni s običnim linkovima (bez tuđih skripti;
+    mreža dobija link tek kad posjetilac sam klikne)."""
+    from urllib.parse import quote
+
+    label, copy, copied, hint = HOME[lang]["share"]
+    title = HOME[lang]["title"]
+    u, text = quote(url, safe=""), quote(f"{title} {url}", safe="")
+    links = (("WhatsApp", f"https://wa.me/?text={text}"), ("Viber", f"viber://forward?text={text}"),
+             ("Telegram", f"https://t.me/share/url?url={u}&text={quote(title, safe='')}"),
+             ("Facebook", f"https://www.facebook.com/sharer/sharer.php?u={u}"),
+             ("X", f"https://x.com/intent/post?url={u}&text={quote(title, safe='')}"),
+             ("E-mail", f"mailto:?subject={quote(title, safe='')}&body={u}"))
+    items = "\n".join(f'              <a href="{html.escape(href)}" target="_blank" rel="noopener noreferrer">{name}</a>'
+                      for name, href in links)
+    return f"""            <div class="share" data-url="{html.escape(url)}" data-title="{html.escape(title)}" data-copied="{html.escape(copied)}">
+              <button class="btn ghost share-btn" type="button" aria-haspopup="true" aria-expanded="false" title="{html.escape(hint)}">{SHARE_ICON} {label}</button>
+              <div class="share-menu" hidden>
+              <button type="button" data-copy>{copy}</button>
+{items}
+              <span class="share-note" role="status" aria-live="polite"></span>
+              </div>
+            </div>"""
+
+
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
-           installer_url: str, mac_url: str, issue_url: str, mac_text: tuple) -> str:
+           installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
+           page_url: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="#{anchor}">{label}</a>'
@@ -438,6 +474,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(h["title"])}</title>
 <meta name="description" content="{esc(h["description"])}">
+{meta}
 <link rel="icon" href="{up}assets/icon.png">
 <link rel="stylesheet" href="{up}assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
@@ -608,7 +645,10 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <div class="kicker" style="color:var(--pink)">{s_kicker}</div>
           <h2>{s_h2}</h2>
           <p class="sub" style="margin-bottom:26px">{s_text}</p>
-          <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">{s_btn}</a>
+          <div class="support-actions">
+            <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">{s_btn}</a>
+{share_html(lang, page_url)}
+          </div>
         </div>
         <div class="qr"><img src="{up}assets/support-qr.png" alt="{esc(s_qr)}">{s_scan}</div>
       </div>

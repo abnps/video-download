@@ -349,6 +349,23 @@ footer a { color: var(--muted); }
   .app { transform: none; }
 }
 
+/* ---------- dugme „Podijeli" ---------- */
+.support-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.share { position: relative; }
+.share-btn svg { width: 18px; height: 18px; }
+.share-menu {
+  position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 20; min-width: 220px; padding: 8px; border-radius: 14px;
+  background: var(--card-solid); border: 1px solid var(--line); box-shadow: var(--shadow-2); animation: rowin .25s var(--ease);
+}
+.share-menu[hidden] { display: none; }
+.share-menu a, .share-menu button {
+  display: block; width: 100%; text-align: left; padding: 9px 12px; border-radius: 8px; border: 0; background: none;
+  font: inherit; font-size: 15px; color: var(--text); cursor: pointer;
+}
+.share-menu a:hover, .share-menu button:hover { background: var(--bg-2); text-decoration: none; }
+.share-menu [data-copy] { font-weight: 600; border-bottom: 1px solid var(--line); border-radius: 8px 8px 0 0; margin-bottom: 4px; }
+.share-note { display: block; padding: 4px 12px; color: var(--green); font-size: 13px; min-height: 1em; }
+
 /* ---------- podstranice (uslovi, privatnost, licence, dodatak) ---------- */
 .doc { max-width: 820px; margin: 0 auto; padding: 56px 24px 88px; }
 .doc h1 { font-size: clamp(32px, 4vw, 44px); line-height: 1.1; letter-spacing: -.03em; margin: 0 0 10px; }

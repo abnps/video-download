@@ -24,6 +24,7 @@ class SiteTest(unittest.TestCase):
 
     def test_every_language_has_every_page(self):
         expected = {build_site.TEXTS[lang]["dir"] + page for lang in build_site.LANGUAGES for page in PAGES}
+        expected.add("sitemap.xml")
         self.assertEqual(set(self.pages), expected)
         self.assertEqual(build_site.LANGUAGES[0], "en")  # engleski je glavni jezik (korijen sajta)
 
@@ -85,6 +86,8 @@ class SiteTest(unittest.TestCase):
 
     def test_contact_email_on_every_page_and_no_personal_email(self):
         for name, text in self.pages.items():
+            if not name.endswith(".html"):
+                continue
             with self.subTest(page=name):
                 self.assertIn(f'href="mailto:{build_site.CONTACT_EMAIL}"', text)
                 self.assertNotIn("bisevac", text.lower())  # lični e-mail nikad na sajtu
@@ -110,6 +113,38 @@ class SiteTest(unittest.TestCase):
             for anchor in re.findall(r'href="(?:index\.html)?#([a-z-]+)"', text):
                 with self.subTest(page=name, anchor=anchor):
                     self.assertIn(anchor, ids)
+
+    def test_search_engines_get_sitemap_canonical_urls_and_app_description(self):
+        import json
+
+        sitemap = self.pages["sitemap.xml"]
+        self.assertEqual(sitemap.count("<url>"), len(build_site.LANGUAGES) * len(PAGES))
+        self.assertIn('hreflang="x-default"', sitemap)
+        for name, text in self.pages.items():
+            if not name.endswith(".html"):
+                continue
+            with self.subTest(page=name):
+                canonical = re.search(r'<link rel="canonical" href="([^"]+)">', text).group(1)
+                self.assertTrue(canonical.startswith(build_site.PUBLIC_URL))
+                self.assertIn(f"<loc>{canonical}</loc>", sitemap)  # svaka stranica je u mapi sajta
+                self.assertIn('property="og:image"', text)
+                for href in re.findall(r'hreflang="[^"]+" href="([^"]+)"', text):
+                    self.assertTrue(href.startswith("https://"))  # Google traži pune adrese
+        for lang in build_site.LANGUAGES:
+            home = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            data = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', home, re.S).group(1))
+            self.assertEqual(data["@type"], "SoftwareApplication")
+            self.assertEqual(data["softwareVersion"], __version__)
+            self.assertEqual(data["offers"]["price"], "0")
+
+    def test_share_button_uses_plain_links_only(self):
+        for lang in build_site.LANGUAGES:
+            home = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            with self.subTest(lang=lang):
+                self.assertIn('class="share"', home)
+                self.assertIn("https://wa.me/?text=", home)
+                self.assertIn("data-copy", home)
+                self.assertNotIn("<iframe", home)  # nikakvi „widgeti" društvenih mreža
 
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():

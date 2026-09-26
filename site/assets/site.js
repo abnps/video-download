@@ -131,6 +131,25 @@
     $(".ext", browser).addEventListener("click", () => browser.classList.toggle("open"));
   }
 
+  // „Podijeli": na telefonu ugrađeno dijeljenje uređaja, inače meni s linkovima i kopiranjem.
+  $$(".share").forEach((box) => {
+    const button = $(".share-btn", box), menu = $(".share-menu", box), note = $(".share-note", box);
+    const toggle = (open) => { menu.hidden = !open; button.setAttribute("aria-expanded", open); };
+    button.addEventListener("click", async () => {
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+        try { await navigator.share({ title: box.dataset.title, url: box.dataset.url }); return; } catch (e) { /* otkazano */ }
+      }
+      toggle(menu.hidden);
+    });
+    $("[data-copy]", box).addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(box.dataset.url); } catch (e) { prompt("", box.dataset.url); return; }
+      note.textContent = box.dataset.copied;
+      setTimeout(() => { note.textContent = ""; }, 2500);
+    });
+    document.addEventListener("click", (e) => { if (!box.contains(e.target)) toggle(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") toggle(false); });
+  });
+
   // Kartice Windows / Mac u uputstvu za instalaciju (strelice mijenjaju karticu).
   const tabs = $$('[role="tab"]');
   const select = (tab) => {
