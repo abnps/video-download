@@ -15,9 +15,9 @@ import time
 import urllib.request
 from pathlib import Path
 
-from PySide6.QtCore import QLocale, QObject, QPoint, QSettings, QSize, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtCore import QLocale, QObject, QPoint, QRect, QSettings, QSize, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import (
-    QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPalette, QPixmap,
+    QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPainter, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox,
@@ -65,6 +65,34 @@ RATE_CHOICES = (0, 1, 2, 5, 10)
 PARALLEL_CHOICES = (1, 2, 3, 4)
 DEFAULT_PARALLEL = 2
 
+
+
+def _needs_adult_ok(item) -> bool:
+    return item.adult and not item.adult_ok
+
+
+def adult_thumbnail(pixmap: QPixmap) -> QPixmap:
+    """Sličica sadržaja 18+: jako zamućena (smanjena pa uvećana) i s oznakom „18+", da se ne vidi preko ramena."""
+    if pixmap.isNull():
+        return pixmap
+    tiny = pixmap.scaled(8, 5, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+    result = tiny.scaled(pixmap.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+    painter = QPainter(result)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    # veličina prema sličici: red je prikazuje umanjenu, pa oznaka mora ostati čitljiva
+    badge = QRect(0, 0, max(44, result.width() * 2 // 5), max(24, result.height() * 2 // 5))
+    badge.moveCenter(result.rect().center())
+    painter.setPen(Qt.PenStyle.NoPen)
+    painter.setBrush(QColor(0, 0, 0, 170))
+    painter.drawRoundedRect(badge, badge.height() // 4, badge.height() // 4)
+    font = painter.font()
+    font.setBold(True)
+    font.setPixelSize(max(13, badge.height() * 3 // 5))
+    painter.setFont(font)
+    painter.setPen(QColor("white"))
+    painter.drawText(badge, int(Qt.AlignmentFlag.AlignCenter), "18+")
+    painter.end()
+    return result
 
 
 def default_output_dir(platform: str = sys.platform) -> str:
@@ -412,6 +440,7 @@ class MainWindow(QMainWindow):
         self._running = False  # „Preuzmi" je pokrenut: red se obrađuje dok ima stavki koje čekaju
         # „Preuzmi" kliknut dok se link još čita: red kreće čim čitanje završi (inače bi klik propao).
         self._start_when_read = False
+        self._ask_adult = self._ask_adult_dialog  # testovi ga zamjenjuju odgovorom bez prozora
         self._manual: list[int] = []  # pojedinačno pokrenute stavke (dugme u redu, browser)
         self._remove_when_done: set[int] = set()
         self._download_jobs: dict[int, DownloadJob] = {}  # stavka -> posao u toku
@@ -806,7 +835,7 @@ class MainWindow(QMainWindow):
                                    row.get("output_dir") or self._output_dir, row.get("subfolder"),
                                    http_headers=row.get("http_headers") or {},
                                    filename_title=row.get("filename_title"), thumbnail=row.get("thumbnail"),
-                                   duration=row.get("duration"))
+                                   duration=row.get("duration"), adult=bool(row.get("adult")))
             item.custom_format = bool(row.get("custom_format"))
             section = row.get("section")
             if isinstance(section, (list, tuple)) and len(section) == 2:
@@ -1129,13 +1158,15 @@ class MainWindow(QMainWindow):
             return
         subfolder = result.title if result.is_playlist else None
         preset_key = preset or self.preset_combo.currentData()
+        added = []
         for entry in result.entries:
             item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
-                                   thumbnail=entry.thumbnail, duration=entry.duration, **access)
+                                   thumbnail=entry.thumbnail, duration=entry.duration, adult=entry.adult, **access)
             item.custom_format = bool(preset)  # format tražen iz dodatka ostaje na toj stavci
             self._append_row(item)
-            if auto_start:
-                self._manual.append(item.id)
+            added.append(item)
+        if auto_start and self._confirm_adult(added):  # iz browsera: kreće odmah, 18+ tek uz potvrdu
+            self._manual.extend(item.id for item in added if item.adult_ok or not item.adult)
         if result.is_playlist:
             self._set_status(tr("status.playlist_added", title=result.title, count=len(result.entries)))
         elif auto_start:
@@ -1196,7 +1227,7 @@ class MainWindow(QMainWindow):
             postponed = []
             while self._manual and item is None:
                 candidate = self._queue.get(self._manual.pop(0))
-                if candidate is None or candidate.status != ItemStatus.WAITING:
+                if candidate is None or candidate.status != ItemStatus.WAITING or _needs_adult_ok(candidate):
                     continue
                 if self._same_output_running(candidate):
                     postponed.append(candidate.id)  # čeka da isti posao završi, pa kreće
@@ -1205,8 +1236,8 @@ class MainWindow(QMainWindow):
             self._manual[:0] = postponed
             if item is None and self._running:
                 item = next((candidate for candidate in self._queue.items()
-                             if candidate.status == ItemStatus.WAITING and not self._same_output_running(candidate)),
-                            None)
+                             if candidate.status == ItemStatus.WAITING and not self._same_output_running(candidate)
+                             and not _needs_adult_ok(candidate)), None)
             if item is None:
                 if not self._download_jobs:
                     self._running = False
@@ -1252,6 +1283,7 @@ class MainWindow(QMainWindow):
         if item is not None and self._retry_with_id_name(item, result):
             return
         if item is not None:
+            item.adult_ok = False  # preuzimanje je gotovo: sljedeće (npr. „Pokušaj ponovo") opet traži potvrdu 18+
             item.status = result.status
             item.filepath = result.filepath
             item.message = MESSAGE_EXISTS if result.already_existed else result.message
@@ -1343,6 +1375,7 @@ class MainWindow(QMainWindow):
             return
         self._running = True
         self._set_status("")
+        self._confirm_adult([item for item in self._queue.items() if item.status == ItemStatus.WAITING])
         self._start_next()
 
     def _cancel_active(self, item_id: int | None = None) -> bool:
@@ -1417,6 +1450,8 @@ class MainWindow(QMainWindow):
     def _stop_all(self) -> None:
         self._running = False
         self._start_when_read = False
+        for item in self._queue.items():
+            item.adult_ok = False  # svaki novi početak 18+ sadržaja ponovo traži potvrdu
         self._manual.clear()
         for item in self._queue.items():
             if item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY:
@@ -1442,6 +1477,8 @@ class MainWindow(QMainWindow):
         if item.status == ItemStatus.DONE:
             converted = item.convert_path if item.convert_path and os.path.isfile(item.convert_path) else None
             reveal(converted or item.filepath or _item_folder(item))
+            return
+        if not self._confirm_adult([item]):
             return
         if item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED):
             self._queue.retry(item_id)
@@ -1547,10 +1584,13 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _retry_failed(self) -> None:
+        retried = []
         for item in self._queue.items():
             if self._queue.retry(item.id):
                 self._refresh_row(item)
                 self._manual.append(item.id)
+                retried.append(item)
+        self._confirm_adult(retried)
         self._start_next()
 
     @Slot()
@@ -1604,7 +1644,7 @@ class MainWindow(QMainWindow):
         cached = self._thumbnail_cache.get(url)
         if cached is not None:
             self._thumbnail_cache.move_to_end(url)
-            self._rows[item_id].thumbnail.set_pixmap(cached)
+            self._set_row_thumbnail(item_id, cached)
             return
         waiters = self._thumbnail_waiters.setdefault(url, [])
         waiters.append(item_id)
@@ -1619,9 +1659,34 @@ class MainWindow(QMainWindow):
         while len(self._thumbnail_cache) > THUMBNAIL_CACHE_MAX:  # duga lista ne drži sve sličice u memoriji
             self._thumbnail_cache.popitem(last=False)
         for item_id in self._thumbnail_waiters.pop(url, []):
-            row = self._rows.get(item_id)
-            if row is not None:
-                row.thumbnail.set_pixmap(pixmap)
+            self._set_row_thumbnail(item_id, pixmap)
+
+    def _set_row_thumbnail(self, item_id: int, pixmap: QPixmap) -> None:
+        row, item = self._rows.get(item_id), self._queue.get(item_id)
+        if row is not None:
+            row.thumbnail.set_pixmap(adult_thumbnail(pixmap) if item is not None and item.adult else pixmap)
+
+    def _confirm_adult(self, items) -> bool:
+        """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti."""
+        pending = [item for item in items if _needs_adult_ok(item)]
+        if not pending:
+            return True
+        if self._ask_adult(pending):
+            for item in pending:
+                item.adult_ok = True
+            return True
+        self._set_status(tr("adult.skipped"))
+        return False
+
+    def _ask_adult_dialog(self, items) -> bool:
+        box = QMessageBox(QMessageBox.Icon.Warning, tr("adult.title"),
+                          tr("adult.one", title=items[0].title) if len(items) == 1 else tr("adult.many", count=len(items)),
+                          parent=self)
+        confirm = box.addButton(tr("adult.confirm"), QMessageBox.ButtonRole.AcceptRole)
+        cancel = box.addButton(tr("adult.cancel"), QMessageBox.ButtonRole.RejectRole)
+        box.setDefaultButton(cancel)  # Enter ne potvrđuje slučajno
+        box.exec()
+        return box.clickedButton() is confirm
 
     @Slot()
     def _open_folder(self) -> None:

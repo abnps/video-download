@@ -43,6 +43,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   briše odmah poslije čitanja/preuzimanja. Vrijednosti kolačića nikad u log, poruke,
   `repr`, podešavanja ili server log testa. Ne proširivati bez Ahmedove potvrde.
 - DRM se ne zaobilazi; ekstenzija ga samo prepoznaje i označava.
+- Sadržaj 18+ (Ahmed 26.9.2026): video s yt-dlp `age_limit >= 18` traži potvrdu „Imam 18 ili više godina" PRI
+  SVAKOM preuzimanju (dugme Preuzmi, dugme u redu, Pokušaj ponovo, dodatak); više videa = jedan prozor; bez
+  potvrde video čeka, ostali idu. Potvrda (`adult_ok`) važi samo za to preuzimanje i nikad se ne čuva na disku;
+  oznaka (`adult`) se čuva u redu. Sličica 18+ je uvijek zamućena s oznakom „18+". NE ide u bilješke o verziji
+  (Ahmedova odluka). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita
+  (blokada 18+, po želji PIN) je sljedeći korak, poslije ovoga.
 
 ## Okruženje
 

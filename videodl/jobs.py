@@ -42,6 +42,9 @@ class QueueItem:
     convert_message: str = ""
     # Kolačići prijave iz browsera: samo u memoriji, nikad u podešavanjima ni na disku.
     cookies: tuple = field(default=(), repr=False)
+    # Sadržaj 18+: svako preuzimanje traži potvrdu; adult_ok važi samo za to jedno preuzimanje.
+    adult: bool = False
+    adult_ok: bool = False
 
 
 class DownloadQueue:
@@ -52,10 +55,10 @@ class DownloadQueue:
     def add(self, url: str, title: str, preset_key: str, output_dir: str,
             subfolder: str | None = None, *, http_headers: dict[str, str] | None = None,
             filename_title: str | None = None, thumbnail: str | None = None,
-            duration: float | None = None, cookies: tuple = ()) -> QueueItem:
+            duration: float | None = None, cookies: tuple = (), adult: bool = False) -> QueueItem:
         item = QueueItem(self._next_id, url, title, preset_key, output_dir, subfolder,
                          http_headers=dict(http_headers or {}), filename_title=filename_title,
-                         thumbnail=thumbnail, duration=duration, cookies=tuple(cookies))
+                         thumbnail=thumbnail, duration=duration, cookies=tuple(cookies), adult=adult)
         self._next_id += 1
         self._items.append(item)
         return item

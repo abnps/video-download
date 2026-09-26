@@ -22,6 +22,15 @@ class Entry:
     title: str
     thumbnail: str | None = None
     duration: float | None = None
+    adult: bool = False  # yt-dlp age_limit >= 18 (sajt ga označio kao sadržaj samo za odrasle)
+
+
+ADULT_AGE = 18
+
+
+def is_adult(info: dict) -> bool:
+    age = info.get("age_limit")
+    return isinstance(age, int) and not isinstance(age, bool) and age >= ADULT_AGE
 
 
 @dataclass(frozen=True)
@@ -84,7 +93,8 @@ def _title(info: dict, fallback: str) -> str:
 def _entry(info: dict, url: str) -> Entry:
     duration = info.get("duration")
     return Entry(url, _title(info, url), pick_thumbnail(info),
-                 float(duration) if isinstance(duration, (int, float)) and duration > 0 else None)
+                 float(duration) if isinstance(duration, (int, float)) and duration > 0 else None,
+                 adult=is_adult(info))
 
 
 def pick_thumbnail(info: dict) -> str | None:

@@ -16,7 +16,7 @@ from .jobs import ItemStatus, QueueItem
 MAX_HISTORY = 500
 FORMAT = 1  # verzija formata fajlova; noviji format se čita koliko se može, ali se ne prepisuje slijepo
 _QUEUE_FIELDS = ("url", "title", "preset_key", "output_dir", "subfolder", "status", "message", "filepath",
-                 "http_headers", "filename_title", "thumbnail", "duration", "custom_format", "section")
+                 "http_headers", "filename_title", "thumbnail", "duration", "custom_format", "section", "adult")
 # Stanja koja nema smisla pamtiti: gotovo ide u istoriju, a prekinuto se ne vraća samo od sebe.
 _KEEP_STATUSES = (ItemStatus.WAITING, ItemStatus.ACTIVE, ItemStatus.FAILED)
 
@@ -79,6 +79,8 @@ def load_queue(path: Path) -> list[dict]:
             clean["duration"] = duration
         if isinstance(row.get("custom_format"), bool):
             clean["custom_format"] = row["custom_format"]
+        if isinstance(row.get("adult"), bool):
+            clean["adult"] = row["adult"]
         section = row.get("section")
         if isinstance(section, (list, tuple)) and len(section) == 2:
             start, end = _number(section[0]), _number(section[1])
