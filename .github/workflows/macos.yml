@@ -17,9 +17,10 @@ jobs:
     env:
       QT_QPA_PLATFORM: offscreen
       PYTHONIOENCODING: utf-8
-      VIDEODL_BUILD_DIR: ${{ runner.temp }}/build
     steps:
       - uses: actions/checkout@v4
+      - name: Build folder (van repoa)
+        run: echo "VIDEODL_BUILD_DIR=$RUNNER_TEMP/build" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
