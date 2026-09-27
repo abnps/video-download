@@ -527,6 +527,9 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 <meta name="description" content="{esc(h["description"])}">
 {meta}
 <link rel="icon" href="{up}assets/icon.png">
+<link rel="apple-touch-icon" href="{up}assets/icon.png">
+<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="{up}assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
@@ -570,11 +573,9 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       </div>
 
       <div class="stage" data-reveal style="--d:.15s">
-        <div class="stage-label">
-          <span class="badge">{h["a11y"][0]}</span>
-          <button class="anim-toggle" type="button" aria-pressed="false" data-pause="{esc(h["a11y"][1])}"
-                  data-play="{esc(h["a11y"][2])}">{PAUSE_ICON}<span>{h["a11y"][1]}</span></button>
-        </div>
+        <!-- Ahmed 27.9.2026: bez vidljive oznake i dugmeta iznad demoa; pauza ostaje za tastaturu (vidi se tek na Tab). -->
+        <button class="anim-toggle" type="button" aria-pressed="false" data-pause="{esc(h["a11y"][1])}"
+                data-play="{esc(h["a11y"][2])}">{PAUSE_ICON}<span>{h["a11y"][1]}</span></button>
         <div class="app" role="region" aria-label="{esc(h["a11y"][6])}">
           <div class="app-title" aria-hidden="true"><img src="{up}assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
           <div class="app-tools">
@@ -714,7 +715,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {share_html(lang, page_url, up)}
           </div>
         </div>
-        <div class="qr"><img src="{up}assets/support-qr.png" alt="{esc(s_qr)}">{s_scan}</div>
+        <div class="qr"><img src="{up}assets/support-qr.png" alt="{esc(s_qr)}" width="500" height="561" loading="lazy">{s_scan}</div>
       </div>
     </div>
   </section>

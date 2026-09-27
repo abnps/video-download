@@ -25,6 +25,8 @@ class SiteTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.pages = build_site.build()
+        # 404 ima apsolutne putanje (/video-download/…) i ne pripada nijednom jeziku; ima svoj test.
+        cls.not_found = cls.pages.pop("404.html")
 
     def test_every_language_has_every_page(self):
         expected = {build_site.TEXTS[lang]["dir"] + page for lang in build_site.LANGUAGES for page in PAGES}
@@ -169,7 +171,7 @@ class SiteTest(unittest.TestCase):
                 self.assertIn('aria-pressed="false"', index)
                 self.assertIn('class="rows" aria-hidden="true"', index)
                 self.assertIn('role="status"', index)
-                self.assertIn(site_home.HOME[lang]["a11y"][0], index)  # vidljiva oznaka „Demonstracija"
+                self.assertNotIn('class="stage-label"', index)  # Ahmed: bez oznake i dugmeta iznad demoa
         css = (build_site.SITE / "assets" / "site.css").read_text(encoding="utf-8")
         self.assertIn(".paused", css)
 
@@ -214,6 +216,18 @@ class SiteTest(unittest.TestCase):
                 self.assertIn('<dialog class="share-sheet"', home)  # prozor kao u aplikacijama, ne padajući meni
                 self.assertEqual(home.count('class="sheet-app"'), 6)  # WhatsApp, Viber, Telegram, Facebook, X, E-mail
                 self.assertNotIn("<iframe", home)  # nikakvi „widgeti" društvenih mreža
+
+    def test_not_found_page_links_every_language_with_absolute_paths(self):
+        page = self.not_found
+        self.assertEqual((build_site.SITE / "404.html").read_text(encoding="utf-8"), page)
+        self.assertIn('name="robots" content="noindex"', page)
+        for target in re.findall(r'(?:href|src)="([^"]+)"', page):
+            with self.subTest(target=target):
+                self.assertTrue(target.startswith("/video-download/"), target)
+                path = target.removeprefix("/video-download/") or "index.html"
+                self.assertTrue((build_site.SITE / (path + "index.html" if path.endswith("/") else path)).is_file())
+        for lang in build_site.LANGUAGES:
+            self.assertIn(f'<div lang="{lang}"', page)
 
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():

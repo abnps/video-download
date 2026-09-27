@@ -319,17 +319,14 @@ footer a { color: var(--muted); }
 .app { max-width: 100%; }
 .app-tools .fmt { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ---------- oznaka demonstracije i pauza animacije ---------- */
-.stage-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.stage-label .badge {
-  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
-  border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px;
-}
+/* ---------- pauza animacije: nevidljiva dok je tastatura ne fokusira (Tab) ---------- */
+.stage { position: relative; }
 .anim-toggle {
-  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; color: var(--muted);
-  background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 8px; cursor: pointer;
+  position: absolute; top: -44px; right: 0; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 13px; color: var(--text); background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 12px 4px 8px; cursor: pointer;
 }
-.anim-toggle:hover { color: var(--text); }
+.anim-toggle:not(:focus-visible) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); }
 .anim-toggle svg { width: 14px; height: 14px; }
 .anim-toggle .i-play, .anim-toggle[aria-pressed="true"] .i-pause { display: none; }
 .anim-toggle[aria-pressed="true"] .i-play { display: inline; }

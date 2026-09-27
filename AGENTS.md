@@ -62,6 +62,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 ## Jezici, instaler i ažuriranje
 
+- Greške yt-dlp-a se u redu i statusnoj traci prikazuju razumljivo (`widgets.friendly_error`, ključevi
+  `error.friendly.*`); original ostaje u oblačiću i u izvještaju o problemu. Nepoznata greška ostaje kakva jeste.
 - 5 jezika (bs, en, de, es, fr): svaki novi tekst ide u `videodl/i18n.py` i, za popup,
   u `extension/i18n.js`, na svih 5 jezika; testovi padaju ako prevod fali.
   Tekstovi iz radnih niti su ključevi prevoda, prevode se tek pri prikazu.
@@ -84,8 +86,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   NE piše ručno: pravi je šablon `tools/site_home.py` (HOME = tekstovi po jeziku; nazivi dugmadi u demou iz
   `videodl/i18n.py`), ostale stranice `tools/build_site.py` (TEXTS). Stil i animacije: `site/assets/site.css` +
   `site.js` (bez biblioteka, kolačića i tuđih skripti; `prefers-reduced-motion` gasi pokret; sadržaj vidljiv i bez JS).
-  Demo je označen kao demonstracija, ima dugme za pauzu i čitaču ekrana javlja samo dodano/završeno; na uskom
-  ekranu meni ☰ (i na podstranicama). Tvrdnje na sajtu moraju biti tačne za oba sistema (potpisana
+  Demo NEMA vidljivu oznaku ni dugme iznad prozora (Ahmed 27.9.2026: „ukloniti"); pauza postoji samo za
+  tastaturu (vidi se na Tab), čitaču ekrana demo javlja samo dodano/završeno; na uskom
+  ekranu meni ☰ (i na podstranicama). Sajt ima 404.html (apsolutne putanje /video-download/). Tvrdnje na sajtu moraju biti tačne za oba sistema (potpisana
   ažuriranja samo na Windowsu, Mac za sada ručno) — pregled 26.9.2026.
   Vodiči (27.9.2026, SEO po uzoru na konkurenciju, bez imena platformi): `tools/site_guides.py` → `<slug>.html` +
   `guides.html` na svih 5 jezika; nazivi menija/dugmadi se pune iz `videodl/i18n.py`, tvrdnje moraju odgovarati

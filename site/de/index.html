@@ -46,6 +46,9 @@
 }
 </script>
 <link rel="icon" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="../assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/">
@@ -104,11 +107,9 @@
       </div>
 
       <div class="stage" data-reveal style="--d:.15s">
-        <div class="stage-label">
-          <span class="badge">Demo</span>
-          <button class="anim-toggle" type="button" aria-pressed="false" data-pause="Animation anhalten"
-                  data-play="Animation abspielen"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg><span>Animation anhalten</span></button>
-        </div>
+        <!-- Ahmed 27.9.2026: bez vidljive oznake i dugmeta iznad demoa; pauza ostaje za tastaturu (vidi se tek na Tab). -->
+        <button class="anim-toggle" type="button" aria-pressed="false" data-pause="Animation anhalten"
+                data-play="Animation abspielen"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg><span>Animation anhalten</span></button>
         <div class="app" role="region" aria-label="Demo des Programmfensters (kein echter Download)">
           <div class="app-title" aria-hidden="true"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
           <div class="app-tools">
@@ -309,7 +310,7 @@
             </div>
           </div>
         </div>
-        <div class="qr"><img src="../assets/support-qr.png" alt="QR-Code für einen PayPal-Beitrag">Mit der Handykamera scannen</div>
+        <div class="qr"><img src="../assets/support-qr.png" alt="QR-Code für einen PayPal-Beitrag" width="500" height="561" loading="lazy">Mit der Handykamera scannen</div>
       </div>
     </div>
   </section>

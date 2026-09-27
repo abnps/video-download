@@ -1768,7 +1768,7 @@ class MainWindow(QMainWindow):
 
     def _note_error(self, message: str) -> None:
         if message:
-            self._errors.append(f"{datetime.datetime.now():%H:%M:%S} {display_message(message)}")
+            self._errors.append(f"{datetime.datetime.now():%H:%M:%S} {display_message(message, friendly=False)}")
             del self._errors[:-diagnostics.MAX_ERRORS]
 
     @Slot()

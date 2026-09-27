@@ -361,6 +361,9 @@ HEAD = """<!doctype html>
 <meta name="description" content="{description}">
 {meta}
 <link rel="icon" href="{up}assets/icon.png">
+<link rel="apple-touch-icon" href="{up}assets/icon.png">
+<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="{up}assets/site.css">
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
@@ -792,6 +795,43 @@ def page_changelog(lang: str) -> str:
     return _page(lang, "changelog.html", title, description, "\n".join(parts))
 
 
+NOT_FOUND = {
+    "en": ("Page not found", "This page doesn't exist or has moved.", "Home"),
+    "bs": ("Stranica nije pronađena", "Ova stranica ne postoji ili je premještena.", "Početna"),
+    "de": ("Seite nicht gefunden", "Diese Seite gibt es nicht oder sie wurde verschoben.", "Startseite"),
+    "es": ("Página no encontrada", "Esta página no existe o se ha movido.", "Inicio"),
+    "fr": ("Page introuvable", "Cette page n'existe pas ou a été déplacée.", "Accueil"),
+}
+
+
+def page_not_found() -> str:
+    base = "/video-download/"
+    blocks = "\n".join(
+        f'<div lang="{lang}" class="box"><h2 style="margin-top:0">{html.escape(title)}</h2><p>{html.escape(text)}</p>'
+        f'<p><a class="btn" href="{base}{TEXTS[lang]["dir"]}">{html.escape(home)}</a> '
+        f'<a class="btn ghost" href="{base}{TEXTS[lang]["dir"]}guides.html">{html.escape(site_guides.HUB[lang][0])}</a></p></div>'
+        for lang, (title, text, home) in NOT_FOUND.items())
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — Video Download</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{base}assets/icon.png">
+<link rel="stylesheet" href="{base}assets/site.css">
+</head>
+<body>
+<main class="doc">
+<p><a class="brand" href="{base}"><img src="{base}assets/icon.png" alt="" width="28" height="28"> Video Download</a></p>
+<h1>404</h1>
+{blocks}
+</main>
+</body>
+</html>
+"""
+
+
 def news_html(lang: str) -> str:
     cards = []
     for version, date, items in changelog.entries(lang)[:NEWS_COUNT]:
@@ -833,6 +873,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
         pages[f"{prefix}extension.html"] = page_extension(lang)
     pages["sitemap.xml"] = sitemap_xml()
+    pages["404.html"] = page_not_found()
     return pages
 
 

@@ -1,6 +1,7 @@
 """Widgeti glavnog prozora: prazan ekran za lijepljenje linka i red preuzimanja."""
 
 import os
+import re
 
 from PySide6.QtCore import (
     QEasingCurve, QElapsedTimer, QPoint, QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal,
@@ -43,8 +44,39 @@ def format_size(size: int | None) -> str:
     raise AssertionError("nedostižno")
 
 
-def display_message(message: str) -> str:
-    """Poruka stavke za prikaz: posebne vrijednosti se prevode, greške yt-dlp-a ostaju kakve jesu."""
+# Najčešće greške yt-dlp-a (engleski, tehnički) → razumljiva poruka na jeziku programa. Redoslijed je bitan:
+# „potvrdi da nisi robot" i „samo punoljetni" su i one „sign in", pa idu prije opšte prijave.
+_FRIENDLY_ERRORS = (
+    ("bot", re.compile(r"confirm you.?re not a bot|not a robot", re.I)),
+    ("age", re.compile(r"confirm your age|age[- ]restricted|inappropriate for some users", re.I)),
+    ("private", re.compile(r"private video|video is private", re.I)),
+    ("geo", re.compile(r"available in your country|geo[- ]?restrict|blocked in your country", re.I)),
+    ("login", re.compile(r"login required|log in to|sign in to|registered users|members[- ]only|requires authentication", re.I)),
+    ("unavailable", re.compile(r"video unavailable|has been removed|no longer available|video does not exist|HTTP Error 404", re.I)),
+    ("forbidden", re.compile(r"HTTP Error 403", re.I)),
+    ("rate", re.compile(r"HTTP Error 429|too many requests", re.I)),
+    ("format", re.compile(r"requested format is not available", re.I)),
+    ("disk", re.compile(r"no space left on device|\[Errno 28\]|not enough space on the disk", re.I)),
+    ("permission", re.compile(r"permission denied|\[Errno 13\]|access is denied", re.I)),
+    ("unsupported", re.compile(r"unsupported url", re.I)),
+    ("network", re.compile(r"unable to download webpage|getaddrinfo failed|name or service not known|timed out"
+                           r"|connection (?:reset|refused|aborted)|network is unreachable|remotedisconnected"
+                           r"|failed to resolve|temporary failure in name resolution", re.I)),
+)
+
+
+def friendly_error(message: str) -> str | None:
+    """Razumljiva poruka za poznatu grešku yt-dlp-a; None ako je greška nepoznata (tada ostaje original)."""
+    for key, pattern in _FRIENDLY_ERRORS:
+        if pattern.search(message or ""):
+            return tr(f"error.friendly.{key}", help=tr("menu.help").replace("&", ""),
+                      update=tr("menu.update_ytdlp"))
+    return None
+
+
+def display_message(message: str, friendly: bool = True) -> str:
+    """Poruka stavke za prikaz: posebne vrijednosti se prevode, poznate greške yt-dlp-a postaju razumljive
+    (friendly=False vraća original, npr. za oblačić i izvještaj o problemu)."""
     if message == MESSAGE_DRM:
         return tr("error.drm")
     if message == MESSAGE_LIVE:
@@ -59,7 +91,7 @@ def display_message(message: str) -> str:
         return tr("row.retrying")
     if message == MESSAGE_EXISTS:
         return tr("row.exists")
-    return message
+    return (friendly and friendly_error(message)) or message
 
 
 def set_state(widget: QWidget, state: str) -> None:
@@ -504,7 +536,7 @@ class QueueRow(QFrame):
         self.play_button.setToolTip(tr("row.play_audio") if get_preset(item.preset_key).is_audio else tr("row.play_video"))
         self.remove_button.setToolTip(tr("row.cancel_remove_tip") if active else tr("row.remove_tip"))
         self.status_label.setToolTip("\n".join(p for p in (item.filepath, item.convert_path) if p)
-                                     or display_message(item.message))
+                                     or display_message(item.message, friendly=False))  # original greške
 
     def show_progress(self, text: str, fraction: float | None, phase: str = "video") -> None:
         """`phase`: "video" ili "audio" (boja trake); bez procenta traka klizi (npr. ffmpeg radi)."""
