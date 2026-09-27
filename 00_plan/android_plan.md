@@ -30,6 +30,9 @@ bez praćenja, na 5 jezika — kao desktop verzija.
   ali 1–2 sedmice više posla i više održavanja (svaka nova verzija Pythona/ffmpeg-a je naša briga).
 - Moja preporuka: **B** ako Android treba ostati pod istom licencom kao desktop; **A** ako je Ahmedu u redu
   da Android verzija bude otvoren kod (GPL).
+- **ODLUKA (Ahmed, 27.9.2026): B** — vlastito pakovanje (Chaquopy za Python/yt-dlp, ffmpeg izgrađen bez
+  GPL dijelova, npr. bez x264; H.264 kroz Android MediaCodec). Biblioteka youtubedl-android (GPL-3.0) se NE
+  koristi, ni njen kod; licenca ostaje kao za desktop (licencni ugovor na 5 jezika).
 
 ## Faze
 
@@ -87,7 +90,7 @@ bez praćenja, na 5 jezika — kao desktop verzija.
 
 ## Šta treba od Ahmeda prije početka
 
-1. Odluka A (GPL, brže) ili B (naša licenca, sporije).
+1. ~~Odluka A ili B~~ — B (27.9.2026).
 2. Android telefon za probu: proizvođač i verzija Androida.
 3. Spremnost na Googleovu provjeru programera (lični podaci Googleu).
 4. Potvrda redoslijeda: Android tek poslije roditeljske kontrole i Mac probe, ili prije.
