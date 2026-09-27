@@ -23,7 +23,7 @@ android {
         }
     }
 
-    // Pravi ključ je van projekta (%USERPROFILE%\.videodlndroid-release.*), nikad u repou; bez njega (npr. CI)
+    // Pravi ključ je van projekta (%USERPROFILE%/.videodl/android-release.*), nikad u repou; bez njega (npr. CI)
     // release se pravi nepotpisan. Isti ključ zauvijek: Android ne prima ažuriranje potpisano drugim ključem.
     val keyFile = File(System.getProperty("user.home"), ".videodl/android-release.properties")
     val releaseKey = keyFile.takeIf { it.isFile }?.let { file -> Properties().apply { file.inputStream().use(::load) } }
