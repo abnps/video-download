@@ -19,6 +19,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -172,6 +173,25 @@ def check_app() -> None:
         raise SystemExit(f"Host način ne odgovara: {host.stdout[:200]!r} {host.stderr[-400:]!r}")
 
 
+def create_dmg(root: Path) -> None:
+    """Najviše tri pokušaja samo kad macOS prijavi zauzet resurs; ostale greške se ne prikrivaju."""
+    command = ["hdiutil", "create", "-volname", APP_NAME, "-srcfolder", str(root), "-ov", "-format", "UDZO", str(DMG)]
+    for attempt in range(3):
+        try:
+            result = run(command, capture_output=True, text=True, errors="replace", env={**os.environ, "LC_ALL": "C"})
+        except subprocess.CalledProcessError as error:
+            output = (error.stdout or "") + (error.stderr or "")
+            print(output, end="" if output.endswith("\n") else "\n", flush=True)
+            if attempt == 2 or "hdiutil: create failed - Resource busy" not in output:
+                raise
+            delay = 2 * (attempt + 1)
+            print(f"› macOS resurs je zauzet; ponovni pokušaj za {delay} s", flush=True)
+            time.sleep(delay)
+        else:
+            print((result.stdout or "") + (result.stderr or ""), end="", flush=True)
+            return
+
+
 def make_dmg() -> None:
     root = WORK / "dmg"
     shutil.rmtree(root, ignore_errors=True)
@@ -179,7 +199,7 @@ def make_dmg() -> None:
     run(["ditto", str(APP), str(root / APP.name)])  # ditto čuva potpis i atribute paketa
     (root / "Applications").symlink_to("/Applications")
     DMG.unlink(missing_ok=True)
-    run(["hdiutil", "create", "-volname", APP_NAME, "-srcfolder", str(root), "-ov", "-format", "UDZO", str(DMG)])
+    create_dmg(root)
     digest = hashlib.sha256(DMG.read_bytes()).hexdigest()
     Path(f"{DMG}.sha256").write_text(f"{digest}  {DMG.name}\n", encoding="ascii")
     print(f"DMG: {DMG} ({DMG.stat().st_size / 1024 / 1024:.0f} MB)\nSHA-256: {digest}", flush=True)

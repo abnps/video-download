@@ -501,7 +501,9 @@ class MainWindowTest(unittest.TestCase):
         self.assertIn("2", window.summary_label.text())
 
         self.release.set()  # oba završavaju, treći kreće sam
-        self.assertTrue(wait_until(lambda: third.status == ItemStatus.DONE))
+        # Poslovi završavaju nezavisno: treći može završiti prije prvog ili drugog.
+        self.assertTrue(wait_until(lambda: all(item.status == ItemStatus.DONE for item in (first, second, third))
+                                   and not window._download_jobs))
         self.assertEqual(window._download_jobs, {})
 
     def test_stop_cancels_every_running_download(self):
