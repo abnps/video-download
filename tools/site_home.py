@@ -33,7 +33,7 @@ HOME = {
         "promise": ('No account', 'No daily limit', 'Your links never reach us'),
         "a11y": ('Demo', 'Pause animation', 'Play animation', 'Menu', 'Added: {t}', 'Finished: {t}', 'Demo of the app window (not a real download)'),
         "share": ('Share', 'Copy', 'Copied', 'Tell a friend who needs it.', 'Share Video Download', 'More…', 'Close'),
-        "title": "ABNPS Video Download — free video and audio downloader for Windows and Mac",
+        "title": "Video Download — free video and audio downloader for Windows and Mac",
         "description": "Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
         "download_short": "Download", "new": "New", "eyebrow": "<b>Mac version</b> in beta",
@@ -101,7 +101,7 @@ HOME = {
         "promise": ('Bez naloga', 'Bez dnevnog ograničenja', 'Tvoji linkovi ne idu nama'),
         "a11y": ('Demonstracija', 'Pauziraj animaciju', 'Pokreni animaciju', 'Meni', 'Dodano: {t}', 'Završeno: {t}', 'Demonstracija prozora programa (nije pravo preuzimanje)'),
         "share": ('Podijeli', 'Kopiraj', 'Kopirano', 'Javi prijatelju kome treba.', 'Podijeli Video Download', 'Više…', 'Zatvori'),
-        "title": "ABNPS Video Download — besplatan program za video i zvuk za Windows i Mac",
+        "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
         "description": "Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
         "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Mac verzija</b> u probnoj fazi",
@@ -171,7 +171,7 @@ HOME = {
         "promise": ('Kein Konto', 'Kein Tageslimit', 'Deine Links landen nicht bei uns'),
         "a11y": ('Demo', 'Animation anhalten', 'Animation abspielen', 'Menü', 'Hinzugefügt: {t}', 'Fertig: {t}', 'Demo des Programmfensters (kein echter Download)'),
         "share": ('Teilen', 'Kopieren', 'Kopiert', 'Erzähl es jemandem, der es braucht.', 'Video Download teilen', 'Mehr…', 'Schließen'),
-        "title": "ABNPS Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
+        "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
         "description": "Kostenlose App für Windows und Mac zum Herunterladen von Video (MP4) und Audio (MP3). Ohne Werbung, ohne Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
         "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Mac-Version</b> in der Beta",
@@ -245,7 +245,7 @@ HOME = {
         "promise": ('Sin cuenta', 'Sin límite diario', 'Tus enlaces no nos llegan'),
         "a11y": ('Demostración', 'Pausar animación', 'Reanudar animación', 'Menú', 'Añadido: {t}', 'Terminado: {t}', 'Demostración de la ventana del programa (no es una descarga real)'),
         "share": ('Compartir', 'Copiar', 'Copiado', 'Cuéntaselo a quien le sirva.', 'Compartir Video Download', 'Más…', 'Cerrar'),
-        "title": "ABNPS Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
+        "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
         "description": "Aplicación gratuita para Windows y Mac para descargar vídeo (MP4) y audio (MP3). Sin anuncios, sin rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
         "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Versión para Mac</b> en beta",
@@ -318,7 +318,7 @@ HOME = {
         "promise": ('Sans compte', 'Sans limite quotidienne', 'Vos liens ne nous parviennent pas'),
         "a11y": ('Démonstration', "Mettre l'animation en pause", "Relancer l'animation", 'Menu', 'Ajouté : {t}', 'Terminé : {t}', 'Démonstration de la fenêtre du programme (pas un vrai téléchargement)'),
         "share": ('Partager', 'Copier', 'Copié', "Parlez-en à quelqu'un qui en a besoin.", 'Partager Video Download', 'Plus…', 'Fermer'),
-        "title": "ABNPS Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
+        "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
         "description": "Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
         "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Version Mac</b> en bêta",
@@ -479,7 +479,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
               <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="{esc(hint)}">{SHARE_ICON} {label}</button>
               <dialog class="share-sheet" aria-label="{esc(title)}">
                 <div class="sheet-head"><h3>{title}</h3><button class="sheet-close" type="button" aria-label="{esc(close)}">✕</button></div>
-                <div class="sheet-preview"><img src="{up}assets/icon.png" alt=""><div><b>ABNPS Video Download</b><span>{esc(url)}</span></div></div>
+                <div class="sheet-preview"><img src="{up}assets/icon.png" alt=""><div><b>Video Download</b><span>{esc(url)}</span></div></div>
                 <div class="sheet-grid">
 {apps}
             <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i>{SHARE_ICON}</i><span>{more}</span></button>
@@ -538,7 +538,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 
 <header>
   <div class="wrap bar">
-    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">ABNPS Video Download</a>
+    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">Video Download</a>
     <nav>
 {nav}
     </nav>

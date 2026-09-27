@@ -357,7 +357,7 @@ HEAD = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} — ABNPS Video Download</title>
+<title>{title} — Video Download</title>
 <meta name="description" content="{description}">
 {meta}
 <link rel="icon" href="{up}assets/icon.png">
@@ -372,7 +372,7 @@ HEAD = """<!doctype html>
 
 <header>
   <div class="wrap bar">
-    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">ABNPS Video Download</a>
+    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">Video Download</a>
     <nav>
 {nav}
     </nav>
@@ -401,7 +401,7 @@ def meta_tags(lang: str, page: str, title: str, description: str) -> str:
     image = f"{PUBLIC_URL}assets/screenshot-light-{lang}.png"
     tags = [f'<link rel="canonical" href="{page_url(lang, page)}">',
             '<meta property="og:type" content="website">',
-            '<meta property="og:site_name" content="ABNPS Video Download">',
+            '<meta property="og:site_name" content="Video Download">',
             f'<meta property="og:title" content="{esc(title)}">',
             f'<meta property="og:description" content="{esc(description)}">',
             f'<meta property="og:url" content="{page_url(lang, page)}">',
@@ -419,9 +419,7 @@ def software_jsonld(lang: str) -> str:
 
     home = site_home.HOME[lang]
     data = {
-        "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ABNPS Video Download",
-        "alternateName": "Video Download",
-        "publisher": {"@type": "Organization", "name": "ABNPS", "url": "https://github.com/abnps"},
+        "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Video Download",
         "description": home["description"], "url": page_url(lang), "inLanguage": lang,
         "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, macOS 13",
         "softwareVersion": __version__, "downloadUrl": INSTALLER_URL, "isAccessibleForFree": True,
@@ -456,7 +454,7 @@ def footer_html(lang: str) -> str:
     terms, privacy, licenses = TEXTS[lang]["footer"]
     return f"""<footer>
   <div class="wrap">
-    <span>© 2026 ABNPS Video Download</span>
+    <span>© 2026 Video Download</span>
     <div class="links">
       <a href="guides.html">{site_guides.HUB[lang][0]}</a><a href="changelog.html">{site_home.HOME[lang]["nav"][3]}</a>
       <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>
@@ -550,7 +548,7 @@ def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
                     for anchor, label in zip(site_home.ANCHORS, site_home.HOME[lang]["nav"]))
     head = HEAD.format(lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
                        nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name),
-                       meta=meta_tags(lang, name, f"{title} — ABNPS Video Download", description),
+                       meta=meta_tags(lang, name, f"{title} — Video Download", description),
                        menu=site_home.menu_button(lang), menu_label=html.escape(site_home.HOME[lang]["a11y"][3]))
     return (head + body + "\n</main>\n\n" + footer_html(lang) +
             f'\n\n<script src="{_up(lang)}assets/site.js" defer></script>\n</body>\n</html>\n')
@@ -818,14 +816,14 @@ def page_not_found() -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>404 — ABNPS Video Download</title>
+<title>404 — Video Download</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="{base}assets/icon.png">
 <link rel="stylesheet" href="{base}assets/site.css">
 </head>
 <body>
 <main class="doc">
-<p><a class="brand" href="{base}"><img src="{base}assets/icon.png" alt="" width="28" height="28"> ABNPS Video Download</a></p>
+<p><a class="brand" href="{base}"><img src="{base}assets/icon.png" alt="" width="28" height="28"> Video Download</a></p>
 <h1>404</h1>
 {blocks}
 </main>
