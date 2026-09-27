@@ -11,6 +11,7 @@ class VideoDownloadApp : Application() {
     override fun onCreate() {
         super.onCreate()
         if (!Python.isStarted()) Python.start(AndroidPlatform(this))
+        History.load(this)
         // Za sajtove koji traže pravi preglednik (TikTok): Chrome za računar, iste verzije kao Chrome ovog telefona.
         // Mobilni identitet TikTok odbije („Video not available") — isto kao yt-dlp na računaru, provjereno 27.9.2026.
         runCatching {

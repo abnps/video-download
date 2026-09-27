@@ -7,61 +7,66 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.net.Uri
 import android.os.IBinder
 import android.os.SystemClock
 import com.chaquo.python.PyException
 import com.chaquo.python.Python
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Preuzimanje u prvom planu (obavještenje s napretkom i dugmetom Zaustavi), da ga Android — i Samsungovo
- * uspavljivanje aplikacija — ne ugasi kad korisnik izađe iz aplikacije. Poslovi idu jedan za drugim.
+ * Preuzimanja u prvom planu (obavještenje s napretkom i dugmetom Zaustavi), da ih Android — i Samsungovo
+ * uspavljivanje aplikacija — ne ugasi kad korisnik izađe iz aplikacije. Poslovi idu jedan za drugim; svaki se
+ * može zaustaviti posebno (✕ na ekranu Preuzimanja ili Zaustavi u obavještenju za onaj koji radi).
  */
 class DownloadService : Service() {
     private val worker = Executors.newSingleThreadExecutor()
-    private val cancelled = AtomicBoolean(false)
+    private val cancelled: MutableSet<Long> = ConcurrentHashMap.newKeySet()
+    @Volatile private var running: Long? = null
     private var pending = 0
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_CANCEL) {
+            val id = intent.getLongExtra(EXTRA_ID, running ?: -1)
             synchronized(this) {
                 if (pending == 0) {
                     // Ništa ne radi (npr. zaostalo obavještenje): samo ga skloni.
                     getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
                     stopSelf()
                 } else {
-                    cancelled.set(true)
-                    notify(progressNotification(getString(R.string.status_stopping), null))
+                    cancelled += id
+                    if (id == running) notify(progressNotification(getString(R.string.status_stopping), null))
                 }
             }
             return START_NOT_STICKY
         }
-        val url = intent?.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
-        val isAudio = intent.getBooleanExtra(EXTRA_AUDIO, false)
-        startForeground(NOTIFICATION_ID, progressNotification(getString(R.string.status_reading), null),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        val job = intent?.getBundleExtra(EXTRA_JOB)?.let(Job::fromBundle) ?: return START_NOT_STICKY
+        startForeground(NOTIFICATION_ID, progressNotification(job.title, null), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         synchronized(this) { pending++ }
-        worker.execute { run(url, isAudio) }
+        Downloads.add(job)
+        worker.execute { run(job) }
         return START_NOT_STICKY
     }
 
-    private fun run(url: String, isAudio: Boolean) {
-        cancelled.set(false)
-        DownloadState.set(DownloadStatus.Reading)
-        val work = File(cacheDir, "preuzimanje-${SystemClock.elapsedRealtime()}").apply { mkdirs() }
+    private fun run(job: Job) {
+        running = job.id
+        val work = File(cacheDir, "preuzimanje-${job.id}").apply { mkdirs() }
         try {
-            val listener = Listener()
-            val result = Python.getInstance().getModule("vd_core")
-                .callAttr("download", url, if (isAudio) "audio" else "video", work.absolutePath, listener).asList()
-            val title = result[0].toString()
+            if (job.id in cancelled) throw CancelledHere()
+            Downloads.lastError.value = null
+            Downloads.update(job.id) { it.copy(phase = Phase.READING) }
+            notify(progressNotification(job.title, null))
+            val result = Python.getInstance().getModule("vd_core").callAttr(
+                "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
+            ).asList()
             val name = result[1].toString()
             val first = File(result[2].toString())
             val second = result[3].toString().takeIf { it.isNotEmpty() }?.let(::File)
-            DownloadState.set(DownloadStatus.Saving)
+            Downloads.update(job.id) { it.copy(phase = Phase.SAVING) }
             notify(progressNotification(getString(R.string.status_saving), null))
             // Slika i zvuk stigli odvojeno: spajaju se u jedan MP4 bez ponovnog kodiranja.
             val file = if (second != null) {
@@ -69,24 +74,24 @@ class DownloadService : Service() {
             } else {
                 File(work, "$name.${first.extension}").also { first.renameTo(it) }
             }
-            val uri = MediaSaver.save(this, file, isAudio)
-            DownloadState.set(DownloadStatus.Done(title, uri, isAudio))
-            notifyFinished(getString(R.string.status_done, title), openIntent(uri, isAudio))
-        } catch (error: PyException) {
-            if (cancelled.get()) {
-                DownloadState.set(DownloadStatus.Cancelled)
+            val size = file.length()
+            val uri = MediaSaver.save(this, file, job.isAudio, Settings.location(this))
+            History.add(HistoryItem(job.id, job.title.ifBlank { result[0].toString() }, uri.toString(), job.isAudio,
+                formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis()))
+            notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio))
+        } catch (error: Exception) {
+            if (job.id in cancelled || error is CancelledHere) {
                 notifyFinished(getString(R.string.status_cancelled), null)
             } else {
-                val message = cleanError(error.message)
-                DownloadState.set(DownloadStatus.Failed(message))
+                val message = if (error is PyException) cleanError(error.message) else error.message ?: error.javaClass.simpleName
+                Downloads.lastError.value = message
                 notifyFinished(getString(R.string.status_failed, message), null)
             }
-        } catch (error: Exception) {
-            val message = error.message ?: error.javaClass.simpleName
-            DownloadState.set(DownloadStatus.Failed(message))
-            notifyFinished(getString(R.string.status_failed, message), null)
         } finally {
             work.deleteRecursively() // privremeni fajlovi nikad ne ostaju
+            cancelled -= job.id
+            running = null
+            Downloads.remove(job.id)
             synchronized(this) {
                 pending--
                 if (pending == 0) {
@@ -97,21 +102,26 @@ class DownloadService : Service() {
         }
     }
 
+    private class CancelledHere : Exception()
+
+    private fun formatLabel(job: Job, extension: String): String =
+        if (job.isAudio) extension.uppercase() else "${extension.uppercase()} • ${job.label}"
+
     /** Poziva ga Python (vd_core.download) iz iste niti. */
-    inner class Listener {
+    inner class Listener(private val job: Job) {
         private var lastUpdate = 0L
 
         fun onProgress(fraction: Double, done: Long, total: Long) {
             val now = SystemClock.elapsedRealtime()
-            if (now - lastUpdate < 500) return // obavještenje najviše dvaput u sekundi
+            if (now - lastUpdate < 400) return // ekran i obavještenje najviše ~2,5 puta u sekundi
             lastUpdate = now
             val value = fraction.takeIf { it >= 0 }?.toFloat()
-            DownloadState.set(DownloadStatus.Downloading(value))
+            Downloads.update(job.id) { it.copy(phase = Phase.DOWNLOADING, fraction = value, done = done, total = total) }
             val percent = ((value ?: 0f) * 100).toInt()
-            notify(progressNotification(getString(R.string.status_downloading, percent), value))
+            notify(progressNotification("${job.title} · ${getString(R.string.status_downloading, percent)}", value))
         }
 
-        fun isCancelled(): Boolean = cancelled.get()
+        fun isCancelled(): Boolean = job.id in cancelled
     }
 
     private fun progressNotification(text: String, fraction: Float?): Notification {
@@ -147,10 +157,11 @@ class DownloadService : Service() {
     }
 
     private fun appIntent(): PendingIntent = PendingIntent.getActivity(
-        this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE,
+        this, 0, Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_OPEN_DOWNLOADS, true),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
-    private fun openIntent(uri: android.net.Uri, isAudio: Boolean): PendingIntent = PendingIntent.getActivity(
+    private fun openIntent(uri: Uri, isAudio: Boolean): PendingIntent = PendingIntent.getActivity(
         this, 2,
         Intent(Intent.ACTION_VIEW).setDataAndType(uri, if (isAudio) "audio/*" else "video/*")
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
@@ -165,14 +176,16 @@ class DownloadService : Service() {
     companion object {
         private const val NOTIFICATION_ID = 1
         private const val DONE_NOTIFICATION_ID = 2
-        private const val EXTRA_URL = "url"
-        private const val EXTRA_AUDIO = "audio"
+        private const val EXTRA_JOB = "job"
+        private const val EXTRA_ID = "id"
         private const val ACTION_CANCEL = "cancel"
 
-        fun start(context: Context, url: String, isAudio: Boolean) {
-            context.startForegroundService(
-                Intent(context, DownloadService::class.java).putExtra(EXTRA_URL, url).putExtra(EXTRA_AUDIO, isAudio),
-            )
+        fun start(context: Context, job: Job) {
+            context.startForegroundService(Intent(context, DownloadService::class.java).putExtra(EXTRA_JOB, job.toBundle()))
+        }
+
+        fun cancel(context: Context, id: Long) {
+            context.startService(Intent(context, DownloadService::class.java).setAction(ACTION_CANCEL).putExtra(EXTRA_ID, id))
         }
 
         /** „ERROR: [youtube] abc: Video unavailable" → „Video unavailable" (razumljive poruke dolaze kasnije). */

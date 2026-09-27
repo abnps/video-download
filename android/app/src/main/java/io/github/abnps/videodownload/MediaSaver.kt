@@ -8,18 +8,23 @@ import android.provider.MediaStore
 import java.io.File
 
 /**
- * Gotov fajl iz privremenog foldera aplikacije ide u Galeriju (Movies/Video Download) ili Muziku
- * (Music/Video Download) preko MediaStore-a: bez dozvole za pisanje po memoriji, vidi se odmah u aplikacijama.
+ * Gotov fajl iz privremenog foldera aplikacije ide u Download/Video Download (podrazumijevano) ili u Galeriju
+ * (Movies/Video Download) i Muziku (Music/Video Download) preko MediaStore-a: bez dozvole za pisanje po memoriji, vidi se odmah u aplikacijama.
  */
 object MediaSaver {
-    fun save(context: Context, source: File, isAudio: Boolean): Uri {
+    fun save(context: Context, source: File, isAudio: Boolean, location: SaveLocation): Uri {
         val resolver = context.contentResolver
-        val collection = if (isAudio) {
-            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        } else {
-            MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val volume = MediaStore.VOLUME_EXTERNAL_PRIMARY
+        val collection = when {
+            location == SaveLocation.DOWNLOADS -> MediaStore.Downloads.getContentUri(volume)
+            isAudio -> MediaStore.Audio.Media.getContentUri(volume)
+            else -> MediaStore.Video.Media.getContentUri(volume)
         }
-        val folder = if (isAudio) Environment.DIRECTORY_MUSIC else Environment.DIRECTORY_MOVIES
+        val folder = when {
+            location == SaveLocation.DOWNLOADS -> Environment.DIRECTORY_DOWNLOADS
+            isAudio -> Environment.DIRECTORY_MUSIC
+            else -> Environment.DIRECTORY_MOVIES
+        }
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, source.name)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeType(source.extension, isAudio))
