@@ -221,6 +221,9 @@
   });
   // Dugme „Mac" u vrhu stranice otvara Mac karticu uputstva.
   $$("[data-mac]").forEach((a) => a.addEventListener("click", () => tabs[1] && select(tabs[1])));
+  $$("[data-android]").forEach((a) => a.addEventListener("click", () => tabs[2] && select(tabs[2])));
   // Mac posjetilac odmah vidi Mac uputstvo.
   if (/Mac/.test(navigator.platform || navigator.userAgent) && tabs[1]) select(tabs[1]);
+  // Posjetilac s Android telefona odmah vidi Android uputstvo.
+  if (/Android/.test(navigator.userAgent) && tabs[2]) select(tabs[2]);
 })();

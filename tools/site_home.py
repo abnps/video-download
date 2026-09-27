@@ -36,7 +36,7 @@ HOME = {
         "title": "Video Download — free video and audio downloader for Windows and Mac",
         "description": "Free app for Windows and Mac for downloading video (MP4) and audio (MP3). No ads, no tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
-        "download_short": "Download", "new": "New", "eyebrow": "<b>Mac version</b> in beta",
+        "download_short": "Download", "new": "New", "eyebrow": "<b>Android and Mac</b> in beta",
         "h1": ("Video and audio.", "In one click."),
         "lead": "A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.",
         "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
@@ -104,7 +104,7 @@ HOME = {
         "title": "Video Download — besplatan program za video i zvuk za Windows i Mac",
         "description": "Besplatan program za Windows i Mac za preuzimanje videa (MP4) i zvuka (MP3). Bez reklama, bez praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
-        "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Mac verzija</b> u probnoj fazi",
+        "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android i Mac</b> u probnoj fazi",
         "h1": ("Video i zvuk.", "Jednim klikom."),
         "lead": "Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.",
         "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
@@ -174,7 +174,7 @@ HOME = {
         "title": "Video Download — kostenloser Video- und Audio-Downloader für Windows und Mac",
         "description": "Kostenlose App für Windows und Mac zum Herunterladen von Video (MP4) und Audio (MP3). Ohne Werbung, ohne Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
-        "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Mac-Version</b> in der Beta",
+        "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android und Mac</b> in der Beta",
         "h1": ("Video und Audio.", "Mit einem Klick."),
         "lead": "Eine kostenlose App für Windows und Mac: MP4 in voller Qualität oder MP3, direkt aus dem Browser oder aus einem kopierten Link.",
         "win_btn": "Für Windows herunterladen", "win_req": "Windows 10 und 11 (64 Bit)", "install_help": "Hilfe zur Installation",
@@ -248,7 +248,7 @@ HOME = {
         "title": "Video Download — descargador gratuito de vídeo y audio para Windows y Mac",
         "description": "Aplicación gratuita para Windows y Mac para descargar vídeo (MP4) y audio (MP3). Sin anuncios, sin rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
-        "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Versión para Mac</b> en beta",
+        "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android y Mac</b> en beta",
         "h1": ("Vídeo y audio.", "Con un clic."),
         "lead": "Una aplicación gratuita para Windows y Mac: MP4 en calidad completa o MP3, directamente desde el navegador o desde un enlace copiado.",
         "win_btn": "Descargar para Windows", "win_req": "Windows 10 y 11 (64 bits)", "install_help": "ayuda para instalar",
@@ -321,7 +321,7 @@ HOME = {
         "title": "Video Download — téléchargeur gratuit de vidéo et d'audio pour Windows et Mac",
         "description": "Application gratuite pour Windows et Mac pour télécharger de la vidéo (MP4) et de l'audio (MP3). Sans publicité, sans pistage, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
-        "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Version Mac</b> en bêta",
+        "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android et Mac</b> en bêta",
         "h1": ("La vidéo et le son.", "En un clic."),
         "lead": "Une application gratuite pour Windows et Mac : MP4 en pleine qualité ou MP3, directement depuis le navigateur ou depuis un lien copié.",
         "win_btn": "Télécharger pour Windows", "win_req": "Windows 10 et 11 (64 bits)", "install_help": "aide à l'installation",
@@ -491,6 +491,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
 
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
+           android_url: str = "", android_text: tuple = ("", "", "", ()),
            page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
@@ -516,6 +517,8 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
     help_kicker, help_h2, help_sub = h["help"]
     faq = "\n".join(f"        <details><summary>{q}</summary><p>{a}</p></details>" for q, a in h["faq"])
     mac_items = "\n".join(f"          <li>{step}</li>" for step in mac_steps)
+    android_lead, android_button, android_note, android_steps = android_text
+    android_items = "\n".join(f"          <li>{step}</li>" for step in android_steps)
     download_icon = (f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
                      f'stroke-linejoin="round">{ICONS["download"]}</svg>')
     return f"""<!doctype html>
@@ -566,6 +569,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
             {h["win_btn"]}
           </a>
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">{badge}</span></a>
+          <a class="btn ghost" href="#install" data-android>Android <span class="badge">{badge}</span></a>
         </div>
         <ul class="promise">{promise}</ul>
         <div class="meta">{version_line} · {h["win_req"]} · <a href="#install">{h["install_help"]}</a></div>
@@ -670,6 +674,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       <div class="tabs" role="tablist" aria-label="{esc(in_label)}">
         <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
         <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">{badge}</span></button>
+        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">{badge}</span></button>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p>{in_win}</p>
@@ -687,6 +692,14 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {mac_items}
         </ol>
         <p style="margin-top:22px"><a class="btn" href="{mac_url}">{mac_button}</a></p>
+      </div>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+        <p><span class="badge">{badge}</span> {android_lead.format(issue=issue_url)}</p>
+        <p>{android_note}</p>
+        <ol>
+{android_items}
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
       </div>
     </div>
   </section>

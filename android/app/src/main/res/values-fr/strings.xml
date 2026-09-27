@@ -61,6 +61,16 @@
     <string name="invite_title">Inviter un ami</string>
     <string name="invite_sub">Envoyez l\'application via WhatsApp, Viber ou Quick Share</string>
     <string name="invite_text">Essayez Video Download : téléchargez vidéo et son gratuitement, sans publicité. Ouvrez le fichier joint et autorisez l\'installation.</string>
+    <string name="update_available">Nouvelle version %1$s</string>
+    <string name="update_install">Installer</string>
+    <string name="update_downloading">Téléchargement de la nouvelle version… %1$d%%</string>
+    <string name="update_failed">La mise à jour a échoué : %1$s</string>
+    <string name="update_check">Rechercher des mises à jour</string>
+    <string name="update_none">Vous avez la dernière version.</string>
+    <string name="update_allow">Autorisez Video Download à installer des mises à jour, puis touchez à nouveau Installer.</string>
+    <string name="welcome_title">Bienvenue dans Video Download</string>
+    <string name="welcome_text">L\'application est destinée à vos propres vidéos, aux contenus autorisés par leur auteur et aux contenus sous licence libre. Les contenus protégés par DRM ne sont pas téléchargés. En continuant, vous acceptez les conditions d\'utilisation et la politique de confidentialité.</string>
+    <string name="accept">J\'accepte</string>
     <string name="copy_report">Copier le rapport</string>
     <string name="report_copied">Rapport copié. Collez-le dans un message.</string>
     <string name="status_stopping">Arrêt en cours…</string>

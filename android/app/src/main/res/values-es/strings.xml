@@ -61,6 +61,16 @@
     <string name="invite_title">Invitar a un amigo</string>
     <string name="invite_sub">Envía la app por WhatsApp, Viber o Quick Share</string>
     <string name="invite_text">Prueba Video Download: descarga vídeo y audio gratis, sin anuncios. Abre el archivo adjunto y permite la instalación.</string>
+    <string name="update_available">Nueva versión %1$s</string>
+    <string name="update_install">Instalar</string>
+    <string name="update_downloading">Descargando la nueva versión… %1$d%%</string>
+    <string name="update_failed">La actualización falló: %1$s</string>
+    <string name="update_check">Buscar actualizaciones</string>
+    <string name="update_none">Tienes la versión más reciente.</string>
+    <string name="update_allow">Permite que Video Download instale actualizaciones y vuelve a pulsar Instalar.</string>
+    <string name="welcome_title">Bienvenido a Video Download</string>
+    <string name="welcome_text">La app está pensada para tus propios vídeos, contenido con permiso del autor y contenido con licencia libre. El contenido protegido con DRM no se descarga. Al continuar aceptas las condiciones de uso y la política de privacidad.</string>
+    <string name="accept">Aceptar</string>
     <string name="copy_report">Copiar informe</string>
     <string name="report_copied">Informe copiado. Pégalo en un mensaje.</string>
     <string name="status_stopping">Deteniendo…</string>

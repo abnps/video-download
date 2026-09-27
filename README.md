@@ -62,7 +62,14 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    Provjeri da je posao prošao (`gh run list --workflow macos.yml`); ako nije, izdanje nema Mac verziju
    i Mac dugme ne radi dok se ne popravi i ponovo pokrene (`gh run rerun <id>`).
 
-5. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
+5. **Android (beta) se dodaje ručno, jednom naredbom** (potpis je na ovom računaru, ključ
+   `%USERPROFILE%/.videodl/android-release.*`): `python tools/publish_android.py`. Pravi potpisan APK i postavlja
+   ga u posljednje izdanje kao `VideoDownload-android-<verzija>.apk`, stalnu kopiju `VideoDownload-android.apk`
+   (Android dugme na sajtu) i `android.json` (po njemu aplikacije nude ažuriranje). Bez ovog koraka novo izdanje
+   nema Android verziju i Android dugme vraća 404. Samo Android popravka: poveća se `versionCode` u
+   `android/app/build.gradle.kts` i pokrene ista naredba (zamjenjuje fajlove u posljednjem izdanju).
+
+6. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
 
 ```
 gh release edit v<prethodna_verzija> --repo abnps/video-download --draft=true

@@ -61,6 +61,16 @@
     <string name="invite_title">Pozovi prijatelja</string>
     <string name="invite_sub">Pošalji aplikaciju preko WhatsAppa, Vibera ili Quick Sharea</string>
     <string name="invite_text">Probaj Video Download: besplatno preuzimanje videa i zvuka, bez reklama. Otvori priloženi fajl i dozvoli instalaciju.</string>
+    <string name="update_available">Nova verzija %1$s</string>
+    <string name="update_install">Instaliraj</string>
+    <string name="update_downloading">Preuzimam novu verziju… %1$d%%</string>
+    <string name="update_failed">Ažuriranje nije uspjelo: %1$s</string>
+    <string name="update_check">Provjeri ažuriranje</string>
+    <string name="update_none">Imaš najnoviju verziju.</string>
+    <string name="update_allow">Dozvoli aplikaciji Video Download da instalira ažuriranja, pa ponovo tapni Instaliraj.</string>
+    <string name="welcome_title">Dobro došao u Video Download</string>
+    <string name="welcome_text">Aplikacija je namijenjena tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Sadržaj zaštićen DRM-om se ne preuzima. Nastavkom prihvataš uslove korištenja i politiku privatnosti.</string>
+    <string name="accept">Prihvatam</string>
     <string name="copy_report">Kopiraj izvještaj</string>
     <string name="report_copied">Izvještaj je kopiran. Zalijepi ga u poruku.</string>
     <string name="status_stopping">Zaustavljam…</string>

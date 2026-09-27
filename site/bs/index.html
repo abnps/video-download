@@ -91,7 +91,7 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">Novo</span> <b>Mac verzija</b> u probnoj fazi</div>
+        <div class="eyebrow"><span class="badge">Novo</span> <b>Android i Mac</b> u probnoj fazi</div>
         <h1>Video i zvuk.<br><span class="grad">Jednim klikom.</span></h1>
         <p class="lead">Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.</p>
         <div class="cta">
@@ -100,6 +100,7 @@
             Preuzmi za Windows
           </a>
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
+          <a class="btn ghost" href="#install" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
         <div class="meta"><!-- version -->Verzija 0.9.7 · 130 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
@@ -232,6 +233,7 @@
       <div class="tabs" role="tablist" aria-label="Sistem">
         <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
         <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Beta</span></button>
+        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">Beta</span></button>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows može prikazati „Windows je zaštitio vaš računar“.</b> Provjeri da je fajl sa ovog sajta, pa klikni <b>Više informacija</b> i <b>Ipak pokreni</b>.</p>
@@ -252,6 +254,18 @@
           <li>Ponovo otvori program i potvrdi <b>Open</b>. To treba samo jednom.</li>
         </ol>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Preuzmi za Mac (beta)</a></p>
+      </div>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+        <p><span class="badge">Beta</span> <b>Novo: Video Download za Android.</b> Za telefone s Androidom 10 ili novijim. Podijeli video iz bilo koje aplikacije i izaberi kvalitet. Radi, ali ga je probalo još malo ljudi: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">javi ako nešto ne radi</a>.</p>
+        <p>Aplikacija nije na Google Playu, pa prva instalacija traži par tapova više:</p>
+        <ol>
+          <li>Otvori preuzeti fajl (Preuzimanja ili lista preuzimanja u pregledniku).</li>
+          <li>Ako Android pita, dozvoli instalaciju iz preglednika: <b>Podešavanja → Dozvoli iz ovog izvora</b>.</li>
+          <li>Na Samsung telefonima za instalaciju isključi <b>Auto Blocker</b> (Podešavanja → Sigurnost i privatnost).</li>
+          <li>Ako Google Play Protect upozori na nepoznatu aplikaciju, tapni <b>Više detalja → Ipak instaliraj</b>.</li>
+          <li>Nove verzije se instaliraju iz same aplikacije: <b>Postavke → Provjeri ažuriranje</b>.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Preuzmi za Android (beta)</a></p>
       </div>
     </div>
   </section>

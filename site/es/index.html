@@ -91,7 +91,7 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">Nuevo</span> <b>Versión para Mac</b> en beta</div>
+        <div class="eyebrow"><span class="badge">Nuevo</span> <b>Android y Mac</b> en beta</div>
         <h1>Vídeo y audio.<br><span class="grad">Con un clic.</span></h1>
         <p class="lead">Una aplicación gratuita para Windows y Mac: MP4 en calidad completa o MP3, directamente desde el navegador o desde un enlace copiado.</p>
         <div class="cta">
@@ -100,6 +100,7 @@
             Descargar para Windows
           </a>
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
+          <a class="btn ghost" href="#install" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Sin cuenta</li><li>Sin límite diario</li><li>Tus enlaces no nos llegan</li></ul>
         <div class="meta"><!-- version -->Versión 0.9.7 · 130 MB<!-- /version --> · Windows 10 y 11 (64 bits) · <a href="#install">ayuda para instalar</a></div>
@@ -232,6 +233,7 @@
       <div class="tabs" role="tablist" aria-label="Sistema">
         <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
         <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Beta</span></button>
+        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">Beta</span></button>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows puede mostrar «Windows protegió su PC».</b> Comprueba que el archivo viene de este sitio y pulsa <b>Más información</b> y luego <b>Ejecutar de todas formas</b>.</p>
@@ -252,6 +254,18 @@
           <li>Vuelve a abrir la app y confirma <b>Abrir</b>. Solo hace falta una vez.</li>
         </ol>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Descargar para Mac (beta)</a></p>
+      </div>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+        <p><span class="badge">Beta</span> <b>Novedad: Video Download para Android.</b> Para móviles con Android 10 o posterior. Comparte un vídeo desde cualquier app y elige la calidad. Funciona, pero aún lo han probado pocas personas: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">avisa si algo no funciona</a>.</p>
+        <p>La app no está en Google Play, así que la primera instalación requiere unos toques más:</p>
+        <ol>
+          <li>Abre el archivo descargado (Descargas o la lista de descargas del navegador).</li>
+          <li>Si Android lo pide, permite instalar apps desde tu navegador: <b>Ajustes → Permitir de esta fuente</b>.</li>
+          <li>En móviles Samsung, desactiva <b>Auto Blocker</b> para la instalación (Ajustes → Seguridad y privacidad).</li>
+          <li>Si Google Play Protect avisa de una app desconocida, pulsa <b>Más detalles → Instalar de todas formas</b>.</li>
+          <li>Las nuevas versiones se instalan desde la propia app: <b>Ajustes → Buscar actualizaciones</b>.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Descargar para Android (beta)</a></p>
       </div>
     </div>
   </section>

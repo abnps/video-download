@@ -111,6 +111,8 @@ fun HomeScreen(
     history: List<HistoryItem>,
     onShowAll: () -> Unit,
     actions: ItemActions,
+    update: UpdateState,
+    onInstallUpdate: () -> Unit,
 ) {
     var help by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp)) {
@@ -126,6 +128,7 @@ fun HomeScreen(
         Text(stringResource(R.string.home_title), fontSize = 34.sp, fontWeight = FontWeight.Bold, lineHeight = 38.sp)
         Text(stringResource(R.string.home_sub), style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
+        UpdateBanner(update, onInstallUpdate)
         Spacer(Modifier.height(20.dp))
         CardBox(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -203,6 +206,28 @@ fun HomeScreen(
         AlertDialog(onDismissRequest = { help = false }, confirmButton = {
             TextButton(onClick = { help = false }) { Text(stringResource(R.string.ok)) }
         }, title = { Text(stringResource(R.string.share_tip_title)) }, text = { Text(stringResource(R.string.share_tip_help)) })
+    }
+}
+
+/** Nova verzija aplikacije: kartica s „Instaliraj", napredak preuzimanja ili greška. Ništa kad je sve ažurno. */
+@Composable
+fun UpdateBanner(update: UpdateState, onInstall: () -> Unit) {
+    val text = when (update) {
+        is UpdateState.Available -> stringResource(R.string.update_available, update.release.versionName)
+        is UpdateState.Downloading -> stringResource(R.string.update_downloading, (update.fraction * 100).toInt())
+        is UpdateState.Failed -> stringResource(R.string.update_failed, update.message)
+        else -> return
+    }
+    Spacer(Modifier.height(16.dp))
+    Card(shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            AppIcon(R.drawable.ic_download, Modifier.size(22.dp), tint = MaterialTheme.colorScheme.primary)
+            Text(text, Modifier.weight(1f).padding(horizontal = 12.dp), color = MaterialTheme.colorScheme.onPrimaryContainer)
+            if (update is UpdateState.Available) {
+                Button(onClick = onInstall, shape = RoundedCornerShape(10.dp)) { Text(stringResource(R.string.update_install)) }
+            }
+        }
     }
 }
 
@@ -428,13 +453,14 @@ private fun startOfToday(): Long = Calendar.getInstance().apply {
 @Composable
 fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocation, onLocation: (SaveLocation) -> Unit,
                    onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, appVersion: String,
-                   readerVersion: String) {
+                   readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit) {
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(stringResource(R.string.nav_settings), fontSize = 30.sp, fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
+        UpdateBanner(update, onInstallUpdate)
         SettingRow(R.drawable.ic_videocam, stringResource(R.string.set_quality),
             if (quality == 0) stringResource(R.string.best_quality) else "${quality}p") { pickQuality = true }
         SettingRow(R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location)) { pickLocation = true }
@@ -447,6 +473,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_info, stringResource(R.string.set_privacy), null) { onOpenLink(Links.site("privacy.html")) }
         SettingRow(R.drawable.ic_download, stringResource(R.string.set_version),
             "$appVersion · ${stringResource(R.string.test_version)}", null)
+        SettingRow(R.drawable.ic_download, stringResource(R.string.update_check),
+            if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
         SettingRow(R.drawable.ic_settings, stringResource(R.string.set_reader), readerVersion, null)
     }
     if (pickQuality) {

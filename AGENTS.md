@@ -135,6 +135,10 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   Android ne prima ažuriranje potpisano drugim ključem. Gradle ga čita iz tog foldera; bez njega release je
   nepotpisan. APK za dijeljenje: `C:/Video Downloader/Build/android/VideoDownload-android-<verzija>.apk`
   (+ .sha256); svaka nova verzija = veći `versionCode` u `android/app/build.gradle.kts`.
+  Android je JAVNA beta od 27.9.2026 (Ahmed: „kao Mac beta, na GitHubu"): SVAKO izdanje mora imati i Android
+  fajlove — `python tools/publish_android.py` (APK s verzijom, stalni `VideoDownload-android.apk` za sajt,
+  `android.json` za ažuriranje u aplikaciji). Aplikacija sama ažurira i yt-dlp (isti `videodl/ytdlp_update.py`
+  kao desktop, kopira se pri gradnji) i sebe (AppUpdater: SHA-256 + isti potpis + Androidov instaler).
 - Stranica dobrodošlice dodatka (27.9.2026): `extension/welcome.html` se otvara SAMO pri prvoj instalaciji
   (`install.js` → `shouldWelcome`), spakovana je u dodatak (ništa s interneta, bez ID-a), stvarno pita program
   za vezu (`app-status`) i daje uputstvo za kačenje ikone po browseru. E2E (`tools/e2e_browser/run.mjs`) je provjerava.

@@ -7,9 +7,27 @@ kodiranja. Kad sajt nudi jedan fajl sa slikom i zvukom, uzima se on. Zvuk je M4A
 """
 
 import os
+import time
 
-from yt_dlp import YoutubeDL
-from yt_dlp.utils import DownloadCancelled, sanitize_filename
+
+def _activate_downloaded_ytdlp() -> None:
+    """Na telefonu: noviji yt-dlp preuzet u privatnu memoriju aplikacije ide ispred ugrađenog (isti kod kao na
+    računaru, videodl/ytdlp_update.py). Mora se desiti PRIJE prvog `import yt_dlp`. Van Androida ništa."""
+    try:
+        from java import jclass
+    except ImportError:
+        return
+    files = jclass("com.chaquo.python.Python").getPlatform().getApplication().getFilesDir().toString()
+    os.environ["VIDEODL_DATA_DIR"] = files
+    from videodl import ytdlp_update
+
+    ytdlp_update.activate()
+
+
+_activate_downloaded_ytdlp()
+
+from yt_dlp import YoutubeDL  # noqa: E402  (poslije aktiviranja preuzete verzije)
+from yt_dlp.utils import DownloadCancelled, sanitize_filename  # noqa: E402
 
 try:  # samo na Androidu (Chaquopy ima modul `java`): imitacija preglednika kroz Androidov mrežni sloj
     import java  # noqa: F401
@@ -267,3 +285,22 @@ def version() -> str:
     from yt_dlp.version import __version__
 
     return __version__
+
+
+def update_ytdlp(force: bool = False) -> str:
+    """Najviše jednom dnevno: ima li noviji yt-dlp na PyPI-ju; preuzima ga (SHA-256), radi od sljedećeg pokretanja
+    aplikacije. Vraća šta se desilo (za dnevnik); greška nikad ne ruši aplikaciju."""
+    from videodl import ytdlp_update
+
+    stamp = ytdlp_update.store_dir() / "zadnja-provjera"
+    try:
+        if not force and stamp.is_file() and time.time() - stamp.stat().st_mtime < ytdlp_update.CHECK_INTERVAL_SECONDS:
+            return "provjereno danas"
+        stamp.parent.mkdir(parents=True, exist_ok=True)
+        stamp.write_text(str(time.time()), encoding="utf-8")
+        release = ytdlp_update.fetch_latest()
+        if release is None:
+            return f"najnovija: {ytdlp_update.active_version()}"
+        return "preuzeta " + ytdlp_update.install(release) + " (radi od sljedećeg pokretanja)"
+    except Exception as error:  # noqa: BLE001 - mreža, PyPI: pokušava se sutra
+        return f"greška: {error}"

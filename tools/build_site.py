@@ -33,6 +33,62 @@ PUBLIC_URL = "https://abnps.github.io/video-download/"  # javna adresa sajta (ka
 OG_LOCALES = {"en": "en_US", "bs": "bs_BA", "de": "de_DE", "es": "es_ES", "fr": "fr_FR"}
 # Mac (beta): stalna kopija .dmg-a uz posljednje izdanje (kao VideoDownload-Setup.exe za Windows).
 MAC_DMG_URL = f"{REPO}/releases/latest/download/VideoDownload-macOS-arm64.dmg"
+
+# Android (beta, Ahmed 27.9.2026: „kao Mac beta, na GitHubu"): APK je u posljednjem izdanju (stalno ime), a nove
+# verzije aplikacija sama nađe preko android.json iz istog izdanja. (uvod, dugme, napomena, koraci)
+ANDROID_APK_URL = f"{REPO}/releases/latest/download/VideoDownload-android.apk"
+ANDROID_TEXT = {
+    "en": ("<b>New: Video Download for Android.</b> For phones with Android 10 or later. Share a video from any app "
+           "and pick the quality. It works, but only a few people have tried it so far: please "
+           "<a href=\"{issue}\">report anything that doesn't work</a>.",
+           "Download for Android (beta)",
+           "The app isn't in Google Play, so the first install takes a few extra taps:",
+           ("Open the downloaded file (Downloads or the browser's download list).",
+            "If Android asks, allow installing apps from your browser: <b>Settings → Allow from this source</b>.",
+            "On Samsung phones, turn off <b>Auto Blocker</b> for the install (Settings → Security and privacy).",
+            "If Google Play Protect warns about an unknown app, tap <b>More details → Install anyway</b>.",
+            "Later versions install from the app itself: <b>Settings → Check for updates</b>.")),
+    "bs": ("<b>Novo: Video Download za Android.</b> Za telefone s Androidom 10 ili novijim. Podijeli video iz bilo koje "
+           "aplikacije i izaberi kvalitet. Radi, ali ga je probalo još malo ljudi: "
+           "<a href=\"{issue}\">javi ako nešto ne radi</a>.",
+           "Preuzmi za Android (beta)",
+           "Aplikacija nije na Google Playu, pa prva instalacija traži par tapova više:",
+           ("Otvori preuzeti fajl (Preuzimanja ili lista preuzimanja u pregledniku).",
+            "Ako Android pita, dozvoli instalaciju iz preglednika: <b>Podešavanja → Dozvoli iz ovog izvora</b>.",
+            "Na Samsung telefonima za instalaciju isključi <b>Auto Blocker</b> (Podešavanja → Sigurnost i privatnost).",
+            "Ako Google Play Protect upozori na nepoznatu aplikaciju, tapni <b>Više detalja → Ipak instaliraj</b>.",
+            "Nove verzije se instaliraju iz same aplikacije: <b>Postavke → Provjeri ažuriranje</b>.")),
+    "de": ("<b>Neu: Video Download für Android.</b> Für Handys mit Android 10 oder neuer. Teile ein Video aus einer "
+           "beliebigen App und wähle die Qualität. Es funktioniert, aber bisher haben es nur wenige ausprobiert: "
+           "<a href=\"{issue}\">melde bitte alles, was nicht klappt</a>.",
+           "Für Android herunterladen (Beta)",
+           "Die App ist nicht bei Google Play, daher braucht die erste Installation ein paar Fingertipps mehr:",
+           ("Öffne die heruntergeladene Datei (Downloads oder Downloadliste des Browsers).",
+            "Wenn Android fragt, erlaube Installationen aus deinem Browser: <b>Einstellungen → Von dieser Quelle zulassen</b>.",
+            "Auf Samsung-Handys für die Installation den <b>Auto Blocker</b> ausschalten (Einstellungen → Sicherheit und Datenschutz).",
+            "Wenn Google Play Protect vor einer unbekannten App warnt, tippe auf <b>Weitere Details → Trotzdem installieren</b>.",
+            "Neue Versionen installierst du direkt in der App: <b>Einstellungen → Nach Updates suchen</b>.")),
+    "es": ("<b>Novedad: Video Download para Android.</b> Para móviles con Android 10 o posterior. Comparte un vídeo "
+           "desde cualquier app y elige la calidad. Funciona, pero aún lo han probado pocas personas: "
+           "<a href=\"{issue}\">avisa si algo no funciona</a>.",
+           "Descargar para Android (beta)",
+           "La app no está en Google Play, así que la primera instalación requiere unos toques más:",
+           ("Abre el archivo descargado (Descargas o la lista de descargas del navegador).",
+            "Si Android lo pide, permite instalar apps desde tu navegador: <b>Ajustes → Permitir de esta fuente</b>.",
+            "En móviles Samsung, desactiva <b>Auto Blocker</b> para la instalación (Ajustes → Seguridad y privacidad).",
+            "Si Google Play Protect avisa de una app desconocida, pulsa <b>Más detalles → Instalar de todas formas</b>.",
+            "Las nuevas versiones se instalan desde la propia app: <b>Ajustes → Buscar actualizaciones</b>.")),
+    "fr": ("<b>Nouveau : Video Download pour Android.</b> Pour les téléphones sous Android 10 ou plus récent. Partagez "
+           "une vidéo depuis n'importe quelle application et choisissez la qualité. Ça fonctionne, mais peu de personnes "
+           "l'ont encore essayé : <a href=\"{issue}\">signalez tout ce qui ne marche pas</a>.",
+           "Télécharger pour Android (bêta)",
+           "L'application n'est pas sur Google Play, la première installation demande donc quelques touches de plus :",
+           ("Ouvrez le fichier téléchargé (Téléchargements ou la liste des téléchargements du navigateur).",
+            "Si Android le demande, autorisez l'installation depuis votre navigateur : <b>Paramètres → Autoriser cette source</b>.",
+            "Sur les téléphones Samsung, désactivez <b>Auto Blocker</b> pour l'installation (Paramètres → Sécurité et confidentialité).",
+            "Si Google Play Protect signale une application inconnue, touchez <b>Plus de détails → Installer quand même</b>.",
+            "Les nouvelles versions s'installent depuis l'application : <b>Réglages → Rechercher des mises à jour</b>.")),
+}
 ISSUE_URL = f"{REPO}/issues/new?template=problem.yml"
 INSTALL_DIR = r"%LOCALAPPDATA%\Programs\Video Download\extension"
 GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
@@ -860,6 +916,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             footer=footer_html(lang), news=news_html(lang),
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
+            android_url=ANDROID_APK_URL, android_text=ANDROID_TEXT[lang],
             meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])
             + "\n" + software_jsonld(lang), page_url=page_url(lang), news_more=CHANGELOG_TEXT[lang][2],
             guides_link=site_guides.HUB[lang][9])

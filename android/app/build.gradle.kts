@@ -15,8 +15,8 @@ android {
         // Android 10+: čuvanje u Galeriju/Muziku preko MediaStore bez dozvole za pisanje (~95 % telefona).
         minSdk = 29
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.1.1"
+        versionCode = 4
+        versionName = "0.2.0"
         ndk {
             // Telefoni (arm64) i emulator na računaru (x86_64).
             abiFilters += listOf("arm64-v8a", "x86_64")
@@ -53,7 +53,19 @@ android {
     }
 }
 
+// Ažuriranje yt-dlp-a je isti kod kao u programu za računar (videodl/ytdlp_update.py): kopira se pri gradnji,
+// da logika (PyPI, SHA-256, povratak na staru verziju) bude jedna za oba programa.
+val sharedPython = tasks.register<Sync>("sharedPython") {
+    from(rootProject.file("../videodl")) { include("__init__.py", "runtime.py", "ytdlp_update.py") }
+    into(layout.buildDirectory.dir("sharedPython/videodl"))
+}
+tasks.named("preBuild") { dependsOn(sharedPython) }
+tasks.matching { it.name.endsWith("PythonSources") }.configureEach { dependsOn(sharedPython) }
+
 chaquopy {
+    sourceSets {
+        getByName("main") { srcDir(layout.buildDirectory.dir("sharedPython").get().asFile) }
+    }
     defaultConfig {
         // Isti Python kao desktop build (tools/build-lock.json); Chaquopy pip-om ubaci yt-dlp u APK.
         version = "3.14"

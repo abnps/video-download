@@ -61,6 +61,12 @@ class SiteTest(unittest.TestCase):
                 # Mac (beta): stalni link na .dmg, jasna oznaka i uputstvo za prvo pokretanje
                 self.assertIn(build_site.MAC_DMG_URL, index)
                 self.assertIn(f'<span class="badge">{build_site.MAC_TEXT[lang][0]}</span>', index)
+                # Android (beta): stalni link na APK iz posljednjeg izdanja, kartica i koraci za prvu instalaciju
+                self.assertIn(build_site.ANDROID_APK_URL, index)
+                self.assertIn('id="panel-android"', index)
+                self.assertIn("data-android", index)
+                for step in build_site.ANDROID_TEXT[lang][3]:
+                    self.assertIn(step, index)
                 for step in build_site.MAC_TEXT[lang][4]:
                     self.assertIn(step, index)
                 # Redizajn: namjena i uslovi ostaju vidljivi, demo nosi nazive iz programa, animacije iz site.js

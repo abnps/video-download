@@ -62,6 +62,16 @@
     <string name="invite_title">Invite a friend</string>
     <string name="invite_sub">Send the app via WhatsApp, Viber or Quick Share</string>
     <string name="invite_text">Try Video Download: free video and audio downloads, no ads. Open the attached file and allow the install.</string>
+    <string name="update_available">New version %1$s</string>
+    <string name="update_install">Install</string>
+    <string name="update_downloading">Downloading the new version… %1$d%%</string>
+    <string name="update_failed">Update failed: %1$s</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_none">You have the latest version.</string>
+    <string name="update_allow">Allow Video Download to install updates, then tap Install again.</string>
+    <string name="welcome_title">Welcome to Video Download</string>
+    <string name="welcome_text">The app is meant for your own videos, content you have the author\'s permission for, and content under a free license. DRM-protected content is not downloaded. By continuing you accept the terms of use and the privacy policy.</string>
+    <string name="accept">Accept</string>
     <string name="copy_report">Copy report</string>
     <string name="report_copied">Report copied. Paste it into a message.</string>
     <string name="status_stopping">Stopping…</string>

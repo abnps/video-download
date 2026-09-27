@@ -91,7 +91,7 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">New</span> <b>Mac version</b> in beta</div>
+        <div class="eyebrow"><span class="badge">New</span> <b>Android and Mac</b> in beta</div>
         <h1>Video and audio.<br><span class="grad">In one click.</span></h1>
         <p class="lead">A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.</p>
         <div class="cta">
@@ -100,6 +100,7 @@
             Download for Windows
           </a>
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
+          <a class="btn ghost" href="#install" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>No account</li><li>No daily limit</li><li>Your links never reach us</li></ul>
         <div class="meta"><!-- version -->Version 0.9.7 · 130 MB<!-- /version --> · Windows 10 and 11 (64-bit) · <a href="#install">installation help</a></div>
@@ -232,6 +233,7 @@
       <div class="tabs" role="tablist" aria-label="System">
         <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
         <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">Beta</span></button>
+        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">Beta</span></button>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows may show “Windows protected your PC”.</b> Make sure the file comes from this site, then click <b>More info</b> and <b>Run anyway</b>.</p>
@@ -252,6 +254,18 @@
           <li>Open the app again and confirm <b>Open</b>. This is needed only once.</li>
         </ol>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Download for Mac (beta)</a></p>
+      </div>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+        <p><span class="badge">Beta</span> <b>New: Video Download for Android.</b> For phones with Android 10 or later. Share a video from any app and pick the quality. It works, but only a few people have tried it so far: please <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report anything that doesn't work</a>.</p>
+        <p>The app isn't in Google Play, so the first install takes a few extra taps:</p>
+        <ol>
+          <li>Open the downloaded file (Downloads or the browser's download list).</li>
+          <li>If Android asks, allow installing apps from your browser: <b>Settings → Allow from this source</b>.</li>
+          <li>On Samsung phones, turn off <b>Auto Blocker</b> for the install (Settings → Security and privacy).</li>
+          <li>If Google Play Protect warns about an unknown app, tap <b>More details → Install anyway</b>.</li>
+          <li>Later versions install from the app itself: <b>Settings → Check for updates</b>.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Download for Android (beta)</a></p>
       </div>
     </div>
   </section>

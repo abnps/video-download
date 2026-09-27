@@ -61,6 +61,16 @@
     <string name="invite_title">Freund einladen</string>
     <string name="invite_sub">App per WhatsApp, Viber oder Quick Share senden</string>
     <string name="invite_text">Probier Video Download aus: Videos und Ton kostenlos herunterladen, ohne Werbung. Öffne die angehängte Datei und erlaube die Installation.</string>
+    <string name="update_available">Neue Version %1$s</string>
+    <string name="update_install">Installieren</string>
+    <string name="update_downloading">Neue Version wird geladen… %1$d%%</string>
+    <string name="update_failed">Update fehlgeschlagen: %1$s</string>
+    <string name="update_check">Nach Updates suchen</string>
+    <string name="update_none">Du hast die neueste Version.</string>
+    <string name="update_allow">Erlaube Video Download, Updates zu installieren, und tippe dann erneut auf Installieren.</string>
+    <string name="welcome_title">Willkommen bei Video Download</string>
+    <string name="welcome_text">Die App ist für eigene Videos, Inhalte mit Erlaubnis des Urhebers und Inhalte unter freier Lizenz gedacht. DRM-geschützte Inhalte werden nicht heruntergeladen. Mit dem Fortfahren akzeptierst du die Nutzungsbedingungen und die Datenschutzerklärung.</string>
+    <string name="accept">Akzeptieren</string>
     <string name="copy_report">Bericht kopieren</string>
     <string name="report_copied">Bericht kopiert. Füge ihn in eine Nachricht ein.</string>
     <string name="status_stopping">Wird gestoppt…</string>

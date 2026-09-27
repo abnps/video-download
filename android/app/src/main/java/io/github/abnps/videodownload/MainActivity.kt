@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
     private val location = mutableStateOf(SaveLocation.DOWNLOADS)
     private val quality = mutableIntStateOf(0)
     private var autoFind = false
+    private val welcome = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +58,12 @@ class MainActivity : ComponentActivity() {
         quality.intValue = Settings.quality(this)
         handle(intent)
         askForNotifications()
+        welcome.value = !getSharedPreferences("postavke", MODE_PRIVATE).getBoolean("uslovi_prihvaceni", false)
+        // U pozadini, najviše jednom dnevno: nova verzija aplikacije (GitHub) i čitača sajtova (PyPI).
+        Thread {
+            AppUpdater.check(this)
+            runCatching { Python.getInstance().getModule("vd_core").callAttr("update_ytdlp") }
+        }.start()
         setContent { AppTheme { App() } }
     }
 
@@ -147,6 +154,19 @@ class MainActivity : ComponentActivity() {
         startActivity(Intent.createChooser(send, getString(R.string.invite_title)))
     }
 
+    private fun installUpdate() {
+        val release = (AppUpdater.state.value as? UpdateState.Available)?.release ?: return
+        // Android traži da korisnik jednom dozvoli ovoj aplikaciji da instalira ažuriranja.
+        if (!packageManager.canRequestPackageInstalls()) {
+            Toast.makeText(this, R.string.update_allow, Toast.LENGTH_LONG).show()
+            runCatching {
+                startActivity(Intent(SystemSettings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+            }
+            return
+        }
+        Thread { AppUpdater.install(this, release) }.start()
+    }
+
     private fun openLink(url: String) = runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
 
     private fun openLanguage() {
@@ -163,7 +183,12 @@ class MainActivity : ComponentActivity() {
         val scope = rememberCoroutineScope()
         val active by Downloads.active.collectAsState()
         val history by History.items.collectAsState()
+        val update by AppUpdater.state.collectAsState()
         val shown = info.value
+        if (welcome.value) WelcomeDialog({ openLink(it) }) {
+            welcome.value = false
+            getSharedPreferences("postavke", MODE_PRIVATE).edit().putBoolean("uslovi_prihvaceni", true).apply()
+        }
         if (autoFind) {
             autoFind = false
             scope.launch { find() }
@@ -203,6 +228,7 @@ class MainActivity : ComponentActivity() {
                         onFind = { scope.launch { find() } }, finding = finding.value, error = findError.value,
                         onCopyReport = { copyReport() }, history = history,
                         onShowAll = { downloadsTab.intValue = 1; tab.intValue = TAB_DOWNLOADS }, actions = actions,
+                        update = update, onInstallUpdate = { installUpdate() },
                     )
                     tab.intValue == TAB_DOWNLOADS -> {
                         val error by Downloads.lastError.collectAsState()
@@ -219,6 +245,8 @@ class MainActivity : ComponentActivity() {
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                         onLanguage = { openLanguage() }, onOpenLink = { openLink(it) },
                         onInvite = { scope.launch { invite() } },
+                        update = update, onInstallUpdate = { installUpdate() },
+                        onCheckUpdate = { Thread { AppUpdater.check(this@MainActivity, force = true) }.start() },
                         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty(),
                         readerVersion = runCatching {
                             Python.getInstance().getModule("vd_core").callAttr("version").toString()
@@ -235,6 +263,23 @@ class MainActivity : ComponentActivity() {
         private const val TAB_DOWNLOADS = 1
         private const val TAB_SETTINGS = 2
     }
+}
+
+/** Prvo pokretanje: namjena aplikacije i prihvatanje uslova (kao u instaleru za računar); ne može se preskočiti. */
+@Composable
+private fun WelcomeDialog(onOpenLink: (String) -> Unit, onAccept: () -> Unit) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = {},
+        title = { Text(stringResource(R.string.welcome_title)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.welcome_text))
+                TextButton(onClick = { onOpenLink(Links.site("terms.html")) }) { Text(stringResource(R.string.set_terms)) }
+                TextButton(onClick = { onOpenLink(Links.site("privacy.html")) }) { Text(stringResource(R.string.set_privacy)) }
+            }
+        },
+        confirmButton = { androidx.compose.material3.Button(onClick = onAccept) { Text(stringResource(R.string.accept)) } },
+    )
 }
 
 /** Posljednja greška ispod praznog „Aktivno": šta nije uspjelo i „Kopiraj izvještaj". */
