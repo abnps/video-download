@@ -491,7 +491,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
 
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
-           android_url: str = "", android_text: tuple = ("", "", "", ()),
+           android_url: str = "", android_text: tuple = ("", "", "", ()), android_guide_label: str = "",
            page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
@@ -700,6 +700,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {android_items}
         </ol>
         <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
+        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
       </div>
     </div>
   </section>

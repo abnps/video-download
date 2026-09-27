@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android — Anleitung: Entwickleroptionen — Video Download</title>
+<meta name="description" content="Telefon für Tests und Support einrichten">
+<link rel="canonical" href="https://abnps.github.io/video-download/de/android-guide.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Video Download">
+<meta property="og:title" content="Android — Anleitung: Entwickleroptionen — Video Download">
+<meta property="og:description" content="Telefon für Tests und Support einrichten">
+<meta property="og:url" content="https://abnps.github.io/video-download/de/android-guide.html">
+<meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-de.png">
+<meta property="og:image:width" content="860">
+<meta property="og:image:height" content="470">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/android-guide.html">
+<link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/android-guide.html">
+<link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/android-guide.html">
+<link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/android-guide.html">
+<link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/android-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/android-guide.html">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><img src="../assets/icon.png" alt="">Video Download</a>
+    <nav>
+      <a href="index.html#features">Funktionen</a>
+      <a href="index.html#extension">Erweiterung</a>
+      <a href="index.html#install">Installation</a>
+      <a href="index.html#news">Neuigkeiten</a>
+      <a href="index.html#help">Hilfe</a>
+      <a class="heart" href="index.html#support">♥ Unterstützen</a>
+    </nav>
+    <span class="lang"><a href="../android-guide.html">EN</a> · <a href="../bs/android-guide.html">BS</a> · <a href="../de/android-guide.html" aria-current="true">DE</a> · <a href="../es/android-guide.html">ES</a> · <a href="../fr/android-guide.html">FR</a></span>
+    <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menü" title="Menü"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Menü" hidden>
+      <a href="index.html#features">Funktionen</a>
+      <a href="index.html#extension">Erweiterung</a>
+      <a href="index.html#install">Installation</a>
+      <a href="index.html#news">Neuigkeiten</a>
+      <a href="index.html#help">Hilfe</a>
+      <a class="heart" href="index.html#support">♥ Unterstützen</a>
+    <div class="menu-lang"><span class="lang"><a href="../android-guide.html">EN</a> · <a href="../bs/android-guide.html">BS</a> · <a href="../de/android-guide.html" aria-current="true">DE</a> · <a href="../es/android-guide.html">ES</a> · <a href="../fr/android-guide.html">FR</a></span></div>
+  </nav>
+</header>
+
+<main class="doc">
+<a class="back" href="index.html">← Startseite</a>
+<h1>Android — Anleitung: Entwickleroptionen</h1>
+<p class="lead">Video Download funktioniert ohne Entwickleroptionen. Diese Anleitung brauchst du nur, um dein Telefon für Tests oder zur Fehlersuche mit einem Computer zu verbinden.</p>
+<section class="box"><h2 style="margin-top:0">APK-Installation ist unabhängig</h2><p>Erlaube zum Installieren der heruntergeladenen APK die Installation über den Browser oder Dateimanager, der sie öffnet. Für Updates in Video Download erlaubst du es dieser App. Entwickleroptionen und USB-Debugging sind nicht erforderlich.</p></section>
+<section class="box"><h2 style="margin-top:0">1. Entwickleroptionen aktivieren</h2><p>Samsung: Einstellungen → Telefoninfo → Softwareinformationen → Buildnummer.</p>
+<p>Andere Telefone: Einstellungen → Über das Telefon → Buildnummer (der Pfad kann abweichen).</p>
+<p>Tippe siebenmal auf Buildnummer. Gib bei Nachfrage die Entsperr-PIN im Systemdialog ein. Suche danach in den Einstellungen nach Entwickleroptionen, manchmal unter System.</p></section>
+<section class="box"><h2 style="margin-top:0">2. Per USB verbinden</h2><p>Aktiviere USB-Debugging in den Entwickleroptionen. Verbinde dein Telefon mit einem Datenkabel mit deinem eigenen Computer. Bestätige die USB-Debugging-Anfrage nur für einen vertrauenswürdigen Computer. Auf dem Computer werden auch Android Platform Tools (ADB) oder Android Studio benötigt.</p></section>
+<section class="box"><h2 style="margin-top:0">3. Oder über WLAN verbinden</h2><p>Ab Android 11: Verbinde Telefon und Computer mit demselben vertrauenswürdigen WLAN. Öffne Entwickleroptionen → Drahtloses Debugging → Gerät mit Kopplungscode koppeln. Kopple es über Android Studio oder ADB am Computer. Code und Kopplungsport stehen auf dem Telefon; der Verbindungsport kann abweichen. Teile den Code nicht öffentlich.</p></section>
+<section class="box"><h2 style="margin-top:0">4. Nach dem Test</h2><p>Schalte USB-Debugging und drahtloses Debugging anschließend aus. Vertraust du dem Computer nicht mehr, widerrufe die USB-Debugging-Autorisierungen und entferne ihn aus den gekoppelten Geräten. Auch die Entwickleroptionen lassen sich ausschalten.</p></section>
+<p>Menünamen können abweichen. Findest du eine Option nicht, nutze die Suche in den Einstellungen. Verwaltete Telefone können diese Optionen einschränken. Auf Samsung kann die Automatische Sperre das Debugging blockieren; beachte die Systemmeldung oder frage den Support.</p>
+<p><a href="https://developer.android.com/studio/debug/dev-options">Offizielle Android-Anleitung</a></p>
+<p><a href="https://developer.android.com/studio/run/device#wireless">Anleitung zur WLAN-Kopplung</a></p>
+<p><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Für Android herunterladen (Beta)</a></p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Video Download</span>
+    <div class="links">
+      <a href="guides.html">Anleitungen</a><a href="changelog.html">Neuigkeiten</a>
+      <a href="terms.html">Nutzungsbedingungen</a><a href="privacy.html">Datenschutz</a><a href="licenses.html">Lizenzen</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

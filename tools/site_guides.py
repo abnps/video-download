@@ -388,13 +388,14 @@ def guide_body(lang: str, slug: str, *, issue_url: str, installer_url: str, win_
     return title, description, body
 
 
-def hub_body(lang: str) -> tuple[str, str, str]:
+def hub_body(lang: str, extra_card: str = "") -> tuple[str, str, str]:
     hub = HUB[lang]
     cards = "\n".join(f'<li><a href="{slug}.html"><b>{html.escape(TEXT[lang][slug][0])}</b></a>'
                       f"<br><span>{html.escape(TEXT[lang][slug][1])}</span></li>" for slug in GUIDES)
     body = f"""<h1>{hub[1]}</h1>
 <p class="lead">{hub[3]}</p>
 <ul class="guide-list cards">
+{extra_card}
 {cards}
 </ul>"""
     return hub[1], hub[2], body

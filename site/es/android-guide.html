@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android — Guía: opciones de desarrollador — Video Download</title>
+<meta name="description" content="Configurar el teléfono para pruebas y soporte">
+<link rel="canonical" href="https://abnps.github.io/video-download/es/android-guide.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Video Download">
+<meta property="og:title" content="Android — Guía: opciones de desarrollador — Video Download">
+<meta property="og:description" content="Configurar el teléfono para pruebas y soporte">
+<meta property="og:url" content="https://abnps.github.io/video-download/es/android-guide.html">
+<meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-es.png">
+<meta property="og:image:width" content="860">
+<meta property="og:image:height" content="470">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<link rel="apple-touch-icon" href="../assets/icon.png">
+<meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/android-guide.html">
+<link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/android-guide.html">
+<link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/android-guide.html">
+<link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/android-guide.html">
+<link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/android-guide.html">
+<link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/android-guide.html">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><img src="../assets/icon.png" alt="">Video Download</a>
+    <nav>
+      <a href="index.html#features">Funciones</a>
+      <a href="index.html#extension">Extensión</a>
+      <a href="index.html#install">Instalación</a>
+      <a href="index.html#news">Novedades</a>
+      <a href="index.html#help">Ayuda</a>
+      <a class="heart" href="index.html#support">♥ Apoyar</a>
+    </nav>
+    <span class="lang"><a href="../android-guide.html">EN</a> · <a href="../bs/android-guide.html">BS</a> · <a href="../de/android-guide.html">DE</a> · <a href="../es/android-guide.html" aria-current="true">ES</a> · <a href="../fr/android-guide.html">FR</a></span>
+    <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menú" title="Menú"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Menú" hidden>
+      <a href="index.html#features">Funciones</a>
+      <a href="index.html#extension">Extensión</a>
+      <a href="index.html#install">Instalación</a>
+      <a href="index.html#news">Novedades</a>
+      <a href="index.html#help">Ayuda</a>
+      <a class="heart" href="index.html#support">♥ Apoyar</a>
+    <div class="menu-lang"><span class="lang"><a href="../android-guide.html">EN</a> · <a href="../bs/android-guide.html">BS</a> · <a href="../de/android-guide.html">DE</a> · <a href="../es/android-guide.html" aria-current="true">ES</a> · <a href="../fr/android-guide.html">FR</a></span></div>
+  </nav>
+</header>
+
+<main class="doc">
+<a class="back" href="index.html">← Inicio</a>
+<h1>Android — Guía: opciones de desarrollador</h1>
+<p class="lead">Video Download funciona sin opciones de desarrollador. Usa esta guía solo para conectar el teléfono a un ordenador y realizar pruebas o resolver problemas.</p>
+<section class="box"><h2 style="margin-top:0">La instalación del APK es independiente</h2><p>Para instalar el APK descargado, permite la instalación desde el navegador o gestor de archivos que lo abre. Para actualizar desde Video Download, permite la instalación desde esta aplicación. No se necesitan opciones de desarrollador ni depuración USB.</p></section>
+<section class="box"><h2 style="margin-top:0">1. Activar opciones de desarrollador</h2><p>Samsung: Ajustes → Acerca del teléfono → Información de software → Número de compilación.</p>
+<p>Otros teléfonos: Ajustes → Acerca del teléfono → Número de compilación (la ruta puede variar).</p>
+<p>Toca Número de compilación siete veces. Si se solicita, introduce el PIN de desbloqueo en la pantalla del sistema. Vuelve a Ajustes y busca Opciones de desarrollador, a veces dentro de Sistema.</p></section>
+<section class="box"><h2 style="margin-top:0">2. Conectar por USB</h2><p>Activa Depuración USB en las opciones de desarrollador. Conecta el teléfono a tu ordenador con un cable que transmita datos. Autoriza la depuración solo si confías en ese ordenador. El ordenador también necesita Android Platform Tools (ADB) o Android Studio.</p></section>
+<section class="box"><h2 style="margin-top:0">3. O conectar por Wi-Fi</h2><p>En Android 11 o posterior, conecta el teléfono y el ordenador a la misma red Wi-Fi de confianza. Abre Opciones de desarrollador → Depuración inalámbrica → Vincular dispositivo con código. Vincúlalo con Android Studio o ADB en el ordenador. El código y el puerto de vinculación aparecen en el teléfono; el puerto de conexión puede ser distinto. No publiques el código.</p></section>
+<section class="box"><h2 style="margin-top:0">4. Al terminar las pruebas</h2><p>Desactiva la depuración USB e inalámbrica al terminar. Si ya no confías en el ordenador, revoca las autorizaciones de depuración USB y elimínalo de los dispositivos vinculados. También puedes desactivar las opciones de desarrollador.</p></section>
+<p>Los nombres de los menús varían. Si no encuentras una opción, usa la búsqueda de Ajustes. Los teléfonos administrados pueden restringir estas opciones. En Samsung, el Bloqueador automático puede impedir la depuración; sigue el mensaje del sistema o contacta con soporte.</p>
+<p><a href="https://developer.android.com/studio/debug/dev-options">Guía oficial de Android</a></p>
+<p><a href="https://developer.android.com/studio/run/device#wireless">Instrucciones para vincular por Wi-Fi</a></p>
+<p><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Descargar para Android (beta)</a></p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Video Download</span>
+    <div class="links">
+      <a href="guides.html">Guías</a><a href="changelog.html">Novedades</a>
+      <a href="terms.html">Condiciones de uso</a><a href="privacy.html">Privacidad</a><a href="licenses.html">Licencias</a>
+      <a href="https://github.com/abnps/video-download">GitHub</a><a href="mailto:abnpsdev@gmail.com">abnpsdev@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

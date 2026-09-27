@@ -17,7 +17,7 @@ import site_home  # noqa: E402
 
 from videodl import __version__, changelog  # noqa: E402
 
-PAGES = ("index.html", "guides.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
+PAGES = ("index.html", "guides.html", "android-guide.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
          "terms.html", "privacy.html", "licenses.html", "extension.html")
 
 

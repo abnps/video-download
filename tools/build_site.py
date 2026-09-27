@@ -22,6 +22,7 @@ from videodl import __version__, changelog, legal  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import site_guides  # noqa: E402  (vodiči: MP3, isječak, plejlista…)
 import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
+import site_android  # noqa: E402  (Android tutorijal)
 
 SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
@@ -487,7 +488,7 @@ def software_jsonld(lang: str) -> str:
     return f'<script type="application/ld+json">\n{text}\n</script>'
 
 
-SITEMAP_PAGES = ("index.html", "guides.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
+SITEMAP_PAGES = ("index.html", "guides.html", site_android.PAGE, *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
                  "extension.html", "terms.html", "privacy.html", "licenses.html")
 
 
@@ -917,11 +918,14 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
             android_url=ANDROID_APK_URL, android_text=ANDROID_TEXT[lang],
+            android_guide_label=site_android.TEXT[lang]["dev_guide_title"],
             meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])
             + "\n" + software_jsonld(lang), page_url=page_url(lang), news_more=CHANGELOG_TEXT[lang][2],
             guides_link=site_guides.HUB[lang][9])
         pages[f"{prefix}changelog.html"] = page_changelog(lang)
-        pages[f"{prefix}guides.html"] = _page(lang, "guides.html", *site_guides.hub_body(lang))
+        pages[f"{prefix}guides.html"] = _page(lang, "guides.html", *site_guides.hub_body(lang, extra_card=site_android.hub_card(lang)))
+        pages[f"{prefix}{site_android.PAGE}"] = _page(lang, site_android.PAGE, *site_android.guide_body(
+            lang, ANDROID_APK_URL, ANDROID_TEXT[lang][1]))
         for slug in site_guides.GUIDES:
             pages[f"{prefix}{slug}.html"] = _page(lang, f"{slug}.html", *site_guides.guide_body(
                 lang, slug, issue_url=ISSUE_URL, installer_url=INSTALLER_URL, win_button=site_home.HOME[lang]["win_btn"]))
