@@ -12,9 +12,10 @@
     <string name="status_saving">Enregistrement…</string>
     <string name="status_done">Terminé : %1$s</string>
     <string name="status_failed">Erreur : %1$s</string>
+    <string name="status_stopping">Arrêt en cours…</string>
     <string name="status_cancelled">Arrêté</string>
     <string name="cancel">Arrêter</string>
     <string name="open">Ouvrir</string>
     <string name="saved_where">Les vidéos vont dans Movies/Video Download, le son dans Music/Video Download.</string>
-    <string name="prototype_note">Version d\'essai : pas encore de MP3 ni de fusion image et son (qualité jusqu\'au meilleur fichier unique).</string>
+    <string name="prototype_note">Version d\'essai : vidéo jusqu\'à 1080p (H.264), son en M4A ; le MP3 arrive bientôt.</string>
 </resources>

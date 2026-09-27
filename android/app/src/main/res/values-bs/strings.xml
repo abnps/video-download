@@ -12,9 +12,10 @@
     <string name="status_saving">Čuvam…</string>
     <string name="status_done">Završeno: %1$s</string>
     <string name="status_failed">Greška: %1$s</string>
+    <string name="status_stopping">Zaustavljam…</string>
     <string name="status_cancelled">Zaustavljeno</string>
     <string name="cancel">Zaustavi</string>
     <string name="open">Otvori</string>
     <string name="saved_where">Video ide u Movies/Video Download, zvuk u Music/Video Download.</string>
-    <string name="prototype_note">Probna verzija: još bez MP3 i spajanja slike i zvuka (kvalitet do najboljeg jednog fajla).</string>
+    <string name="prototype_note">Probna verzija: video do 1080p (H.264), zvuk kao M4A; MP3 dolazi uskoro.</string>
 </resources>

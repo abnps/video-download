@@ -13,9 +13,10 @@
     <string name="status_saving">Saving…</string>
     <string name="status_done">Done: %1$s</string>
     <string name="status_failed">Failed: %1$s</string>
+    <string name="status_stopping">Stopping…</string>
     <string name="status_cancelled">Stopped</string>
     <string name="cancel">Stop</string>
     <string name="open">Open</string>
     <string name="saved_where">Videos go to Movies/Video Download, audio to Music/Video Download.</string>
-    <string name="prototype_note">Test version: no MP3 or video+audio merging yet (quality up to the best single file).</string>
+    <string name="prototype_note">Test version: video up to 1080p (H.264), audio as M4A; MP3 is coming.</string>
 </resources>

@@ -12,9 +12,10 @@
     <string name="status_saving">Wird gespeichert…</string>
     <string name="status_done">Fertig: %1$s</string>
     <string name="status_failed">Fehler: %1$s</string>
+    <string name="status_stopping">Wird gestoppt…</string>
     <string name="status_cancelled">Gestoppt</string>
     <string name="cancel">Stoppen</string>
     <string name="open">Öffnen</string>
     <string name="saved_where">Videos landen in Movies/Video Download, Ton in Music/Video Download.</string>
-    <string name="prototype_note">Testversion: noch ohne MP3 und ohne Zusammenführen von Bild und Ton (Qualität bis zur besten Einzeldatei).</string>
+    <string name="prototype_note">Testversion: Video bis 1080p (H.264), Ton als M4A; MP3 kommt bald.</string>
 </resources>

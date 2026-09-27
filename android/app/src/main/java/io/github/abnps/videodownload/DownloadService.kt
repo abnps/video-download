@@ -28,14 +28,23 @@ class DownloadService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_CANCEL) {
-            cancelled.set(true)
+            synchronized(this) {
+                if (pending == 0) {
+                    // Ništa ne radi (npr. zaostalo obavještenje): samo ga skloni.
+                    getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
+                    stopSelf()
+                } else {
+                    cancelled.set(true)
+                    notify(progressNotification(getString(R.string.status_stopping), null))
+                }
+            }
             return START_NOT_STICKY
         }
         val url = intent?.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
         val isAudio = intent.getBooleanExtra(EXTRA_AUDIO, false)
         startForeground(NOTIFICATION_ID, progressNotification(getString(R.string.status_reading), null),
             ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-        pending++
+        synchronized(this) { pending++ }
         worker.execute { run(url, isAudio) }
         return START_NOT_STICKY
     }
@@ -81,7 +90,7 @@ class DownloadService : Service() {
             synchronized(this) {
                 pending--
                 if (pending == 0) {
-                    stopForeground(STOP_FOREGROUND_DETACH) // obavještenje o kraju ostaje
+                    stopForeground(STOP_FOREGROUND_REMOVE) // napredak nestaje; ostaje samo obavještenje o kraju
                     stopSelf()
                 }
             }
