@@ -202,3 +202,72 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   (pravi Edge sa privremenim profilom i `--load-extension`; ne dira Ahmedov profil).
 - Najmanja izmjena koja rješava zahtjev; bez refaktorisanja nepovezanog koda.
 - Commit samo poslije zelenih testova; push na `origin/main`.
+
+## Primopredaja Claude → Codex (27.9.2026)
+
+Claude pauzira do resetovanja tokena; dotle Ahmed radi s Codex-om. Ovo su dogovori iz Claudeovih sesija
+koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
+
+### Dogovori s Ahmedom (ne mijenjati bez njegove izričite riječi)
+
+- Izdanje (GitHub release, verzija u `videodl/__init__.py`, Android `versionCode`) se objavljuje SAMO kad
+  Ahmed kaže „objavi". Povećanje verzije se ne commituje prije toga.
+- Dva agenta rade u istom folderu: prije rada `git log -5` i `git status`; tuđe commite i izmjene nikad ne
+  vraćati (revert) niti prepisivati — ako smetaju, pitati Ahmeda.
+- Agent nikad ne šalje novac, ne unosi lozinke/pristupne podatke, ne pravi naloge; izmjena podešavanja
+  naloga (GitHub, Google, PayPal…) samo uz Ahmedovu potvrdu. Brisanje GitHub izdanja/nacrta samo uz potvrdu.
+- Privatni ključevi (`%USERPROFILE%\.videodl\release-signing-key.pem`, `android-release.jks`,
+  `android-release.properties`) nikad u repo, vault, log ili poruku. Ahmed ih ima u OneDrive Personal Vault.
+  NIKAD ne praviti novi Android ključ.
+- Izgled sajta ostaje kakav jeste (Ahmed odbio „svjetlije, manje sjaja i naginjanja"). Bez Microsoftovih i
+  Appleovih logotipa (pravno); dugmad i kartice su tekst: „Windows · macOS · Android" (u tekuć tekst može „Mac").
+- PayPal dugme s oznakom „7.99" je namjerno. Dugmad za plaćanje koja ne rade se uklanjaju.
+- 18+ se ne pominje u bilješkama o verziji; YouTube je izuzet od provjere 18+.
+- Vault: bilješke se ne brišu, ne premještaju i ne preimenuju bez dozvole; dopisuje se, ne prepisuje.
+
+### Android — tehničke činjenice
+
+- Alati (van repoa): `C:\Video Downloader\Alati\` — `jdk-21`, `android-sdk` (build-tools 37.0.0, platforma
+  android-37.0, NDK 29), `gradle-9.8.0`. `sdkmanager.bat` pokretati iz PowerShell-a (razmak u putanji lomi Bash).
+- Stack: Kotlin + Jetpack Compose, AGP 9.2.1, Chaquopy 17 (Python 3.14, `yt-dlp==2026.8.19` preko pip-a),
+  minSdk 29, targetSdk 36. Odluka B iz plana: bez GPL biblioteka (nema ffmpeg-a) — video (H.264) i zvuk (AAC)
+  spaja Androidov MediaMuxer (`Muxer.kt`).
+- `vd_core.py`: jedna yt-dlp sesija po preuzimanju, ali ponovno čitanje (re-extract) za svaki dio i novi
+  `format_selector` po dijelu — ponovna upotreba pročitanih podataka daje YouTube 403. Prekid:
+  `Cancelled(DownloadCancelled)`. Log zadnjeg preuzimanja: `cache/zadnji-log.txt` (Postavke → „Kopiraj izvještaj").
+- `vd_net.py`: TikTok traži impersonaciju; zahtjevi idu kroz Kotlin `NativeHttp` s DESKTOP Chrome UA
+  (mobilni UA ne radi).
+- Desktop `videodl/{__init__,runtime,ytdlp_update}.py` se kopiraju u APK pri gradnji (Gradle `sharedPython`) —
+  izmjena tih fajlova utiče i na Android.
+- Ažuriranje u aplikaciji (`AppUpdater.kt`): čita `releases/latest/download/android.json`, provjeri SHA-256 i
+  da je potpis isti kao instaliran, instalira preko PackageInstaller-a.
+- Objava: `python tools/publish_android.py` (`--dry-run` samo gradi u `C:\Video Downloader\Build\android`).
+  Postavlja u POSLJEDNJE izdanje s `--clobber`. Poslije svakog novog desktop izdanja obavezno ponoviti.
+- Test telefon: Ahmedov Samsung S26 Ultra. Bežični adb: `adb mdns services` → `adb connect <ip:port>`;
+  Samsung gasi bežično otklanjanje grešaka kad se ekran zaključa. Ne tapkati automatski dok Ahmed koristi
+  telefon — pitati ga ili ga pustiti da testira ručno. Na Samsungu Auto Blocker mora biti isključen prije
+  USB otklanjanja grešaka i instalacije APK-a.
+- Google provjera programera (DE/RS od 2027): $25 pun nalog ili besplatan ograničen (20 uređaja) — odluka
+  čeka Ahmeda; vidi `00_plan/android_plan.md`.
+
+### Stanje 27.9.2026
+
+- Objavljeno: Windows 0.9.7, macOS 0.9.7 (beta, .dmg pravi CI), Android 0.2.0 (beta) u izdanju v0.9.7;
+  dodatak 0.5.3 (Chrome/Edge). Sajt: Windows · macOS · Android, vodiči, changelog, 404. CI zelen.
+
+### Otvoreno (redom kako je predloženo Ahmedu)
+
+1. Android: MP3 pored M4A (bez ffmpeg-a — riješiti bez GPL biblioteka ili pitati Ahmeda).
+2. Android: plejliste i potvrda 18+ (ista pravila kao desktop, YouTube izuzet).
+3. Android: razumljive poruke o greškama na 5 jezika (kao `widgets.friendly_error`).
+4. Pravi test ažuriranja u aplikaciji: nova Android verzija (npr. 0.2.1, veći `versionCode`) → Ahmed u
+   aplikaciji Postavke → Provjeri ažuriranje. Objava samo uz „objavi".
+5. Android licence trećih strana (Material ikone, Chaquopy, yt-dlp, Python) u aplikaciji i na sajtu.
+6. Firefox dodatak 0.5.3: ZIP za AMO (`python tools/build_firefox.py`); Ahmed ga sam predaje.
+
+### Čeka Ahmeda
+
+PayPal probna uplata 1 €; izvještaj prijatelja s Macom i prvi utisci s Androidom; Search Console provjera;
+brisanje starih nacrta 0.9.4/0.9.5 (traži potvrdu); čišćenje e-maila u `abnps/.github` i GitHub privatnost
+e-maila; prazan stari OneDrive folder (briše Ahmed); Trusted Signing (ponuđeno istraživanje).
+Kasnije: roditeljska zaštita (blokada 18+ + PIN), privatni repo, Video Toolkit.
