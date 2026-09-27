@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
@@ -13,17 +15,33 @@ android {
         // Android 10+: čuvanje u Galeriju/Muziku preko MediaStore bez dozvole za pisanje (~95 % telefona).
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0-proba"
+        versionCode = 2
+        versionName = "0.1.0"
         ndk {
             // Telefoni (arm64) i emulator na računaru (x86_64).
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
     }
 
+    // Pravi ključ je van projekta (%USERPROFILE%\.videodlndroid-release.*), nikad u repou; bez njega (npr. CI)
+    // release se pravi nepotpisan. Isti ključ zauvijek: Android ne prima ažuriranje potpisano drugim ključem.
+    val keyFile = File(System.getProperty("user.home"), ".videodl/android-release.properties")
+    val releaseKey = keyFile.takeIf { it.isFile }?.let { file -> Properties().apply { file.inputStream().use(::load) } }
+    signingConfigs {
+        if (releaseKey != null) {
+            create("release") {
+                storeFile = File(keyFile.parentFile, releaseKey.getProperty("storeFile"))
+                storePassword = releaseKey.getProperty("storePassword")
+                keyAlias = releaseKey.getProperty("keyAlias")
+                keyPassword = releaseKey.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {
