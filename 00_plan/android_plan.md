@@ -71,6 +71,20 @@ bez praćenja, na 5 jezika — kao desktop verzija.
 - Bez Play Storea: nema automatskog ažuriranja od strane Googlea, korisnik mora dozvoliti instalaciju
   „iz nepoznatih izvora" (jednom). Pravila ista kao desktop: bez DRM-a, bez piratskih izvora, 18+ potvrda.
 
+## Googleova provjera programera — provjereno 27.9.2026 (zvanične stranice)
+
+- Od 30.9.2026. samo Brazil, Indonezija, Singapur, Tajland; 2027. globalno (DE/RS bez tačnog datuma).
+  Certificirani telefoni, Android 7+.
+- Pun lični nalog (Android Developer Console): lični dokument s fotografijom, ime, adresa, e-mail, telefon,
+  jednokratno 25 $. Za aplikacije van Play Storea kontakt-podaci „nisu prikazani javno" (samo Google ih ima).
+- Besplatan ograničen nalog (studenti/hobisti): bez dokumenta i naknade, najviše 20 uređaja — dovoljno za
+  prototip i betu s Ahmedom i prijateljima.
+- Bez registracije: samo „napredni postupak" na telefonu (opcije za programere, upozorenja, restart,
+  24 sata čekanja) — za obične korisnike praktično neupotrebljivo.
+- Prijedlog: prototip/beta na besplatnom ograničenom nalogu; pun nalog tek za javno izdanje (najkasnije 2027.).
+- Izvori: developer.android.com/developer-verification; support.google.com/android-developer-console/answer/16561738
+  i /16641416; 9to5google.com (napredni postupak, 19.3.2026).
+
 ## Šta treba od Ahmeda prije početka
 
 1. Odluka A (GPL, brže) ili B (naša licenca, sporije).
