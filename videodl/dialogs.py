@@ -210,6 +210,11 @@ class BrowserHelpDialog(QDialog):
             self.browser_buttons[exe] = button
         browsers.addStretch(1)
         layout.addLayout(browsers)
+        # Firefox ne treba ništa od gornjeg: dodatak potpisan od Mozille se instalira sa sajta jednim klikom.
+        firefox = QLabel(tr("help.firefox"))
+        firefox.setWordWrap(True)
+        firefox.linkActivated.connect(lambda _href: QDesktopServices.openUrl(QUrl(self.guide_url())))
+        layout.addWidget(firefox)
 
         self.note = QLabel()
         self.note.setObjectName("supportNote")
@@ -226,7 +231,9 @@ class BrowserHelpDialog(QDialog):
 
     @staticmethod
     def guide_url() -> str:
-        return SITE_URL + ("bs/" if get_language() == "bs" else "") + "extension.html"
+        # sajt ima svih 5 jezika: engleski u korijenu, ostali u svom podfolderu
+        language = get_language()
+        return SITE_URL + ("" if language == "en" else f"{language}/") + "extension.html"
 
     def _copy_path(self) -> None:
         QApplication.clipboard().setText(self._folder)

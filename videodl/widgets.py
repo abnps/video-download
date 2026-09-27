@@ -2,6 +2,7 @@
 
 import os
 import re
+import zlib
 
 from PySide6.QtCore import (
     QEasingCurve, QElapsedTimer, QPoint, QRectF, QSize, Qt, QTimer, QVariantAnimation, Signal,
@@ -276,6 +277,11 @@ class ElidedLabel(QLabel):
         painter.drawText(rect, int(self.alignment() | Qt.AlignmentFlag.AlignVCenter), text)
 
 
+# Parovi boja privremene sličice (prigušeni, čitljivi uz bijelo trajanje u obje teme).
+PLACEHOLDER_COLORS = (("#3d7a5a", "#2b5a82"), ("#8a3b6b", "#4b3f8f"), ("#8a6a3b", "#8a3b4f"),
+                      ("#3b5f8a", "#5b3f8f"), ("#2f7a78", "#3b5f8a"), ("#6b4f8f", "#8a3b6b"))
+
+
 class Thumbnail(QWidget):
     WIDTH, HEIGHT = 96, 54
 
@@ -284,6 +290,7 @@ class Thumbnail(QWidget):
         self.setFixedSize(self.WIDTH, self.HEIGHT)
         self._pixmap: QPixmap | None = None
         self._duration = ""
+        self._colors = PLACEHOLDER_COLORS[0]
 
     def set_pixmap(self, pixmap: QPixmap) -> None:
         self._pixmap = pixmap
@@ -291,6 +298,11 @@ class Thumbnail(QWidget):
 
     def has_pixmap(self) -> bool:
         return self._pixmap is not None
+
+    def set_seed(self, text: str) -> None:
+        """Boje privremene sličice zavise od naslova: isti video uvijek iste, susjedni redovi različite."""
+        self._colors = PLACEHOLDER_COLORS[zlib.crc32((text or "").encode("utf-8")) % len(PLACEHOLDER_COLORS)]
+        self.update()
 
     def set_duration(self, text: str) -> None:
         self._duration = text
@@ -309,14 +321,24 @@ class Thumbnail(QWidget):
                                          Qt.TransformationMode.SmoothTransformation)
             painter.drawPixmap((self.width() - scaled.width()) // 2, (self.height() - scaled.height()) // 2, scaled)
         else:
-            painter.fillRect(self.rect(), QColor(theme.c("thumb")))
-            play = QPainterPath()
+            # Dok prava sličica ne stigne (ili je sajt nema): blagi dvobojni prelaz s kosim prugama, kao na sajtu.
+            gradient = QLinearGradient(0, 0, self.width(), self.height())
+            gradient.setColorAt(0, QColor(self._colors[0]))
+            gradient.setColorAt(1, QColor(self._colors[1]))
+            painter.fillRect(self.rect(), gradient)
+            painter.setPen(QPen(QColor(255, 255, 255, 22), 6))
+            for x in range(-self.height(), self.width() + self.height(), 16):
+                painter.drawLine(x, self.height(), x + self.height(), 0)
             cx, cy = self.width() / 2, self.height() / 2
-            play.moveTo(cx - 6, cy - 9)
-            play.lineTo(cx + 9, cy)
-            play.lineTo(cx - 6, cy + 9)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QColor(0, 0, 0, 70))
+            painter.drawEllipse(QRectF(cx - 14, cy - 14, 28, 28))
+            play = QPainterPath()
+            play.moveTo(cx - 4, cy - 7)
+            play.lineTo(cx + 7, cy)
+            play.lineTo(cx - 4, cy + 7)
             play.closeSubpath()
-            painter.fillPath(play, QColor(255, 255, 255, 200))
+            painter.fillPath(play, QColor(255, 255, 255, 230))
 
         if self._duration:
             font = QFont(self.font())
@@ -465,12 +487,13 @@ class QueueRow(QFrame):
 
         self.remove_button = QToolButton()
         self.remove_button.setObjectName("rowRemove")
-        self.remove_button.setIconSize(QSize(12, 12))
-        self.remove_button.setFixedSize(20, 20)
+        self.remove_button.setIconSize(QSize(14, 14))
+        self.remove_button.setFixedSize(34, 34)  # kao ostala dugmad u redu: lakše se pogodi, u istoj liniji
         self.remove_button.clicked.connect(lambda: self.remove_clicked.emit(self.item_id))
-        layout.addWidget(self.remove_button, 0, Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(self.remove_button, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.thumbnail.set_duration(format_duration(item.duration))
+        self.thumbnail.set_seed(item.title or item.url)
         self.update_item(item)
 
     def _on_format_link(self, _href: str) -> None:

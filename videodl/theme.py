@@ -93,7 +93,7 @@ QLabel#rowStatus[state="done"] {{ color: {k['done']}; }}
 QLabel#rowStatus[state="failed"] {{ color: {k['failed']}; }}
 QToolButton#rowAction {{ border: none; border-radius: 17px; background: transparent; }}
 QToolButton#rowAction:hover {{ background: {k['action_hover']}; }}
-QToolButton#rowRemove {{ border: none; border-radius: 10px; background: transparent; }}
+QToolButton#rowRemove {{ border: none; border-radius: 17px; background: transparent; }}
 QToolButton#rowRemove:hover {{ background: {k['remove_hover']}; }}
 QToolButton#rowConvert {{ border: 1px solid {k['convert_border']}; border-radius: 17px; background: {k['convert_bg']};
     color: {k['convert_fg']}; font-weight: 600; font-size: 12px; }}

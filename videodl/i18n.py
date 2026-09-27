@@ -271,6 +271,17 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "échecs : {count}"),
 
     # pomoć i zatvaranje
+    "help.firefox": (
+        'Firefox: dodatak koji je potpisala Mozilla instalira se jednim klikom, bez „Developer mode“: '
+        '<a href="guide">uputstvo na sajtu</a>.',
+        'Firefox: the extension signed by Mozilla installs with one click, no developer mode: '
+        '<a href="guide">guide on the website</a>.',
+        'Firefox: Die von Mozilla signierte Erweiterung wird mit einem Klick installiert, ohne Entwicklermodus: '
+        '<a href="guide">Anleitung auf der Website</a>.',
+        'Firefox: la extensión firmada por Mozilla se instala con un clic, sin modo de desarrollador: '
+        '<a href="guide">guía en el sitio web</a>.',
+        "Firefox : l'extension signée par Mozilla s'installe en un clic, sans mode développeur : "
+        '<a href="guide">guide sur le site</a>.'),
     "help.browser_text": (
         "1. Otvori edge://extensions (ili chrome://extensions).\n2. Uključi „Developer mode“ i klikni „Load unpacked“.\n"
         "3. Izaberi folder:\n   {folder}\n\nNa stranici pokreni video i klikni ikonu Video Download. "

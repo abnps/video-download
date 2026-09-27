@@ -361,6 +361,12 @@ nav.mobile-nav { display: none; }
   nav.mobile-nav a:hover { background: var(--bg); }
   nav.mobile-nav a.heart { color: var(--pink); }
 }
+/* Koraci sa slikama (Windows prozori, dodatak) na uskom ekranu stoje jedan ispod drugog: strelica ide nadolje. */
+@media (max-width: 720px) {
+  .dialogs .arrow, .mock-row .ss-arrow { width: 100%; text-align: center; font-size: 0; line-height: 1; }
+  .dialogs .arrow::after, .mock-row .ss-arrow::after { content: "↓"; font-size: 22px; }
+  .mock-row .mock { max-width: none; flex-basis: 100%; }
+}
 @media (max-width: 480px) {
   .bar > .lang { display: none; }  /* jezici prelaze u meni, da zaglavlje stane */
   .menu-btn { margin-left: auto; }

@@ -5,7 +5,7 @@ import unittest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtWidgets import QApplication, QLabel  # noqa: E402
 
 from videodl.gui import BrowserHelpDialog  # noqa: E402
 from videodl.i18n import set_language, tr  # noqa: E402
@@ -54,8 +54,17 @@ class BrowserHelpDialogTest(unittest.TestCase):
         set_language("en")
         try:
             self.assertEqual(BrowserHelpDialog.guide_url(), "https://abnps.github.io/video-download/extension.html")
+            for language in ("de", "es", "fr"):  # sajt ima svih 5 jezika, ne samo bs i en
+                set_language(language)
+                self.assertEqual(BrowserHelpDialog.guide_url(),
+                                 f"https://abnps.github.io/video-download/{language}/extension.html")
         finally:
             set_language("bs")
+
+    def test_firefox_is_mentioned_with_a_link_to_the_signed_extension(self):
+        dialog = self.dialog()
+        texts = [label.text() for label in dialog.findChildren(QLabel)]
+        self.assertTrue(any(text.startswith("Firefox:") and 'href="guide"' in text for text in texts))
 
 
 if __name__ == "__main__":
