@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Napravljeno iz jedne tabele (5 jezika); sr-Latn i hr dobijaju bosanske tekstove kao desktop. -->
+<resources>
+    <string name="link_hint">Link videa</string>
+    <string name="paste">Zalijepi</string>
+    <string name="download_video">Preuzmi video (MP4)</string>
+    <string name="download_audio">Samo zvuk (M4A)</string>
+    <string name="no_link">Još nema linka. Podijeli video iz druge aplikacije ili zalijepi njegov link.</string>
+    <string name="channel_name">Preuzimanja</string>
+    <string name="status_reading">Čitam link…</string>
+    <string name="status_downloading">Preuzimanje %1$d%%</string>
+    <string name="status_saving">Čuvam…</string>
+    <string name="status_done">Završeno: %1$s</string>
+    <string name="status_failed">Greška: %1$s</string>
+    <string name="status_cancelled">Zaustavljeno</string>
+    <string name="cancel">Zaustavi</string>
+    <string name="open">Otvori</string>
+    <string name="saved_where">Video ide u Movies/Video Download, zvuk u Music/Video Download.</string>
+    <string name="prototype_note">Probna verzija: još bez MP3 i spajanja slike i zvuka (kvalitet do najboljeg jednog fajla).</string>
+</resources>

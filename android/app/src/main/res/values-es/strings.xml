@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Napravljeno iz jedne tabele (5 jezika); sr-Latn i hr dobijaju bosanske tekstove kao desktop. -->
+<resources>
+    <string name="link_hint">Enlace del vídeo</string>
+    <string name="paste">Pegar</string>
+    <string name="download_video">Descargar vídeo (MP4)</string>
+    <string name="download_audio">Solo audio (M4A)</string>
+    <string name="no_link">Aún no hay enlace. Comparte un vídeo desde otra aplicación o pega su enlace.</string>
+    <string name="channel_name">Descargas</string>
+    <string name="status_reading">Leyendo el enlace…</string>
+    <string name="status_downloading">Descargando %1$d%%</string>
+    <string name="status_saving">Guardando…</string>
+    <string name="status_done">Terminado: %1$s</string>
+    <string name="status_failed">Error: %1$s</string>
+    <string name="status_cancelled">Detenido</string>
+    <string name="cancel">Detener</string>
+    <string name="open">Abrir</string>
+    <string name="saved_where">Los vídeos van a Movies/Video Download y el audio a Music/Video Download.</string>
+    <string name="prototype_note">Versión de prueba: aún sin MP3 ni unión de imagen y sonido (calidad hasta el mejor archivo único).</string>
+</resources>

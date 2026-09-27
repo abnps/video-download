@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Napravljeno iz jedne tabele (5 jezika); sr-Latn i hr dobijaju bosanske tekstove kao desktop. -->
+<resources>
+    <string name="app_name" translatable="false">Video Download</string>
+    <string name="link_hint">Video link</string>
+    <string name="paste">Paste</string>
+    <string name="download_video">Download video (MP4)</string>
+    <string name="download_audio">Audio only (M4A)</string>
+    <string name="no_link">No link yet. Share a video from another app or paste its link.</string>
+    <string name="channel_name">Downloads</string>
+    <string name="status_reading">Reading the link…</string>
+    <string name="status_downloading">Downloading %1$d%%</string>
+    <string name="status_saving">Saving…</string>
+    <string name="status_done">Done: %1$s</string>
+    <string name="status_failed">Failed: %1$s</string>
+    <string name="status_cancelled">Stopped</string>
+    <string name="cancel">Stop</string>
+    <string name="open">Open</string>
+    <string name="saved_where">Videos go to Movies/Video Download, audio to Music/Video Download.</string>
+    <string name="prototype_note">Test version: no MP3 or video+audio merging yet (quality up to the best single file).</string>
+</resources>

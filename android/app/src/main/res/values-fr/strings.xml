@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Napravljeno iz jedne tabele (5 jezika); sr-Latn i hr dobijaju bosanske tekstove kao desktop. -->
+<resources>
+    <string name="link_hint">Lien de la vidéo</string>
+    <string name="paste">Coller</string>
+    <string name="download_video">Télécharger la vidéo (MP4)</string>
+    <string name="download_audio">Son uniquement (M4A)</string>
+    <string name="no_link">Pas encore de lien. Partagez une vidéo depuis une autre application ou collez son lien.</string>
+    <string name="channel_name">Téléchargements</string>
+    <string name="status_reading">Lecture du lien…</string>
+    <string name="status_downloading">Téléchargement %1$d%%</string>
+    <string name="status_saving">Enregistrement…</string>
+    <string name="status_done">Terminé : %1$s</string>
+    <string name="status_failed">Erreur : %1$s</string>
+    <string name="status_cancelled">Arrêté</string>
+    <string name="cancel">Arrêter</string>
+    <string name="open">Ouvrir</string>
+    <string name="saved_where">Les vidéos vont dans Movies/Video Download, le son dans Music/Video Download.</string>
+    <string name="prototype_note">Version d\'essai : pas encore de MP3 ni de fusion image et son (qualité jusqu\'au meilleur fichier unique).</string>
+</resources>
