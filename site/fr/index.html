@@ -26,7 +26,7 @@
  "inLanguage": "fr",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.6",
+ "softwareVersion": "0.9.7",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -102,7 +102,7 @@
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Bêta</span></a>
         </div>
         <ul class="promise"><li>Sans compte</li><li>Sans limite quotidienne</li><li>Vos liens ne nous parviennent pas</li></ul>
-        <div class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 et 11 (64 bits) · <a href="#install">aide à l'installation</a></div>
+        <div class="meta"><!-- version -->Version 0.9.7 · 130 MB<!-- /version --> · Windows 10 et 11 (64 bits) · <a href="#install">aide à l'installation</a></div>
         <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.</p>
       </div>
 
@@ -262,21 +262,23 @@
       <h2 data-reveal>Meilleur chaque semaine.</h2>
       <p class="sub" data-reveal>La même liste que dans l'application (Aide → Nouveautés).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.7 <span>27.9.2026</span></h3><ul>
+          <li>Messages d&#x27;erreur compréhensibles dans la langue du programme (p. ex. « La vidéo n&#x27;est plus disponible », « Impossible de joindre le site ») ; le message technique reste dans l&#x27;info-bulle et dans le rapport de problème.</li>
+          <li>Deux téléchargements n&#x27;écrivent jamais le même fichier : ni la même vidéo via deux liens, ni de longs titres qui commencent pareil, ni des extraits dans la même seconde ; un MP3 de la même vidéo ne supprime plus le MP4 déjà téléchargé.</li>
+          <li>La file s&#x27;enregistre toute seule après chaque modification : un plantage ou une coupure de courant ne fait perdre aucun lien ; « Tout télécharger » pendant la lecture d&#x27;un lien démarre dès que le lien arrive.</li>
+          <li>« Arrêter » arrête aussi la conversion en MP3, tandis que « Tout retirer de la liste » et « Effacer les terminés » gardent un MP3 encore en cours ; fermer le programme ne lance plus de nouveaux téléchargements.</li>
+          <li>Une nouvelle tentative après une coupure de connexion attend vraiment 5 secondes ; le rapport de problème masque mieux les mots de passe et les clés.</li>
+          <li>L&#x27;extension du navigateur ouvre une page d&#x27;accueil à l&#x27;installation (vérifie la connexion au programme, montre comment épingler l&#x27;icône) ; bouton × plus grand et une plus belle image pendant le chargement de la miniature.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Les mises à jour sont signées numériquement : le programme n&#x27;installe qu&#x27;une nouvelle version signée par nous, même si quelqu&#x27;un remplace le fichier publié.</li>
           <li>Au premier démarrage, un court avis indiquant que le programme surveille les liens copiés, avec un bouton pour le désactiver tout de suite.</li>
           <li>Les fichiers temporaires de cookies restants (après un arrêt brutal) sont supprimés au démarrage suivant ; les longues listes utilisent moins de mémoire.</li>
           <li>La connexion avec le module du navigateur résiste mieux aux requêtes lentes ou bloquées.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p et 480p reçoivent une marque dans le nom du fichier : une autre qualité de la même vidéo n&#x27;est plus « déjà téléchargée ».</li>
           <li>Deux vidéos du même titre (nom sans ID) ne se mélangent plus ; la même vidéo lancée deux fois en même temps attend la première.</li>
           <li>« Terminé » seulement quand le fichier existe et est lisible ; la conversion en MP3 peut toujours être arrêtée.</li>
           <li>La fermeture ne fige plus la fenêtre ; la mise à jour attend aussi les conversions en MP3.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
-          <li>Stabilité : le même lien peut être ajouté à nouveau juste après « Arrêter ».</li>
-          <li>La mise à jour du lecteur de sites (yt-dlp) ne supprime plus la version utilisée ; si la nouvelle ne fonctionne pas, le programme revient à la précédente.</li>
-          <li>Un historique ou une file endommagés ne font plus planter le programme ; si l&#x27;enregistrement échoue, le programme le signale.</li>
-          <li>La désinstallation supprime aussi la connexion à Firefox ; la limite de vitesse n&#x27;est partagée qu&#x27;entre les téléchargements réellement en cours.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Toutes les versions →</a></p>
     </div>

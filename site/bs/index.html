@@ -26,7 +26,7 @@
  "inLanguage": "bs",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.6",
+ "softwareVersion": "0.9.7",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -102,7 +102,7 @@
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
-        <div class="meta"><!-- version -->Verzija 0.9.6 · 130 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
+        <div class="meta"><!-- version -->Verzija 0.9.7 · 130 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
         <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
       </div>
 
@@ -262,21 +262,23 @@
       <h2 data-reveal>Svake sedmice bolje.</h2>
       <p class="sub" data-reveal>Ista lista kao u programu (Pomoć → Šta je novo).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.7 <span>27.9.2026</span></h3><ul>
+          <li>Razumljive poruke o greškama na jeziku programa (npr. „Video više nije dostupan“, „Nema veze sa sajtom“); tehnička poruka ostaje u oblačiću i u izvještaju o problemu.</li>
+          <li>Dva preuzimanja nikad ne pišu u isti fajl: ni isti video preko dva linka, ni dugi naslovi istog početka, ni isječci unutar iste sekunde; MP3 istog videa više ne briše već preuzeti MP4.</li>
+          <li>Red se sam čuva poslije svake izmjene, pa pad programa ili nestanak struje ne gube linkove; „Preuzmi sve“ dok se link još čita kreće čim link stigne.</li>
+          <li>„Zaustavi“ zaustavlja i pretvaranje u MP3, a „Ukloni sve sa liste“ i „Očisti završene“ ne sklanjaju MP3 koji se još pravi; zatvaranje programa više ne pokreće nova preuzimanja.</li>
+          <li>Novi pokušaj poslije pucanja veze zaista sačeka 5 sekundi; izvještaj o problemu bolje skriva lozinke i ključeve.</li>
+          <li>Dodatak za browser pri instalaciji otvara stranicu dobrodošlice (provjera veze s programom, kačenje ikone); veće dugme × i ljepša sličica dok se učitava.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Ažuriranja su digitalno potpisana: program instalira samo novu verziju koju smo mi potpisali, čak i ako neko podmetne drugi fajl na mjesto objave.</li>
           <li>Pri prvom pokretanju kratka obavijest da program prati kopirane linkove, s dugmetom da se to odmah isključi.</li>
           <li>Zaostali privremeni fajlovi s kolačićima (poslije naglog prekida) brišu se pri sljedećem pokretanju; duge liste troše manje memorije.</li>
           <li>Veza s dodatkom u pretraživaču otpornija je na spore i zaglavljene zahtjeve.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p i 480p dobijaju oznaku u imenu fajla, pa različit kvalitet istog videa više nije „već preuzeto“.</li>
           <li>Dva videa istog naslova (ime fajla bez ID-a) više se ne miješaju; isti video pokrenut dvaput istovremeno čeka da prvi završi.</li>
           <li>„Završeno“ tek kad gotov fajl postoji i može se pročitati; pretvaranje u MP3 se uvijek može prekinuti.</li>
           <li>Zatvaranje programa ne zamrzava prozor; ažuriranje čeka i pretvaranja u MP3.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
-          <li>Stabilnost: isti link se može ponovo dodati odmah poslije „Zaustavi“.</li>
-          <li>Ažuriranje čitača sajtova (yt-dlp) više ne briše verziju koja radi; ako nova ne radi, program se sam vraća na prethodnu.</li>
-          <li>Oštećena istorija ili red ne obaraju program; ako čuvanje ne uspije, program to javi.</li>
-          <li>Deinstalacija uklanja i vezu s Firefoxom; ograničenje brzine se dijeli samo na preuzimanja koja stvarno rade.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Sve verzije →</a></p>
     </div>

@@ -26,7 +26,7 @@
  "inLanguage": "de",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.6",
+ "softwareVersion": "0.9.7",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -102,7 +102,7 @@
           <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Kein Konto</li><li>Kein Tageslimit</li><li>Deine Links landen nicht bei uns</li></ul>
-        <div class="meta"><!-- version -->Version 0.9.6 · 130 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
+        <div class="meta"><!-- version -->Version 0.9.7 · 130 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
         <p class="note">Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href="terms.html">Nutzungsbedingungen</a>. DRM-geschützte Inhalte werden nicht heruntergeladen.</p>
       </div>
 
@@ -262,21 +262,23 @@
       <h2 data-reveal>Jede Woche besser.</h2>
       <p class="sub" data-reveal>Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.7 <span>27.9.2026</span></h3><ul>
+          <li>Verständliche Fehlermeldungen in der Sprache des Programms (z. B. „Das Video ist nicht mehr verfügbar“, „Keine Verbindung zur Seite“); die technische Meldung bleibt im Tooltip und im Problembericht.</li>
+          <li>Zwei Downloads schreiben nie in dieselbe Datei: weder dasselbe Video über zwei Links noch lange Titel mit gleichem Anfang noch Ausschnitte innerhalb derselben Sekunde; eine MP3 desselben Videos löscht die schon geladene MP4 nicht mehr.</li>
+          <li>Die Liste speichert sich nach jeder Änderung selbst, daher gehen bei einem Absturz oder Stromausfall keine Links verloren; „Alle herunterladen“, während ein Link noch gelesen wird, startet, sobald der Link da ist.</li>
+          <li>„Stoppen“ hält auch die MP3-Umwandlung an, während „Alle aus der Liste entfernen“ und „Fertige entfernen“ eine MP3 behalten, die noch entsteht; das Schließen startet keine neuen Downloads mehr.</li>
+          <li>Ein neuer Versuch nach einem Verbindungsabbruch wartet wirklich 5 Sekunden; der Problembericht verbirgt Passwörter und Schlüssel gründlicher.</li>
+          <li>Die Browser-Erweiterung öffnet bei der Installation eine Willkommensseite (prüft die Verbindung zum Programm, zeigt das Anheften des Symbols); größere ×-Schaltfläche und schöneres Bild, solange das Vorschaubild lädt.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Updates sind digital signiert: Das Programm installiert nur eine von uns signierte neue Version, selbst wenn jemand die Datei am Veröffentlichungsort austauscht.</li>
           <li>Beim ersten Start ein kurzer Hinweis, dass das Programm kopierte Links beobachtet, mit einer Schaltfläche zum sofortigen Abschalten.</li>
           <li>Übrig gebliebene temporäre Cookie-Dateien (nach einem plötzlichen Abbruch) werden beim nächsten Start gelöscht; lange Listen brauchen weniger Speicher.</li>
           <li>Die Verbindung zum Browser-Add-on kommt besser mit langsamen oder hängenden Anfragen zurecht.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
           <li>1080p, 720p und 480p erhalten eine Markierung im Dateinamen, daher gilt eine andere Qualität desselben Videos nicht mehr als „bereits heruntergeladen“.</li>
           <li>Zwei Videos mit gleichem Titel (Dateiname ohne ID) werden nicht mehr verwechselt; dasselbe Video, das zweimal gleichzeitig startet, wartet auf das erste.</li>
           <li>„Fertig“ erst, wenn die Datei existiert und lesbar ist; die MP3-Umwandlung lässt sich immer abbrechen.</li>
           <li>Das Schließen friert das Fenster nicht mehr ein; das Update wartet auch auf MP3-Umwandlungen.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.4 <span>26.9.2026</span></h3><ul>
-          <li>Stabilität: Derselbe Link kann direkt nach „Stopp“ erneut hinzugefügt werden.</li>
-          <li>Das Aktualisieren des Seitenlesers (yt-dlp) löscht die laufende Version nicht mehr; funktioniert die neue nicht, kehrt das Programm zur vorherigen zurück.</li>
-          <li>Ein beschädigter Verlauf oder eine beschädigte Liste bringt das Programm nicht mehr zum Absturz; schlägt das Speichern fehl, meldet es das Programm.</li>
-          <li>Die Deinstallation entfernt auch die Firefox-Verbindung; das Tempolimit wird nur auf tatsächlich laufende Downloads verteilt.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Alle Versionen →</a></p>
     </div>

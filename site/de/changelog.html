@@ -60,6 +60,15 @@
 <a class="back" href="index.html">← Startseite</a>
 <h1>Neuigkeiten</h1>
 <p class="lead">Alle Versionen, die neueste zuerst. Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
+<h2 id="v0-9-7">0.9.7 <small>27.9.2026</small></h2>
+<ul>
+<li>Verständliche Fehlermeldungen in der Sprache des Programms (z. B. „Das Video ist nicht mehr verfügbar“, „Keine Verbindung zur Seite“); die technische Meldung bleibt im Tooltip und im Problembericht.</li>
+<li>Zwei Downloads schreiben nie in dieselbe Datei: weder dasselbe Video über zwei Links noch lange Titel mit gleichem Anfang noch Ausschnitte innerhalb derselben Sekunde; eine MP3 desselben Videos löscht die schon geladene MP4 nicht mehr.</li>
+<li>Die Liste speichert sich nach jeder Änderung selbst, daher gehen bei einem Absturz oder Stromausfall keine Links verloren; „Alle herunterladen“, während ein Link noch gelesen wird, startet, sobald der Link da ist.</li>
+<li>„Stoppen“ hält auch die MP3-Umwandlung an, während „Alle aus der Liste entfernen“ und „Fertige entfernen“ eine MP3 behalten, die noch entsteht; das Schließen startet keine neuen Downloads mehr.</li>
+<li>Ein neuer Versuch nach einem Verbindungsabbruch wartet wirklich 5 Sekunden; der Problembericht verbirgt Passwörter und Schlüssel gründlicher.</li>
+<li>Die Browser-Erweiterung öffnet bei der Installation eine Willkommensseite (prüft die Verbindung zum Programm, zeigt das Anheften des Symbols); größere ×-Schaltfläche und schöneres Bild, solange das Vorschaubild lädt.</li>
+</ul>
 <h2 id="v0-9-6">0.9.6 <small>26.9.2026</small></h2>
 <ul>
 <li>Updates sind digital signiert: Das Programm installiert nur eine von uns signierte neue Version, selbst wenn jemand die Datei am Veröffentlichungsort austauscht.</li>

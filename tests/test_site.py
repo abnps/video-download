@@ -53,7 +53,7 @@ class SiteTest(unittest.TestCase):
                 self.assertIn(f"{label} {__version__} ·", index)
                 for version, _date, items in changelog.entries(lang)[:build_site.NEWS_COUNT]:
                     self.assertIn(f"<h3>{version} <span>", index)
-                    self.assertIn(items[0].replace('"', "&quot;")[:30].split("&")[0], index)
+                    self.assertIn(f"<li>{html.escape(items[0])}</li>", index)
                 self.assertIn(build_site.INSTALLER_URL, index)
                 self.assertIn(more_info, index)
                 self.assertIn(run_anyway, index)

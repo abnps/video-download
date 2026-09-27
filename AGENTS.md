@@ -67,6 +67,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   ključ (posao sačeka), nikad dva pisanja u isti fajl. Poslije potvrde zatvaranja (`_closing`) ništa novo ne
   kreće. Red se sam čuva 0,5 s poslije svake izmjene. „Ukloni sve" ne dira red koji se pretvara u MP3. Novi
   pokušaj poslije pucanja veze poštuje rok (`_retry_at`) na svim putevima pokretanja. Testovi: `tests/test_reliability.py`.
+- MP3/M4A (proba instalera 27.9.2026): yt-dlp za zvuk prvo preuzme „Naslov [id].mp4" i poslije ga BRIŠE, pa je
+  brisao korisnikov MP4 istog imena. Zvučni posao zato radi u skrivenom podfolderu `.videodl-<hash>` i pored
+  videa premjesti samo gotov zvuk (`download._download_audio`); postojeći se ne prepisuje. Test: `test_audio_keeps_video.py`.
 - Greške yt-dlp-a se u redu i statusnoj traci prikazuju razumljivo (`widgets.friendly_error`, ključevi
   `error.friendly.*`); original ostaje u oblačiću i u izvještaju o problemu. Nepoznata greška ostaje kakva jeste.
 - 5 jezika (bs, en, de, es, fr): svaki novi tekst ide u `videodl/i18n.py` i, za popup,

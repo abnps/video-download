@@ -1,12 +1,15 @@
 """Preuzimanje jedne stavke: ukupan napredak, prekid i čišćenje privremenih fajlova."""
 
 import glob
+import hashlib
 import os
+import shutil
 import subprocess
 import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 from yt_dlp import YoutubeDL
 from yt_dlp.postprocessor import FFmpegExtractAudioPP, FFmpegMergerPP, PostProcessor
@@ -14,7 +17,7 @@ from yt_dlp.utils import DownloadCancelled
 
 from .browser import Cookie, cookie_file
 from .jobs import ItemStatus
-from .presets import Preset, build_ydl_options, pick_subtitles
+from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
 from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS
 from .ytdl import YdlLogger, error_message
 
@@ -192,7 +195,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              subtitle_langs: list[str] | None = None,
              thumbnail: bool = False,
              ratelimit: "int | RateBudget | None" = None,
-             name_template: str | None = None) -> DownloadResult:
+             name_template: str | None = None,
+             _isolated: bool = False) -> DownloadResult:
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
@@ -206,6 +210,10 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                             name_template=name_template)
         finally:
             budget.leave()
+    if preset.is_audio and not _isolated:
+        return _download_audio(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
+                               filename_title=filename_title, cookies=cookies, section=section, thumbnail=thumbnail,
+                               ratelimit=ratelimit, name_template=name_template)
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     no_subtitles = False
@@ -264,6 +272,44 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         _plain_name_for_first_subtitle(filepath, (info or {}).get("requested_subtitles") or {})
     return DownloadResult(ItemStatus.DONE, filepath, MESSAGE_NO_SUBS if no_subtitles else "",
                           already_existed=not attempt.real_download)
+
+
+def _download_audio(url: str, preset: Preset, output_dir: str, subfolder: str | None, on_progress, cancel_event,
+                    **options) -> DownloadResult:
+    """MP3/M4A: yt-dlp prvo preuzme video (npr. „Naslov [id].mp4"), izvuče zvuk i OBRIŠE taj video. U folderu
+    korisnika to bi obrisalo njegov MP4 istog imena (preuzet ranije ili upravo sada kao MP4). Zato posao radi u
+    svom skrivenom podfolderu, a pored videa dolazi samo gotov zvučni fajl; postojeći se nikad ne prepisuje."""
+    target = Path(output_dir)
+    if subfolder:
+        target /= safe_folder_name(subfolder)
+    # Isto ime za isti link i format: prekinut pa ponovljen posao nastavlja svoje .part fajlove.
+    key = hashlib.sha1(f"{url}|{preset.key}|{options.get('section')}".encode("utf-8")).hexdigest()[:10]
+    work = target / f".videodl-{key}"
+    try:
+        work.mkdir(parents=True, exist_ok=True)
+        _hide(work)
+    except OSError as exc:
+        return DownloadResult(ItemStatus.FAILED, message=str(exc))
+    try:
+        result = download(url, preset, str(work), None, on_progress, cancel_event, _isolated=True, **options)
+        if result.status != ItemStatus.DONE or not result.filepath:
+            return result
+        final = target / Path(result.filepath).name
+        if final.exists():
+            # Isti zvučni fajl već postoji pored videa: ostaje taj, novi se odbacuje.
+            return DownloadResult(ItemStatus.DONE, str(final), result.message, already_existed=True)
+        os.replace(result.filepath, final)
+        return DownloadResult(ItemStatus.DONE, str(final), result.message, result.already_existed)
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def _hide(folder: Path) -> None:
+    """Privremeni folder se ne vidi u Exploreru dok posao traje (na Macu ga skriva tačka u imenu)."""
+    if os.name == "nt":
+        import ctypes
+
+        ctypes.windll.kernel32.SetFileAttributesW(str(folder), 0x2)  # FILE_ATTRIBUTE_HIDDEN
 
 
 MEDIA_SUFFIXES = frozenset((".mp4", ".mkv", ".webm", ".mov", ".m4v", ".avi", ".flv", ".ts", ".3gp",
