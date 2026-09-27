@@ -96,3 +96,12 @@ bez praćenja, na 5 jezika — kao desktop verzija.
    aplikacija u pozadini (preuzimanje mora biti usluga s obavještenjem).
 3. Spremnost na Googleovu provjeru programera (lični podaci Googleu).
 4. Potvrda redoslijeda: Android tek poslije roditeljske kontrole i Mac probe, ili prije.
+
+## Alati (instalirano 27.9.2026, Ahmed odobrio preuzimanje i Googleovu SDK licencu)
+
+`C:\Video Downloader\Alati\` (van projekta i van AppData, vidljivo Ahmedu; `PROCITAJ.txt` unutra):
+- `jdk-21` — Eclipse Temurin 21.0.12.1 (SHA-256 provjeren s Adoptium API-ja); `JAVA_HOME` postaviti na njega.
+- `android-sdk` — cmdline-tools 15859902 (SHA-256 sa developer.android.com), platform-tools 37.0.1 (`adb`),
+  build-tools 37.0.0, platforms;android-37.0, ndk;29.0.14206865. `ANDROID_HOME` = taj folder.
+- `sdkmanager.bat` iz Basha ne radi zbog razmaka u putanji: pokretati iz PowerShella (Start-Process).
+- Emulator nije instaliran (proba na Ahmedovom S26 Ultra + GitHub Actions).
