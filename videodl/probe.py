@@ -24,6 +24,7 @@ class Entry:
     thumbnail: str | None = None
     duration: float | None = None
     adult: bool = False  # yt-dlp age_limit >= 18 (sajt ga označio kao sadržaj samo za odrasle)
+    video_id: str | None = None  # ID videa na sajtu (ide u ime fajla): isti video preko dva linka = isti fajl
 
 
 ADULT_AGE = 18
@@ -109,7 +110,12 @@ def _entry(info: dict, url: str) -> Entry:
     duration = info.get("duration")
     return Entry(url, _title(info, url), pick_thumbnail(info),
                  float(duration) if isinstance(duration, (int, float)) and duration > 0 else None,
-                 adult=is_adult(info, url))
+                 adult=is_adult(info, url), video_id=_video_id(info))
+
+
+def _video_id(info: dict) -> str | None:
+    value = info.get("id")
+    return str(value) if isinstance(value, (str, int)) and str(value) else None
 
 
 def pick_thumbnail(info: dict) -> str | None:

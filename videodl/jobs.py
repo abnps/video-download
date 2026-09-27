@@ -45,6 +45,8 @@ class QueueItem:
     # Sadržaj 18+: svako preuzimanje traži potvrdu; adult_ok važi samo za to jedno preuzimanje.
     adult: bool = False
     adult_ok: bool = False
+    # ID videa na sajtu (iz čitanja linka): dva linka istog videa pišu isti fajl „naslov [id]".
+    video_id: str | None = None
 
 
 class DownloadQueue:
@@ -55,10 +57,12 @@ class DownloadQueue:
     def add(self, url: str, title: str, preset_key: str, output_dir: str,
             subfolder: str | None = None, *, http_headers: dict[str, str] | None = None,
             filename_title: str | None = None, thumbnail: str | None = None,
-            duration: float | None = None, cookies: tuple = (), adult: bool = False) -> QueueItem:
+            duration: float | None = None, cookies: tuple = (), adult: bool = False,
+            video_id: str | None = None) -> QueueItem:
         item = QueueItem(self._next_id, url, title, preset_key, output_dir, subfolder,
                          http_headers=dict(http_headers or {}), filename_title=filename_title,
-                         thumbnail=thumbnail, duration=duration, cookies=tuple(cookies), adult=adult)
+                         thumbnail=thumbnail, duration=duration, cookies=tuple(cookies), adult=adult,
+                         video_id=video_id)
         self._next_id += 1
         self._items.append(item)
         return item

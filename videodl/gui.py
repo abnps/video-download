@@ -36,9 +36,8 @@ from .native_messaging import TemporaryLocationError, install_native_host, unins
 from .runtime import extension_dir, find_tool, mark_running
 from .presets import (
     DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
-    section_label, subtitle_languages,
+    direct_output_name, section_label, subtitle_languages, title_identity,
 )
-from yt_dlp.utils import sanitize_filename
 from .probe import ProbeResult, probe
 from . import convert, diagnostics, release_signing, store, support, theme, winshell
 from . import updater, ytdlp_update
@@ -56,6 +55,8 @@ MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
 # Pucanje veze: koliko puta aplikacija sama ponavlja i koliko čeka između pokušaja.
 MAX_AUTO_RETRIES = 3
 AUTO_RETRY_DELAY_MS = 5000
+# Red se čuva sam kratko poslije svake izmjene (više brzih izmjena = jedan upis), ne samo pri zatvaranju.
+QUEUE_SAVE_DELAY_MS = 500
 CLOSE_WAIT_SECONDS = 10  # zajednički rok za gašenje svih poslova pri zatvaranju
 THUMBNAIL_CACHE_MAX = 300  # posljednjih N sličica ostaje u memoriji; starije se ponovo učitaju kad zatrebaju
 
@@ -448,6 +449,13 @@ class MainWindow(QMainWindow):
         self._ask_adult = self._ask_adult_dialog  # testovi ga zamjenjuju odgovorom bez prozora
         self._manual: list[int] = []  # pojedinačno pokrenute stavke (dugme u redu, browser)
         self._remove_when_done: set[int] = set()
+        self._closing = False  # zatvaranje potvrđeno: ništa novo više ne kreće
+        # stavka -> monotoni rok: novi pokušaj poslije pucanja veze ne smije krenuti prije njega
+        self._retry_at: dict[int, float] = {}
+        self._save_timer = QTimer(self)
+        self._save_timer.setSingleShot(True)
+        self._save_timer.setInterval(QUEUE_SAVE_DELAY_MS)
+        self._save_timer.timeout.connect(self._save_queue)
         self._download_jobs: dict[int, DownloadJob] = {}  # stavka -> posao u toku
         self._probe_jobs: dict[int, ProbeJob] = {}
         self._next_probe_id = 1
@@ -842,7 +850,8 @@ class MainWindow(QMainWindow):
                                    row.get("output_dir") or self._output_dir, row.get("subfolder"),
                                    http_headers=row.get("http_headers") or {},
                                    filename_title=row.get("filename_title"), thumbnail=row.get("thumbnail"),
-                                   duration=row.get("duration"), adult=bool(row.get("adult")))
+                                   duration=row.get("duration"), adult=bool(row.get("adult")),
+                                   video_id=row.get("video_id"))
             item.custom_format = bool(row.get("custom_format"))
             section = row.get("section")
             if isinstance(section, (list, tuple)) and len(section) == 2:
@@ -1168,7 +1177,8 @@ class MainWindow(QMainWindow):
         added = []
         for entry in result.entries:
             item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
-                                   thumbnail=entry.thumbnail, duration=entry.duration, adult=entry.adult, **access)
+                                   thumbnail=entry.thumbnail, duration=entry.duration, adult=entry.adult,
+                                   video_id=entry.video_id, **access)
             item.custom_format = bool(preset)  # format tražen iz dodatka ostaje na toj stavci
             self._append_row(item)
             added.append(item)
@@ -1216,13 +1226,20 @@ class MainWindow(QMainWindow):
     # ---------- red preuzimanja ----------
 
     def _output_key(self, item: QueueItem) -> tuple:
-        """Šta određuje ime izlaznog fajla: folder, format (kvalitet je u imenu), isječak i — kad šablon imena
-        nema ID — naslov. Dva RAZLIČITA linka istog naslova uz „Samo naslov" tako dobijaju isti ključ."""
+        """Šta određuje ime izlaznog fajla, po ISTIM pravilima kao samo ime (presets): folder, format (kvalitet je
+        u imenu), isječak i identitet videa. Isti ključ = isti fajl, pa dva takva posla ne rade istovremeno.
+        Kad nije sigurno, ključ je radije isti (drugi posao samo sačeka) nego različit (dva pisanja u isti fajl)."""
         folder = os.path.normcase(os.path.normpath(os.path.join(item.output_dir, item.subfolder or "")))
-        by_id = item.force_id_name or self._name_template == DEFAULT_NAME_TEMPLATE or item.filename_title
-        # sa ID-om (ili otiskom toka) u imenu je link dovoljan; bez njega ime daje naslov
-        identity = item.url if by_id else sanitize_filename(item.title or item.url).casefold().strip()
-        return folder, item.preset_key, section_label(item.section), bool(by_id), identity
+        if item.filename_title:
+            # direktan tok: ime je naslov stranice + otisak toka (parametri koji određuju video su u otisku)
+            identity = ("stream", direct_output_name(item.filename_title, item.url).casefold())
+        elif item.force_id_name or self._name_template == DEFAULT_NAME_TEMPLATE:
+            # „naslov [id]": dva linka istog videa (npr. kratka i duga adresa) daju isti ID, pa i isto ime
+            identity = ("id", item.video_id or item.url)
+        else:
+            # šablon bez ID-a: ime daje naslov, skraćen kao u imenu fajla (dugi naslovi istog početka = isto ime)
+            identity = ("title", title_identity(item.title or item.url))
+        return folder, item.preset_key, section_label(item.section), identity
 
     def _same_output_running(self, item: QueueItem) -> bool:
         """Posao koji bi pisao ISTI fajl već radi (isti link dvaput, ili dva videa istog naslova uz šablon bez ID-a):
@@ -1234,15 +1251,22 @@ class MainWindow(QMainWindow):
                 return True
         return False
 
+    def _retry_pending(self, item: QueueItem) -> bool:
+        """Stavka čeka novi pokušaj poslije pucanja veze, a rok od AUTO_RETRY_DELAY_MS još nije prošao."""
+        return time.monotonic() < self._retry_at.get(item.id, 0.0)
+
     def _start_next(self) -> None:
         """Pokreće stavke dok ih u toku ne bude onoliko koliko je izabrano (Preuzimanja → Istovremeno)."""
+        if self._closing:
+            return  # program se zatvara: gase se samo postojeći poslovi, novi ne kreću
         started = []
         while len(self._download_jobs) < self._parallel:
             item = None
             postponed = []
             while self._manual and item is None:
                 candidate = self._queue.get(self._manual.pop(0))
-                if candidate is None or candidate.status != ItemStatus.WAITING or _needs_adult_ok(candidate):
+                if candidate is None or candidate.status != ItemStatus.WAITING or _needs_adult_ok(candidate) \
+                        or self._retry_pending(candidate):
                     continue
                 if self._same_output_running(candidate):
                     postponed.append(candidate.id)  # čeka da isti posao završi, pa kreće
@@ -1252,7 +1276,7 @@ class MainWindow(QMainWindow):
             if item is None and self._running:
                 item = next((candidate for candidate in self._queue.items()
                              if candidate.status == ItemStatus.WAITING and not self._same_output_running(candidate)
-                             and not _needs_adult_ok(candidate)), None)
+                             and not _needs_adult_ok(candidate) and not self._retry_pending(candidate)), None)
             if item is None:
                 if not self._download_jobs:
                     self._running = False
@@ -1431,6 +1455,8 @@ class MainWindow(QMainWindow):
         item.auto_retries += 1
         item.status = ItemStatus.WAITING
         item.message = MESSAGE_RETRY
+        # Rok važi za SVE puteve pokretanja: i kad se oslobodi mjesto završetkom drugog posla.
+        self._retry_at[item.id] = time.monotonic() + AUTO_RETRY_DELAY_MS / 1000
         self._refresh_row(item)
         self._set_status(tr("row.retrying"))
         QTimer.singleShot(AUTO_RETRY_DELAY_MS, lambda: self._retry_after_drop(item.id))
@@ -1459,6 +1485,9 @@ class MainWindow(QMainWindow):
         return True
 
     def _retry_after_drop(self, item_id: int) -> None:
+        self._retry_at.pop(item_id, None)  # rok je prošao (tajmer može kasniti ili žuriti par ms)
+        if self._closing:
+            return
         item = self._queue.get(item_id)
         if item is None or item.status != ItemStatus.WAITING or item.message != MESSAGE_RETRY:
             return  # u međuvremenu obrisano, ručno pokrenuto ili zaustavljeno
@@ -1472,6 +1501,7 @@ class MainWindow(QMainWindow):
         for item in self._queue.items():
             item.adult_ok = False  # svaki novi početak 18+ sadržaja ponovo traži potvrdu
         self._manual.clear()
+        self._retry_at.clear()
         for item in self._queue.items():
             if item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY:
                 item.message = ""
@@ -1504,6 +1534,7 @@ class MainWindow(QMainWindow):
         if item.status in (ItemStatus.FAILED, ItemStatus.CANCELLED):
             self._queue.retry(item_id)
             self._refresh_row(item)
+        self._retry_at.pop(item_id, None)  # korisnik je sam kliknuo: kreće odmah
         if self._running:
             self._queue.move_to_front(item_id)
         else:
@@ -1627,8 +1658,11 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _remove_all(self) -> None:
+        # Red koji se preuzima ili pretvara u MP3 ostaje dok ne završi: inače bi posao radio bez reda,
+        # a MP3 ne bi stigao u istoriju. Pojedinačno „×" na redu to namjerno prekida.
+        busy = set(self._convert_jobs)
         for item in self._queue.items():
-            if item.status != ItemStatus.ACTIVE:
+            if item.status != ItemStatus.ACTIVE and item.id not in busy:
                 self._remove_item(item.id)
 
     # ---------- redovi ----------
@@ -1645,6 +1679,7 @@ class MainWindow(QMainWindow):
         if item.thumbnail:
             self._load_thumbnail(item.id, item.thumbnail)
         self._update_controls()
+        self._schedule_save()
 
     def _refresh_row(self, item: QueueItem | None) -> None:
         if item is None:
@@ -1653,6 +1688,13 @@ class MainWindow(QMainWindow):
         if row is not None:
             row.update_item(item, self._sizes.get(item.id))
         self._update_controls()
+        self._schedule_save()
+
+    def _schedule_save(self) -> None:
+        """Red se sam sačuva kratko poslije izmjene (dodavanje, brisanje, format, stanje), da pad programa
+        ili nestanak struje ne izgubi nove linkove niti vrati obrisane."""
+        if not self._closing:
+            self._save_timer.start()
 
     def _remove_item(self, item_id: int) -> None:
         if self._queue.remove(item_id):
@@ -1660,6 +1702,8 @@ class MainWindow(QMainWindow):
         self._update_controls()
 
     def _drop_row(self, item_id: int) -> None:
+        self._retry_at.pop(item_id, None)
+        self._schedule_save()
         self._sizes.pop(item_id, None)
         row = self._rows.pop(item_id, None)
         if row is not None:
@@ -1936,7 +1980,14 @@ class MainWindow(QMainWindow):
             if answer != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
-            self._running = False
+        # Od ovog trenutka ništa novo ne kreće: ni automatski red, ni „pokreni odmah" (browser, dugme u redu),
+        # ni zakazani ponovni pokušaj. Gase se samo poslovi koji već rade.
+        self._closing = True
+        self._running = False
+        self._start_when_read = False
+        self._manual.clear()
+        self._retry_at.clear()
+        self._save_timer.stop()
         self._stop_all_jobs(CLOSE_WAIT_SECONDS)
         self._save_settings()
         self._save_queue()

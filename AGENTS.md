@@ -62,6 +62,11 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 ## Jezici, instaler i ažuriranje
 
+- Pouzdanost reda (Codex pregled 27.9.2026): `_output_key` računa identitet izlaza po ISTIM pravilima kao ime
+  fajla (`presets.direct_output_name`, `title_identity`, ID videa iz čitanja linka) — kad nije sigurno, isti
+  ključ (posao sačeka), nikad dva pisanja u isti fajl. Poslije potvrde zatvaranja (`_closing`) ništa novo ne
+  kreće. Red se sam čuva 0,5 s poslije svake izmjene. „Ukloni sve" ne dira red koji se pretvara u MP3. Novi
+  pokušaj poslije pucanja veze poštuje rok (`_retry_at`) na svim putevima pokretanja. Testovi: `tests/test_reliability.py`.
 - Greške yt-dlp-a se u redu i statusnoj traci prikazuju razumljivo (`widgets.friendly_error`, ključevi
   `error.friendly.*`); original ostaje u oblačiću i u izvještaju o problemu. Nepoznata greška ostaje kakva jeste.
 - 5 jezika (bs, en, de, es, fr): svaki novi tekst ide u `videodl/i18n.py` i, za popup,

@@ -5,7 +5,7 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlsplit
 
 from yt_dlp.utils import download_range_func, sanitize_filename
 
@@ -234,12 +234,38 @@ def _with_section(template: str, section: tuple[float, float] | None) -> str:
     return template.replace(".%(ext)s", f" ({section_label(section)}).%(ext)s")
 
 
+# Parametri linka toka koji se mijenjaju pri svakom otvaranju stranice (potpis, rok važenja, keš): ne određuju
+# KOJI je video, pa ne ulaze u otisak. Ostali parametri (npr. ?id=2) ulaze: mogu biti drugi video.
+_VOLATILE_PARAMS = re.compile(
+    r"^(?:token|access_token|auth|signature|sig|hash|expires?|exp|e|st|hdnts|hdntl|hdnea|policy|key-pair-id"
+    r"|validfrom|validto|acl|_|cb|cachebuster|ts|timestamp|x-amz-.*|x-goog-.*)$", re.IGNORECASE)
+
+
+def stream_fingerprint(source_url: str | None) -> str:
+    """Kratki otisak direktnog toka: sajt, putanja i parametri koji određuju video (bez privremenih)."""
+    parts = urlsplit(source_url or "")
+    stable = sorted((key, value) for key, value in parse_qsl(parts.query, keep_blank_values=True)
+                    if not _VOLATILE_PARAMS.match(key))
+    # Bez takvih parametara otisak je isti kao u ranijim verzijama, pa se već preuzeti fajl i dalje prepoznaje.
+    query = ("?" + "&".join(f"{key}={value}" for key, value in stable)) if stable else ""
+    return hashlib.sha1(f"{parts.netloc}{parts.path}{query}".encode("utf-8")).hexdigest()[:8]
+
+
+def title_identity(title: str) -> str:
+    """Naslov onako kako završi u imenu fajla (%(title).150B: prvih 150 bajtova, pa čišćenje znakova),
+    bez razlike u velikim i malim slovima (Windows ih ne razlikuje). Isti rezultat = isto ime fajla."""
+    cut = (title or "").encode("utf-8")[:150].decode("utf-8", errors="ignore")
+    return sanitize_filename(cut).strip().casefold()
+
+
+def direct_output_name(filename_title: str, source_url: str | None) -> str:
+    """Ime fajla za direktan tok (npr. index.m3u8): nema smislen naslov ni id, pa ime daje naslov
+    stranice, a otisak toka razlikuje različite videe istog naslova."""
+    title = sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"
+    return f"{_escape(title)} [{stream_fingerprint(source_url)}].%(ext)s"
+
+
 def _output_name(filename_title: str | None, source_url: str | None, name_template: str | None = None) -> str:
     if not filename_title:
         return NAME_TEMPLATES.get(name_template or DEFAULT_NAME_TEMPLATE, OUTPUT_NAME)
-    # Direktan tok (npr. index.m3u8) nema smislen naslov ni id, pa ime daje naslov
-    # stranice, a kratki otisak putanje toka razlikuje različite videe istog naslova.
-    title = sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"
-    parts = urlsplit(source_url or "")
-    fingerprint = hashlib.sha1(f"{parts.netloc}{parts.path}".encode("utf-8")).hexdigest()[:8]
-    return f"{_escape(title)} [{fingerprint}].%(ext)s"
+    return direct_output_name(filename_title, source_url)

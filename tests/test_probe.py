@@ -22,7 +22,7 @@ class ProbeTest(unittest.TestCase):
         })
         result = probe("https://v/1", extract)
         self.assertFalse(result.is_playlist)
-        self.assertEqual(result.entries, (Entry("https://www.v/watch?v=1", "Prvi"),))
+        self.assertEqual(result.entries, (Entry("https://www.v/watch?v=1", "Prvi", video_id="1"),))  # ID ide u ime fajla
 
     def test_playlist_skips_empty_entries_and_uses_id_when_no_title(self):
         extract = fake_extractor({
@@ -36,7 +36,7 @@ class ProbeTest(unittest.TestCase):
         result = probe("https://v/list", extract)
         self.assertTrue(result.is_playlist)
         self.assertEqual(result.title, "Lista")
-        self.assertEqual(result.entries, (Entry("https://v/1", "Prvi"), Entry("https://v/2", "2")))
+        self.assertEqual(result.entries, (Entry("https://v/1", "Prvi"), Entry("https://v/2", "2", video_id="2")))
 
     def test_channel_tabs_are_flattened(self):
         extract = fake_extractor({
