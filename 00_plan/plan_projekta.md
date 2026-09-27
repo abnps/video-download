@@ -247,6 +247,7 @@ Ahmedov prijatelj potvrdio da instaler i program rade na njegovom računaru.
   Googleovu provjeru programera (najava 2025: od 2027. na većini telefona samo APK identifikovanih
   programera; provjeriti uslove za DE/RS), (3) odgovor šta radimo bolje od Seal/YTDLnis/NewPipe.
   Prvi korak: prototip „podijeli link → MP4/MP3" na Ahmedovom telefonu.
+  Detaljan plan (27.9.2026): [android_plan.md](android_plan.md) — faze, licenca (GPL ili naša), rizici.
 - [ ] **Video Toolkit Pro** (ideja): tek poslije razgovora s poreskim savjetnikom (Njemačka ili Srbija)
   i jasnog odgovora „zašto bi neko platio" pored besplatnih HandBrake/LosslessCut/Shutter Encoder.
   Od početka u privatnom repou.
