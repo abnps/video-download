@@ -91,6 +91,8 @@ bez praćenja, na 5 jezika — kao desktop verzija.
 ## Šta treba od Ahmeda prije početka
 
 1. ~~Odluka A ili B~~ — B (27.9.2026).
-2. Android telefon za probu: proizvođač i verzija Androida.
+2. ~~Android telefon za probu~~ — Samsung Galaxy S26 Ultra (Android 16 / One UI 8.x, ARM64). Paziti na
+   Samsungov Auto Blocker (blokira APK van prodavnica; za probu privremeno isključiti) i uspavljivanje
+   aplikacija u pozadini (preuzimanje mora biti usluga s obavještenjem).
 3. Spremnost na Googleovu provjeru programera (lični podaci Googleu).
 4. Potvrda redoslijeda: Android tek poslije roditeljske kontrole i Mac probe, ili prije.
