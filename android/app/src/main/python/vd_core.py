@@ -11,6 +11,13 @@ import os
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadCancelled, sanitize_filename
 
+try:  # samo na Androidu (Chaquopy ima modul `java`): imitacija preglednika kroz Androidov mrežni sloj
+    import java  # noqa: F401
+
+    import vd_net  # noqa: F401  (registruje handler)
+except ImportError:
+    pass
+
 
 class _FileLog:
     """Detaljan zapis yt-dlp-a za posljednje preuzimanje (cache/zadnji-log.txt, samo u memoriji aplikacije):
@@ -151,6 +158,44 @@ def _run(url, kind, work_dir, options, part, log):
     title = info.get("title") or info.get("id") or "video"
     name = f"{sanitize_filename(title).strip()[:120].rstrip('. ') or 'video'} [{info.get('id', '')}]"
     return [title, name, paths[0], paths[1] if len(paths) > 1 else ""]
+
+
+def _page_start(line: str, size: int = 3000) -> str:
+    """yt-dlp stranicu upisuje kao base64 (dump_intermediate_pages); za izvještaj treba čitljiv početak."""
+    import base64
+    import re
+
+    raw = line.split("] ", 1)[-1].strip()
+    try:
+        text = base64.b64decode(raw, validate=True).decode("utf-8", errors="replace")
+    except ValueError:
+        text = raw
+    return "    " + re.sub(r"\s+", " ", text)[:size]
+
+
+def report(cache_dir: str, limit: int = 20_000) -> str:
+    """Sažetak posljednjeg dnevnika za „Kopiraj izvještaj": verzije, sve osim sitnih debug redova, i početak
+    stranica koje je sajt vratio (tu se vidi npr. provjera „jesi li robot"). Ide samo tamo gdje ga korisnik zalijepi."""
+    import platform
+    import sys
+
+    path = os.path.join(cache_dir, "zadnji-log.txt")
+    if not os.path.isfile(path):
+        return "Nema dnevnika."
+    with open(path, encoding="utf-8", errors="replace") as file:
+        lines = file.read().splitlines()
+    head = [f"Video Download Android | yt-dlp {version()} | Python {sys.version.split()[0]} | {platform.platform()}"]
+    keep = []
+    for index, line in enumerate(lines):
+        important = not line.startswith("[debug]") or any(key in line for key in (
+            "Dumping request", "Request Handlers", "Python ", "Proxy", "Extracting URL", "Downloading webpage",
+            "Downloading JSON", "Redirect", "HTTP Error", "Unexpected"))
+        if important:
+            keep.append(line[:600])
+        if "Dumping request" in line and index + 1 < len(lines):
+            keep.append(_page_start(lines[index + 1]))  # početak stranice koju je sajt vratio
+    text = "\n".join(head + keep)
+    return text if len(text) <= limit else text[:limit // 2] + "\n…\n" + text[-limit // 2:]
 
 
 def version() -> str:

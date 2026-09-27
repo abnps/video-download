@@ -12,6 +12,8 @@
     <string name="status_saving">Enregistrement…</string>
     <string name="status_done">Terminé : %1$s</string>
     <string name="status_failed">Erreur : %1$s</string>
+    <string name="copy_report">Copier le rapport</string>
+    <string name="report_copied">Rapport copié. Collez-le dans un message.</string>
     <string name="status_stopping">Arrêt en cours…</string>
     <string name="status_cancelled">Arrêté</string>
     <string name="cancel">Arrêter</string>

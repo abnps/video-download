@@ -12,6 +12,8 @@
     <string name="status_saving">Wird gespeichert…</string>
     <string name="status_done">Fertig: %1$s</string>
     <string name="status_failed">Fehler: %1$s</string>
+    <string name="copy_report">Bericht kopieren</string>
+    <string name="report_copied">Bericht kopiert. Füge ihn in eine Nachricht ein.</string>
     <string name="status_stopping">Wird gestoppt…</string>
     <string name="status_cancelled">Gestoppt</string>
     <string name="cancel">Stoppen</string>

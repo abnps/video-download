@@ -12,6 +12,8 @@
     <string name="status_saving">Čuvam…</string>
     <string name="status_done">Završeno: %1$s</string>
     <string name="status_failed">Greška: %1$s</string>
+    <string name="copy_report">Kopiraj izvještaj</string>
+    <string name="report_copied">Izvještaj je kopiran. Zalijepi ga u poruku.</string>
     <string name="status_stopping">Zaustavljam…</string>
     <string name="status_cancelled">Zaustavljeno</string>
     <string name="cancel">Zaustavi</string>

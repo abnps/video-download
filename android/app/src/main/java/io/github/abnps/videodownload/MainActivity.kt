@@ -72,6 +72,14 @@ class MainActivity : ComponentActivity() {
         findUrl(text)?.let { link.value = it }
     }
 
+    private fun copyReport() {
+        val text = com.chaquo.python.Python.getInstance().getModule("vd_core")
+            .callAttr("report", cacheDir.absolutePath).toString()
+        getSystemService(ClipboardManager::class.java)
+            .setPrimaryClip(android.content.ClipData.newPlainText("Video Download", text))
+        android.widget.Toast.makeText(this, R.string.report_copied, android.widget.Toast.LENGTH_SHORT).show()
+    }
+
     @Composable
     private fun Screen() {
         val status by DownloadState.status.collectAsState()
@@ -132,8 +140,11 @@ class MainActivity : ComponentActivity() {
                         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
                 }) { Text(stringResource(R.string.open)) }
             }
-            is DownloadStatus.Failed -> Text(stringResource(R.string.status_failed, status.message),
-                color = MaterialTheme.colorScheme.error)
+            is DownloadStatus.Failed -> {
+                Text(stringResource(R.string.status_failed, status.message), color = MaterialTheme.colorScheme.error)
+                // Probna faza: sažetak dnevnika u clipboard, pa ga korisnik zalijepi u poruku (bez kabla i adb-a).
+                OutlinedButton(onClick = { copyReport() }) { Text(stringResource(R.string.copy_report)) }
+            }
             DownloadStatus.Cancelled -> Text(stringResource(R.string.status_cancelled))
         }
     }

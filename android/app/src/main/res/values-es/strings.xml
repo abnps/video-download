@@ -12,6 +12,8 @@
     <string name="status_saving">Guardando…</string>
     <string name="status_done">Terminado: %1$s</string>
     <string name="status_failed">Error: %1$s</string>
+    <string name="copy_report">Copiar informe</string>
+    <string name="report_copied">Informe copiado. Pégalo en un mensaje.</string>
     <string name="status_stopping">Deteniendo…</string>
     <string name="status_cancelled">Detenido</string>
     <string name="cancel">Detener</string>
