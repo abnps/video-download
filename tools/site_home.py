@@ -568,7 +568,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
             {download_icon}
             {h["win_btn"]}
           </a>
-          <a class="btn ghost" href="#install" data-mac>Mac <span class="badge">{badge}</span></a>
+          <a class="btn ghost" href="#install" data-mac>macOS <span class="badge">{badge}</span></a>
           <a class="btn ghost" href="#install" data-android>Android <span class="badge">{badge}</span></a>
         </div>
         <ul class="promise">{promise}</ul>
@@ -673,7 +673,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       <p class="sub" data-reveal>{in_sub}</p>
       <div class="tabs" role="tablist" aria-label="{esc(in_label)}">
         <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
-        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">Mac <span class="badge">{badge}</span></button>
+        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">macOS <span class="badge">{badge}</span></button>
         <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">{badge}</span></button>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
