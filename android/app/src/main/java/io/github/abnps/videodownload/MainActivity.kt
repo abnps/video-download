@@ -131,6 +131,22 @@ class MainActivity : ComponentActivity() {
         remove = { item -> History.remove(item.id) }, // uklanja samo s liste; fajl ostaje u folderu
     )
 
+    /** „Pozovi prijatelja": šalje samu aplikaciju (kopija instaliranog APK-a) uz kratku poruku, preko menija Podijeli. */
+    private suspend fun invite() {
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        val copy = withContext(Dispatchers.IO) {
+            val folder = java.io.File(cacheDir, "dijeli").apply { mkdirs(); listFiles()?.forEach { it.delete() } }
+            java.io.File(folder, "VideoDownload-android-$version.apk").also { target ->
+                java.io.File(applicationInfo.sourceDir).copyTo(target, overwrite = true)
+            }
+        }
+        val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.dijeli", copy)
+        val send = Intent(Intent.ACTION_SEND).setType("application/vnd.android.package-archive")
+            .putExtra(Intent.EXTRA_STREAM, uri).putExtra(Intent.EXTRA_TEXT, getString(R.string.invite_text))
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(Intent.createChooser(send, getString(R.string.invite_title)))
+    }
+
     private fun openLink(url: String) = runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
 
     private fun openLanguage() {
@@ -202,6 +218,7 @@ class MainActivity : ComponentActivity() {
                         location = location.value,
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                         onLanguage = { openLanguage() }, onOpenLink = { openLink(it) },
+                        onInvite = { scope.launch { invite() } },
                         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty(),
                         readerVersion = runCatching {
                             Python.getInstance().getModule("vd_core").callAttr("version").toString()

@@ -58,6 +58,9 @@
     <string name="set_version">Verzija</string>
     <string name="set_reader">Čitač sajtova (yt-dlp)</string>
     <string name="test_version">Probna verzija</string>
+    <string name="invite_title">Pozovi prijatelja</string>
+    <string name="invite_sub">Pošalji aplikaciju preko WhatsAppa, Vibera ili Quick Sharea</string>
+    <string name="invite_text">Probaj Video Download: besplatno preuzimanje videa i zvuka, bez reklama. Otvori priloženi fajl i dozvoli instalaciju.</string>
     <string name="copy_report">Kopiraj izvještaj</string>
     <string name="report_copied">Izvještaj je kopiran. Zalijepi ga u poruku.</string>
     <string name="status_stopping">Zaustavljam…</string>

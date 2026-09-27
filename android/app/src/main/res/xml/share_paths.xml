@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Samo kopija aplikacije za „Pozovi prijatelja" (cache/dijeli); ništa drugo nije dostupno drugim aplikacijama. -->
+<paths>
+    <cache-path name="dijeli" path="dijeli/" />
+</paths>

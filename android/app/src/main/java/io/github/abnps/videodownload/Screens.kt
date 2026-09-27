@@ -427,7 +427,8 @@ private fun startOfToday(): Long = Calendar.getInstance().apply {
 
 @Composable
 fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocation, onLocation: (SaveLocation) -> Unit,
-                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, appVersion: String, readerVersion: String) {
+                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, appVersion: String,
+                   readerVersion: String) {
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -439,6 +440,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location)) { pickLocation = true }
         SettingRow(R.drawable.ic_language, stringResource(R.string.set_language), java.util.Locale.getDefault().displayLanguage,
             onClick = onLanguage)
+        SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
+            onClick = onInvite)
         SettingRow(R.drawable.ic_heart, stringResource(R.string.set_support), null) { onOpenLink(Links.SUPPORT) }
         SettingRow(R.drawable.ic_info, stringResource(R.string.set_terms), null) { onOpenLink(Links.site("terms.html")) }
         SettingRow(R.drawable.ic_info, stringResource(R.string.set_privacy), null) { onOpenLink(Links.site("privacy.html")) }

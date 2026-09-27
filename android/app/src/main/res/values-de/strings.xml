@@ -58,6 +58,9 @@
     <string name="set_version">Version</string>
     <string name="set_reader">Seitenleser (yt-dlp)</string>
     <string name="test_version">Testversion</string>
+    <string name="invite_title">Freund einladen</string>
+    <string name="invite_sub">App per WhatsApp, Viber oder Quick Share senden</string>
+    <string name="invite_text">Probier Video Download aus: Videos und Ton kostenlos herunterladen, ohne Werbung. Öffne die angehängte Datei und erlaube die Installation.</string>
     <string name="copy_report">Bericht kopieren</string>
     <string name="report_copied">Bericht kopiert. Füge ihn in eine Nachricht ein.</string>
     <string name="status_stopping">Wird gestoppt…</string>

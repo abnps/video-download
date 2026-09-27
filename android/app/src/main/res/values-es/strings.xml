@@ -58,6 +58,9 @@
     <string name="set_version">Versión</string>
     <string name="set_reader">Lector de sitios (yt-dlp)</string>
     <string name="test_version">Versión de prueba</string>
+    <string name="invite_title">Invitar a un amigo</string>
+    <string name="invite_sub">Envía la app por WhatsApp, Viber o Quick Share</string>
+    <string name="invite_text">Prueba Video Download: descarga vídeo y audio gratis, sin anuncios. Abre el archivo adjunto y permite la instalación.</string>
     <string name="copy_report">Copiar informe</string>
     <string name="report_copied">Informe copiado. Pégalo en un mensaje.</string>
     <string name="status_stopping">Deteniendo…</string>

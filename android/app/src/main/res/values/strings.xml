@@ -59,6 +59,9 @@
     <string name="set_version">Version</string>
     <string name="set_reader">Site reader (yt-dlp)</string>
     <string name="test_version">Test version</string>
+    <string name="invite_title">Invite a friend</string>
+    <string name="invite_sub">Send the app via WhatsApp, Viber or Quick Share</string>
+    <string name="invite_text">Try Video Download: free video and audio downloads, no ads. Open the attached file and allow the install.</string>
     <string name="copy_report">Copy report</string>
     <string name="report_copied">Report copied. Paste it into a message.</string>
     <string name="status_stopping">Stopping…</string>
