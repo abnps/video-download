@@ -129,6 +129,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   svog naloga. Potpisan .xpi ide u `site/firefox/`, a unos (verzija, link, sha256) u
   `site/firefox/updates.json` i `FIREFOX_XPI` u `tools/build_site.py`; test provjerava da se slažu.
   Nova verzija dodatka = veći `version` u `extension/manifest.json` (AMO ne prima isti broj dvaput).
+- Android (prototip, `android/`; plan `00_plan/android_plan.md`): ključ za potpis je
+  `%USERPROFILE%\.videodlndroid-release.jks` + `android-release.properties` (nasumična lozinka), napravljen
+  27.9.2026; Ahmed ima rezervnu kopiju u OneDrive Personal Vault. NIKAD novi ključ, nikad u repo/vault/logove:
+  Android ne prima ažuriranje potpisano drugim ključem. Gradle ga čita iz tog foldera; bez njega release je
+  nepotpisan. APK za dijeljenje: `C:\Video Downloader\Buildndroid\VideoDownload-android-<verzija>.apk`
+  (+ .sha256); svaka nova verzija = veći `versionCode` u `android/app/build.gradle.kts`.
 - Stranica dobrodošlice dodatka (27.9.2026): `extension/welcome.html` se otvara SAMO pri prvoj instalaciji
   (`install.js` → `shouldWelcome`), spakovana je u dodatak (ništa s interneta, bez ID-a), stvarno pita program
   za vezu (`app-status`) i daje uputstvo za kačenje ikone po browseru. E2E (`tools/e2e_browser/run.mjs`) je provjerava.
