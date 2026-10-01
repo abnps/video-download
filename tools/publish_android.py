@@ -1,11 +1,10 @@
-"""Android (beta): potpisan APK u posljednje GitHub izdanje, da ga nađu sajt (stalno ime) i aplikacije (android.json).
+"""Priprema potpisan Android APK i postavlja ga samo u izričito navedeni nacrt.
 
-Pokretanje iz foldera projekta:
-    python tools/publish_android.py           → gradi, priprema i postavlja u posljednje izdanje (--clobber)
-    python tools/publish_android.py --dry-run → samo gradi i priprema fajlove u Build/android, ništa ne postavlja
+    python tools/publish_android.py --dry-run       → samo gradi i priprema lokalne fajlove
+    python tools/publish_android.py --tag v0.9.8    → dodaje APK postojećem nacrtu tog taga
 
-Ključ za potpis je %USERPROFILE%/.videodl/android-release.* (nikad u repou); bez njega se ne objavljuje.
-Nova verzija = veći `versionCode` u android/app/build.gradle.kts (aplikacije porede versionCode).
+Objava cijelog izdanja ide kroz tools/publish_release.py, tek po Ahmedovom nalogu.
+Ključ je van repoa; nova Android verzija traži veći versionCode.
 """
 
 import argparse
@@ -17,6 +16,8 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+from publish_release import check_android_apk, check_checkout, draft
 
 PROJECT = Path(__file__).resolve().parent.parent
 ANDROID = PROJECT / "android"
@@ -38,14 +39,12 @@ def build() -> Path:
         sys.exit(f"Nema ključa za potpis: {KEY}")
     env = dict(os.environ, JAVA_HOME=str(TOOLS / "jdk-21"))
     gradlew = ANDROID / ("gradlew.bat" if os.name == "nt" else "gradlew")
-    subprocess.run([str(gradlew), "assembleRelease", "--console=plain", "-q"], cwd=ANDROID, env=env, check=True)
+    subprocess.run([str(gradlew), "lintDebug", "testDebugUnitTest", "assembleRelease", "--console=plain", "-q"], cwd=ANDROID, env=env, check=True)
     return ANDROID / "app" / "build" / "outputs" / "apk" / "release" / "app-release.apk"
 
 
 def prepare(apk: Path, code: int, name: str) -> list[Path]:
     OUT.mkdir(parents=True, exist_ok=True)
-    for old in OUT.glob("VideoDownload-android-*.apk*"):
-        old.unlink()  # u folderu ostaje samo posljednja verzija
     versioned = OUT / f"VideoDownload-android-{name}.apk"
     shutil.copyfile(apk, versioned)
     stable = OUT / "VideoDownload-android.apk"  # stalni link na sajtu
@@ -59,9 +58,9 @@ def prepare(apk: Path, code: int, name: str) -> list[Path]:
     return [versioned, checksum, stable, manifest]
 
 
-def publish(files: list[Path]) -> str:
-    tag = subprocess.run(["gh", "release", "view", "--repo", REPO, "--json", "tagName", "--jq", ".tagName"],
-                         capture_output=True, text=True, check=True).stdout.strip()
+def publish(files: list[Path], tag: str) -> str:
+    check_checkout(tag)
+    draft(tag)
     subprocess.run(["gh", "release", "upload", tag, *map(str, files), "--repo", REPO, "--clobber"], check=True)
     return tag
 
@@ -69,12 +68,20 @@ def publish(files: list[Path]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="samo gradi i pripremi, bez postavljanja na GitHub")
+    parser.add_argument("--tag", help="tačan tag postojećeg nacrta; obavezno osim uz --dry-run")
     args = parser.parse_args()
+    if not args.dry_run:
+        if not args.tag:
+            parser.error("--tag je obavezan; APK se više ne postavlja u implicitno posljednje izdanje")
+        check_checkout(args.tag)
+        draft(args.tag)
     code, name = version()
-    files = prepare(build(), code, name)
+    apk = build()
+    check_android_apk(apk, code, name)
+    files = prepare(apk, code, name)
     print(f"Android {name} (versionCode {code}) spreman u {OUT}")
     if not args.dry_run:
-        print(f"Postavljeno u izdanje {publish(files)}")
+        print(f"Postavljeno u izdanje {publish(files, args.tag)}")
     return 0
 
 

@@ -12,8 +12,8 @@ Program ne šalje autoru nikakve podatke, statistiku korištenja ni izvještaje 
 - Sa PayPal-om samo ako klikneš „Podrži projekat“: PayPal stranica za prilog otvara se u tvom browseru, a program pri tome ništa ne šalje.
 Tim servisima su vidljivi tvoja IP adresa i verzija programa; za njih važe njihove politike privatnosti.
 
-3. Šta se čuva na tvom računaru
-Podešavanja (registry: HKCU\Software\VideoDownload), red i istorija preuzimanja (linkovi, naslovi, putanje, veličine, vrijeme) i preuzeti yt-dlp u folderu %LOCALAPPDATA%\VideoDownload, te lokalni ključ za vezu sa browserom. Ništa od toga ne napušta tvoj računar.
+3. Šta se čuva na tvom uređaju
+Na Windowsu: podešavanja (registry: HKCU\Software\VideoDownload), red i istorija preuzimanja (linkovi, naslovi, putanje, veličine, vrijeme), preuzeti yt-dlp u %LOCALAPPDATA%\VideoDownload i lokalni ključ za vezu sa browserom. Na Macu: podaci programa u ~/Library/Application Support/VideoDownload i sistemska podešavanja aplikacije. Na Androidu: podešavanja, red (s linkovima), istorija, dijagnostika i preuzeti yt-dlp u privatnoj memoriji aplikacije; gotovi fajlovi u Downloads/Video Download ili Galeriji/Muzici, prema tvom izboru. Ti podaci se ne šalju autoru.
 
 4. Kolačići prijave
 Samo ako u browseru daš dozvolu. Programu se šalju samo kolačići sajta sa kog preuzimaš, drže se samo u memoriji, a privremeni fajl za yt-dlp briše se odmah. Nikad se ne upisuju u red, istoriju ni izvještaje.
@@ -22,10 +22,10 @@ Samo ako u browseru daš dozvolu. Programu se šalju samo kolačići sajta sa ko
 Dozvole: praćenje mrežnih zahtjeva (da prepozna video tokove), skripta na stranici (da nađe video koji se pušta i prepozna DRM), meni desnog klika, lokalna veza sa programom (native messaging) i privremena memorija po tabu; kolačići samo ako ih dozvoliš. Dodatak ništa ne šalje na internet: podatke predaje samo programu na tvom računaru, i to tek kad klikneš.
 
 6. Izvještaj o problemu
-Pravi se samo kad ga sam sačuvaš. Linkovi su u njemu skraćeni na ime sajta, a ime korisnika i tajne su sakriveni. Šalješ ga samo ako to sam odlučiš.
+Na računaru se pravi samo kad ga sam sačuvaš. Na Androidu se u privatnoj memoriji vodi ograničen dnevnik s vrstom događaja, domenom i HTTP statusom; dugme „Kopiraj izvještaj“ kopira te podatke u međuspremnik. Putanje i parametri linkova, sadržaj stranica i zaglavlja se ne čuvaju u Android dnevniku. Izvještaj šalješ samo ako to sam odlučiš.
 
 7. Brisanje podataka
-Istoriju brišeš u Preuzimanja → Istorija preuzimanja → Obriši listu. Deinstalacija uklanja program, vezu sa browserom i preuzeti yt-dlp. Red, istorija i podešavanja ostaju dok ne obrišeš folder %LOCALAPPDATA%\VideoDownload i ključ HKCU\Software\VideoDownload.
+Na Windowsu istoriju brišeš u Preuzimanja → Istorija preuzimanja → Obriši listu. Deinstalacija uklanja program, vezu sa browserom i preuzeti yt-dlp; red, istorija i podešavanja ostaju dok ne obrišeš %LOCALAPPDATA%\VideoDownload i HKCU\Software\VideoDownload. Na Macu se lokalni podaci brišu uklanjanjem foldera ~/Library/Application Support/VideoDownload i podešavanja aplikacije. Na Androidu uklanjanje aplikacije briše njenu privatnu memoriju (red, istoriju i dnevnik), ali gotovi fajlovi u Downloads, Galeriji ili Muzici ostaju dok ih zasebno ne obrišeš.
 
 8. Kontakt
 Pošto autor ne prikuplja podatke, nema podataka koje bi mogao dati, ispraviti ili obrisati. Pitanja: https://github.com/abnps/video-download/issues

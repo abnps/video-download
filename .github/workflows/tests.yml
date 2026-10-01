@@ -1,4 +1,4 @@
-# Svi testovi na čistom Windowsu, sa zaključanim verzijama (requirements-lock.txt), na svaki push i PR.
+# Desktop, sajt i Android provjere na svaki push i PR.
 name: Testovi
 
 on:
@@ -33,3 +33,21 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: JS testovi (dodatak)
         run: node --test "tests/extension/*.test.mjs"
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: android-actions/setup-android@v3
+      - name: Android SDK
+        run: sdkmanager "platforms;android-37" "build-tools;37.0.0"
+      - name: Android lint, Kotlin testovi i debug APK
+        working-directory: android
+        run: ./gradlew lintDebug testDebugUnitTest assembleDebug --console=plain

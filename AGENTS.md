@@ -234,15 +234,17 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
   spaja Androidov MediaMuxer (`Muxer.kt`).
 - `vd_core.py`: jedna yt-dlp sesija po preuzimanju, ali ponovno čitanje (re-extract) za svaki dio i novi
   `format_selector` po dijelu — ponovna upotreba pročitanih podataka daje YouTube 403. Prekid:
-  `Cancelled(DownloadCancelled)`. Log zadnjeg preuzimanja: `cache/zadnji-log.txt` (Postavke → „Kopiraj izvještaj").
+  `Cancelled(DownloadCancelled)`. Ograničeni dijagnostički događaji su u `cache/zadnji-log.txt`; nikad ne
+  upisivati pun URL, zaglavlja ni sadržaj stranice. Stari dnevnik se čisti pri pokretanju i pri kopiranju izvještaja.
 - `vd_net.py`: TikTok traži impersonaciju; zahtjevi idu kroz Kotlin `NativeHttp` s DESKTOP Chrome UA
   (mobilni UA ne radi).
 - Desktop `videodl/{__init__,runtime,ytdlp_update}.py` se kopiraju u APK pri gradnji (Gradle `sharedPython`) —
   izmjena tih fajlova utiče i na Android.
 - Ažuriranje u aplikaciji (`AppUpdater.kt`): čita `releases/latest/download/android.json`, provjeri SHA-256 i
   da je potpis isti kao instaliran, instalira preko PackageInstaller-a.
-- Objava: `python tools/publish_android.py` (`--dry-run` samo gradi u `C:\Video Downloader\Build\android`).
-  Postavlja u POSLJEDNJE izdanje s `--clobber`. Poslije svakog novog desktop izdanja obavezno ponoviti.
+- Objava: `python tools/publish_android.py --tag v<verzija>` postavlja APK samo u tačan postojeći nacrt
+  izdanja; `--dry-run` samo gradi. Mac workflow se ručno pokreće za isti tag. `tools/publish_release.py`
+  provjerava sve tri platforme; `--publish` tek po Ahmedovom nalogu „objavi“. Detalji su u `README.md`.
 - Test telefon: Ahmedov Samsung S26 Ultra. Bežični adb: `adb mdns services` → `adb connect <ip:port>`;
   Samsung gasi bežično otklanjanje grešaka kad se ekran zaključa. Ne tapkati automatski dok Ahmed koristi
   telefon — pitati ga ili ga pustiti da testira ručno. Na Samsungu Auto Blocker mora biti isključen prije

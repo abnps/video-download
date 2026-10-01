@@ -9,6 +9,8 @@ kodiranja. Kad sajt nudi jedan fajl sa slikom i zvukom, uzima se on. Zvuk je M4A
 import os
 import time
 
+from vd_diagnostics import SafeLog as _FileLog, clean_file, records, render
+
 
 def _activate_downloaded_ytdlp() -> None:
     """Na telefonu: noviji yt-dlp preuzet u privatnu memoriju aplikacije ide ispred ugrađenog (isti kod kao na
@@ -35,40 +37,6 @@ try:  # samo na Androidu (Chaquopy ima modul `java`): imitacija preglednika kroz
     import vd_net  # noqa: F401  (registruje handler)
 except ImportError:
     pass
-
-
-class _FileLog:
-    """Detaljan zapis yt-dlp-a za posljednje preuzimanje (cache/zadnji-log.txt, samo u memoriji aplikacije):
-    kad sajt ne radi na telefonu, vidi se šta je tačno vratio (i stranica, kroz dump_intermediate_pages)."""
-
-    LIMIT = 400_000
-
-    def __init__(self, path: str):
-        self.path = path
-        self.size = 0
-        self.file = open(path, "w", encoding="utf-8", errors="replace")
-
-    def _write(self, level: str, message: str) -> None:
-        if self.size < self.LIMIT:
-            line = f"[{level}] {message}\n"
-            self.size += len(line)
-            self.file.write(line)
-            self.file.flush()
-
-    def debug(self, message):
-        self._write("debug", message)
-
-    def info(self, message):
-        self._write("info", message)
-
-    def warning(self, message):
-        self._write("warning", message)
-
-    def error(self, message):
-        self._write("error", message)
-
-    def close(self):
-        self.file.close()
 
 
 class Cancelled(DownloadCancelled):
@@ -103,10 +71,12 @@ def _best_audio(formats: list):
 def plan(info: dict, kind: str, height: int = 0) -> list[str]:
     """Koje formate preuzeti: jedan ID, dva ID-a (slika pa zvuk, za spajanje) ili opšti izbor yt-dlp-a.
     `height` > 0 ograničava visinu slike (izbor 1080p/720p/480p); 0 = najbolja dostupna."""
-    formats = info.get("formats") or []
+    formats = info.get("formats") or [info]
     audio = _best_audio(formats)
     if kind == "audio":
-        return [audio["format_id"]] if audio else ["ba/b"]
+        if audio is None:
+            raise ValueError("AUDIO_UNAVAILABLE")
+        return [audio.get("format_id") or "ba[ext=m4a]"]
     fits = (lambda f: (f.get("height") or 0) <= height) if height else (lambda f: True)
     key = lambda f: (f.get("height") or 0, f.get("fps") or 0, _size(f))  # noqa: E731
     video_h264 = sorted((f for f in _video_candidates(formats) if fits(f)), key=key)
@@ -125,7 +95,7 @@ def plan(info: dict, kind: str, height: int = 0) -> list[str]:
 def options(info: dict) -> dict:
     """Izbor za ekran „Izaberi kvalitet": visine slike (najviše 4, npr. 1080/720/480/360) s procjenom veličine
     (slika + zvuk) i veličina samog zvuka. Veličina 0 = sajt je ne javlja."""
-    formats = info.get("formats") or []
+    formats = info.get("formats") or [info]
     audio = _best_audio(formats)
     audio_size = _size(audio) if audio else 0.0
     by_height, labels = {}, {}
@@ -140,7 +110,7 @@ def options(info: dict) -> dict:
             labels.setdefault(fmt["height"], _label(fmt))
     heights = sorted(by_height, reverse=True)[:4]
     return {"video": [{"height": height, "label": labels[height], "size": by_height[height]} for height in heights],
-            "audio_size": audio_size}
+            "audio_size": audio_size, "audio_available": audio is not None}
 
 
 def _label(fmt: dict) -> int:
@@ -157,8 +127,8 @@ def probe(url: str, cache_dir: str) -> str:
     log = _FileLog(os.path.join(cache_dir, "zadnji-log.txt"))
     log.info(f"čitanje linka: {url}")
     try:
-        with YoutubeDL({"quiet": True, "no_warnings": True, "noplaylist": True, "logger": log, "verbose": True,
-                        "dump_intermediate_pages": True}) as ydl:
+        with YoutubeDL({"quiet": True, "no_warnings": True, "noplaylist": True, "logger": log, "verbose": False,
+                        "dump_intermediate_pages": False}) as ydl:
             info = ydl.extract_info(url, download=False)
             if info.get("_type") == "playlist":
                 entries = [entry for entry in info.get("entries") or [] if entry]
@@ -196,7 +166,7 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0):
     log = _FileLog(os.path.join(os.path.dirname(work_dir), "zadnji-log.txt"))
     log.info(f"link: {url} | vrsta: {kind}")
     options = {"quiet": True, "no_warnings": True, "noprogress": True, "noplaylist": True, "retries": 3,
-               "progress_hooks": [hook], "logger": log, "verbose": True, "dump_intermediate_pages": True}
+               "progress_hooks": [hook], "logger": log, "verbose": False, "dump_intermediate_pages": False}
     try:
         return _run(url, kind, work_dir, options, part, log, height)
     except Exception as error:
@@ -236,6 +206,10 @@ def _run(url, kind, work_dir, options, part, log, height=0):
             # Link se čita ponovo pa odmah preuzima: kopija ranije pročitanih podataka daje YouTubeu HTTP 403.
             result = ydl.extract_info(url, download=True)
             downloads = result.get("requested_downloads") or []
+            if kind == "audio":
+                selected = {**result, **(downloads[-1] if downloads else {})}
+                if _has_video(selected) or not _has_audio(selected) or selected.get("ext") != "m4a":
+                    raise ValueError("AUDIO_UNAVAILABLE")
             paths.append(downloads[-1]["filepath"] if downloads else result.get("filepath"))
 
     title = info.get("title") or info.get("id") or "video"
@@ -243,41 +217,20 @@ def _run(url, kind, work_dir, options, part, log, height=0):
     return [title, name, paths[0], paths[1] if len(paths) > 1 else ""]
 
 
-def _page_start(line: str, size: int = 3000) -> str:
-    """yt-dlp stranicu upisuje kao base64 (dump_intermediate_pages); za izvještaj treba čitljiv početak."""
-    import base64
-    import re
-
-    raw = line.split("] ", 1)[-1].strip()
-    try:
-        text = base64.b64decode(raw, validate=True).decode("utf-8", errors="replace")
-    except ValueError:
-        text = raw
-    return "    " + re.sub(r"\s+", " ", text)[:size]
+def clean_diagnostics(cache_dir: str) -> None:
+    """Pri pokretanju aplikacije uklanja privatne podatke iz naslijeđenog dnevnika."""
+    clean_file(os.path.join(cache_dir, "zadnji-log.txt"))
 
 
 def report(cache_dir: str, limit: int = 20_000) -> str:
-    """Sažetak posljednjeg dnevnika za „Kopiraj izvještaj": verzije, sve osim sitnih debug redova, i početak
-    stranica koje je sajt vratio (tu se vidi npr. provjera „jesi li robot"). Ide samo tamo gdje ga korisnik zalijepi."""
-    import platform
+    """Verzije i provjereni događaji; bez sadržaja stranica i privatnih dijelova linkova."""
     import sys
 
     path = os.path.join(cache_dir, "zadnji-log.txt")
     if not os.path.isfile(path):
         return "Nema dnevnika."
-    with open(path, encoding="utf-8", errors="replace") as file:
-        lines = file.read().splitlines()
-    head = [f"Video Download Android | yt-dlp {version()} | Python {sys.version.split()[0]} | {platform.platform()}"]
-    keep = []
-    for index, line in enumerate(lines):
-        important = not line.startswith("[debug]") or any(key in line for key in (
-            "Dumping request", "Request Handlers", "Python ", "Proxy", "Extracting URL", "Downloading webpage",
-            "Downloading JSON", "Redirect", "HTTP Error", "Unexpected"))
-        if important:
-            keep.append(line[:600])
-        if "Dumping request" in line and index + 1 < len(lines):
-            keep.append(_page_start(lines[index + 1]))  # početak stranice koju je sajt vratio
-    text = "\n".join(head + keep)
+    head = [f"Video Download Android | yt-dlp {version()} | Python {sys.version.split()[0]}"]
+    text = "\n".join(head + render(records(path)))
     return text if len(text) <= limit else text[:limit // 2] + "\n…\n" + text[-limit // 2:]
 
 

@@ -43,37 +43,34 @@ Glavni jezik je engleski; bosanski, njemački, španski i francuski su u `site/b
 ## Izdavanje nove verzije
 
 1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
+   Ako je Android APK izmijenjen, povećaj i `versionCode` u `android/app/build.gradle.kts`.
 2. `python tools/build_release.py` (build u folder `Build` pored projekta, npr. `C:\Video Downloader\Build`;
    gotovi instaler je u `Build\installer`;
    uključuje self-test spakovane aplikacije). Build odbija da radi ako se paketi ili alati ne slažu
    sa `tools/build-lock.json`, prvo pokreće sve testove, a na kraju potpisuje `release.json` ključem
    `%USERPROFILE%\.videodl\release-signing-key.pem` (ključ nikad ne ide u repo; bez njega nema izdanja).
 3. Build osvježi i sajt (`site/`: verzija, veličina, „Šta je novo"); te izmjene idu u commit izdanja.
-   Objavi instaler, `.sha256`, `release.json`, `release.json.sig` i kopiju bez verzije (za stalni
-   link na sajtu) kao izdanje:
+   Pošalji taj commit i tag `v<verzija>`. Napravi **nacrt** izdanja sa Windows fajlovima; nacrt
+   nije javni `latest` i ne mijenja linkove na sajtu:
 
 ```
-gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\release.json" "<folder instalera>\release.json.sig" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
+gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\release.json" "<folder instalera>\release.json.sig" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --draft --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
-4. **Mac (beta) se dodaje sam.** Kad se izdanje objavi, GitHub posao „Mac paket" (`.github/workflows/macos.yml`)
-   iz taga napravi `.dmg` (uz sve testove) i doda ga izdanju, zajedno sa stalnom kopijom
-   `VideoDownload-macOS-arm64.dmg` za link na sajtu. Traje ~15 minuta; do tada Mac dugme na sajtu vraća 404.
-   Provjeri da je posao prošao (`gh run list --workflow macos.yml`); ako nije, izdanje nema Mac verziju
-   i Mac dugme ne radi dok se ne popravi i ponovo pokrene (`gh run rerun <id>`).
+4. Pokreni Mac paket za taj nacrt: `gh workflow run macos.yml --repo abnps/video-download
+   --ref main -f tag=v<verzija>`. Posao gradi iz taga, provjerava verziju i da je izdanje nacrt,
+   pa dodaje `.dmg`, `.sha256` i `VideoDownload-macOS-arm64.dmg`. Sačekaj uspješan završetak
+   (`gh run list --workflow macos.yml`); grešku popravi prije objave.
 
-5. **Android (beta) se dodaje ručno, jednom naredbom** (potpis je na ovom računaru, ključ
-   `%USERPROFILE%/.videodl/android-release.*`): `python tools/publish_android.py`. Pravi potpisan APK i postavlja
-   ga u posljednje izdanje kao `VideoDownload-android-<verzija>.apk`, stalnu kopiju `VideoDownload-android.apk`
-   (Android dugme na sajtu) i `android.json` (po njemu aplikacije nude ažuriranje). Bez ovog koraka novo izdanje
-   nema Android verziju i Android dugme vraća 404. Samo Android popravka: poveća se `versionCode` u
-   `android/app/build.gradle.kts` i pokrene ista naredba (zamjenjuje fajlove u posljednjem izdanju).
+5. Na računaru sa Android ključem (`%USERPROFILE%/.videodl/android-release.*`) pokreni
+   `python tools/publish_android.py --tag v<verzija>`. Skripta provjerava lint, testove, potpis,
+   paket i verziju, pa dodaje APK, `.sha256`, stalnu kopiju i `android.json` samo tom nacrtu.
 
-6. Prethodno izdanje sakrij kao nacrt, da javno ostane samo posljednje:
-
-```
-gh release edit v<prethodna_verzija> --repo abnps/video-download --draft=true
-```
+6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 12 fajlova,
+   hashove, Windows manifest, Android potpis, verzije i nepromijenjen nacrt. Tek po odluci za
+   objavu pokreni istu naredbu uz `--publish`; ona ponovi provjere i zatim objavi cjelinu kao `latest`.
+   Javno ostaje samo posljednje izdanje (Ahmedova odluka 23.9.2026): `--publish` poslije objave
+   prethodno izdanje sam vrati u nacrt (ne briše ga).
 
 ## Podrži projekat
 

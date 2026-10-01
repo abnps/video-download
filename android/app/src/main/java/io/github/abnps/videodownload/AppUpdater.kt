@@ -33,6 +33,7 @@ sealed interface UpdateState {
 object AppUpdater {
     private const val BASE = "https://github.com/abnps/video-download/releases/latest/download/"
     private const val CHECK_INTERVAL = 24 * 60 * 60 * 1000L
+    private const val MAX_APK_SIZE = 500L * 1024 * 1024
     val state = MutableStateFlow<UpdateState>(UpdateState.Idle)
 
     /** Najviše jednom dnevno (ili odmah kad korisnik klikne „Provjeri"); poziva se van glavne niti. */
@@ -54,12 +55,23 @@ object AppUpdater {
     /** Preuzima, provjerava i predaje Androidovom instaleru. Poziva se van glavne niti. */
     fun install(context: Context, release: AppRelease) {
         try {
+            require(release.apk.matches(Regex("[A-Za-z0-9_.-]+\\.apk"))) { "Nevažeće ime APK fajla" }
+            require(release.size in 1..MAX_APK_SIZE) { "Nevažeća veličina APK fajla" }
             val folder = File(context.cacheDir, "azuriranje").apply { mkdirs(); listFiles()?.forEach { it.delete() } }
             val apk = File(folder, release.apk)
-            download(BASE + release.apk, apk) { state.value = UpdateState.Downloading(release, it) }
-            val digest = MessageDigest.getInstance("SHA-256").digest(apk.readBytes()).joinToString("") { "%02x".format(it) }
+            download(BASE + release.apk, apk, release.size) { state.value = UpdateState.Downloading(release, it) }
+            val hash = MessageDigest.getInstance("SHA-256")
+            apk.inputStream().use { input ->
+                val buffer = ByteArray(256 * 1024)
+                while (true) {
+                    val count = input.read(buffer)
+                    if (count < 0) break
+                    hash.update(buffer, 0, count)
+                }
+            }
+            val digest = hash.digest().joinToString("") { "%02x".format(it) }
             require(digest == release.sha256) { "SHA-256 se ne slaže" }
-            require(sameSigner(context, apk)) { "APK nije potpisan našim ključem" }
+            require(sameSigner(context, apk, release.versionCode)) { "APK nije potpisan našim ključem ili nije odgovarajuća verzija" }
             val installer = context.packageManager.packageInstaller
             val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
             val session = installer.openSession(installer.createSession(params))
@@ -79,12 +91,17 @@ object AppUpdater {
         context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode.toInt()
 
     /** Isti certifikat kao instalirana aplikacija (Android bi drugačiji ionako odbio, ali ovako jasnija poruka). */
-    private fun sameSigner(context: Context, apk: File): Boolean {
+    private fun sameSigner(context: Context, apk: File, expectedVersion: Int): Boolean {
         val flags = PackageManager.GET_SIGNING_CERTIFICATES
-        val candidate = context.packageManager.getPackageArchiveInfo(apk.path, flags)?.signingInfo ?: return false
+        val archive = context.packageManager.getPackageArchiveInfo(apk.path, flags) ?: return false
+        if (archive.packageName != context.packageName || archive.longVersionCode != expectedVersion.toLong()) return false
+        val candidate = archive.signingInfo ?: return false
         val installed = context.packageManager.getPackageInfo(context.packageName, flags).signingInfo ?: return false
-        val mine = installed.apkContentsSigners.map { it.toByteArray().contentHashCode() }.toSet()
-        return candidate.apkContentsSigners.isNotEmpty() && candidate.apkContentsSigners.all { it.toByteArray().contentHashCode() in mine }
+        val mine = installed.apkContentsSigners.map { MessageDigest.getInstance("SHA-256")
+            .digest(it.toByteArray()).toList() }.toSet()
+        val theirs = candidate.apkContentsSigners.map { MessageDigest.getInstance("SHA-256")
+            .digest(it.toByteArray()).toList() }.toSet()
+        return mine.isNotEmpty() && theirs == mine
     }
 
     private fun read(url: String): String {
@@ -98,7 +115,7 @@ object AppUpdater {
         }
     }
 
-    private fun download(url: String, target: File, onProgress: (Float) -> Unit) {
+    private fun download(url: String, target: File, expectedSize: Long, onProgress: (Float) -> Unit) {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 15000
         connection.readTimeout = 30000
@@ -111,12 +128,14 @@ object AppUpdater {
                     while (true) {
                         val count = input.read(buffer)
                         if (count < 0) break
-                        out.write(buffer, 0, count)
                         done += count
+                        require(done <= expectedSize) { "APK je veći od očekivane veličine" }
+                        out.write(buffer, 0, count)
                         if (total > 0) onProgress(done.toFloat() / total)
                     }
                 }
             }
+            require(done == expectedSize) { "APK nije potpuno preuzet" }
         } finally {
             connection.disconnect()
         }

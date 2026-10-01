@@ -260,11 +260,14 @@ section h2 { font-size: clamp(30px, 3.6vw, 48px); line-height: 1.08; letter-spac
 
 /* ---------- instalacija: kartice Windows / Mac ---------- */
 .tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); margin-bottom: 26px; }
-.tabs button {
+.tabs a {
   border: 0; border-radius: 999px; padding: 9px 22px; font: inherit; font-weight: 600; color: var(--muted); background: transparent; cursor: pointer;
   transition: background .25s, color .25s;
 }
-.tabs button[aria-selected="true"] { background: var(--card-solid); color: var(--text); box-shadow: var(--shadow-1); }
+.tabs a[aria-selected="true"] { background: var(--card-solid); color: var(--text); box-shadow: var(--shadow-1); }
+.tabs a { text-decoration: none; }
+.panel + .panel { margin-top: 18px; }
+.tabs[role="tablist"] ~ .panel { margin-top: 0; }
 .panel { border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); padding: 30px; animation: rowin .4s var(--ease); }
 .panel[hidden] { display: none; }
 .panel p { color: var(--muted); margin-top: 0; }

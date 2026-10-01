@@ -12,6 +12,10 @@ class VideoDownloadApp : Application() {
         super.onCreate()
         if (!Python.isStarted()) Python.start(AndroidPlatform(this))
         History.load(this)
+        Downloads.load(this)
+        runCatching { Python.getInstance().getModule("vd_core").callAttr("clean_diagnostics", cacheDir.absolutePath) }
+        val staleWork = cacheDir.listFiles()?.filter { it.isDirectory && it.name.startsWith("preuzimanje-") }.orEmpty()
+        Thread { staleWork.forEach { it.deleteRecursively() } }.start()
         // Za sajtove koji traže pravi preglednik (TikTok): Chrome za računar, iste verzije kao Chrome ovog telefona.
         // Mobilni identitet TikTok odbije („Video not available") — isto kao yt-dlp na računaru, provjereno 27.9.2026.
         runCatching {

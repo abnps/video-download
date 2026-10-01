@@ -133,6 +133,148 @@ class SameOutputTest(Base):
         self.release.set()
         self.assertTrue(wait_until(lambda: len(self.started) == 2))
 
+    def test_playlist_names_that_share_a_real_folder_wait_for_each_other(self):
+        window = self.window(self.blocking, parallel=2)
+        prefix = "P" * 80
+        for url, title in (("https://v/a", prefix + " prvi"), ("https://kratko/aaa", prefix + " drugi")):
+            result = ProbeResult(title, (Entry(url, "Prvi", video_id="aaa"),), True)
+            window._on_probed(result, self.tmp.name, {}, False)
+        first, second = window._queue.items()
+        paths = [presets.build_ydl_options(presets.get_preset(item.preset_key), item.output_dir,
+                                          item.subfolder)["outtmpl"] for item in (first, second)]
+        self.assertEqual(paths[0], paths[1])  # različiti izvorni nazivi, ali isti stvarni folder
+        window._start_all()
+        try:
+            self.assertTrue(wait_until(lambda: len(self.started) >= 1))
+            self.assertFalse(wait_until(lambda: len(self.started) > 1, 0.2))
+            self.assertEqual(second.status, ItemStatus.WAITING)
+        finally:
+            self.release.set()
+            self.assertTrue(wait_until(lambda: not window._download_jobs))
+        self.assertEqual(len(self.started), 2)
+        self.assertTrue(all(item.status == ItemStatus.DONE for item in (first, second)))
+
+
+class SectionChangeTest(Base):
+    """Novi isječak je novi posao; prethodni video i MP3 ostaju sačuvani."""
+
+    def test_change_and_remove_section_requeue_finished_download_without_deleting_files(self):
+        sections = []
+
+        def download(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            sections.append(extra.get("section"))
+            path = Path(output_dir) / f"video-{len(sections)}.mp4"
+            path.write_bytes(b"video")
+            return DownloadResult(ItemStatus.DONE, filepath=str(path))
+
+        window = self.window(download)
+        [item] = self.add(window, "https://v/a")
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and not window._download_jobs))
+        old_video = Path(item.filepath)
+        old_mp3 = Path(self.tmp.name) / "video-1.mp3"
+        old_mp3.write_bytes(b"mp3")
+        item.convert_state, item.convert_path = "done", str(old_mp3)
+        item.convert_message, item.message = "stara poruka", "stara poruka"
+        window.set_item_section(item.id, (10.0, 20.0))
+        self.assertEqual(item.status, ItemStatus.WAITING)
+        self.assertIsNone(item.filepath)
+        self.assertEqual((item.convert_state, item.convert_path, item.convert_message), ("", None, ""))
+        self.assertEqual(item.message, "")
+        self.assertNotIn(item.id, window._sizes)
+        saved = store.load_queue(store.queue_path(Path(self.tmp.name)))
+        self.assertEqual(saved[0]["section"], [10.0, 20.0])
+        self.assertIsNone(saved[0]["filepath"])
+        self.assertEqual(old_video.read_bytes(), b"video")
+        self.assertEqual(old_mp3.read_bytes(), b"mp3")
+        # Dugme sada preuzima traženi isječak umjesto otvaranja prethodnog fajla.
+        window._on_row_action(item.id)
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and not window._download_jobs))
+        self.assertEqual(sections, [None, (10.0, 20.0)])
+        clipped = Path(item.filepath)
+        window.set_item_section(item.id, None)
+        self.assertEqual(item.status, ItemStatus.WAITING)
+        self.assertIsNone(item.filepath)
+        self.assertEqual(clipped.read_bytes(), b"video")
+        self.assertEqual(old_video.read_bytes(), b"video")
+
+    def test_unchanged_section_keeps_result_and_confirmation(self):
+        window = self.window(self.quick)
+        [item] = self.add(window, "https://v/a")
+        window.set_item_section(item.id, (10.0, 20.0))
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and not window._download_jobs))
+        item.adult_ok = True
+        before = vars(item).copy()
+        sizes = window._sizes.copy()
+        with mock.patch.object(window, "_save_queue") as save:
+            window.set_item_section(item.id, (10, 20))
+        self.assertEqual(vars(item), before)
+        self.assertEqual(window._sizes, sizes)
+        save.assert_not_called()
+
+    def test_changed_section_resets_failed_cancelled_and_waiting_attempts(self):
+        for status in (ItemStatus.FAILED, ItemStatus.CANCELLED, ItemStatus.WAITING):
+            with self.subTest(status=status):
+                window = self.window(self.quick)
+                item = window._queue.add("https://v/a", "Prvi", "best", self.tmp.name, adult=True)
+                window._append_row(item)
+                item.status, item.message = status, "stara greška"
+                item.adult_ok, item.auto_retries = True, 3
+                window._retry_at[item.id] = time.monotonic() + 60
+                window.set_item_section(item.id, (10, 20))
+                self.assertEqual(item.status, ItemStatus.WAITING)
+                self.assertEqual(item.message, "")
+                self.assertEqual(item.auto_retries, 0)
+                self.assertFalse(item.adult_ok)
+                self.assertNotIn(item.id, window._retry_at)
+                with mock.patch.object(window, "_ask_adult", return_value=False) as ask:
+                    window._on_row_action(item.id)
+                ask.assert_called_once()
+                self.assertEqual(item.status, ItemStatus.WAITING)
+                self.assertFalse(self.started)
+
+    def test_active_download_cannot_change_section(self):
+        window = self.window(self.blocking)
+        [item] = self.add(window, "https://v/a")
+        window._start_all()
+        self.assertTrue(wait_until(lambda: bool(self.started)))
+        try:
+            before = vars(item).copy()
+            window.set_item_section(item.id, (10, 20))
+            self.assertEqual(vars(item), before)
+        finally:
+            self.release.set()
+            self.assertTrue(wait_until(lambda: not window._download_jobs))
+
+    def test_running_conversion_cannot_change_section(self):
+        go = threading.Event()
+        mp3 = Path(self.tmp.name) / "a.mp3"
+
+        def convert_fn(source, on_progress=None, cancel_event=None, duration=None):
+            go.wait(5)
+            mp3.write_bytes(b"mp3")
+            return str(mp3)
+
+        window = self.window(self.quick, convert_fn=convert_fn)
+        [item] = self.add(window, "https://v/a")
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE and not window._download_jobs))
+        window._on_row_convert(item.id)
+        try:
+            self.assertIn(item.id, window._convert_jobs)
+            before = vars(item).copy()
+            window.set_item_section(item.id, (10, 20))
+            self.assertEqual(vars(item), before)
+        finally:
+            go.set()
+            self.assertTrue(wait_until(lambda: not window._convert_jobs))
+        self.assertEqual(item.convert_state, "done")
+        window.set_item_section(item.id, (10, 20))
+        self.assertEqual(item.status, ItemStatus.WAITING)
+        self.assertIsNone(item.convert_path)
+        self.assertEqual(mp3.read_bytes(), b"mp3")
+
 
 class ClosingTest(Base):
     """Nalaz 2: poslije potvrde zatvaranja ništa novo ne kreće."""

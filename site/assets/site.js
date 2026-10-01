@@ -43,7 +43,9 @@
   // Pojavljivanje pri skrolu (i „crtanje" linije koraka). Ako posmatranje ne proradi (stari
   // preglednik, pozadinska kartica), sve postaje vidljivo najkasnije poslije 2,5 s.
   const showAll = () => $$("[data-reveal], .steps").forEach((el) => el.classList.add("in"));
-  if (!("IntersectionObserver" in window)) { showAll(); return; }
+  const canObserve = "IntersectionObserver" in window;
+  if (!canObserve) showAll();
+  if (canObserve) {
   setTimeout(() => { const first = $(".hero [data-reveal]"); if (first && !first.classList.contains("in")) showAll(); }, 2500);
   const seen = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); seen.unobserve(e.target); }
@@ -67,6 +69,7 @@
     }
   }, { threshold: 0.6 });
   $$("[data-count]").forEach((el) => count.observe(el));
+  }
 
   // Svjetlo na pločicama prati miša.
   $$(".tile").forEach((tile) => tile.addEventListener("pointermove", (e) => {
@@ -161,9 +164,10 @@
   // Dodatak: popup se otvori kad sekcija dođe na ekran (i na klik ikone).
   const browser = $(".browser");
   if (browser) {
-    new IntersectionObserver(([e], o) => {
+    if (canObserve) new IntersectionObserver(([e], o) => {
       if (e.isIntersecting) { setTimeout(() => browser.classList.add("open"), calm ? 0 : 500); o.disconnect(); }
     }, { threshold: 0.5 }).observe(browser);
+    else browser.classList.add("open");
     $(".ext", browser).addEventListener("click", () => browser.classList.toggle("open"));
   }
 
@@ -201,8 +205,8 @@
     input.addEventListener("focus", () => input.select());
   });
 
-  // Kartice Windows / Mac u uputstvu za instalaciju (strelice mijenjaju karticu).
-  const tabs = $$('[role="tab"]');
+  // Bez skripte su sve platforme vidljive; kartice i skrivanje uključujemo tek kad su spremne.
+  const tabs = $$(".tabs a");
   const select = (tab) => {
     tabs.forEach((t) => {
       const on = t === tab;
@@ -212,13 +216,16 @@
     });
   };
   tabs.forEach((tab, i) => {
+    tab.setAttribute("role", "tab");
     tab.addEventListener("click", () => select(tab));
     tab.addEventListener("keydown", (e) => {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
       const to = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
       select(to); to.focus();
     });
   });
+  if (tabs.length) { $(".tabs").setAttribute("role", "tablist"); select(tabs[0]); }
   // Dugme „Mac" u vrhu stranice otvara Mac karticu uputstva.
   $$("[data-mac]").forEach((a) => a.addEventListener("click", () => tabs[1] && select(tabs[1])));
   $$("[data-android]").forEach((a) => a.addEventListener("click", () => tabs[2] && select(tabs[2])));
@@ -226,4 +233,10 @@
   if (/Mac/.test(navigator.platform || navigator.userAgent) && tabs[1]) select(tabs[1]);
   // Posjetilac s Android telefona odmah vidi Android uputstvo.
   if (/Android/.test(navigator.userAgent) && tabs[2]) select(tabs[2]);
+  const selectHash = () => {
+    const tab = tabs.find((t) => t.getAttribute("href") === location.hash);
+    if (tab) select(tab);
+  };
+  selectHash();
+  addEventListener("hashchange", selectHash);
 })();

@@ -12,8 +12,8 @@ Le programme n'envoie à l'auteur aucune donnée, aucune statistique d'utilisati
 - À PayPal seulement si tu cliques sur « Soutenir le projet » : la page de contribution PayPal s'ouvre dans ton navigateur et le programme n'envoie rien.
 Ces services voient ton adresse IP et la version du programme ; leurs propres politiques de confidentialité s'appliquent.
 
-3. Ce qui est enregistré sur ton ordinateur
-Les réglages (registre : HKCU\Software\VideoDownload), la file et l'historique des téléchargements (liens, titres, chemins, tailles, heures) et le yt-dlp téléchargé dans le dossier %LOCALAPPDATA%\VideoDownload, ainsi qu'une clé locale pour la connexion avec le navigateur. Rien de tout cela ne quitte ton ordinateur.
+3. Ce qui est enregistré sur ton appareil
+Sous Windows : réglages (registre : HKCU\Software\VideoDownload), file et historique (liens, titres, chemins, tailles, heures), yt-dlp téléchargé dans %LOCALAPPDATA%\VideoDownload et clé locale pour le navigateur. Sur Mac : données de l'application dans ~/Library/Application Support/VideoDownload et réglages système de l'application. Sous Android : réglages, file (avec les liens), historique, diagnostic et yt-dlp téléchargé dans le stockage privé de l'application ; les fichiers terminés vont dans Downloads/Video Download ou dans Galerie/Musique, selon ton choix. Ces données ne sont pas envoyées à l'auteur.
 
 4. Cookies de connexion
 Seulement si tu l'autorises dans le navigateur. Seuls les cookies du site d'où tu télécharges sont transmis au programme ; ils restent uniquement en mémoire, et le fichier temporaire pour yt-dlp est supprimé immédiatement. Ils ne sont jamais écrits dans la file, l'historique ni les rapports.
@@ -22,10 +22,10 @@ Seulement si tu l'autorises dans le navigateur. Seuls les cookies du site d'où 
 Autorisations : observation des requêtes réseau (pour reconnaître les flux vidéo), un script sur la page (pour trouver la vidéo en cours et reconnaître les DRM), le menu contextuel, une connexion locale avec le programme (native messaging) et un stockage temporaire par onglet ; les cookies seulement si tu les autorises. L'extension n'envoie rien sur internet : elle transmet des données uniquement au programme sur ton ordinateur, et seulement quand tu cliques.
 
 6. Rapport de problème
-Il n'est créé que lorsque tu l'enregistres toi-même. Les liens y sont réduits au nom du site, et le nom d'utilisateur et les secrets sont masqués. Tu ne l'envoies que si tu le décides.
+Sur ordinateur, un rapport est créé seulement quand tu l'enregistres. Sous Android, un journal limité dans le stockage privé conserve les types d'événements, domaines et codes HTTP ; « Copier le rapport » copie ces données dans le presse-papiers. Le journal Android ne conserve pas les chemins et paramètres d'URL, le contenu des pages ni les en-têtes. Tu n'envoies un rapport que si tu le décides.
 
 7. Supprimer les données
-L'historique se vide dans Téléchargements → Historique des téléchargements → Vider la liste. La désinstallation supprime le programme, la connexion au navigateur et le yt-dlp téléchargé. La file, l'historique et les réglages restent jusqu'à ce que tu supprimes le dossier %LOCALAPPDATA%\VideoDownload et la clé HKCU\Software\VideoDownload.
+Sous Windows, vide l'historique dans Téléchargements → Historique des téléchargements → Vider la liste. La désinstallation supprime le programme, la connexion au navigateur et yt-dlp ; la file, l'historique et les réglages restent jusqu'à la suppression de %LOCALAPPDATA%\VideoDownload et HKCU\Software\VideoDownload. Sur Mac, supprime ~/Library/Application Support/VideoDownload et les réglages de l'application. Sous Android, désinstaller efface le stockage privé (file, historique et journal), mais les fichiers terminés dans Downloads, Galerie ou Musique restent jusqu'à leur suppression séparée.
 
 8. Contact
 Comme l'auteur ne collecte aucune donnée, il n'a aucune donnée à fournir, corriger ou supprimer. Questions : https://github.com/abnps/video-download/issues

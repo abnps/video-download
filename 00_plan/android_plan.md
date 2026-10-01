@@ -1,7 +1,18 @@
-# Plan: Video Download za Android (.apk van Play Storea)
+# Android beta — stanje i izvorni plan
 
-Napravljeno 27.9.2026 (Ahmed: „Plan za .apk"). Nadovezuje se na stavku „Android" u `plan_projekta.md`.
-Ništa od ovoga još nije počelo; odluke označene **[Ahmed]** su njegove.
+Izvorni plan napisan je 27.9.2026 (Ahmed: „Plan za .apk"). Odluke označene **[Ahmed]** su njegove.
+Tekst od „Cilj“ naniže čuva tadašnji plan; za sadašnji postupak izdavanja važi `README.md`.
+
+**Stanje 29.9.2026:** Android beta je implementirana kao Kotlin/Compose aplikacija s Chaquopyjem i yt-dlp-om.
+Podržani su MP4 video i zaseban M4A zvuk; slika i zvuk se spajaju Androidovim MediaMuxerom, bez ffmpeg-a.
+MP3, cijele plejliste i potvrda 18+ sadržaja još nisu dio Android bete. Najstariji podržani sistem je Android 10
+(API 29), a ne planirani Android 8. Aplikacija ima dijeljenje linka, foreground preuzimanje, lokalnu istoriju,
+oporavak prekinutog reda uz ručni ponovni pokušaj, ograničen dijagnostički izvještaj i ažuriranje iz potpisanog APK-a.
+APK se potpisuje lokalno i dodaje tačno određenom nacrtu GitHub izdanja; Mac i Android fajlovi se provjeravaju prije
+objave cijelog izdanja. Android lint, Kotlin kompilacija i debug gradnja sada su u CI, kao i Python testovi Android jezgra.
+Ručna proba na stvarnom telefonu i puna provjera izdavanja ostaju prije naredne javne verzije.
+
+## Izvorni plan iz 27.9.2026 (historijski zapis)
 
 ## Cilj
 

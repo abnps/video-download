@@ -12,8 +12,8 @@ El programa no envía al autor ningún dato, estadística de uso ni informe de e
 - Con PayPal solo si pulsas «Apoyar el proyecto»: la página de aportaciones de PayPal se abre en tu navegador y el programa no envía nada.
 Estos servicios ven tu dirección IP y la versión del programa; se aplican sus propias políticas de privacidad.
 
-3. Qué se guarda en tu ordenador
-La configuración (registro: HKCU\Software\VideoDownload), la cola y el historial de descargas (enlaces, títulos, rutas, tamaños, horas) y el yt-dlp descargado en la carpeta %LOCALAPPDATA%\VideoDownload, además de una clave local para la conexión con el navegador. Nada de ello sale de tu ordenador.
+3. Qué se guarda en tu dispositivo
+En Windows: configuración (registro: HKCU\Software\VideoDownload), cola e historial (enlaces, títulos, rutas, tamaños, horas), yt-dlp descargado en %LOCALAPPDATA%\VideoDownload y una clave local para el navegador. En Mac: datos de la aplicación en ~/Library/Application Support/VideoDownload y ajustes del sistema. En Android: configuración, cola (con enlaces), historial, diagnóstico y yt-dlp descargado en el almacenamiento privado de la aplicación; los archivos terminados van a Downloads/Video Download o a Galería/Música, según elijas. Estos datos no se envían al autor.
 
 4. Cookies de inicio de sesión
 Solo si lo permites en el navegador. Al programa solo llegan las cookies del sitio desde el que descargas; se guardan solo en memoria y el archivo temporal para yt-dlp se borra de inmediato. Nunca se escriben en la cola, el historial ni los informes.
@@ -22,10 +22,10 @@ Solo si lo permites en el navegador. Al programa solo llegan las cookies del sit
 Permisos: observar las solicitudes de red (para reconocer flujos de vídeo), un script en la página (para encontrar el vídeo en reproducción y reconocer DRM), el menú contextual, una conexión local con el programa (native messaging) y almacenamiento temporal por pestaña; cookies solo si las permites. La extensión no envía nada a internet: solo pasa datos al programa de tu ordenador, y solo cuando haces clic.
 
 6. Informe del problema
-Solo se crea cuando tú lo guardas. Los enlaces aparecen acortados al nombre del sitio, y el nombre de usuario y los secretos están ocultos. Solo lo envías si tú lo decides.
+En el ordenador, el informe solo se crea cuando lo guardas. En Android, un registro limitado en el almacenamiento privado guarda tipos de eventos, dominios y códigos de estado HTTP; «Copiar informe» copia estos datos al portapapeles. El registro de Android no guarda rutas ni parámetros de URL, contenido de páginas ni cabeceras. Solo envías el informe si lo decides.
 
 7. Borrar los datos
-El historial se borra en Descargas → Historial de descargas → Borrar la lista. La desinstalación elimina el programa, la conexión con el navegador y el yt-dlp descargado. La cola, el historial y la configuración permanecen hasta que borres la carpeta %LOCALAPPDATA%\VideoDownload y la clave HKCU\Software\VideoDownload.
+En Windows, borra el historial en Descargas → Historial de descargas → Borrar la lista. La desinstalación elimina el programa, la conexión con el navegador y yt-dlp; la cola, el historial y la configuración permanecen hasta que borres %LOCALAPPDATA%\VideoDownload y HKCU\Software\VideoDownload. En Mac, elimina ~/Library/Application Support/VideoDownload y los ajustes de la aplicación. En Android, desinstalar borra el almacenamiento privado (cola, historial y registro), pero los archivos terminados en Downloads, Galería o Música permanecen hasta que los borres por separado.
 
 8. Contacto
 Como el autor no recopila datos, no hay datos que pueda facilitar, corregir o borrar. Preguntas: https://github.com/abnps/video-download/issues

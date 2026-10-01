@@ -25,11 +25,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -48,7 +50,7 @@ class MainActivity : ComponentActivity() {
     private val findError = mutableStateOf<String?>(null)
     private val location = mutableStateOf(SaveLocation.DOWNLOADS)
     private val quality = mutableIntStateOf(0)
-    private var autoFind = false
+    private var autoFind by mutableStateOf(false)
     private val welcome = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,7 +113,7 @@ class MainActivity : ComponentActivity() {
             }
             info.value = VideoInfo.parse(json)
         } catch (error: Exception) {
-            findError.value = DownloadService.cleanError(error.message)
+            findError.value = DownloadService.cleanError(this, error.message)
         } finally {
             finding.value = false
         }
@@ -189,9 +191,11 @@ class MainActivity : ComponentActivity() {
             welcome.value = false
             getSharedPreferences("postavke", MODE_PRIVATE).edit().putBoolean("uslovi_prihvaceni", true).apply()
         }
-        if (autoFind) {
-            autoFind = false
-            scope.launch { find() }
+        LaunchedEffect(autoFind) {
+            if (autoFind) {
+                autoFind = false
+                find()
+            }
         }
         BackHandler(enabled = shown != null || tab.intValue != TAB_HOME) {
             if (shown != null) info.value = null else tab.intValue = TAB_HOME
@@ -233,7 +237,10 @@ class MainActivity : ComponentActivity() {
                     tab.intValue == TAB_DOWNLOADS -> {
                         val error by Downloads.lastError.collectAsState()
                         DownloadsScreen(active, history, downloadsTab.intValue, { downloadsTab.intValue = it },
-                            onCancel = { DownloadService.cancel(this@MainActivity, it) }, actions = actions)
+                            onCancel = { id ->
+                                if (active.any { it.job.id == id && it.phase == Phase.INTERRUPTED }) Downloads.remove(id)
+                                else DownloadService.cancel(this@MainActivity, id)
+                            }, onRetry = { DownloadService.start(this@MainActivity, it) }, actions = actions)
                         if (error != null && active.isEmpty() && downloadsTab.intValue == 0) {
                             ErrorBanner(error!!) { copyReport() }
                         }

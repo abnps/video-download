@@ -12,7 +12,9 @@ import java.io.File
  * (Movies/Video Download) i Muziku (Music/Video Download) preko MediaStore-a: bez dozvole za pisanje po memoriji, vidi se odmah u aplikacijama.
  */
 object MediaSaver {
-    fun save(context: Context, source: File, isAudio: Boolean, location: SaveLocation): Uri {
+    fun save(context: Context, source: File, isAudio: Boolean, location: SaveLocation,
+             isCancelled: () -> Boolean = { false }): Uri {
+        if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
         val resolver = context.contentResolver
         val volume = MediaStore.VOLUME_EXTERNAL_PRIMARY
         val collection = when {
@@ -35,8 +37,17 @@ object MediaSaver {
         try {
             resolver.openOutputStream(uri).use { out ->
                 requireNotNull(out) { "MediaStore nije otvorio fajl za pisanje" }
-                source.inputStream().use { it.copyTo(out) }
+                source.inputStream().use { input ->
+                    val buffer = ByteArray(256 * 1024)
+                    while (true) {
+                        if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        out.write(buffer, 0, count)
+                    }
+                }
             }
+            if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
             resolver.update(uri, ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }, null, null)
         } catch (error: Exception) {
             resolver.delete(uri, null, null) // nedovršen fajl ne ostaje u Galeriji

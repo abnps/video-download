@@ -10,7 +10,6 @@ import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.IBinder
 import android.os.SystemClock
-import com.chaquo.python.PyException
 import com.chaquo.python.Python
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -54,7 +53,7 @@ class DownloadService : Service() {
 
     private fun run(job: Job) {
         running = job.id
-        val work = File(cacheDir, "preuzimanje-${job.id}").apply { mkdirs() }
+        val work = File(cacheDir, "preuzimanje-${job.id}-${System.nanoTime()}").apply { mkdirs() }
         try {
             if (job.id in cancelled) throw CancelledHere()
             Downloads.lastError.value = null
@@ -70,20 +69,25 @@ class DownloadService : Service() {
             notify(progressNotification(getString(R.string.status_saving), null))
             // Slika i zvuk stigli odvojeno: spajaju se u jedan MP4 bez ponovnog kodiranja.
             val file = if (second != null) {
-                File(work, "$name.mp4").also { Muxer.merge(first, second, it) }
+                File(work, "$name.mp4").also { Muxer.merge(first, second, it) { job.id in cancelled } }
             } else {
-                File(work, "$name.${first.extension}").also { first.renameTo(it) }
+                File(work, "$name.${first.extension}").also { check(first.renameTo(it)) { "Privremeni fajl nije premješten" } }
             }
+            if (job.id in cancelled) throw CancelledHere()
             val size = file.length()
-            val uri = MediaSaver.save(this, file, job.isAudio, Settings.location(this))
+            val uri = MediaSaver.save(this, file, job.isAudio, Settings.location(this)) { job.id in cancelled }
+            if (job.id in cancelled) {
+                contentResolver.delete(uri, null, null)
+                throw CancelledHere()
+            }
             History.add(HistoryItem(job.id, job.title.ifBlank { result[0].toString() }, uri.toString(), job.isAudio,
                 formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis()))
             notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio))
         } catch (error: Exception) {
-            if (job.id in cancelled || error is CancelledHere) {
+            if (job.id in cancelled || error is CancelledHere || error is InterruptedException) {
                 notifyFinished(getString(R.string.status_cancelled), null)
             } else {
-                val message = if (error is PyException) cleanError(error.message) else error.message ?: error.javaClass.simpleName
+                val message = cleanError(this, error.message)
                 Downloads.lastError.value = message
                 notifyFinished(getString(R.string.status_failed, message), null)
             }
@@ -188,11 +192,23 @@ class DownloadService : Service() {
             context.startService(Intent(context, DownloadService::class.java).setAction(ACTION_CANCEL).putExtra(EXTRA_ID, id))
         }
 
-        /** „ERROR: [youtube] abc: Video unavailable" → „Video unavailable" (razumljive poruke dolaze kasnije). */
-        fun cleanError(message: String?): String {
-            val line = message.orEmpty().lines().lastOrNull { it.isNotBlank() }.orEmpty()
-            return line.substringAfter("DownloadError: ").removePrefix("ERROR: ")
-                .replace(Regex("^\\[[^]]+] [^:]+: "), "").ifBlank { "?" }
+        /** Greška može sadržati potpisan URL, kolačić ili tekst stranice: prikazujemo samo poznate kategorije. */
+        fun cleanError(context: Context, message: String?): String {
+            val raw = message.orEmpty().lowercase()
+            return when {
+                "audio_unavailable" in raw -> context.getString(R.string.audio_unavailable)
+                "unsupported url" in raw -> context.getString(R.string.error_unsupported)
+                "sign in" in raw || "login" in raw || "cookies" in raw -> context.getString(R.string.error_login)
+                else -> {
+                    val status = Regex("\\bhttp(?: error)?[ :]+([45]\\d\\d)\\b").find(raw)?.groupValues?.get(1)
+                    when {
+                        status != null -> context.getString(R.string.error_http, status)
+                        "timed out" in raw || "timeout" in raw || "connection" in raw || "network" in raw ->
+                            context.getString(R.string.error_network)
+                        else -> context.getString(R.string.error_generic)
+                    }
+                }
+            }
         }
     }
 }

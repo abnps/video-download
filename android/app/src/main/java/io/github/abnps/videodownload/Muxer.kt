@@ -12,7 +12,8 @@ import java.nio.ByteBuffer
  * kodiranja (kvalitet ostaje isti, traje par sekundi). Radi samo s kodecima koje MP4 kontejner prima.
  */
 object Muxer {
-    fun merge(video: File, audio: File, output: File) {
+    fun merge(video: File, audio: File, output: File, isCancelled: () -> Boolean = { false }) {
+        if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
         val muxer = MediaMuxer(output.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         val extractors = mutableListOf<MediaExtractor>()
         try {
@@ -39,6 +40,7 @@ object Muxer {
             for ((extractor, track, capacity) in tracks) {
                 val buffer = ByteBuffer.allocateDirect(capacity)
                 while (true) {
+                    if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
                     val size = extractor.readSampleData(buffer, 0)
                     if (size < 0) break
                     // SAMPLE_FLAG_SYNC i BUFFER_FLAG_KEY_FRAME su ista vrijednost (ključni kadar).
@@ -52,6 +54,7 @@ object Muxer {
                     extractor.advance()
                 }
             }
+            if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
             muxer.stop()
         } finally {
             extractors.forEach { it.release() }

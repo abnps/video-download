@@ -223,6 +223,18 @@ class SiteTest(unittest.TestCase):
                 self.assertEqual(home.count('class="sheet-app"'), 6)  # WhatsApp, Viber, Telegram, Facebook, X, E-mail
                 self.assertNotIn("<iframe", home)  # nikakvi „widgeti" društvenih mreža
 
+    def test_install_instructions_remain_visible_without_javascript(self):
+        for lang in build_site.LANGUAGES:
+            home = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            with self.subTest(lang=lang):
+                for platform in ("win", "mac", "android"):
+                    self.assertRegex(home, rf'<div class="panel" id="panel-{platform}"[^>]*>')
+                    self.assertIn(f'href="#panel-{platform}"', home)
+                self.assertNotIn('<svgviewBox=', home)
+        js = (build_site.SITE / "assets" / "site.js").read_text(encoding="utf-8")
+        self.assertIn('if (!canObserve) showAll()', js)
+        self.assertNotIn('showAll(); return;', js)
+
     def test_not_found_page_links_every_language_with_absolute_paths(self):
         page = self.not_found
         self.assertEqual((build_site.SITE / "404.html").read_text(encoding="utf-8"), page)

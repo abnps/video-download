@@ -1002,9 +1002,19 @@ class MainWindow(QMainWindow):
 
     def set_item_section(self, item_id: int, section: tuple[float, float] | None) -> None:
         item = self._queue.get(item_id)
-        if item is None or item.status == ItemStatus.ACTIVE:
+        if item is None or item.status == ItemStatus.ACTIVE or item_id in self._convert_jobs:
+            return
+        if item.section == section:
             return
         item.section = section
+        # Novi raspon je novi posao; raniji video i MP3 ostaju u folderu i istoriji.
+        item.status = ItemStatus.WAITING
+        item.filepath = None
+        item.message = ""
+        item.convert_state, item.convert_path, item.convert_message = "", None, ""
+        item.adult_ok = False
+        item.auto_retries = 0
+        self._retry_at.pop(item_id, None)
         self._sizes.pop(item_id, None)
         self._refresh_row(item)
         self._save_queue()
@@ -1229,7 +1239,8 @@ class MainWindow(QMainWindow):
         """Šta određuje ime izlaznog fajla, po ISTIM pravilima kao samo ime (presets): folder, format (kvalitet je
         u imenu), isječak i identitet videa. Isti ključ = isti fajl, pa dva takva posla ne rade istovremeno.
         Kad nije sigurno, ključ je radije isti (drugi posao samo sačeka) nego različit (dva pisanja u isti fajl)."""
-        folder = os.path.normcase(os.path.normpath(os.path.join(item.output_dir, item.subfolder or "")))
+        subfolder = safe_folder_name(item.subfolder) if item.subfolder else ""
+        folder = os.path.normcase(os.path.normpath(os.path.join(item.output_dir, subfolder)))
         if item.filename_title:
             # direktan tok: ime je naslov stranice + otisak toka (parametri koji određuju video su u otisku)
             identity = ("stream", direct_output_name(item.filename_title, item.url).casefold())

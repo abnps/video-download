@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -263,9 +264,12 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 SegmentedButton(selected = !audio, onClick = { audio = false }, shape = SegmentedButtonDefaults.itemShape(0, 2),
                     icon = { AppIcon(R.drawable.ic_videocam, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_video)) }
-                SegmentedButton(selected = audio, onClick = { audio = true }, shape = SegmentedButtonDefaults.itemShape(1, 2),
+                SegmentedButton(selected = audio, onClick = { audio = true }, enabled = info.audioAvailable,
+                    shape = SegmentedButtonDefaults.itemShape(1, 2),
                     icon = { AppIcon(R.drawable.ic_music, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_audio)) }
             }
+            if (!info.audioAvailable) Text(stringResource(R.string.audio_unavailable),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (audio) {
                 OptionRow(true, stringResource(R.string.best_audio), sizeText("M4A", info.audioSize)) {}
             } else {
@@ -346,7 +350,7 @@ fun LocationDialog(current: SaveLocation, onDismiss: () -> Unit, onPick: (SaveLo
 
 @Composable
 fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: Int, onTab: (Int) -> Unit,
-                    onCancel: (Long) -> Unit, actions: ItemActions) {
+                    onCancel: (Long) -> Unit, onRetry: (Job) -> Unit, actions: ItemActions) {
     Column(Modifier.fillMaxSize()) {
         Text(stringResource(R.string.nav_downloads), fontSize = 30.sp, fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp))
@@ -357,7 +361,7 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
         if (tab == 0) {
             if (active.isEmpty()) Empty(stringResource(R.string.no_active))
             LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(active, key = { it.job.id }) { ActiveCard(it, onCancel) }
+                items(active, key = { it.job.id }) { ActiveCard(it, onCancel, onRetry) }
             }
         } else {
             if (history.isEmpty()) Empty(stringResource(R.string.no_done))
@@ -380,7 +384,7 @@ private fun Empty(text: String) = Text(text, Modifier.padding(24.dp), color = Ma
 private fun SectionTitle(text: String) = Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 4.dp))
 
 @Composable
-private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit) {
+private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Job) -> Unit) {
     CardBox(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Thumb(active.job.thumbnail, null, active.job.title, 0, Modifier.width(104.dp).height(64.dp), active.job.isAudio)
@@ -396,7 +400,7 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit) {
                         Text("${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                } else if (active.phase != Phase.QUEUED) {
+                } else if (active.phase != Phase.QUEUED && active.phase != Phase.INTERRUPTED) {
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
                 Text(stringResource(when (active.phase) {
@@ -404,7 +408,11 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit) {
                     Phase.READING -> R.string.status_reading
                     Phase.DOWNLOADING -> R.string.phase_downloading
                     Phase.SAVING -> R.string.status_saving
+                    Phase.INTERRUPTED -> R.string.phase_interrupted
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (active.phase == Phase.INTERRUPTED) TextButton(onClick = { onRetry(active.job) }) {
+                    Text(stringResource(R.string.retry))
+                }
             }
             IconButton(onClick = { onCancel(active.job.id) }) { AppIcon(R.drawable.ic_close, tint = MaterialTheme.colorScheme.onSurface) }
         }
@@ -464,7 +472,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_videocam, stringResource(R.string.set_quality),
             if (quality == 0) stringResource(R.string.best_quality) else "${quality}p") { pickQuality = true }
         SettingRow(R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location)) { pickLocation = true }
-        SettingRow(R.drawable.ic_language, stringResource(R.string.set_language), java.util.Locale.getDefault().displayLanguage,
+        SettingRow(R.drawable.ic_language, stringResource(R.string.set_language),
+            LocalConfiguration.current.locales[0].displayLanguage,
             onClick = onLanguage)
         SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
             onClick = onInvite)

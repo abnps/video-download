@@ -1,14 +1,16 @@
 # Mac (Apple Silicon) paket: svi testovi na Macu, pa .app → .dmg (bez Appleovog potpisa, beta).
-# Na push: .dmg je samo artefakt pokretanja. Kad se objavi izdanje (release published), isti posao napravi
-# .dmg iz taga izdanja i sam ga doda izdanju, uz stalnu kopiju za link na sajtu (releases/latest/download/…).
+# Na push: .dmg je samo artefakt pokretanja. Ručno pokretanje za tačan tag dodaje ga nacrtu izdanja.
 name: Mac paket
 
 on:
   push:
     branches: [main, macos]
-  release:
-    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Postojeći tag nacrta izdanja, npr. v0.9.8
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -24,15 +26,19 @@ jobs:
       PYTHONIOENCODING: utf-8
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Build folder (van repoa)
         run: echo "VIDEODL_BUILD_DIR=$RUNNER_TEMP/build" >> "$GITHUB_ENV"
       - name: Verzija u kodu mora odgovarati tagu izdanja
-        if: github.event_name == 'release'
+        if: github.event_name == 'workflow_dispatch'
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(python3 -c 'import re,pathlib; print(re.search(r"__version__ = \"([^\"]+)\"", pathlib.Path("videodl/__init__.py").read_text(encoding="utf-8")).group(1))')
           test "v$VERSION" = "$TAG" || { echo "Tag $TAG ne odgovara verziji $VERSION"; exit 1; }
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq .draft)" = true || { echo "Izdanje mora biti nacrt"; exit 1; }
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
@@ -57,10 +63,10 @@ jobs:
             ${{ runner.temp }}/build/checks.txt
           if-no-files-found: warn
       - name: Dodaj .dmg izdanju
-        if: github.event_name == 'release'
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ inputs.tag }}
         run: |
           cd "$RUNNER_TEMP/build/macos"
           DMG="VideoDownload-macOS-arm64-${TAG#v}.dmg"

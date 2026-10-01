@@ -1,0 +1,80 @@
+"""Androidova Python logika bez mreže, telefona i izmjene korisničkih fajlova."""
+
+import base64
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ANDROID_PYTHON = Path(__file__).resolve().parents[1] / "android" / "app" / "src" / "main" / "python"
+sys.path.insert(0, str(ANDROID_PYTHON))
+
+import vd_core  # noqa: E402
+from vd_diagnostics import SafeLog, clean_file, records, render  # noqa: E402
+
+
+class AndroidAudioTest(unittest.TestCase):
+    def test_audio_must_be_a_separate_m4a_stream(self):
+        combined = {"format_id": "combined", "ext": "mp4", "vcodec": "avc1.640028", "acodec": "mp4a.40.2"}
+        info = {"formats": [combined]}
+        self.assertFalse(vd_core.options(info)["audio_available"])
+        with self.assertRaisesRegex(ValueError, "AUDIO_UNAVAILABLE"):
+            vd_core.plan(info, "audio")
+        self.assertEqual(vd_core.plan(info, "video"), ["combined"])
+
+        m4a = {"format_id": "audio", "ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2"}
+        info["formats"].append(m4a)
+        self.assertTrue(vd_core.options(info)["audio_available"])
+        self.assertEqual(vd_core.plan(info, "audio"), ["audio"])
+
+    def test_standalone_m4a_and_other_audio(self):
+        standalone = {"ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2"}
+        self.assertTrue(vd_core.options(standalone)["audio_available"])
+        self.assertEqual(vd_core.plan(standalone, "audio"), ["ba[ext=m4a]"])
+        standalone["ext"] = "webm"
+        self.assertFalse(vd_core.options(standalone)["audio_available"])
+
+
+class AndroidDiagnosticsTest(unittest.TestCase):
+    def test_new_log_keeps_useful_status_without_private_url_or_page(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder, "zadnji-log.txt")
+            log = SafeLog(str(path))
+            log.info("čitanje linka: https://alice:TOKEN@www.youtube.com/private?token=SECRET")
+            log.debug("[debug] Dumping request to https://www.youtube.com: " + base64.b64encode(b"<html>SECRET</html>").decode())
+            log.error("HTTP Error 403: Forbidden na https://www.youtube.com/private?key=SECRET")
+            log.error("HTTP Error 403 na https://TOKEN.cdn.youtube.com/private?key=SECRET")
+            log.error("HTTP Error 403 na https://FAKESECRET.onion/private")
+            log.error("Authorization: Bearer SECRET\nCookie: session=SECRET")
+            log.close()
+            raw = path.read_text(encoding="utf-8")
+            shown = "\n".join(render(records(str(path))))
+            for secret in ("SECRET", "TOKEN", "/private", "<html>", "Authorization", "Cookie"):
+                self.assertNotIn(secret, raw)
+                self.assertNotIn(secret, shown)
+            self.assertIn("youtube.com", shown)
+            self.assertNotIn("FAKESECRET", raw + shown)
+            self.assertIn("HTTP Error 403", shown)
+
+    def test_old_log_is_sanitized_before_export_and_on_startup(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder, "zadnji-log.txt")
+            secret = "FAKE_REVIEW_TOKEN"
+            page = base64.b64encode(f"<html>{secret}</html>".encode()).decode()
+            path.write_text(
+                f"[info] link: https://alice:{secret}@www.youtube.com/p?token={secret}\n"
+                f"[debug] Dumping request to https://www.youtube.com/p\n[debug] {page}\n"
+                f"[error] HTTP Error 403: Forbidden\nAuthorization: Bearer {secret}\n",
+                encoding="utf-8",
+            )
+            report = vd_core.report(folder)
+            self.assertNotIn(secret, report)
+            self.assertNotIn("Authorization", report)
+            self.assertIn("HTTP Error 403", report)
+            clean_file(str(path))
+            self.assertNotIn(secret, path.read_text(encoding="utf-8"))
+            self.assertIn("HTTP Error 403", "\n".join(render(records(str(path)))))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -33,6 +33,14 @@
     <string name="about_size">about %1$s</string>
     <string name="size_unknown">size unknown</string>
     <string name="best_audio">Best audio</string>
+    <string name="audio_unavailable">Separate M4A audio is unavailable for this video.</string>
+    <string name="error_unsupported">This link is not supported.</string>
+    <string name="error_login">This site requires a login or confirmation.</string>
+    <string name="error_http">The site returned HTTP %1$s.</string>
+    <string name="error_network">The connection failed. Try again.</string>
+    <string name="error_generic">Could not read or download this video. Copy the report for details.</string>
+    <string name="phase_interrupted">Interrupted when the app closed</string>
+    <string name="retry">Retry</string>
     <string name="best_quality">Best available</string>
     <string name="save_to">Save to</string>
     <string name="loc_downloads">Downloads</string>

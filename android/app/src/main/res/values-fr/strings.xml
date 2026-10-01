@@ -32,6 +32,14 @@
     <string name="about_size">env. %1$s</string>
     <string name="size_unknown">taille inconnue</string>
     <string name="best_audio">Meilleur son</string>
+    <string name="audio_unavailable">Aucune piste audio M4A séparée pour cette vidéo.</string>
+    <string name="error_unsupported">Ce lien est incompatible.</string>
+    <string name="error_login">Ce site demande une connexion ou une confirmation.</string>
+    <string name="error_http">Le site a renvoyé HTTP %1$s.</string>
+    <string name="error_network">La connexion a échoué. Réessaie.</string>
+    <string name="error_generic">Impossible de lire ou de télécharger cette vidéo. Copie le rapport pour les détails.</string>
+    <string name="phase_interrupted">Interrompu à la fermeture de l’application</string>
+    <string name="retry">Réessayer</string>
     <string name="best_quality">Meilleure disponible</string>
     <string name="save_to">Enregistrer dans</string>
     <string name="loc_downloads">Téléchargements (Download)</string>

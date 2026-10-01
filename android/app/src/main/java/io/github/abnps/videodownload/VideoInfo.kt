@@ -14,6 +14,7 @@ data class VideoInfo(
     val site: String,
     val video: List<QualityOption>,
     val audioSize: Double,
+    val audioAvailable: Boolean,
 ) {
     companion object {
         fun parse(json: String): VideoInfo {
@@ -24,7 +25,8 @@ data class VideoInfo(
                 QualityOption(option.optInt("height"), option.optInt("label", option.optInt("height")), option.optDouble("size", 0.0))
             }
             return VideoInfo(data.optString("url"), data.optString("title"), data.optString("thumbnail"),
-                data.optDouble("duration", 0.0).toInt(), data.optString("site"), video, data.optDouble("audio_size", 0.0))
+                data.optDouble("duration", 0.0).toInt(), data.optString("site"), video,
+                data.optDouble("audio_size", 0.0), data.optBoolean("audio_available", false))
         }
     }
 }

@@ -435,7 +435,7 @@ def menu_button(lang: str) -> str:
             f'aria-label="{label}" title="{label}"><span></span><span></span><span></span></button>')
 
 
-SHARE_ICON = ('<svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+SHARE_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
               'stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>'
               '<path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>')
 
@@ -568,8 +568,8 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
             {download_icon}
             {h["win_btn"]}
           </a>
-          <a class="btn ghost" href="#install" data-mac>macOS <span class="badge">{badge}</span></a>
-          <a class="btn ghost" href="#install" data-android>Android <span class="badge">{badge}</span></a>
+          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">{badge}</span></a>
+          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">{badge}</span></a>
         </div>
         <ul class="promise">{promise}</ul>
         <div class="meta">{version_line} · {h["win_req"]} · <a href="#install">{h["install_help"]}</a></div>
@@ -671,10 +671,10 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       <div class="kicker" data-reveal>{in_kicker}</div>
       <h2 data-reveal>{in_h2}</h2>
       <p class="sub" data-reveal>{in_sub}</p>
-      <div class="tabs" role="tablist" aria-label="{esc(in_label)}">
-        <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
-        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">macOS <span class="badge">{badge}</span></button>
-        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">{badge}</span></button>
+      <div class="tabs" aria-label="{esc(in_label)}">
+        <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
+        <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">{badge}</span></a>
+        <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">{badge}</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p>{in_win}</p>
@@ -685,7 +685,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         </div>
         <p style="margin-top:22px"><a class="btn" href="{installer_url}">{h["win_btn"]}</a></p>
       </div>
-      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">{badge}</span> {mac_lead.format(issue=issue_url)}</p>
         <p>{mac_note}</p>
         <ol>
@@ -693,7 +693,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         </ol>
         <p style="margin-top:22px"><a class="btn" href="{mac_url}">{mac_button}</a></p>
       </div>
-      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
         <p><span class="badge">{badge}</span> {android_lead.format(issue=issue_url)}</p>
         <p>{android_note}</p>
         <ol>

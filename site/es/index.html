@@ -99,8 +99,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Descargar para Windows
           </a>
-          <a class="btn ghost" href="#install" data-mac>macOS <span class="badge">Beta</span></a>
-          <a class="btn ghost" href="#install" data-android>Android <span class="badge">Beta</span></a>
+          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">Beta</span></a>
+          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Sin cuenta</li><li>Sin límite diario</li><li>Tus enlaces no nos llegan</li></ul>
         <div class="meta"><!-- version -->Versión 0.9.7 · 130 MB<!-- /version --> · Windows 10 y 11 (64 bits) · <a href="#install">ayuda para instalar</a></div>
@@ -230,10 +230,10 @@
       <div class="kicker" data-reveal>Instalación</div>
       <h2 data-reveal>Primer inicio, paso a paso.</h2>
       <p class="sub" data-reveal>La aplicación aún no tiene un certificado de pago, así que tu sistema pregunta una vez. Las actualizaciones desde la aplicación no preguntan.</p>
-      <div class="tabs" role="tablist" aria-label="Sistema">
-        <button role="tab" id="tab-win" aria-controls="panel-win" aria-selected="true">Windows</button>
-        <button role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false" tabindex="-1">macOS <span class="badge">Beta</span></button>
-        <button role="tab" id="tab-android" aria-controls="panel-android" aria-selected="false" tabindex="-1">Android <span class="badge">Beta</span></button>
+      <div class="tabs" aria-label="Sistema">
+        <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
+        <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">Beta</span></a>
+        <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">Beta</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows puede mostrar «Windows protegió su PC».</b> Comprueba que el archivo viene de este sitio y pulsa <b>Más información</b> y luego <b>Ejecutar de todas formas</b>.</p>
@@ -244,7 +244,7 @@
         </div>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Descargar para Windows</a></p>
       </div>
-      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac" hidden>
+      <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">Beta</span> <b>Novedad: Video Download para Mac.</b> Para Mac con chip de Apple (M1 o posterior) y macOS 13 o posterior. Funciona, pero aún lo han probado pocas personas: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">avísanos si algo no funciona</a>.</p>
         <p>La versión para Mac aún no está firmada por Apple, así que el primer inicio requiere unos clics más:</p>
         <ol>
@@ -255,7 +255,7 @@
         </ol>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg">Descargar para Mac (beta)</a></p>
       </div>
-      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android" hidden>
+      <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
         <p><span class="badge">Beta</span> <b>Novedad: Video Download para Android.</b> Para móviles con Android 10 o posterior. Comparte un vídeo desde cualquier app y elige la calidad. Funciona, pero aún lo han probado pocas personas: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">avisa si algo no funciona</a>.</p>
         <p>La app no está en Google Play, así que la primera instalación requiere unos toques más:</p>
         <ol>
@@ -309,7 +309,7 @@
           <div class="support-actions">
             <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">♥ Apoyar con PayPal</a>
             <div class="share" data-url="https://abnps.github.io/video-download/es/" data-title="Video Download — descargador gratuito de vídeo y audio para Windows y Mac" data-copied="Copiado">
-              <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="Cuéntaselo a quien le sirva."><svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg> Compartir</button>
+              <button class="btn ghost share-btn" type="button" aria-haspopup="dialog" title="Cuéntaselo a quien le sirva."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg> Compartir</button>
               <dialog class="share-sheet" aria-label="Compartir Video Download">
                 <div class="sheet-head"><h3>Compartir Video Download</h3><button class="sheet-close" type="button" aria-label="Cerrar">✕</button></div>
                 <div class="sheet-preview"><img src="../assets/icon.png" alt=""><div><b>Video Download</b><span>https://abnps.github.io/video-download/es/</span></div></div>
@@ -320,7 +320,7 @@
             <a class="sheet-app" style="--c:#1877F2" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.5H16l.4-3H13.5V8.7c0-.9.3-1.4 1.5-1.4h1.5V4.6A20 20 0 0 0 14.3 4.5c-2.2 0-3.8 1.3-3.8 3.8v2.2H8v3h2.5V21z"/></svg></i><span>Facebook</span></a>
             <a class="sheet-app" style="--c:#111111" href="https://x.com/intent/post?url=https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F&amp;text=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.8 3.5h3l-6.6 7.5 7.8 9.5h-6.1l-4.8-5.9-5.4 5.9h-3l7-7.9L2.3 3.5h6.2l4.3 5.4zm-1 15.3h1.7L7.3 5.1H5.5z"/></svg></i><span>X</span></a>
             <a class="sheet-app" style="--c:#6B7280" href="mailto:?subject=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac&amp;body=Video%20Download%20%E2%80%94%20descargador%20gratuito%20de%20v%C3%ADdeo%20y%20audio%20para%20Windows%20y%20Mac%20https%3A%2F%2Fabnps.github.io%2Fvideo-download%2Fes%2F" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></i><span>E-mail</span></a>
-            <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i><svgviewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></i><span>Más…</span></button>
+            <button class="sheet-app sheet-more" type="button" style="--c:#8A94A6" hidden><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></i><span>Más…</span></button>
                 </div>
                 <div class="sheet-copy"><input type="text" readonly value="https://abnps.github.io/video-download/es/" aria-label="URL"><button type="button" data-copy data-label="Copiar">Copiar</button></div>
               </dialog>
