@@ -260,7 +260,7 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 
 ### Stanje 2.10.2026
 
-- Objavljeno: Windows 0.9.7, macOS 0.9.7 (beta, .dmg pravi CI), Android 0.2.1 (beta) u izdanju v0.9.7;
+- Objavljeno: Windows 0.9.7, macOS 0.9.7 (beta, .dmg pravi CI), Android 0.2.3 (beta, 3.10.2026: plejliste, 18+, MP3, prijava problema) u izdanju v0.9.7;
   dodatak 0.5.3 (Chrome/Edge). Sajt: Windows · macOS · Android, vodiči, changelog, 404. CI zelen (i Android posao).
 - Android 0.2.1: Instagram prijava (SiteLogin.kt), dijeljenje iz prvog puta, licence, „Preuzmi video", zupčanik.
   Ažuriranje iz aplikacije (0.2.0-proba → 0.2.1) Ahmed potvrdio na S26 Ultra 2.10.2026.
