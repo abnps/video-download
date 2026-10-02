@@ -57,6 +57,8 @@ def _validate(record):
     status = record.get("status")
     if type(status) is int and 400 <= status <= 599:
         clean["status"] = status
+    if clean["event"] in ("probe", "download") and type(record.get("login")) is bool:
+        clean["login"] = record["login"]
     return clean
 
 
@@ -92,6 +94,11 @@ def record(message, level="info"):
     result = {"v": 2, "event": event}
     if status:
         result["status"] = int(status[1])
+    # Samo da/ne: da li je posao dobio kolačiće prijave (nikad sami kolačići ni nalog).
+    if event in ("probe", "download"):
+        login = re.search(r"\| prijava: (da|ne)\b", text)
+        if login:
+            result["login"] = login[1] == "da"
     match = _URL.search(text)
     if match:
         try:
@@ -166,6 +173,8 @@ def render(items):
             text = f"HTTP Error {code}" + (f": {reason}" if reason else "")
         if "host" in safe:
             text += f" | <{safe['host']}>"
+        if "login" in safe:
+            text += " | prijava: " + ("da" if safe["login"] else "ne")
         lines.append(text)
     return lines
 

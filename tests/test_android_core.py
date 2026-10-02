@@ -76,5 +76,49 @@ class AndroidDiagnosticsTest(unittest.TestCase):
             self.assertIn("HTTP Error 403", "\n".join(render(records(str(path)))))
 
 
+class AndroidLoginCookiesTest(unittest.TestCase):
+    """Instagram prijava (SiteLogin.kt): fajl s kolačićima ide yt-dlp-u samo kad postoji, nikad u dnevnik."""
+
+    def test_cookie_file_only_when_logged_in(self):
+        self.assertNotIn("cookiefile", vd_core._with_cookies({}, ""))
+        self.assertEqual(vd_core._with_cookies({}, "/x/kolacici.txt")["cookiefile"], "/x/kolacici.txt")
+
+    def test_probe_passes_cookies_and_log_hides_them(self):
+        seen = {}
+
+        class FakeYDL:
+            def __init__(self, params):
+                seen.update(params)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def extract_info(self, url, download=False):
+                return {"id": "abc", "title": "Reel", "formats": []}
+
+        original = vd_core.YoutubeDL
+        vd_core.YoutubeDL = FakeYDL
+        try:
+            with tempfile.TemporaryDirectory() as folder:
+                cookies = Path(folder, "kolacici-1.txt")
+                cookies.write_text("# Netscape HTTP Cookie File\n.instagram.com\tTRUE\t/\tTRUE\t0\tsessionid\tSECRET\n")
+                vd_core.probe("https://www.instagram.com/reel/abc/", folder, str(cookies))
+                self.assertEqual(seen["cookiefile"], str(cookies))
+                raw = Path(folder, "zadnji-log.txt").read_text(encoding="utf-8")
+                self.assertNotIn("SECRET", raw)
+                self.assertNotIn("kolacici", raw)
+                # Izvještaj kaže samo da li je prijava korištena.
+                report = vd_core.render(vd_core.records(str(Path(folder, "zadnji-log.txt"))))
+                self.assertIn("Čitanje linka | <instagram.com> | prijava: da", report)
+                vd_core.probe("https://www.instagram.com/reel/abc/", folder, "")
+                report = vd_core.render(vd_core.records(str(Path(folder, "zadnji-log.txt"))))
+                self.assertIn("Čitanje linka | <instagram.com> | prijava: ne", report)
+        finally:
+            vd_core.YoutubeDL = original
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -35,6 +35,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Prijava na Instagram (ugrađeni preglednik); kolačići ostaju samo u aplikaciji. -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.dijeli"

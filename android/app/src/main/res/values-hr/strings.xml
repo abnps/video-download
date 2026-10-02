@@ -18,7 +18,7 @@
     <string name="home_title">Preuzmi video.</string>
     <string name="home_sub">Dodaj link i izaberi kvalitet.</string>
     <string name="link_placeholder">Zalijepi link ovdje</string>
-    <string name="find_video">Pronađi video</string>
+    <string name="find_video">Preuzmi video</string>
     <string name="finding">Tražim video…</string>
     <string name="share_tip_title">Direktno iz preglednika</string>
     <string name="share_tip_text">Podijeli link u Video Download.</string>
@@ -87,4 +87,13 @@
     <string name="open">Otvori</string>
     <string name="saved_where">Video ide u Movies/Video Download, zvuk u Music/Video Download.</string>
     <string name="prototype_note">Probna verzija: video do 1080p (H.264), zvuk kao M4A; MP3 dolazi uskoro.</string>
+    <string name="login_title">Instagram račun</string>
+    <string name="login_on">Prijavljen</string>
+    <string name="login_off">Prijavi se za Instagram videozapise</string>
+    <string name="login_button">Prijavi se na Instagram</string>
+    <string name="login_done">Gotovo</string>
+    <string name="login_note">Prijava ostaje samo u ovoj aplikaciji na mobitelu. Savjet: koristi pomoćni račun.</string>
+    <string name="logout_title">Odjaviti se s Instagrama?</string>
+    <string name="logout">Odjavi se</string>
+    <string name="dialog_cancel">Odustani</string>
 </resources>

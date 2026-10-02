@@ -36,6 +36,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.chaquo.python.Python
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,6 +46,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : ComponentActivity() {
     private val link = mutableStateOf("")
     private val tab = mutableIntStateOf(TAB_HOME)
+    private var tabBeforeSettings = TAB_HOME // Postavke su poseban ekran; „nazad" vraća tamo odakle se došlo
     private val downloadsTab = mutableIntStateOf(0)
     private val info = mutableStateOf<VideoInfo?>(null)
     private val finding = mutableStateOf(false)
@@ -52,6 +55,7 @@ class MainActivity : ComponentActivity() {
     private val quality = mutableIntStateOf(0)
     private var autoFind by mutableStateOf(false)
     private val welcome = mutableStateOf(false)
+    private val instagram = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +71,16 @@ class MainActivity : ComponentActivity() {
             runCatching { Python.getInstance().getModule("vd_core").callAttr("update_ytdlp") }
         }.start()
         setContent { AppTheme { App() } }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        instagram.value = SiteLogin.isLoggedIn() // osvježi i poslije povratka s ekrana prijave
+    }
+
+    private fun openLogin() {
+        findError.value = null
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -109,9 +123,17 @@ class MainActivity : ComponentActivity() {
         findError.value = null
         try {
             val json = withContext(Dispatchers.IO) {
-                Python.getInstance().getModule("vd_core").callAttr("probe", url, cacheDir.absolutePath).toString()
+                val cookies = SiteLogin.cookieFile(cacheDir)
+                try {
+                    Python.getInstance().getModule("vd_core").callAttr("probe", url, cacheDir.absolutePath, cookies)
+                        .toString()
+                } finally {
+                    if (cookies.isNotEmpty()) java.io.File(cookies).delete() // privremeni kolačići nikad ne ostaju
+                }
             }
             info.value = VideoInfo.parse(json)
+        } catch (error: CancellationException) {
+            throw error // prekid nije greška sajta
         } catch (error: Exception) {
             findError.value = DownloadService.cleanError(this, error.message)
         } finally {
@@ -194,18 +216,25 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(autoFind) {
             if (autoFind) {
                 autoFind = false
-                find()
+                // Ne u ovom efektu: promjena autoFind ga ponovo pokrene i prekine čitanje (link iz „Podijeli"
+                // je zato uvijek prvi put padao, S26 Ultra 2.10.2026). Čitanje pripada aktivnosti, ne ekranu.
+                lifecycleScope.launch { find() }
             }
         }
         BackHandler(enabled = shown != null || tab.intValue != TAB_HOME) {
-            if (shown != null) info.value = null else tab.intValue = TAB_HOME
+            when {
+                shown != null -> info.value = null
+                tab.intValue == TAB_SETTINGS -> tab.intValue = tabBeforeSettings
+                else -> tab.intValue = TAB_HOME
+            }
         }
+        val openSettings = { tabBeforeSettings = tab.intValue; tab.intValue = TAB_SETTINGS }
         Scaffold(bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+            // Donja traka samo na glavnim ekranima; Postavke se otvaraju zupčanikom gore desno.
+            if (tab.intValue != TAB_SETTINGS) NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 listOf(
                     Triple(TAB_HOME, R.drawable.ic_home, R.string.nav_home),
                     Triple(TAB_DOWNLOADS, R.drawable.ic_download, R.string.nav_downloads),
-                    Triple(TAB_SETTINGS, R.drawable.ic_settings, R.string.nav_settings),
                 ).forEach { (index, icon, label) ->
                     NavigationBarItem(selected = tab.intValue == index,
                         onClick = { tab.intValue = index; if (index != TAB_HOME) info.value = null },
@@ -229,10 +258,11 @@ class MainActivity : ComponentActivity() {
                     )
                     tab.intValue == TAB_HOME -> HomeScreen(
                         link = link.value, onLinkChange = { link.value = it; findError.value = null }, onPaste = { paste() },
-                        onFind = { scope.launch { find() } }, finding = finding.value, error = findError.value,
+                        onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
                         onCopyReport = { copyReport() }, history = history,
+                        onLogin = if (findError.value == getString(R.string.error_login)) ({ openLogin() }) else null,
                         onShowAll = { downloadsTab.intValue = 1; tab.intValue = TAB_DOWNLOADS }, actions = actions,
-                        update = update, onInstallUpdate = { installUpdate() },
+                        update = update, onInstallUpdate = { installUpdate() }, onSettings = openSettings,
                     )
                     tab.intValue == TAB_DOWNLOADS -> {
                         val error by Downloads.lastError.collectAsState()
@@ -240,7 +270,8 @@ class MainActivity : ComponentActivity() {
                             onCancel = { id ->
                                 if (active.any { it.job.id == id && it.phase == Phase.INTERRUPTED }) Downloads.remove(id)
                                 else DownloadService.cancel(this@MainActivity, id)
-                            }, onRetry = { DownloadService.start(this@MainActivity, it) }, actions = actions)
+                            }, onRetry = { DownloadService.start(this@MainActivity, it) }, actions = actions,
+                            onSettings = openSettings)
                         if (error != null && active.isEmpty() && downloadsTab.intValue == 0) {
                             ErrorBanner(error!!) { copyReport() }
                         }
@@ -252,12 +283,15 @@ class MainActivity : ComponentActivity() {
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                         onLanguage = { openLanguage() }, onOpenLink = { openLink(it) },
                         onInvite = { scope.launch { invite() } },
+                        instagram = instagram.value, onLogin = { openLogin() },
+                        onLogout = { SiteLogin.logout(); instagram.value = false },
                         update = update, onInstallUpdate = { installUpdate() },
                         onCheckUpdate = { Thread { AppUpdater.check(this@MainActivity, force = true) }.start() },
                         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty(),
                         readerVersion = runCatching {
                             Python.getInstance().getModule("vd_core").callAttr("version").toString()
                         }.getOrDefault("?"),
+                        onBack = { tab.intValue = tabBeforeSettings },
                     )
                 }
             }

@@ -18,7 +18,7 @@
     <string name="home_title">Video herunterladen.</string>
     <string name="home_sub">Link einfügen und Qualität wählen.</string>
     <string name="link_placeholder">Link hier einfügen</string>
-    <string name="find_video">Video suchen</string>
+    <string name="find_video">Video herunterladen</string>
     <string name="finding">Video wird gesucht…</string>
     <string name="share_tip_title">Direkt aus dem Browser</string>
     <string name="share_tip_text">Teile den Link mit Video Download.</string>
@@ -87,4 +87,13 @@
     <string name="open">Öffnen</string>
     <string name="saved_where">Videos landen in Movies/Video Download, Ton in Music/Video Download.</string>
     <string name="prototype_note">Testversion: Video bis 1080p (H.264), Ton als M4A; MP3 kommt bald.</string>
+    <string name="login_title">Instagram-Konto</string>
+    <string name="login_on">Angemeldet</string>
+    <string name="login_off">Für Instagram-Videos anmelden</string>
+    <string name="login_button">Bei Instagram anmelden</string>
+    <string name="login_done">Fertig</string>
+    <string name="login_note">Die Anmeldung bleibt nur in dieser App auf deinem Telefon. Tipp: Nutze ein Zweitkonto.</string>
+    <string name="logout_title">Von Instagram abmelden?</string>
+    <string name="logout">Abmelden</string>
+    <string name="dialog_cancel">Abbrechen</string>
 </resources>

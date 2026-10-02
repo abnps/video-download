@@ -119,16 +119,24 @@ def _label(fmt: dict) -> int:
     return min(width, height) if width and height else height
 
 
-def probe(url: str, cache_dir: str) -> str:
+def _with_cookies(options: dict, cookie_file: str) -> dict:
+    """Privremeni Netscape fajl s kolačićima prijave (Instagram, `SiteLogin.kt`) ili "" bez prijave. Putanja i
+    sadržaj se nikad ne upisuju u dnevnik; fajl briše Kotlin čim posao završi."""
+    if cookie_file:
+        options["cookiefile"] = cookie_file
+    return options
+
+
+def probe(url: str, cache_dir: str, cookie_file: str = "") -> str:
     """Brzo čitanje linka za ekran „Izaberi kvalitet": naslov, sličica, trajanje, izbor kvaliteta (JSON).
     Zapis ide u isti dnevnik kao preuzimanje (za „Kopiraj izvještaj")."""
     import json
 
     log = _FileLog(os.path.join(cache_dir, "zadnji-log.txt"))
-    log.info(f"čitanje linka: {url}")
+    log.info(f"čitanje linka: {url} | prijava: {'da' if cookie_file else 'ne'}")
     try:
-        with YoutubeDL({"quiet": True, "no_warnings": True, "noplaylist": True, "logger": log, "verbose": False,
-                        "dump_intermediate_pages": False}) as ydl:
+        with YoutubeDL(_with_cookies({"quiet": True, "no_warnings": True, "noplaylist": True, "logger": log,
+                                      "verbose": False, "dump_intermediate_pages": False}, cookie_file)) as ydl:
             info = ydl.extract_info(url, download=False)
             if info.get("_type") == "playlist":
                 entries = [entry for entry in info.get("entries") or [] if entry]
@@ -145,7 +153,7 @@ def probe(url: str, cache_dir: str) -> str:
                        "site": info.get("extractor_key") or "", **options(info)}, ensure_ascii=False)
 
 
-def download(url: str, kind: str, work_dir: str, listener, height: int = 0):
+def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = ""):
     """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno) i isCancelled().
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
@@ -164,9 +172,10 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0):
     hook.cancelled = listener.isCancelled
 
     log = _FileLog(os.path.join(os.path.dirname(work_dir), "zadnji-log.txt"))
-    log.info(f"link: {url} | vrsta: {kind}")
+    log.info(f"link: {url} | vrsta: {kind} | prijava: {'da' if cookie_file else 'ne'}")
     options = {"quiet": True, "no_warnings": True, "noprogress": True, "noplaylist": True, "retries": 3,
                "progress_hooks": [hook], "logger": log, "verbose": False, "dump_intermediate_pages": False}
+    _with_cookies(options, cookie_file)
     try:
         return _run(url, kind, work_dir, options, part, log, height)
     except Exception as error:

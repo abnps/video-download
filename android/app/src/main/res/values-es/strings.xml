@@ -18,7 +18,7 @@
     <string name="home_title">Descarga un vídeo.</string>
     <string name="home_sub">Añade un enlace y elige la calidad.</string>
     <string name="link_placeholder">Pega el enlace aquí</string>
-    <string name="find_video">Buscar vídeo</string>
+    <string name="find_video">Descargar vídeo</string>
     <string name="finding">Buscando el vídeo…</string>
     <string name="share_tip_title">Directo desde el navegador</string>
     <string name="share_tip_text">Comparte el enlace con Video Download.</string>
@@ -87,4 +87,13 @@
     <string name="open">Abrir</string>
     <string name="saved_where">Los vídeos van a Movies/Video Download y el audio a Music/Video Download.</string>
     <string name="prototype_note">Versión de prueba: vídeo hasta 1080p (H.264), audio en M4A; el MP3 llegará pronto.</string>
+    <string name="login_title">Cuenta de Instagram</string>
+    <string name="login_on">Sesión iniciada</string>
+    <string name="login_off">Inicia sesión para vídeos de Instagram</string>
+    <string name="login_button">Iniciar sesión en Instagram</string>
+    <string name="login_done">Listo</string>
+    <string name="login_note">La sesión se guarda solo en esta app de tu teléfono. Consejo: usa una cuenta secundaria.</string>
+    <string name="logout_title">¿Cerrar sesión en Instagram?</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="dialog_cancel">Cancelar</string>
 </resources>

@@ -59,8 +59,11 @@ class DownloadService : Service() {
             Downloads.lastError.value = null
             Downloads.update(job.id) { it.copy(phase = Phase.READING) }
             notify(progressNotification(job.title, null))
+            // Kolačići Instagram prijave (ako postoji) idu u privremeni fajl u `work`, koji se briše na kraju.
+            val cookies = SiteLogin.cookieFile(work)
             val result = Python.getInstance().getModule("vd_core").callAttr(
                 "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
+                cookies,
             ).asList()
             val name = result[1].toString()
             val first = File(result[2].toString())
@@ -109,7 +112,8 @@ class DownloadService : Service() {
     private class CancelledHere : Exception()
 
     private fun formatLabel(job: Job, extension: String): String =
-        if (job.isAudio) extension.uppercase() else "${extension.uppercase()} • ${job.label}"
+        if (job.isAudio || job.label.isBlank() || job.label.equals(extension, ignoreCase = true)) extension.uppercase()
+        else "${extension.uppercase()} • ${job.label}" // bez „MP4 • MP4" kad sajt ne javi visinu (Instagram)
 
     /** Poziva ga Python (vd_core.download) iz iste niti. */
     inner class Listener(private val job: Job) {

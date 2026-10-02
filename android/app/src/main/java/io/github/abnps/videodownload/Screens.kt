@@ -68,6 +68,13 @@ import java.util.Calendar
 fun AppIcon(id: Int, modifier: Modifier = Modifier, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) =
     Icon(painterResource(id), contentDescription = null, modifier = modifier, tint = tint)
 
+/** Zupčanik gore desno, kao u većini Android aplikacija: otvara Postavke. */
+@Composable
+fun SettingsButton(onClick: () -> Unit) = IconButton(onClick = onClick) {
+    Icon(painterResource(R.drawable.ic_settings), contentDescription = stringResource(R.string.nav_settings),
+        tint = MaterialTheme.colorScheme.onSurface)
+}
+
 @Composable
 fun CardBox(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
     val colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -109,11 +116,13 @@ fun HomeScreen(
     finding: Boolean,
     error: String?,
     onCopyReport: () -> Unit,
+    onLogin: (() -> Unit)?,
     history: List<HistoryItem>,
     onShowAll: () -> Unit,
     actions: ItemActions,
     update: UpdateState,
     onInstallUpdate: () -> Unit,
+    onSettings: () -> Unit,
 ) {
     var help by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp)) {
@@ -123,7 +132,8 @@ fun HomeScreen(
                 AppIcon(R.drawable.ic_download, Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onPrimary)
             }
             Text("Video Download", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 12.dp))
+                modifier = Modifier.padding(start = 12.dp).weight(1f))
+            SettingsButton(onSettings)
         }
         Spacer(Modifier.height(28.dp))
         Text(stringResource(R.string.home_title), fontSize = 34.sp, fontWeight = FontWeight.Bold, lineHeight = 38.sp)
@@ -161,6 +171,9 @@ fun HomeScreen(
                 if (error != null) {
                     Text(stringResource(R.string.status_failed, error), color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium)
+                    if (onLogin != null) {
+                        FilledTonalButton(onClick = onLogin) { Text(stringResource(R.string.login_button)) }
+                    }
                     TextButton(onClick = onCopyReport) { Text(stringResource(R.string.copy_report)) }
                 }
             }
@@ -350,10 +363,13 @@ fun LocationDialog(current: SaveLocation, onDismiss: () -> Unit, onPick: (SaveLo
 
 @Composable
 fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: Int, onTab: (Int) -> Unit,
-                    onCancel: (Long) -> Unit, onRetry: (Job) -> Unit, actions: ItemActions) {
+                    onCancel: (Long) -> Unit, onRetry: (Job) -> Unit, actions: ItemActions, onSettings: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
-        Text(stringResource(R.string.nav_downloads), fontSize = 30.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp))
+        Row(Modifier.fillMaxWidth().padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.nav_downloads), fontSize = 30.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp).weight(1f))
+            SettingsButton(onSettings)
+        }
         PrimaryTabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {
             Tab(selected = tab == 0, onClick = { onTab(0) }, text = { Text(stringResource(R.string.tab_active, active.size)) })
             Tab(selected = tab == 1, onClick = { onTab(1) }, text = { Text(stringResource(R.string.tab_done)) })
@@ -460,14 +476,22 @@ private fun startOfToday(): Long = Calendar.getInstance().apply {
 
 @Composable
 fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocation, onLocation: (SaveLocation) -> Unit,
-                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, appVersion: String,
-                   readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit) {
+                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit,
+                   instagram: Boolean, onLogin: () -> Unit, onLogout: () -> Unit, appVersion: String,
+                   readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit,
+                   onBack: () -> Unit) {
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+    var askLogout by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxSize()) {
+    // Standardna Android traka: strelica nazad + naslov (kao ekran „Izaberi kvalitet").
+    Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
+        Text(stringResource(R.string.nav_settings), style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold)
+    }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(stringResource(R.string.nav_settings), fontSize = 30.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
         UpdateBanner(update, onInstallUpdate)
         SettingRow(R.drawable.ic_videocam, stringResource(R.string.set_quality),
             if (quality == 0) stringResource(R.string.best_quality) else "${quality}p") { pickQuality = true }
@@ -475,6 +499,10 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_language, stringResource(R.string.set_language),
             LocalConfiguration.current.locales[0].displayLanguage,
             onClick = onLanguage)
+        SettingRow(R.drawable.ic_link, stringResource(R.string.login_title),
+            stringResource(if (instagram) R.string.login_on else R.string.login_off)) {
+            if (instagram) askLogout = true else onLogin()
+        }
         SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
             onClick = onInvite)
         SettingRow(R.drawable.ic_heart, stringResource(R.string.set_support), null) { onOpenLink(Links.SUPPORT) }
@@ -485,6 +513,13 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_download, stringResource(R.string.update_check),
             if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
         SettingRow(R.drawable.ic_settings, stringResource(R.string.set_reader), readerVersion, null)
+    }
+    }
+    if (askLogout) {
+        AlertDialog(onDismissRequest = { askLogout = false },
+            title = { Text(stringResource(R.string.logout_title)) },
+            confirmButton = { TextButton(onClick = { onLogout(); askLogout = false }) { Text(stringResource(R.string.logout)) } },
+            dismissButton = { TextButton(onClick = { askLogout = false }) { Text(stringResource(R.string.dialog_cancel)) } })
     }
     if (pickQuality) {
         AlertDialog(onDismissRequest = { pickQuality = false }, confirmButton = {},

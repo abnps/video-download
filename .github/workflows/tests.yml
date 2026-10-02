@@ -46,8 +46,12 @@ jobs:
         with:
           python-version: "3.14"
       - uses: android-actions/setup-android@v3
+        with:
+          packages: ""  # podrazumijevani paket „tools" više ne postoji i obara posao
       - name: Android SDK
-        run: sdkmanager "platforms;android-37" "build-tools;37.0.0"
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platform-tools" "platforms;android-37.0" "build-tools;37.0.0"
       - name: Android lint, Kotlin testovi i debug APK
         working-directory: android
         run: ./gradlew lintDebug testDebugUnitTest assembleDebug --console=plain

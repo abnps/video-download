@@ -19,7 +19,7 @@
     <string name="home_title">Download a video.</string>
     <string name="home_sub">Add a link and choose the quality.</string>
     <string name="link_placeholder">Paste the link here</string>
-    <string name="find_video">Find video</string>
+    <string name="find_video">Download video</string>
     <string name="finding">Looking for the video…</string>
     <string name="share_tip_title">Straight from the browser</string>
     <string name="share_tip_text">Share the link to Video Download.</string>
@@ -88,4 +88,13 @@
     <string name="open">Open</string>
     <string name="saved_where">Videos go to Movies/Video Download, audio to Music/Video Download.</string>
     <string name="prototype_note">Test version: video up to 1080p (H.264), audio as M4A; MP3 is coming.</string>
+    <string name="login_title">Instagram account</string>
+    <string name="login_on">Signed in</string>
+    <string name="login_off">Sign in for Instagram videos</string>
+    <string name="login_button">Sign in to Instagram</string>
+    <string name="login_done">Done</string>
+    <string name="login_note">The sign-in stays only in this app on your phone. Tip: use a secondary account.</string>
+    <string name="logout_title">Sign out of Instagram?</string>
+    <string name="logout">Sign out</string>
+    <string name="dialog_cancel">Cancel</string>
 </resources>
