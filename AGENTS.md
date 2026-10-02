@@ -258,10 +258,14 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 - Google provjera programera (DE/RS od 2027): $25 pun nalog ili besplatan ograničen (20 uređaja) — odluka
   čeka Ahmeda; vidi `00_plan/android_plan.md`.
 
-### Stanje 27.9.2026
+### Stanje 2.10.2026
 
-- Objavljeno: Windows 0.9.7, macOS 0.9.7 (beta, .dmg pravi CI), Android 0.2.0 (beta) u izdanju v0.9.7;
-  dodatak 0.5.3 (Chrome/Edge). Sajt: Windows · macOS · Android, vodiči, changelog, 404. CI zelen.
+- Objavljeno: Windows 0.9.7, macOS 0.9.7 (beta, .dmg pravi CI), Android 0.2.1 (beta) u izdanju v0.9.7;
+  dodatak 0.5.3 (Chrome/Edge). Sajt: Windows · macOS · Android, vodiči, changelog, 404. CI zelen (i Android posao).
+- Android 0.2.1: Instagram prijava (SiteLogin.kt), dijeljenje iz prvog puta, licence, „Preuzmi video", zupčanik.
+  Ažuriranje iz aplikacije (0.2.0-proba → 0.2.1) Ahmed potvrdio na S26 Ultra 2.10.2026.
+- Instalacija s računara: `adb install --user 0 -r …` — bez `--user 0` APK ode i u Samsungov Dual Messenger
+  profil (druga ikona sa značkom).
 
 ### Otvoreno (redom kako je predloženo Ahmedu)
 
