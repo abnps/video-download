@@ -75,6 +75,11 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    Javno ostaje samo posljednje izdanje (Ahmedova odluka 23.9.2026): `--publish` poslije objave
    prethodno izdanje sam vrati u nacrt (ne briše ga).
 
+7. **winget** (`winget install abnps.VideoDownload`): `--publish` sam kopira instaler u
+   `abnps/video-download-installers` (stalni link). Zatim novi opis paketa: kopiraj `tools/winget/*.yaml`, promijeni
+   `PackageVersion`, `ReleaseDate`, `InstallerUrl` i `InstallerSha256`, provjeri s `winget validate --manifest <folder>`
+   i pošalji pull request u `microsoft/winget-pkgs` (folder `manifests/a/abnps/VideoDownload/<verzija>`).
+
 ## Podrži projekat
 
 Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, možeš dobrovoljno

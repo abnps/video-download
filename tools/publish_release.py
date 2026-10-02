@@ -19,6 +19,9 @@ sys.path.insert(0, str(PROJECT))
 from videodl import __version__, release_signing
 
 REPO = "abnps/video-download"
+# Stalni linkovi na Windows instalere za winget (Ahmed 3.10.2026): glavni repo javno drži samo posljednje
+# izdanje, a winget traži link koji nikad ne nestaje.
+INSTALLERS_REPO = "abnps/video-download-installers"
 # Javni certifikat objavljenog Android 0.2.0 APK-a; nikad privatni ključ.
 ANDROID_CERTIFICATE = "83c26828568c1c1fc66be15353650c382a73f9badc5c847b22a7a141ca6b7230"
 ANDROID_PACKAGE = "io.github.abnps.videodownload"
@@ -161,6 +164,21 @@ def publish_latest(tag: str) -> None:
     if old and old != tag:
         run("gh", "release", "edit", old, "--repo", REPO, "--draft=true")
         print(f"Prethodno izdanje {old} je vraćeno u nacrt.")
+    copy_to_installers_repo(tag)
+
+
+def copy_to_installers_repo(tag: str) -> None:
+    """Isti Windows instaler (i .sha256) u abnps/video-download-installers, za winget. Novi winget opis paketa
+    se i dalje šalje ručno (README: korak winget)."""
+    version = tag.removeprefix("v")
+    names = (f"VideoDownload-Setup-{version}.exe", f"VideoDownload-Setup-{version}.exe.sha256")
+    with tempfile.TemporaryDirectory(prefix="videodl-winget-") as temp:
+        run("gh", "release", "download", tag, "--repo", REPO, "--dir", temp,
+            *[arg for name in names for arg in ("--pattern", name)])
+        run("gh", "release", "create", tag, *(str(Path(temp) / name) for name in names), "--repo", INSTALLERS_REPO,
+            "--title", f"Video Download {version} (Windows installer)",
+            "--notes", f"Same installer as https://github.com/{REPO}/releases/tag/{tag}")
+    print(f"Instaler {version} je i u {INSTALLERS_REPO} (winget).")
 
 
 def validate_draft(tag: str, *, publish: bool = False) -> None:

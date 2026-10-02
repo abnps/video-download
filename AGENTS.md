@@ -268,6 +268,9 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 - Android plejliste i 18+ (3.10.2026): `vd_core.probe` vraća spisak (extract_flat) → PlaylistScreen; 18+ po
   istim pravilima kao računar (`vd_core.is_adult` = `probe.is_adult`, test), potvrda `Job.adultOk` samo u memoriji
   (nikad u pending_jobs/istoriju); bez potvrde `ADULT_CONFIRM` → posao čeka (Phase.NEEDS_ADULT), ostali idu.
+- winget (Ahmed 3.10.2026: „Da, uradi oboje"): paket `abnps.VideoDownload`, instaleri trajno u javnom repou
+  `abnps/video-download-installers` (glavni repo javno drži samo posljednje izdanje, a winget traži stalni link).
+  Prva prijava: microsoft/winget-pkgs#445943 (s naloga npgamy). Postupak za nove verzije: README korak 7.
 - Instalacija s računara: `adb install --user 0 -r …` — bez `--user 0` APK ode i u Samsungov Dual Messenger
   profil (druga ikona sa značkom).
 

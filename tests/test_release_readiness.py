@@ -36,6 +36,11 @@ class ReleaseReadinessTest(unittest.TestCase):
         self.assertEqual(edits[0][3:], ("v0.9.8", "--repo", publish_release.REPO, "--draft=false", "--latest"))
         self.assertEqual(edits[1][3:], ("v0.9.7", "--repo", publish_release.REPO, "--draft=true"))
         self.assertFalse(any("delete" in call.args for call in run.call_args_list))
+        # Isti instaler ide i u repo za winget (stalni link).
+        create = [call.args for call in run.call_args_list if call.args[1:3] == ("release", "create")]
+        self.assertEqual(len(create), 1)
+        self.assertIn(publish_release.INSTALLERS_REPO, create[0])
+        self.assertTrue(any(str(arg).endswith("VideoDownload-Setup-0.9.8.exe") for arg in create[0]))
 
 
 if __name__ == "__main__":
