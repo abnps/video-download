@@ -9,6 +9,8 @@ plugins {
 android {
     namespace = "io.github.abnps.videodownload"
     compileSdk = 37
+    // NDK samo za MP3 koder (LAME, LGPL, src/main/cpp); ista verzija kao u Alati/android-sdk i u CI.
+    ndkVersion = "29.0.14206865"
 
     defaultConfig {
         applicationId = "io.github.abnps.videodownload"
@@ -50,6 +52,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "4.1.2"
+        }
     }
 }
 

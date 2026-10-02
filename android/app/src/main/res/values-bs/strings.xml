@@ -99,4 +99,7 @@
     <string name="set_licenses">Licence otvorenog koda</string>
     <string name="dialog_close">Zatvori</string>
     <string name="progress_eta">još %1$s</string>
+    <string name="status_converting">Pretvaranje u MP3</string>
+    <string name="audio_m4a_original">M4A (originalni kvalitet)</string>
+    <string name="phase_done">Gotovo</string>
 </resources>

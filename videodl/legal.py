@@ -84,6 +84,10 @@ ANDROID_COMPONENTS = (
     Component("Python", "PSF-2.0", "https://www.python.org/", ("Python-LICENSE.txt",),
               "Includes bzip2 and libffi; their licenses are in the same file."),
     Component("Chaquopy", "MIT", "https://chaquo.com/chaquopy/", ("Chaquopy-LICENSE.txt",)),
+    Component("LAME 3.100 (MP3 encoder)", "LGPL-2.0-or-later", "https://lame.sourceforge.io/", ("LAME-COPYING.txt",),
+              "Separate replaceable library libvdmp3.so. Source: lame-3.100.tar.gz from lame.sourceforge.io "
+              "(SHA-256 ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e) and our build files in "
+              "https://github.com/abnps/video-download/tree/main/android/app/src/main/cpp ."),
     Component("OpenSSL", "Apache-2.0", "https://www.openssl.org/", ("Apache-2.0.txt",)),
     Component("SQLite", "Public Domain", "https://www.sqlite.org/copyright.html", ()),
     Component("XZ Utils (liblzma)", "0BSD", "https://tukaani.org/xz/", ("0BSD.txt",)),

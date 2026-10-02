@@ -26,6 +26,7 @@ class AndroidLicensesTest(unittest.TestCase):
         self.assertIn("Apache License", (LICENSES / "Apache-2.0.txt").read_text(encoding="utf-8"))
         self.assertIn("Chaquo Ltd", (LICENSES / "Chaquopy-LICENSE.txt").read_text(encoding="utf-8"))
         self.assertIn("unlicense", (LICENSES / "yt-dlp-LICENSE").read_text(encoding="utf-8").lower())
+        self.assertIn("GNU LIBRARY GENERAL PUBLIC LICENSE", (LICENSES / "LAME-COPYING.txt").read_text(encoding="utf-8"))
         python = (LICENSES / "Python-LICENSE.txt").read_text(encoding="utf-8")
         self.assertIn("PYTHON SOFTWARE FOUNDATION LICENSE", python)
         for bundled in ("bzip2", "libffi"):

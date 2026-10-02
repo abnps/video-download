@@ -5,6 +5,8 @@ Their licenses apply to them; the full texts follow below.
 - Python — PSF-2.0 — https://www.python.org/
   Includes bzip2 and libffi; their licenses are in the same file.
 - Chaquopy — MIT — https://chaquo.com/chaquopy/
+- LAME 3.100 (MP3 encoder) — LGPL-2.0-or-later — https://lame.sourceforge.io/
+  Separate replaceable library libvdmp3.so. Source: lame-3.100.tar.gz from lame.sourceforge.io (SHA-256 ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e) and our build files in https://github.com/abnps/video-download/tree/main/android/app/src/main/cpp .
 - OpenSSL — Apache-2.0 — https://www.openssl.org/
 - SQLite — Public Domain — https://www.sqlite.org/copyright.html
 - XZ Utils (liblzma) — 0BSD — https://tukaani.org/xz/

@@ -158,13 +158,14 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
     # u kojoj su pročitani; nova sesija za preuzimanje dobije HTTP 403 (nađeno na S26 Ultra, 27.9.2026).
-    part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0}
+    part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0, "audio": kind == "audio"}
 
     def hook(status):
         if listener.isCancelled():
             raise Cancelled()
         if status.get("status") == "downloading":
-            listener.onProgress(*progress(part, status))
+            # Zadnji podatak: dio sa zvukom (traka ljubičasta kao na računaru), inače video (plava).
+            listener.onProgress(*progress(part, status), part["audio"])
 
     hook.cancelled = listener.isCancelled
 
@@ -219,7 +220,7 @@ def _run(url, kind, work_dir, options, part, log, height=0):
         finished = 0  # stvarni bajtovi završenih dijelova
         for index, spec in enumerate(specs):
             part.update(before=sum(weights[:index]), weight=weights[index], done_before=finished,
-                        rest=int(sum(sizes[index + 1:])))
+                        rest=int(sum(sizes[index + 1:])), audio=kind == "audio" or index > 0)
             # yt-dlp izbor formata sastavi jednom, u konstruktoru; za svaki dio se sastavlja ponovo.
             ydl.params["format"] = spec
             ydl.format_selector = ydl.build_format_selector(spec)

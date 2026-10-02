@@ -134,7 +134,7 @@ class LoginActivity : ComponentActivity() {
                             }
                             TextButton(onClick = { done() }) { Text(stringResource(R.string.login_done)) }
                         }
-                        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+                        if (loading) AppProgressBar(null, BarPhase.WORK)
                         if (failed) {
                             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically) {

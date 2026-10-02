@@ -100,4 +100,7 @@
     <string name="set_licenses">Open-source licenses</string>
     <string name="dialog_close">Close</string>
     <string name="progress_eta">%1$s left</string>
+    <string name="status_converting">Converting to MP3</string>
+    <string name="audio_m4a_original">M4A (original quality)</string>
+    <string name="phase_done">Done</string>
 </resources>

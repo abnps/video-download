@@ -253,6 +253,7 @@ fun UpdateBanner(update: UpdateState, onInstall: () -> Unit) {
 fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (Job) -> Unit,
                   location: SaveLocation, onLocation: (SaveLocation) -> Unit) {
     var audio by remember { mutableStateOf(false) }
+    var mp3 by remember { mutableStateOf(true) } // zvuk: MP3 (kao na računaru) ili originalni M4A
     val best = QualityOption(0, 0, info.video.firstOrNull()?.size ?: 0.0)
     val options = info.video.ifEmpty { listOf(best) }
     var chosen by remember {
@@ -286,7 +287,9 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             if (!info.audioAvailable) Text(stringResource(R.string.audio_unavailable),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (audio) {
-                OptionRow(true, stringResource(R.string.best_audio), sizeText("M4A", info.audioSize)) {}
+                // MP3 192 kbps: veličina ≈ trajanje × 24 KB/s.
+                OptionRow(mp3, "MP3 · ${Mp3.KBPS} kbps", sizeText("MP3", info.duration * Mp3.KBPS * 125.0)) { mp3 = true }
+                OptionRow(!mp3, stringResource(R.string.audio_m4a_original), sizeText("M4A", info.audioSize)) { mp3 = false }
             } else {
                 options.forEach { option ->
                     val title = if (option.label > 0) "${option.label}p" else stringResource(R.string.best_quality)
@@ -306,7 +309,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             }
         }
         Button(onClick = {
-            val label = if (audio) "M4A" else if (chosen.label > 0) "${chosen.label}p" else "MP4"
+            val label = if (audio) (if (mp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
             onDownload(Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
                 if (audio) 0 else chosen.height, label))
         }, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp), shape = RoundedCornerShape(12.dp)) {
@@ -409,8 +412,15 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Jo
             Column(Modifier.weight(1f).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(active.job.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
                 val fraction = active.fraction
-                if (active.phase == Phase.DOWNLOADING && fraction != null) {
-                    LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth())
+                // Iste trake kao na računaru: video plavo, zvuk i obrada ljubičasto, završeno zeleno.
+                if (active.phase == Phase.DONE) {
+                    AppProgressBar(1f, BarPhase.DONE)
+                } else if (active.phase == Phase.CONVERTING && fraction != null) {
+                    AppProgressBar(fraction, BarPhase.WORK)
+                    Text("MP3 · ${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else if (active.phase == Phase.DOWNLOADING && fraction != null) {
+                    AppProgressBar(fraction, if (active.job.isAudio || active.audioPart) BarPhase.AUDIO else BarPhase.VIDEO)
                     Row {
                         val context = LocalContext.current
                         val size = if (active.total > 0) "${formatSize(active.done.toDouble())} / ${formatSize(active.total.toDouble())}" else null
@@ -421,13 +431,15 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Jo
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else if (active.phase != Phase.QUEUED && active.phase != Phase.INTERRUPTED) {
-                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    AppProgressBar(null, BarPhase.WORK) // čitanje, spajanje, snimanje: traka klizi
                 }
                 Text(stringResource(when (active.phase) {
                     Phase.QUEUED -> R.string.phase_queued
                     Phase.READING -> R.string.status_reading
                     Phase.DOWNLOADING -> R.string.phase_downloading
+                    Phase.CONVERTING -> R.string.status_converting
                     Phase.SAVING -> R.string.status_saving
+                    Phase.DONE -> R.string.phase_done
                     Phase.INTERRUPTED -> R.string.phase_interrupted
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (active.phase == Phase.INTERRUPTED) TextButton(onClick = { onRetry(active.job) }) {

@@ -25,6 +25,7 @@ def main() -> int:
     ytdlp = next(f for f in metadata.distribution("yt-dlp").files if f.name == "LICENSE")
     shutil.copyfile(ytdlp.locate(), TARGET / "yt-dlp-LICENSE")
     shutil.copyfile(legal.python_license_path(), TARGET / "Python-LICENSE.txt")
+    shutil.copyfile(PROJECT / "android" / "app" / "src" / "main" / "cpp" / "lame" / "COPYING", TARGET / "LAME-COPYING.txt")
     print(f"Licence osvježene u {TARGET}")
     return 0
 
