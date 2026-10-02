@@ -66,6 +66,9 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    `python tools/publish_android.py --tag v<verzija>`. Skripta provjerava lint, testove, potpis,
    paket i verziju, pa dodaje APK, `.sha256`, stalnu kopiju i `android.json` samo tom nacrtu.
 
+   Samo Android (bez novog desktop izdanja): poveća se `versionCode`/`versionName`, commit i push, pa
+   `python tools/publish_android.py --android-update` (APK u postojeće javno izdanje; provjerava potpis i veći versionCode).
+
 6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 12 fajlova,
    hashove, Windows manifest, Android potpis, verzije i nepromijenjen nacrt. Tek po odluci za
    objavu pokreni istu naredbu uz `--publish`; ona ponovi provjere i zatim objavi cjelinu kao `latest`.

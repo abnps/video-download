@@ -2,6 +2,8 @@
 
     python tools/publish_android.py --dry-run       → samo gradi i priprema lokalne fajlove
     python tools/publish_android.py --tag v0.9.8    → dodaje APK postojećem nacrtu tog taga
+    python tools/publish_android.py --android-update → samo Android: nova verzija u javno izdanje
+                                                       (Ahmedov nalog „objavi", npr. 0.2.1 2.10.2026)
 
 Objava cijelog izdanja ide kroz tools/publish_release.py, tek po Ahmedovom nalogu.
 Ključ je van repoa; nova Android verzija traži veći versionCode.
@@ -17,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from publish_release import check_android_apk, check_checkout, draft
+from publish_release import ReleaseError, check_android_apk, check_android_upgrade, check_checkout, draft, run
 
 PROJECT = Path(__file__).resolve().parent.parent
 ANDROID = PROJECT / "android"
@@ -65,12 +67,33 @@ def publish(files: list[Path], tag: str) -> str:
     return tag
 
 
+def publish_android_update(files: list[Path], code: int, name: str) -> str:
+    """Samo Android: APK u postojeće JAVNO izdanje (aplikacije ga nađu preko releases/latest/android.json).
+    Kod mora biti poslan (HEAD = origin/main, bez lokalnih izmjena), a versionCode veći od objavljenog."""
+    if run("git", "status", "--porcelain", "--untracked-files=no", cwd=PROJECT):
+        raise ReleaseError("Praćeni fajlovi imaju lokalne izmjene; prvo commit.")
+    run("git", "fetch", "-q", "origin", cwd=PROJECT)
+    if run("git", "rev-parse", "HEAD", cwd=PROJECT) != run("git", "rev-parse", "origin/main", cwd=PROJECT):
+        raise ReleaseError("HEAD nije origin/main; prvo pošalji commit.")
+    tag = run("gh", "release", "view", "--repo", REPO, "--json", "tagName", "--jq", ".tagName")
+    previous = json.loads(run("gh", "release", "download", tag, "--repo", REPO, "--pattern", "android.json",
+                              "--output", "-"))
+    current = json.loads((OUT / "android.json").read_text(encoding="utf-8"))
+    if current["versionCode"] <= previous["versionCode"]:
+        raise ReleaseError(f"versionCode {code} nije veći od objavljenog {previous['versionCode']}.")
+    check_android_upgrade(current, previous)
+    subprocess.run(["gh", "release", "upload", tag, *map(str, files), "--repo", REPO, "--clobber"], check=True)
+    return tag
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="samo gradi i pripremi, bez postavljanja na GitHub")
     parser.add_argument("--tag", help="tačan tag postojećeg nacrta; obavezno osim uz --dry-run")
+    parser.add_argument("--android-update", action="store_true",
+                        help="samo Android: nova verzija u postojeće javno izdanje (po Ahmedovom nalogu)")
     args = parser.parse_args()
-    if not args.dry_run:
+    if not args.dry_run and not args.android_update:
         if not args.tag:
             parser.error("--tag je obavezan; APK se više ne postavlja u implicitno posljednje izdanje")
         check_checkout(args.tag)
@@ -80,7 +103,9 @@ def main() -> int:
     check_android_apk(apk, code, name)
     files = prepare(apk, code, name)
     print(f"Android {name} (versionCode {code}) spreman u {OUT}")
-    if not args.dry_run:
+    if args.android_update and not args.dry_run:
+        print(f"Android {name} postavljen u javno izdanje {publish_android_update(files, code, name)}")
+    elif not args.dry_run:
         print(f"Postavljeno u izdanje {publish(files, args.tag)}")
     return 0
 

@@ -15,8 +15,8 @@ android {
         // Android 10+: čuvanje u Galeriju/Muziku preko MediaStore bez dozvole za pisanje (~95 % telefona).
         minSdk = 29
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.2.0"
+        versionCode = 5
+        versionName = "0.2.1"
         ndk {
             // Telefoni (arm64) i emulator na računaru (x86_64).
             abiFilters += listOf("arm64-v8a", "x86_64")
