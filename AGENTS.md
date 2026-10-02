@@ -264,6 +264,9 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
   dodatak 0.5.3 (Chrome/Edge). Sajt: Windows · macOS · Android, vodiči, changelog, 404. CI zelen (i Android posao).
 - Android 0.2.1: Instagram prijava (SiteLogin.kt), dijeljenje iz prvog puta, licence, „Preuzmi video", zupčanik.
   Ažuriranje iz aplikacije (0.2.0-proba → 0.2.1) Ahmed potvrdio na S26 Ultra 2.10.2026.
+- Android plejliste i 18+ (3.10.2026): `vd_core.probe` vraća spisak (extract_flat) → PlaylistScreen; 18+ po
+  istim pravilima kao računar (`vd_core.is_adult` = `probe.is_adult`, test), potvrda `Job.adultOk` samo u memoriji
+  (nikad u pending_jobs/istoriju); bez potvrde `ADULT_CONFIRM` → posao čeka (Phase.NEEDS_ADULT), ostali idu.
 - Instalacija s računara: `adb install --user 0 -r …` — bez `--user 0` APK ode i u Samsungov Dual Messenger
   profil (druga ikona sa značkom).
 

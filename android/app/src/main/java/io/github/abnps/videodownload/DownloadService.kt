@@ -52,6 +52,7 @@ class DownloadService : Service() {
     }
 
     private fun run(job: Job) {
+        var waitsForAdult = false
         running = job.id
         val work = File(cacheDir, "preuzimanje-${job.id}-${System.nanoTime()}").apply { mkdirs() }
         try {
@@ -63,7 +64,7 @@ class DownloadService : Service() {
             val cookies = SiteLogin.cookieFile(work)
             val result = Python.getInstance().getModule("vd_core").callAttr(
                 "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
-                cookies,
+                cookies, job.adultOk,
             ).asList()
             val name = result[1].toString()
             val first = File(result[2].toString())
@@ -103,7 +104,8 @@ class DownloadService : Service() {
                 throw CancelledHere()
             }
             History.add(HistoryItem(job.id, job.title.ifBlank { result[0].toString() }, uri.toString(), job.isAudio,
-                formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis()))
+                formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis(),
+                adult = job.adult))
             notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio))
             // Kao na računaru: traka zazeleni, kratko pulsira, pa kartica nestane.
             Downloads.update(job.id) { it.copy(phase = Phase.DONE, fraction = 1f) }
@@ -111,6 +113,11 @@ class DownloadService : Service() {
         } catch (error: Exception) {
             if (job.id in cancelled || error is CancelledHere || error is InterruptedException) {
                 notifyFinished(getString(R.string.status_cancelled), null)
+            } else if ("ADULT_CONFIRM" in error.message.orEmpty()) {
+                // Video za odrasle bez potvrde: čeka na listi (dugme „Imam 18+"), ostali poslovi idu dalje.
+                waitsForAdult = true
+                Downloads.update(job.id) { it.copy(job = job.copy(adult = true, adultOk = false), phase = Phase.NEEDS_ADULT) }
+                notifyFinished(getString(R.string.adult_waiting, job.title), null)
             } else {
                 val message = cleanError(this, error.message)
                 Downloads.lastError.value = message
@@ -120,7 +127,7 @@ class DownloadService : Service() {
             work.deleteRecursively() // privremeni fajlovi nikad ne ostaju
             cancelled -= job.id
             running = null
-            Downloads.remove(job.id)
+            if (!waitsForAdult) Downloads.remove(job.id)
             synchronized(this) {
                 pending--
                 if (pending == 0) {

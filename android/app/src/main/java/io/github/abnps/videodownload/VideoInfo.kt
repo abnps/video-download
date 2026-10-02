@@ -15,6 +15,7 @@ data class VideoInfo(
     val video: List<QualityOption>,
     val audioSize: Double,
     val audioAvailable: Boolean,
+    val adult: Boolean = false, // sajt ga označio kao 18+ (YouTube izuzet): potvrda pri svakom preuzimanju
 ) {
     companion object {
         fun parse(json: String): VideoInfo {
@@ -26,7 +27,27 @@ data class VideoInfo(
             }
             return VideoInfo(data.optString("url"), data.optString("title"), data.optString("thumbnail"),
                 data.optDouble("duration", 0.0).toInt(), data.optString("site"), video,
-                data.optDouble("audio_size", 0.0), data.optBoolean("audio_available", false))
+                data.optDouble("audio_size", 0.0), data.optBoolean("audio_available", false), data.optBoolean("adult"))
+        }
+    }
+}
+
+/** Jedan video iz plejliste (vd_core.playlist_json): kvalitet se bira tek pri preuzimanju. */
+data class PlaylistEntry(val url: String, val title: String, val thumbnail: String, val duration: Int, val adult: Boolean)
+
+data class PlaylistInfo(val url: String, val title: String, val site: String, val entries: List<PlaylistEntry>) {
+    companion object {
+        /** null kad JSON nije plejlista (onda je VideoInfo). */
+        fun parseOrNull(json: String): PlaylistInfo? {
+            val data = JSONObject(json)
+            if (!data.optBoolean("playlist")) return null
+            val array = data.getJSONArray("entries")
+            val entries = (0 until array.length()).map {
+                val e = array.getJSONObject(it)
+                PlaylistEntry(e.getString("url"), e.optString("title"), e.optString("thumbnail"), e.optInt("duration"),
+                    e.optBoolean("adult"))
+            }
+            return PlaylistInfo(data.optString("url"), data.optString("title"), data.optString("site"), entries)
         }
     }
 }

@@ -145,5 +145,41 @@ class AndroidProgressTest(unittest.TestCase):
         self.assertEqual((fraction, done, total, eta), (-1.0, 5, 0, -1))
 
 
+
+class AndroidAdultAndPlaylistTest(unittest.TestCase):
+    """18+ po istim pravilima kao računar (YouTube izuzet); plejlista kao spisak bez čitanja svakog videa."""
+
+    def test_adult_rules_match_desktop(self):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from videodl import probe as desktop
+        cases = [({"age_limit": 18, "extractor_key": "Generic"}, "https://example.com/v"),
+                 ({"age_limit": 18, "extractor_key": "Youtube"}, "https://www.youtube.com/watch?v=x"),
+                 ({"age_limit": 18}, "https://m.youtube.com/watch?v=x"),
+                 ({"age_limit": 18}, "https://youtu.be/x"),
+                 ({"age_limit": 0}, "https://example.com/v"),
+                 ({"age_limit": True}, "https://example.com/v"),
+                 ({}, "https://example.com/v")]
+        for info, url in cases:
+            with self.subTest(info=info, url=url):
+                self.assertEqual(vd_core.is_adult(info, url), desktop.is_adult(info, url))
+
+    def test_playlist_keeps_only_downloadable_entries(self):
+        info = {"_type": "playlist", "title": "Lista", "extractor_key": "YoutubeTab", "entries": [
+            {"url": "https://www.youtube.com/watch?v=a", "title": "A", "duration": 61.5,
+             "thumbnails": [{"url": "https://i/a-small"}, {"url": "https://i/a-big"}]},
+            None,
+            {"url": "b", "title": "samo ID"},
+            {"url": "https://example.com/c", "title": "C", "age_limit": 18, "thumbnail": "https://i/c"},
+        ]}
+        data = vd_core.playlist_json(info, "https://www.youtube.com/playlist?list=x")
+        self.assertTrue(data["playlist"])
+        self.assertEqual([e["title"] for e in data["entries"]], ["A", "C"])
+        self.assertEqual(data["entries"][0]["thumbnail"], "https://i/a-big")
+        self.assertEqual(data["entries"][0]["duration"], 61)
+        self.assertEqual([e["adult"] for e in data["entries"]], [False, True])
+        with self.assertRaises(ValueError):
+            vd_core.playlist_json({"entries": [{"url": "x"}]}, "u")
+
+
 if __name__ == "__main__":
     unittest.main()

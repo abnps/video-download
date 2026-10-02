@@ -56,6 +56,8 @@ class MainActivity : ComponentActivity() {
     private var autoFind by mutableStateOf(false)
     private val welcome = mutableStateOf(false)
     private val instagram = mutableStateOf(false)
+    private val playlist = mutableStateOf<PlaylistInfo?>(null)
+    private val askAdultFor = mutableStateOf<List<Job>>(emptyList()) // 18+ koji čekaju potvrdu (jedan prozor)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,7 +133,8 @@ class MainActivity : ComponentActivity() {
                     if (cookies.isNotEmpty()) java.io.File(cookies).delete() // privremeni kolačići nikad ne ostaju
                 }
             }
-            info.value = VideoInfo.parse(json)
+            val list = PlaylistInfo.parseOrNull(json)
+            if (list != null) playlist.value = list else info.value = VideoInfo.parse(json)
         } catch (error: CancellationException) {
             throw error // prekid nije greška sajta
         } catch (error: Exception) {
@@ -221,14 +224,22 @@ class MainActivity : ComponentActivity() {
                 lifecycleScope.launch { find() }
             }
         }
-        BackHandler(enabled = shown != null || tab.intValue != TAB_HOME) {
+        val shownList = playlist.value
+        BackHandler(enabled = shown != null || shownList != null || tab.intValue != TAB_HOME) {
             when {
                 shown != null -> info.value = null
+                shownList != null -> playlist.value = null
                 tab.intValue == TAB_SETTINGS -> tab.intValue = tabBeforeSettings
                 else -> tab.intValue = TAB_HOME
             }
         }
         val openSettings = { tabBeforeSettings = tab.intValue; tab.intValue = TAB_SETTINGS }
+        if (askAdultFor.value.isNotEmpty()) {
+            AdultDialog(askAdultFor.value.size, onCancel = { askAdultFor.value = emptyList() }) {
+                askAdultFor.value.forEach { DownloadService.start(this@MainActivity, it.copy(adultOk = true)) }
+                askAdultFor.value = emptyList()
+            }
+        }
         Scaffold(bottomBar = {
             // Donja traka samo na glavnim ekranima; Postavke se otvaraju zupčanikom gore desno.
             if (tab.intValue != TAB_SETTINGS) NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
@@ -237,7 +248,7 @@ class MainActivity : ComponentActivity() {
                     Triple(TAB_DOWNLOADS, R.drawable.ic_download, R.string.nav_downloads),
                 ).forEach { (index, icon, label) ->
                     NavigationBarItem(selected = tab.intValue == index,
-                        onClick = { tab.intValue = index; if (index != TAB_HOME) info.value = null },
+                        onClick = { tab.intValue = index; if (index != TAB_HOME) { info.value = null; playlist.value = null } },
                         icon = { AppIcon(icon) }, label = { Text(stringResource(label)) })
                 }
             }
@@ -256,6 +267,16 @@ class MainActivity : ComponentActivity() {
                         location = location.value,
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                     )
+                    tab.intValue == TAB_HOME && shownList != null -> PlaylistScreen(
+                        playlist = shownList, defaultHeight = quality.intValue, onBack = { playlist.value = null },
+                        onDownload = { jobs ->
+                            jobs.forEach { DownloadService.start(this@MainActivity, it) }
+                            playlist.value = null
+                            link.value = ""
+                            downloadsTab.intValue = 0
+                            tab.intValue = TAB_DOWNLOADS
+                        },
+                    )
                     tab.intValue == TAB_HOME -> HomeScreen(
                         link = link.value, onLinkChange = { link.value = it; findError.value = null }, onPaste = { paste() },
                         onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
@@ -268,9 +289,15 @@ class MainActivity : ComponentActivity() {
                         val error by Downloads.lastError.collectAsState()
                         DownloadsScreen(active, history, downloadsTab.intValue, { downloadsTab.intValue = it },
                             onCancel = { id ->
-                                if (active.any { it.job.id == id && it.phase == Phase.INTERRUPTED }) Downloads.remove(id)
+                                val waiting = setOf(Phase.INTERRUPTED, Phase.NEEDS_ADULT)
+                                if (active.any { it.job.id == id && it.phase in waiting }) Downloads.remove(id)
                                 else DownloadService.cancel(this@MainActivity, id)
-                            }, onRetry = { DownloadService.start(this@MainActivity, it) }, actions = actions,
+                            }, onRetry = { job ->
+                                // 18+: jedan prozor za SVE koji čekaju potvrdu (kao na računaru), potvrda ne ostaje.
+                                val adults = active.filter { it.phase == Phase.NEEDS_ADULT }.map { it.job }
+                                if (job.id in adults.map { it.id }) askAdultFor.value = adults
+                                else DownloadService.start(this@MainActivity, job)
+                            }, actions = actions,
                             onSettings = openSettings)
                         if (error != null && active.isEmpty() && downloadsTab.intValue == 0) {
                             ErrorBanner(error!!) { copyReport() }

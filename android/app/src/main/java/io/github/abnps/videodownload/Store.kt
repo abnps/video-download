@@ -39,16 +39,17 @@ data class HistoryItem(
     val duration: Int,
     val thumbnail: String,
     val finishedAt: Long,
+    val adult: Boolean = false, // 18+: sličica ostaje zamućena i u istoriji
 ) {
     fun toJson(): JSONObject = JSONObject().put("id", id).put("title", title).put("uri", uri).put("audio", isAudio)
         .put("format", format).put("size", size).put("duration", duration).put("thumbnail", thumbnail)
-        .put("finished", finishedAt)
+        .put("finished", finishedAt).put("adult", adult)
 
     companion object {
         fun fromJson(json: JSONObject) = HistoryItem(
             json.optLong("id"), json.optString("title"), json.optString("uri"), json.optBoolean("audio"),
             json.optString("format"), json.optLong("size"), json.optInt("duration"), json.optString("thumbnail"),
-            json.optLong("finished"),
+            json.optLong("finished"), json.optBoolean("adult"),
         )
     }
 }

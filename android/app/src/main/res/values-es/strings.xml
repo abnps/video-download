@@ -102,4 +102,28 @@
     <string name="status_converting">Convirtiendo a MP3</string>
     <string name="audio_m4a_original">M4A (calidad original)</string>
     <string name="phase_done">Listo</string>
+    <string name="adult_title">Contenido para adultos</string>
+    <string name="adult_text">El sitio marcó este vídeo como solo para adultos. Confirma que tienes 18 años o más.</string>
+    <string name="adult_confirm">Tengo 18 años o más</string>
+    <string name="phase_needs_adult">Esperando confirmación +18</string>
+    <string name="adult_waiting">Esperando confirmación +18: %1$s</string>
+    <string name="playlist">Lista de reproducción</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="select_none">Quitar selección</string>
+    <string name="playlist_quality">Calidad de vídeo: %1$s (Ajustes)</string>
+    <plurals name="adult_text_many">
+        <item quantity="one">%d vídeo está marcado como solo para adultos. Confirma que tienes 18 años o más.</item>
+        <item quantity="many">%d vídeos están marcados como solo para adultos. Confirma que tienes 18 años o más.</item>
+        <item quantity="other">%d vídeos están marcados como solo para adultos. Confirma que tienes 18 años o más.</item>
+    </plurals>
+    <plurals name="playlist_count">
+        <item quantity="one">%d vídeo</item>
+        <item quantity="many">%d vídeos</item>
+        <item quantity="other">%d vídeos</item>
+    </plurals>
+    <plurals name="download_selected">
+        <item quantity="one">Descargar %d vídeo</item>
+        <item quantity="many">Descargar %d vídeos</item>
+        <item quantity="other">Descargar %d vídeos</item>
+    </plurals>
 </resources>

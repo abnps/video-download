@@ -102,4 +102,28 @@
     <string name="status_converting">Pretvaranje u MP3</string>
     <string name="audio_m4a_original">M4A (originalna kvaliteta)</string>
     <string name="phase_done">Gotovo</string>
+    <string name="adult_title">Sadržaj za odrasle</string>
+    <string name="adult_text">Sajt je ovaj video označio kao sadržaj samo za odrasle. Potvrdi da imaš 18 ili više godina.</string>
+    <string name="adult_confirm">Imam 18 ili više godina</string>
+    <string name="phase_needs_adult">Čeka potvrdu 18+</string>
+    <string name="adult_waiting">Čeka potvrdu 18+: %1$s</string>
+    <string name="playlist">Plejlista</string>
+    <string name="select_all">Izaberi sve</string>
+    <string name="select_none">Poništi izbor</string>
+    <string name="playlist_quality">Kvalitet videa: %1$s (Postavke)</string>
+    <plurals name="adult_text_many">
+        <item quantity="one">%d video je označen kao sadržaj samo za odrasle. Potvrdi da imaš 18 ili više godina.</item>
+        <item quantity="few">%d videa su označena kao sadržaj samo za odrasle. Potvrdi da imaš 18 ili više godina.</item>
+        <item quantity="other">%d videa je označeno kao sadržaj samo za odrasle. Potvrdi da imaš 18 ili više godina.</item>
+    </plurals>
+    <plurals name="playlist_count">
+        <item quantity="one">%d video</item>
+        <item quantity="few">%d videa</item>
+        <item quantity="other">%d videa</item>
+    </plurals>
+    <plurals name="download_selected">
+        <item quantity="one">Preuzmi %d video</item>
+        <item quantity="few">Preuzmi %d videa</item>
+        <item quantity="other">Preuzmi %d videa</item>
+    </plurals>
 </resources>

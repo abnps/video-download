@@ -2,6 +2,7 @@ package io.github.abnps.videodownload
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.net.Uri
 import android.util.LruCache
 import android.util.Size
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +53,8 @@ private val placeholder = listOf(
  * `duration` (sekunde) se crta kao oznaka u uglu, kao u dizajnu.
  */
 @Composable
-fun Thumb(remote: String, local: String?, seed: String, duration: Int, modifier: Modifier, isAudio: Boolean = false) {
+fun Thumb(remote: String, local: String?, seed: String, duration: Int, modifier: Modifier, isAudio: Boolean = false,
+          adult: Boolean = false) {
     val context = LocalContext.current
     val key = local ?: remote
     var bitmap by remember(key) { mutableStateOf(cache.get(key)) }
@@ -69,10 +73,19 @@ fun Thumb(remote: String, local: String?, seed: String, duration: Int, modifier:
     Box(modifier.clip(RoundedCornerShape(10.dp)).background(Brush.linearGradient(listOf(colors.first, colors.second)))) {
         val image = bitmap
         if (image != null) {
+            // 18+ je uvijek zamućen (kao na računaru). Zamućenje postoji od Androida 12; na 10–11 tamni pokrivač.
             Image(image.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize())
+                modifier = Modifier.matchParentSize().then(if (adult) Modifier.blur(18.dp) else Modifier))
+            if (adult && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                Box(Modifier.matchParentSize().background(Color(0xF2202020)))
+            }
         } else if (isAudio) {
             Icon(painterResource(R.drawable.ic_music), null, tint = Color.White, modifier = Modifier.align(Alignment.Center))
+        }
+        if (adult) {
+            Text("18+", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center).background(Color(0xCCD32F2F), RoundedCornerShape(5.dp))
+                    .padding(horizontal = 7.dp, vertical = 2.dp))
         }
         if (duration > 0) {
             Text(formatDuration(duration), color = Color.White, fontSize = 11.sp,

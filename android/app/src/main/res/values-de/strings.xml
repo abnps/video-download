@@ -102,4 +102,25 @@
     <string name="status_converting">Wird in MP3 umgewandelt</string>
     <string name="audio_m4a_original">M4A (Originalqualität)</string>
     <string name="phase_done">Fertig</string>
+    <string name="adult_title">Inhalte für Erwachsene</string>
+    <string name="adult_text">Die Website hat dieses Video als nur für Erwachsene markiert. Bestätige, dass du mindestens 18 bist.</string>
+    <string name="adult_confirm">Ich bin mindestens 18</string>
+    <string name="phase_needs_adult">Wartet auf 18+-Bestätigung</string>
+    <string name="adult_waiting">Wartet auf 18+-Bestätigung: %1$s</string>
+    <string name="playlist">Playlist</string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="select_none">Auswahl aufheben</string>
+    <string name="playlist_quality">Videoqualität: %1$s (Einstellungen)</string>
+    <plurals name="adult_text_many">
+        <item quantity="one">%d Video ist nur für Erwachsene markiert. Bestätige, dass du mindestens 18 bist.</item>
+        <item quantity="other">%d Videos sind nur für Erwachsene markiert. Bestätige, dass du mindestens 18 bist.</item>
+    </plurals>
+    <plurals name="playlist_count">
+        <item quantity="one">%d Video</item>
+        <item quantity="other">%d Videos</item>
+    </plurals>
+    <plurals name="download_selected">
+        <item quantity="one">%d Video herunterladen</item>
+        <item quantity="other">%d Videos herunterladen</item>
+    </plurals>
 </resources>

@@ -26,6 +26,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -48,6 +49,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,6 +60,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -206,7 +209,8 @@ fun HomeScreen(
             history.take(3).forEach { item ->
                 Row(Modifier.fillMaxWidth().clickable { actions.open(item) }.padding(vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(112.dp).height(64.dp), item.isAudio)
+                    Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(112.dp).height(64.dp), item.isAudio,
+                        item.adult)
                     Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
                         Text(item.title, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Medium)
                         Text(item.format, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -260,6 +264,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
         mutableStateOf(options.firstOrNull { defaultHeight == 0 || it.label <= defaultHeight } ?: options.first())
     }
     var pickLocation by remember { mutableStateOf(false) }
+    var askAdult by remember { mutableStateOf<Job?>(null) }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
@@ -269,7 +274,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Box {
-                Thumb(info.thumbnail, null, info.title, info.duration, Modifier.fillMaxWidth().aspectRatio(16f / 9f))
+                Thumb(info.thumbnail, null, info.title, info.duration, Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                    adult = info.adult)
                 Box(Modifier.align(Alignment.Center).size(56.dp).background(Color(0x99000000), CircleShape),
                     contentAlignment = Alignment.Center) {
                     AppIcon(R.drawable.ic_play, Modifier.size(32.dp), tint = Color.White)
@@ -310,13 +316,17 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
         }
         Button(onClick = {
             val label = if (audio) (if (mp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
-            onDownload(Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
-                if (audio) 0 else chosen.height, label))
+            val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
+                if (audio) 0 else chosen.height, label, adult = info.adult)
+            if (info.adult) askAdult = job else onDownload(job)
         }, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp), shape = RoundedCornerShape(12.dp)) {
             AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
             Text(stringResource(if (audio) R.string.download_btn_audio else R.string.download_btn_video),
                 Modifier.padding(start = 10.dp), fontSize = 16.sp)
         }
+    }
+    askAdult?.let { job ->
+        AdultDialog(1, onCancel = { askAdult = null }) { askAdult = null; onDownload(job.copy(adultOk = true)) }
     }
     if (pickLocation) {
         LocationDialog(location, onDismiss = { pickLocation = false }) { onLocation(it); pickLocation = false }
@@ -408,7 +418,8 @@ private fun SectionTitle(text: String) = Text(text, style = MaterialTheme.typogr
 private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Job) -> Unit) {
     CardBox(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Thumb(active.job.thumbnail, null, active.job.title, 0, Modifier.width(104.dp).height(64.dp), active.job.isAudio)
+            Thumb(active.job.thumbnail, null, active.job.title, 0, Modifier.width(104.dp).height(64.dp), active.job.isAudio,
+                active.job.adult)
             Column(Modifier.weight(1f).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(active.job.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
                 val fraction = active.fraction
@@ -441,9 +452,14 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Jo
                     Phase.SAVING -> R.string.status_saving
                     Phase.DONE -> R.string.phase_done
                     Phase.INTERRUPTED -> R.string.phase_interrupted
+                    Phase.NEEDS_ADULT -> R.string.phase_needs_adult
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (active.phase == Phase.INTERRUPTED) TextButton(onClick = { onRetry(active.job) }) {
                     Text(stringResource(R.string.retry))
+                }
+                // 18+ bez potvrde: MainActivity pita jednim prozorom za sve koji čekaju.
+                if (active.phase == Phase.NEEDS_ADULT) TextButton(onClick = { onRetry(active.job) }) {
+                    Text(stringResource(R.string.adult_confirm))
                 }
             }
             IconButton(onClick = { onCancel(active.job.id) }) { AppIcon(R.drawable.ic_close, tint = MaterialTheme.colorScheme.onSurface) }
@@ -455,7 +471,8 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Jo
 private fun DoneCard(item: HistoryItem, actions: ItemActions) {
     CardBox(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp)) {
-            Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(120.dp).height(80.dp), item.isAudio)
+            Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(120.dp).height(80.dp), item.isAudio,
+                item.adult)
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(item.title, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold,
@@ -595,4 +612,102 @@ fun LicensesDialog(onClose: () -> Unit) {
                 fontSize = 11.sp, lineHeight = 14.sp)
         },
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.dialog_close)) } })
+}
+
+
+/** Potvrda 18+ (kao na računaru): pri svakom preuzimanju, više videa = jedan prozor. Ne pamti se. */
+@Composable
+fun AdultDialog(count: Int, onCancel: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.adult_title)) },
+        text = {
+            Text(if (count > 1) pluralStringResource(R.plurals.adult_text_many, count, count)
+                 else stringResource(R.string.adult_text))
+        },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(R.string.adult_confirm)) } },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
+}
+
+// ---------- Plejlista ----------
+
+/** Spisak videa iz plejliste: izbor (sve ili neki), video ili zvuk, pa redom preuzimanje kao zasebni poslovi. */
+@Composable
+fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (List<Job>) -> Unit) {
+    val selected = remember(playlist) { mutableStateListOf<Int>().apply { addAll(playlist.entries.indices) } }
+    var audio by remember { mutableStateOf(false) }
+    var mp3 by remember { mutableStateOf(true) }
+    var askAdult by remember { mutableStateOf<List<Job>?>(null) }
+    Column(Modifier.fillMaxSize()) {
+        Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
+            Column(Modifier.weight(1f)) {
+                Text(playlist.title.ifBlank { stringResource(R.string.playlist) }, style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(pluralStringResource(R.plurals.playlist_count, playlist.entries.size, playlist.entries.size),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            val all = selected.size == playlist.entries.size
+            TextButton(onClick = { selected.clear(); if (!all) selected.addAll(playlist.entries.indices) }) {
+                Text(stringResource(if (all) R.string.select_none else R.string.select_all))
+            }
+        }
+        Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                SegmentedButton(selected = !audio, onClick = { audio = false }, shape = SegmentedButtonDefaults.itemShape(0, 2),
+                    icon = { AppIcon(R.drawable.ic_videocam, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_video)) }
+                SegmentedButton(selected = audio, onClick = { audio = true }, shape = SegmentedButtonDefaults.itemShape(1, 2),
+                    icon = { AppIcon(R.drawable.ic_music, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_audio)) }
+            }
+            if (audio) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChoiceButton(mp3, "MP3 · ${Mp3.KBPS} kbps") { mp3 = true }
+                ChoiceButton(!mp3, "M4A") { mp3 = false }
+            } else Text(stringResource(R.string.playlist_quality,
+                if (defaultHeight > 0) "${defaultHeight}p" else stringResource(R.string.best_quality)),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            items(playlist.entries.size) { index ->
+                val entry = playlist.entries[index]
+                val checked = index in selected
+                Row(Modifier.fillMaxWidth().clickable { if (checked) selected.remove(index) else selected.add(index) }
+                    .padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = checked, onCheckedChange = { if (it) selected.add(index) else selected.remove(index) })
+                    Thumb(entry.thumbnail, null, entry.title, entry.duration, Modifier.width(96.dp).height(54.dp), audio,
+                        entry.adult)
+                    Text(entry.title, Modifier.weight(1f).padding(start = 10.dp), maxLines = 2,
+                        overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+        Button(onClick = {
+            val now = System.currentTimeMillis()
+            val label = if (audio) (if (mp3) DownloadService.MP3_LABEL else "M4A")
+                else if (defaultHeight > 0) "${defaultHeight}p" else "MP4"
+            val jobs = selected.sorted().mapIndexed { order, index ->
+                val e = playlist.entries[index]
+                Job(now + order, e.url, e.title, e.thumbnail, e.duration, audio, if (audio) 0 else defaultHeight, label,
+                    adult = e.adult)
+            }
+            // Videe koje je sajt već u spisku označio kao 18+ potvrđuješ odmah, jednim prozorom; ostale
+            // (oznaka se vidi tek pri čitanju) pita lista Preuzimanja.
+            if (jobs.any { it.adult }) askAdult = jobs else onDownload(jobs)
+        }, enabled = selected.isNotEmpty(), modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
+            shape = RoundedCornerShape(12.dp)) {
+            AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
+            Text(pluralStringResource(R.plurals.download_selected, selected.size, selected.size),
+                Modifier.padding(start = 10.dp), fontSize = 16.sp)
+        }
+    }
+    askAdult?.let { jobs ->
+        AdultDialog(jobs.count { it.adult }, onCancel = { askAdult = null }) {
+            askAdult = null
+            onDownload(jobs.map { if (it.adult) it.copy(adultOk = true) else it })
+        }
+    }
+}
+
+@Composable
+private fun ChoiceButton(selected: Boolean, text: String, onClick: () -> Unit) {
+    if (selected) FilledTonalButton(onClick = onClick) { Text(text) } else OutlinedButton(onClick = onClick) { Text(text) }
 }

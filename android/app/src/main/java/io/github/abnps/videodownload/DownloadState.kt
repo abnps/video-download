@@ -18,22 +18,27 @@ data class Job(
     val isAudio: Boolean,
     val height: Int, // 0 = najbolji
     val label: String, // „1080p", „Najbolji", „M4A"
+    val adult: Boolean = false, // sajt ga je označio kao 18+ (sličica zamućena); čuva se
+    // Potvrda „imam 18+" važi SAMO za ovo preuzimanje i nikad se ne upisuje na disk (pravilo kao na računaru).
+    val adultOk: Boolean = false,
 ) {
     fun toBundle() = Bundle().apply {
         putLong("id", id); putString("url", url); putString("title", title); putString("thumbnail", thumbnail)
         putInt("duration", duration); putBoolean("audio", isAudio); putInt("height", height); putString("label", label)
+        putBoolean("adult", adult); putBoolean("adult_ok", adultOk)
     }
 
     companion object {
         fun fromBundle(bundle: Bundle) = Job(
             bundle.getLong("id"), bundle.getString("url").orEmpty(), bundle.getString("title").orEmpty(),
             bundle.getString("thumbnail").orEmpty(), bundle.getInt("duration"), bundle.getBoolean("audio"),
-            bundle.getInt("height"), bundle.getString("label").orEmpty(),
+            bundle.getInt("height"), bundle.getString("label").orEmpty(), bundle.getBoolean("adult"),
+            bundle.getBoolean("adult_ok"),
         )
     }
 }
 
-enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, SAVING, DONE, INTERRUPTED }
+enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, SAVING, DONE, INTERRUPTED, NEEDS_ADULT }
 
 data class ActiveJob(val job: Job, val phase: Phase, val fraction: Float? = null, val done: Long = 0, val total: Long = 0,
                      val speed: Double = 0.0, val eta: Long = -1, val audioPart: Boolean = false)
@@ -58,7 +63,7 @@ object Downloads {
                     val value = array.getJSONObject(index)
                     ActiveJob(Job(value.getLong("id"), value.getString("url"), value.getString("title"),
                         value.optString("thumbnail"), value.optInt("duration"), value.getBoolean("audio"),
-                        value.optInt("height"), value.optString("label")), Phase.INTERRUPTED)
+                        value.optInt("height"), value.optString("label"), value.optBoolean("adult")), Phase.INTERRUPTED)
                 }.getOrNull()
             }.distinctBy { it.job.id }
         }.getOrDefault(emptyList())
@@ -85,7 +90,7 @@ object Downloads {
             val job = active.job
             array.put(JSONObject().put("id", job.id).put("url", job.url).put("title", job.title)
                 .put("thumbnail", job.thumbnail).put("duration", job.duration).put("audio", job.isAudio)
-                .put("height", job.height).put("label", job.label))
+                .put("height", job.height).put("label", job.label).put("adult", job.adult)) // adultOk nikad
         }
         check(app.getSharedPreferences("pending_jobs", Context.MODE_PRIVATE).edit()
             .putString("jobs", array.toString()).commit()) { "Lista preuzimanja nije sačuvana" }

@@ -127,33 +127,87 @@ def _with_cookies(options: dict, cookie_file: str) -> dict:
     return options
 
 
+# 18+ (isto kao videodl/probe.py na računaru, Ahmed 26.9.2026): sajt označi video sa age_limit >= 18; YouTube je
+# izuzet (tamo age_limit znači starosno ograničen video, ne sadržaj za odrasle). Test poredi s računarom.
+ADULT_AGE = 18
+YOUTUBE_HOSTS = ("youtube.com", "youtu.be", "youtube-nocookie.com")
+PLAYLIST_LIMIT = 500  # spisak na ekranu; veće plejliste se skraćuju
+
+
+def is_youtube(info: dict, url: str | None = None) -> bool:
+    from urllib.parse import urlsplit
+
+    extractor = str(info.get("extractor_key") or info.get("ie_key") or info.get("extractor") or "")
+    if extractor.lower().startswith("youtube"):
+        return True
+    host = (urlsplit(url or info.get("webpage_url") or info.get("url") or "").hostname or "").lower()
+    return any(host == domain or host.endswith("." + domain) for domain in YOUTUBE_HOSTS)
+
+
+def is_adult(info: dict, url: str | None = None) -> bool:
+    age = info.get("age_limit")
+    marked = isinstance(age, int) and not isinstance(age, bool) and age >= ADULT_AGE
+    return marked and not is_youtube(info, url)
+
+
+def _thumbnail(entry: dict) -> str:
+    if entry.get("thumbnail"):
+        return entry["thumbnail"]
+    thumbnails = [t for t in entry.get("thumbnails") or [] if t.get("url")]
+    return thumbnails[-1]["url"] if thumbnails else ""
+
+
+def playlist_json(info: dict, url: str) -> dict:
+    """Plejlista za ekran sa spiskom: samo ono što se vidi; svaki video se čita tek pri preuzimanju."""
+    entries = []
+    for entry in info.get("entries") or []:
+        if not entry:
+            continue
+        link = entry.get("webpage_url") or entry.get("url") or ""
+        if not link.startswith(("http://", "https://")):
+            continue  # npr. samo ID bez adrese: ne može se preuzeti zasebno
+        entries.append({"url": link, "title": entry.get("title") or entry.get("id") or "",
+                        "thumbnail": _thumbnail(entry), "duration": int(entry.get("duration") or 0),
+                        "adult": is_adult(entry, link)})
+        if len(entries) >= PLAYLIST_LIMIT:
+            break
+    if not entries:
+        raise ValueError("Plejlista nema videa.")
+    return {"playlist": True, "url": info.get("webpage_url") or url, "title": info.get("title") or "",
+            "site": info.get("extractor_key") or "", "entries": entries}
+
+
 def probe(url: str, cache_dir: str, cookie_file: str = "") -> str:
-    """Brzo čitanje linka za ekran „Izaberi kvalitet": naslov, sličica, trajanje, izbor kvaliteta (JSON).
-    Zapis ide u isti dnevnik kao preuzimanje (za „Kopiraj izvještaj")."""
+    """Brzo čitanje linka (JSON): jedan video → naslov, sličica, trajanje, izbor kvaliteta, oznaka 18+;
+    plejlista → spisak videa (bez čitanja svakog, extract_flat). Zapis ide u dnevnik za „Kopiraj izvještaj"."""
     import json
 
     log = _FileLog(os.path.join(cache_dir, "zadnji-log.txt"))
     log.info(f"čitanje linka: {url} | prijava: {'da' if cookie_file else 'ne'}")
     try:
+        # noplaylist: link na video unutar plejliste (…watch?v=…&list=…) je taj video, kao na računaru.
         with YoutubeDL(_with_cookies({"quiet": True, "no_warnings": True, "noplaylist": True, "logger": log,
-                                      "verbose": False, "dump_intermediate_pages": False}, cookie_file)) as ydl:
+                                      "extract_flat": "in_playlist", "verbose": False,
+                                      "dump_intermediate_pages": False}, cookie_file)) as ydl:
             info = ydl.extract_info(url, download=False)
             if info.get("_type") == "playlist":
-                entries = [entry for entry in info.get("entries") or [] if entry]
-                if not entries:
-                    raise ValueError("Plejlista nema videa.")
-                info = ydl.extract_info(entries[0].get("webpage_url") or entries[0]["url"], download=False)
+                return json.dumps(playlist_json(info, url), ensure_ascii=False)
+            if info.get("_type") in ("url", "url_transparent"):  # preusmjerenje na drugi sajt
+                info = ydl.extract_info(info["url"], download=False)
     except Exception as error:
         log.error(f"{type(error).__name__}: {error}")
         raise
     finally:
         log.close()
-    return json.dumps({"url": info.get("webpage_url") or url, "title": info.get("title") or info.get("id") or "",
+    page = info.get("webpage_url") or url
+    return json.dumps({"url": page, "title": info.get("title") or info.get("id") or "",
                        "thumbnail": info.get("thumbnail") or "", "duration": info.get("duration") or 0,
-                       "site": info.get("extractor_key") or "", **options(info)}, ensure_ascii=False)
+                       "site": info.get("extractor_key") or "", "adult": is_adult(info, page), **options(info)},
+                      ensure_ascii=False)
 
 
-def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = ""):
+def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = "",
+             adult_ok: bool = False):
     """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno, brzina, preostalo) i isCancelled().
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
@@ -175,7 +229,7 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
                "progress_hooks": [hook], "logger": log, "verbose": False, "dump_intermediate_pages": False}
     _with_cookies(options, cookie_file)
     try:
-        return _run(url, kind, work_dir, options, part, log, height)
+        return _run(url, kind, work_dir, options, part, log, height, adult_ok)
     except Exception as error:
         log.error(f"{type(error).__name__}: {error}")
         raise
@@ -200,7 +254,7 @@ def listener_cancelled(options) -> bool:
     return any(getattr(hook, "cancelled", lambda: False)() for hook in options["progress_hooks"])
 
 
-def _run(url, kind, work_dir, options, part, log, height=0):
+def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=False)
         if info.get("_type") == "playlist":  # prototip: iz plejliste samo prvi video
@@ -212,6 +266,9 @@ def _run(url, kind, work_dir, options, part, log, height=0):
 
         if listener_cancelled(options):
             raise Cancelled()
+        # 18+ bez potvrde za OVO preuzimanje: video čeka (Kotlin pita korisnika), ostali poslovi idu dalje.
+        if is_adult(info, url) and not adult_ok:
+            raise ValueError("ADULT_CONFIRM")
         specs = plan(info, kind, height)
         sizes = [_size(next((f for f in info.get("formats") or [] if f.get("format_id") == spec), {}))
                  for spec in specs]
