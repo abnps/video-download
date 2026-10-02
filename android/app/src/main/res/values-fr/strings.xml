@@ -96,4 +96,6 @@
     <string name="logout_title">Se déconnecter d\'Instagram ?</string>
     <string name="logout">Se déconnecter</string>
     <string name="dialog_cancel">Annuler</string>
+    <string name="set_licenses">Licences open source</string>
+    <string name="dialog_close">Fermer</string>
 </resources>

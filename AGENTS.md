@@ -248,6 +248,9 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 - Objava: `python tools/publish_android.py --tag v<verzija>` postavlja APK samo u tačan postojeći nacrt
   izdanja; `--dry-run` samo gradi. Mac workflow se ručno pokreće za isti tag. `tools/publish_release.py`
   provjerava sve tri platforme; `--publish` tek po Ahmedovom nalogu „objavi“. Detalji su u `README.md`.
+- Licence (2.10.2026): komponente APK-a su `ANDROID_COMPONENTS` u `videodl/legal.py`; tekstovi u
+  `android/app/src/main/assets/licenses` (`python tools/android_licenses.py`), prikaz u Postavke → Licence otvorenog
+  koda i na sajtu (licenses.html). Nova biblioteka u APK-u = novi unos + tekst; `test_android_licenses` pada inače.
 - Test telefon: Ahmedov Samsung S26 Ultra. Bežični adb: `adb mdns services` → `adb connect <ip:port>`;
   Samsung gasi bežično otklanjanje grešaka kad se ekran zaključa. Ne tapkati automatski dok Ahmed koristi
   telefon — pitati ga ili ga pustiti da testira ručno. Na Samsungu Auto Blocker mora biti isključen prije

@@ -77,6 +77,34 @@ COMPONENTS = (
 )
 
 
+# Android (beta): komponente u APK-u. Tekstovi licenci su u android/app/src/main/assets/licenses (kopira ih
+# `tools/android_licenses.py`), aplikacija ih prikazuje u Postavke → Licence; test pada ako fajl fali.
+ANDROID_COMPONENTS = (
+    Component("yt-dlp", "Unlicense", "https://github.com/yt-dlp/yt-dlp", ("yt-dlp-LICENSE",)),
+    Component("Python", "PSF-2.0", "https://www.python.org/", ("Python-LICENSE.txt",),
+              "Includes bzip2 and libffi; their licenses are in the same file."),
+    Component("Chaquopy", "MIT", "https://chaquo.com/chaquopy/", ("Chaquopy-LICENSE.txt",)),
+    Component("OpenSSL", "Apache-2.0", "https://www.openssl.org/", ("Apache-2.0.txt",)),
+    Component("SQLite", "Public Domain", "https://www.sqlite.org/copyright.html", ()),
+    Component("XZ Utils (liblzma)", "0BSD", "https://tukaani.org/xz/", ("0BSD.txt",)),
+    Component("Kotlin, kotlinx.coroutines", "Apache-2.0", "https://kotlinlang.org/", ("Apache-2.0.txt",)),
+    Component("AndroidX, Jetpack Compose", "Apache-2.0", "https://developer.android.com/jetpack",
+              ("Apache-2.0.txt",)),
+    Component("Material Symbols (icons)", "Apache-2.0", "https://github.com/google/material-design-icons",
+              ("Apache-2.0.txt",)),
+)
+
+
+def android_notices_text() -> str:
+    lines = ["Video Download for Android includes the following third-party software.",
+             "Their licenses apply to them; the full texts follow below.", ""]
+    for component in ANDROID_COMPONENTS:
+        lines.append(f"- {component.name} — {component.license} — {component.url}")
+        if component.note:
+            lines.append(f"  {component.note}")
+    return "\n".join(lines) + "\n"
+
+
 def site_components(published_mac: bool = False) -> tuple[Component, ...]:
     """Komponente za stranicu licenci na sajtu: ista lista bez obzira na kom sistemu se sajt pravi.
     Mac build ffmpeg-a se dodaje tek kad Mac verzija bude javno objavljena."""

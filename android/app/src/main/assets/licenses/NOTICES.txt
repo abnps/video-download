@@ -1,0 +1,13 @@
+Video Download for Android includes the following third-party software.
+Their licenses apply to them; the full texts follow below.
+
+- yt-dlp — Unlicense — https://github.com/yt-dlp/yt-dlp
+- Python — PSF-2.0 — https://www.python.org/
+  Includes bzip2 and libffi; their licenses are in the same file.
+- Chaquopy — MIT — https://chaquo.com/chaquopy/
+- OpenSSL — Apache-2.0 — https://www.openssl.org/
+- SQLite — Public Domain — https://www.sqlite.org/copyright.html
+- XZ Utils (liblzma) — 0BSD — https://tukaani.org/xz/
+- Kotlin, kotlinx.coroutines — Apache-2.0 — https://kotlinlang.org/
+- AndroidX, Jetpack Compose — Apache-2.0 — https://developer.android.com/jetpack
+- Material Symbols (icons) — Apache-2.0 — https://github.com/google/material-design-icons

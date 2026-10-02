@@ -136,6 +136,7 @@ TEXTS = {
                          "full license texts are in the <code>licenses</code> folder next to the installed app.",
         "licenses_desc": "Licenses of the components used by Video Download.",
         "licenses_cols": ("Component", "License"),
+        "licenses_android": ('Android (beta)', 'The Android app also shows these licenses in Settings → Open-source licenses.'),
         "licenses_note": "FFmpeg is licensed under GPL-3.0: the source code of the exact build in the installer is at the "
                          "links above, and a copy of the source code is also available on request.",
         "ext_title": "Browser extension",
@@ -194,6 +195,7 @@ The browser may therefore remind you about “Developer mode”; that is expecte
                          "licenci su u folderu <code>licenses</code> pored instaliranog programa.",
         "licenses_desc": "Licence komponenti koje koristi Video Download.",
         "licenses_cols": ("Komponenta", "Licenca"),
+        "licenses_android": ('Android (beta)', 'Android aplikacija ove licence prikazuje i u Postavke → Licence otvorenog koda.'),
         "licenses_note": "FFmpeg je pod licencom GPL-3.0: izvorni kod tačnog builda koji je u instaleru je na linkovima "
                          "iznad, a kopiju izvornog koda možeš dobiti i na zahtjev.",
         "ext_title": "Dodatak za browser",
@@ -253,6 +255,7 @@ Browser zato ponekad podsjeti na „Developer mode"; to je očekivano i dodatak 
                          "vollständigen Lizenztexte liegen im Ordner <code>licenses</code> neben der installierten App.",
         "licenses_desc": "Lizenzen der Komponenten, die Video Download nutzt.",
         "licenses_cols": ("Komponente", "Lizenz"),
+        "licenses_android": ('Android (Beta)', 'Die Android-App zeigt diese Lizenzen auch unter Einstellungen → Open-Source-Lizenzen.'),
         "licenses_note": "FFmpeg steht unter GPL-3.0: Der Quellcode genau des Builds im Installer ist unter den Links oben, "
                          "und eine Kopie des Quellcodes gibt es auch auf Anfrage.",
         "ext_title": "Browser-Erweiterung",
@@ -314,6 +317,7 @@ Der Browser erinnert deshalb manchmal an den „Entwicklermodus“; das ist norm
                          "completos están en la carpeta <code>licenses</code> junto a la aplicación instalada.",
         "licenses_desc": "Licencias de los componentes que usa Video Download.",
         "licenses_cols": ("Componente", "Licencia"),
+        "licenses_android": ('Android (beta)', 'La app de Android también muestra estas licencias en Ajustes → Licencias de código abierto.'),
         "licenses_note": "FFmpeg tiene licencia GPL-3.0: el código fuente de la compilación exacta del instalador está en los "
                          "enlaces de arriba, y también puedes pedir una copia del código fuente.",
         "ext_title": "Extensión para el navegador",
@@ -377,6 +381,7 @@ Por eso el navegador a veces recuerda el «Modo de desarrollador»; es lo espera
                          "les textes complets se trouvent dans le dossier <code>licenses</code> à côté de l'application installée.",
         "licenses_desc": "Licences des composants utilisés par Video Download.",
         "licenses_cols": ("Composant", "Licence"),
+        "licenses_android": ('Android (bêta)', "L'application Android affiche aussi ces licences dans Réglages → Licences open source."),
         "licenses_note": "FFmpeg est sous licence GPL-3.0 : le code source de la version exacte incluse dans le programme "
                          "d'installation se trouve aux liens ci-dessus, et une copie du code source est aussi disponible sur demande.",
         "ext_title": "Extension pour le navigateur",
@@ -645,13 +650,21 @@ def page_licenses(lang: str) -> str:
         note = f"<br><small>{_inline(component.note)}</small>" if component.note else ""
         rows.append(f"<tr><td><a href=\"{html.escape(component.url)}\">{html.escape(component.name)}</a>{note}</td>"
                     f"<td>{html.escape(component.license)}</td></tr>")
+    android = [f"<tr><td><a href=\"{html.escape(c.url)}\">{html.escape(c.name)}</a></td><td>{html.escape(c.license)}</td></tr>"
+               for c in legal.ANDROID_COMPONENTS]
     body = f"""<h1>{t['licenses_title']}</h1>
 <p class="lead">{t['licenses_lead']}</p>
 <table>
 <tr><th>{t['licenses_cols'][0]}</th><th>{t['licenses_cols'][1]}</th></tr>
 {chr(10).join(rows)}
 </table>
-<div class="box">{t['licenses_note']}</div>"""
+<div class="box">{t['licenses_note']}</div>
+<h2>{html.escape(t['licenses_android'][0])}</h2>
+<table>
+<tr><th>{t['licenses_cols'][0]}</th><th>{t['licenses_cols'][1]}</th></tr>
+{chr(10).join(android)}
+</table>
+<p>{html.escape(t['licenses_android'][1])}</p>"""
     return _page(lang, "licenses.html", t["licenses_title"], t["licenses_desc"], body)
 
 

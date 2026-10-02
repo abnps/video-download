@@ -97,4 +97,6 @@
     <string name="logout_title">Sign out of Instagram?</string>
     <string name="logout">Sign out</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="set_licenses">Open-source licenses</string>
+    <string name="dialog_close">Close</string>
 </resources>

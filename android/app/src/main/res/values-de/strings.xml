@@ -96,4 +96,6 @@
     <string name="logout_title">Von Instagram abmelden?</string>
     <string name="logout">Abmelden</string>
     <string name="dialog_cancel">Abbrechen</string>
+    <string name="set_licenses">Open-Source-Lizenzen</string>
+    <string name="dialog_close">Schließen</string>
 </resources>

@@ -96,4 +96,6 @@
     <string name="logout_title">¿Cerrar sesión en Instagram?</string>
     <string name="logout">Cerrar sesión</string>
     <string name="dialog_cancel">Cancelar</string>
+    <string name="set_licenses">Licencias de código abierto</string>
+    <string name="dialog_close">Cerrar</string>
 </resources>

@@ -53,6 +53,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -483,6 +485,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
     var askLogout by remember { mutableStateOf(false) }
+    var showLicenses by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
     // Standardna Android traka: strelica nazad + naslov (kao ekran „Izaberi kvalitet").
     Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -508,6 +511,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_heart, stringResource(R.string.set_support), null) { onOpenLink(Links.SUPPORT) }
         SettingRow(R.drawable.ic_info, stringResource(R.string.set_terms), null) { onOpenLink(Links.site("terms.html")) }
         SettingRow(R.drawable.ic_info, stringResource(R.string.set_privacy), null) { onOpenLink(Links.site("privacy.html")) }
+        SettingRow(R.drawable.ic_info, stringResource(R.string.set_licenses), null) { showLicenses = true }
         SettingRow(R.drawable.ic_download, stringResource(R.string.set_version),
             "$appVersion · ${stringResource(R.string.test_version)}", null)
         SettingRow(R.drawable.ic_download, stringResource(R.string.update_check),
@@ -515,6 +519,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_settings, stringResource(R.string.set_reader), readerVersion, null)
     }
     }
+    if (showLicenses) LicensesDialog { showLicenses = false }
     if (askLogout) {
         AlertDialog(onDismissRequest = { askLogout = false },
             title = { Text(stringResource(R.string.logout_title)) },
@@ -554,4 +559,26 @@ private fun SettingRow(icon: Int, title: String, value: String?, onClick: (() ->
             if (onClick != null) AppIcon(R.drawable.ic_chevron)
         }
     }
+}
+
+
+/** Licence komponenti iz APK-a (assets/licenses, pravi ih tools/android_licenses.py): spisak pa puni tekstovi. */
+@Composable
+fun LicensesDialog(onClose: () -> Unit) {
+    val context = LocalContext.current
+    val text = remember {
+        val folder = "licenses"
+        val names = context.assets.list(folder).orEmpty().sorted()
+        val notices = context.assets.open("$folder/NOTICES.txt").bufferedReader().use { it.readText() }
+        notices + names.filter { it != "NOTICES.txt" }.joinToString("") { name ->
+            "\n\n===== $name =====\n\n" + context.assets.open("$folder/$name").bufferedReader().use { it.readText() }
+        }
+    }
+    AlertDialog(onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.set_licenses)) },
+        text = {
+            Text(text, Modifier.verticalScroll(rememberScrollState()), fontFamily = FontFamily.Monospace,
+                fontSize = 11.sp, lineHeight = 14.sp)
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.dialog_close)) } })
 }

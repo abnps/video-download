@@ -96,4 +96,6 @@
     <string name="logout_title">Odjaviti se s Instagrama?</string>
     <string name="logout">Odjavi se</string>
     <string name="dialog_cancel">Odustani</string>
+    <string name="set_licenses">Licence otvorenog koda</string>
+    <string name="dialog_close">Zatvori</string>
 </resources>
