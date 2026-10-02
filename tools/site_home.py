@@ -6,6 +6,17 @@ programu). Sajt nema kolačiće ni tuđe skripte: animacije su CSS + assets/site
 """
 
 import html
+
+# Ikona u zaglavlju (Ahmed 2.10.2026: „animiraj ikonicu kao simulacija downloada"): isti oblik i boja kao
+# assets/icon.png, ali SVG — strelica se spusti u crtu, crta se napuni kao traka preuzimanja, pa iznova.
+# Animacija je samo CSS (.brand-icon u site.css); bez nje, i uz prefers-reduced-motion, ikona miruje.
+BRAND_ICON = ('<svg class="brand-icon" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true">'
+              '<rect width="128" height="128" rx="28" fill="#6c4ce0"/>'
+              '<g class="bi-arrow" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" '
+              'stroke-linejoin="round"><path d="M64 27V80"/><path d="M38 56 64 82 90 56"/></g>'
+              '<path class="bi-track" d="M35.5 99.5H92.5" stroke="#fff" stroke-width="13" stroke-linecap="round"/>'
+              '<path class="bi-fill" d="M35.5 99.5H92.5" stroke="#fff" stroke-width="13" stroke-linecap="round" '
+              'pathLength="100"/></svg>')
 import json
 
 # Sidra sekcija (ista na svim jezicima; nazivi su u HOME[lang]["nav"]).
@@ -541,7 +552,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 
 <header>
   <div class="wrap bar">
-    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">Video Download</a>
+    <a class="brand" href="index.html">{BRAND_ICON}Video Download</a>
     <nav>
 {nav}
     </nav>

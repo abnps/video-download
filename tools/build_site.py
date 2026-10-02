@@ -434,7 +434,7 @@ HEAD = """<!doctype html>
 
 <header>
   <div class="wrap bar">
-    <a class="brand" href="index.html"><img src="{up}assets/icon.png" alt="">Video Download</a>
+    <a class="brand" href="index.html">{brand_icon}Video Download</a>
     <nav>
 {nav}
     </nav>
@@ -608,7 +608,7 @@ def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
     t = TEXTS[lang]
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="index.html#{anchor}">{label}</a>'
                     for anchor, label in zip(site_home.ANCHORS, site_home.HOME[lang]["nav"]))
-    head = HEAD.format(lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
+    head = HEAD.format(brand_icon=site_home.BRAND_ICON, lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
                        nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name),
                        meta=meta_tags(lang, name, f"{title} — Video Download", description),
                        menu=site_home.menu_button(lang), menu_label=html.escape(site_home.HOME[lang]["a11y"][3]))
@@ -893,7 +893,7 @@ def page_not_found() -> str:
 </head>
 <body>
 <main class="doc">
-<p><a class="brand" href="{base}"><img src="{base}assets/icon.png" alt="" width="28" height="28"> Video Download</a></p>
+<p><a class="brand" href="{base}">{site_home.BRAND_ICON} Video Download</a></p>
 <h1>404</h1>
 {blocks}
 </main>

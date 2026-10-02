@@ -49,6 +49,24 @@ header.scrolled {
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text); font-size: 17px; }
 .brand:hover { text-decoration: none; }
 .brand img { width: 28px; height: 28px; border-radius: 7px; }
+/* Ikona kao simulacija preuzimanja (4 s): strelica siđe u crtu, crta se napuni, strelica se vrati odozgo. */
+.brand-icon { width: 28px; height: 28px; flex: none; overflow: hidden; border-radius: 7px; }
+.brand-icon .bi-track { opacity: .38; }
+.brand-icon .bi-arrow { animation: bi-drop 4s cubic-bezier(.45,.05,.35,1) infinite; }
+.brand-icon .bi-fill { stroke-dasharray: 100; stroke-dashoffset: 100; animation: bi-fill 4s ease-in-out infinite; }
+.brand:hover .brand-icon .bi-arrow, .brand:hover .brand-icon .bi-fill { animation-duration: 2s; }
+@keyframes bi-drop {
+  0%, 10% { transform: translateY(0); opacity: 1; }
+  38% { transform: translateY(16px); opacity: 0; }
+  39% { transform: translateY(-34px); opacity: 0; }
+  62%, 100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes bi-fill {
+  0%, 12% { stroke-dashoffset: 100; opacity: 1; }
+  45%, 72% { stroke-dashoffset: 0; opacity: 1; }
+  86% { stroke-dashoffset: 0; opacity: 0; }
+  87%, 100% { stroke-dashoffset: 100; opacity: 0; }
+}
 nav { display: flex; gap: 24px; margin-left: auto; font-size: 14.5px; }
 nav a { color: var(--muted); transition: color .2s; }
 nav a:hover { color: var(--text); text-decoration: none; }
