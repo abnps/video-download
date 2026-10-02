@@ -11,7 +11,7 @@ import re
 import sys
 import time
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlencode, urlsplit
 
 from . import __version__, runtime, ytdlp_update
 
@@ -25,6 +25,19 @@ _JSON_SECRET = re.compile(rf"(\"{_SECRET_NAMES}\")\s*:\s*\"[^\"]*\"", re.IGNOREC
 _SECRET = re.compile(rf"\b({_SECRET_NAMES})\b\s*[=:]\s*(?:\"[^\"]*\"|'[^']*'|[^\s&;,]+)", re.IGNORECASE)
 _SCHEME_TOKEN = re.compile(r"\b(Bearer|Basic|Token)\s+[A-Za-z0-9._~+/=-]{4,}", re.IGNORECASE)
 MAX_ERRORS = 20
+# Javni kontakt projekta (Ahmedova odluka 26.9.2026; isti kao na sajtu, test provjerava). Lični e-mail nikad.
+CONTACT_EMAIL = "abnpsdev@gmail.com"
+
+
+def feedback_info() -> str:
+    """Kratko i bez ličnih podataka (bez putanja, korisničkog imena i linkova): ide u tijelo e-pošte."""
+    return (f"Video Download {__version__} · yt-dlp {ytdlp_update.active_version()} · "
+            f"{platform.system()} {platform.release()} ({platform.machine()})")
+
+
+def feedback_url(subject: str, body: str) -> str:
+    """mailto: link za „Prijavi problem ili prijedlog" (program za e-poštu, bez naloga na GitHubu)."""
+    return f"mailto:{CONTACT_EMAIL}?" + urlencode({"subject": subject, "body": body}, quote_via=quote)
 
 
 def _site(match: re.Match) -> str:

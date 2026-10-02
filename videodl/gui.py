@@ -598,6 +598,7 @@ class MainWindow(QMainWindow):
         self.help_menu.addSeparator()
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
         self.report_action = self.help_menu.addAction("", self._save_report)
+        self.feedback_action = self.help_menu.addAction("", self._send_feedback)
         self.legal_action = self.help_menu.addAction("", self._show_legal)
         self.support_action = self.help_menu.addAction("", lambda: self.show_support_dialog(automatic=False))
         self.about_action = self.help_menu.addAction("", self._show_about)
@@ -656,6 +657,7 @@ class MainWindow(QMainWindow):
             action.setChecked(action.data() == get_language())
         self.browser_help_action.setText(tr("menu.browser_help"))
         self.report_action.setText(tr("menu.report"))
+        self.feedback_action.setText(tr("menu.feedback"))
         self.legal_action.setText(tr("menu.legal"))
         self.support_action.setText(tr("menu.support"))
         self.support_link.setText(f'<a href="support" style="color:{theme.c('support_link')};text-decoration:none">{tr("support.link")}</a>')
@@ -1825,6 +1827,15 @@ class MainWindow(QMainWindow):
         if message:
             self._errors.append(f"{datetime.datetime.now():%H:%M:%S} {display_message(message, friendly=False)}")
             del self._errors[:-diagnostics.MAX_ERRORS]
+
+    @Slot()
+    def _send_feedback(self) -> None:
+        """Poruka autoru preko programa za e-poštu; bez njega se adresa kopira."""
+        url = diagnostics.feedback_url(tr("feedback.subject", version=__version__),
+                                       tr("feedback.body", info=diagnostics.feedback_info()))
+        if not QDesktopServices.openUrl(QUrl(url)):
+            QApplication.clipboard().setText(diagnostics.CONTACT_EMAIL)
+            self._set_status(tr("feedback.no_mail", email=diagnostics.CONTACT_EMAIL))
 
     @Slot()
     def _save_report(self) -> None:

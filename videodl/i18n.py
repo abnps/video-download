@@ -160,6 +160,28 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                               "Kopierter Link zur Liste hinzugefügt: {title}",
                               "Enlace copiado añadido a la cola: {title}",
                               "Lien copié ajouté à la file : {title}"),
+    "menu.feedback": ("Prijavi problem ili prijedlog…", "Report a problem or suggestion…",
+                      "Problem oder Vorschlag melden…", "Informar de un problema o sugerencia…",
+                      "Signaler un problème ou une suggestion…"),
+    "feedback.subject": ("Video Download {version}: problem ili prijedlog", "Video Download {version}: problem or suggestion",
+                         "Video Download {version}: Problem oder Vorschlag", "Video Download {version}: problema o sugerencia",
+                         "Video Download {version} : problème ou suggestion"),
+    "feedback.body": (
+        "Opiši šta se desilo ili šta predlažeš:\n\n\n"
+        "Ako je problem s preuzimanjem: Pomoć → Sačuvaj izvještaj o problemu, pa priloži taj fajl.\n\n{info}",
+        "Describe what happened or what you suggest:\n\n\n"
+        "If it is a download problem: Help → Save a problem report, then attach that file.\n\n{info}",
+        "Beschreibe, was passiert ist oder was du vorschlägst:\n\n\n"
+        "Bei einem Downloadproblem: Hilfe → Problembericht speichern und die Datei anhängen.\n\n{info}",
+        "Describe qué pasó o qué sugieres:\n\n\n"
+        "Si es un problema de descarga: Ayuda → Guardar un informe del problema y adjunta ese archivo.\n\n{info}",
+        "Décrivez ce qui s'est passé ou ce que vous suggérez :\n\n\n"
+        "S'il s'agit d'un problème de téléchargement : Aide → Enregistrer un rapport de problème, puis joignez ce fichier.\n\n{info}"),
+    "feedback.no_mail": ("Nema programa za e-poštu. Adresa {email} je kopirana: zalijepi je u svoju poštu.",
+                         "No e-mail program found. The address {email} was copied: paste it into your mail.",
+                         "Kein E-Mail-Programm gefunden. Die Adresse {email} wurde kopiert: füge sie in deine Mail ein.",
+                         "No hay programa de correo. Se copió la dirección {email}: pégala en tu correo.",
+                         "Aucun programme de messagerie. L'adresse {email} a été copiée : collez-la dans votre e-mail."),
     "menu.report": ("Sačuvaj izvještaj o problemu…", "Save a problem report…", "Problembericht speichern…",
                     "Guardar un informe del problema…", "Enregistrer un rapport de problème…"),
     "report.saved": ("Izvještaj je sačuvan: {path}", "The report was saved: {path}",

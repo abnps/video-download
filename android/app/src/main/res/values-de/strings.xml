@@ -123,4 +123,9 @@
         <item quantity="one">%d Video herunterladen</item>
         <item quantity="other">%d Videos herunterladen</item>
     </plurals>
+    <string name="feedback_title">Problem oder Vorschlag melden</string>
+    <string name="feedback_sub">E-Mail an den Autor, mit sicherem Bericht</string>
+    <string name="feedback_subject">Video Download %1$s: Problem oder Vorschlag</string>
+    <string name="feedback_body">Beschreibe, was passiert ist oder was du vorschlägst:</string>
+    <string name="feedback_no_mail">Keine E-Mail-App gefunden. Die Adresse %1$s wurde kopiert.</string>
 </resources>

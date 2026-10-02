@@ -76,5 +76,30 @@ class ReportTest(unittest.TestCase):
             self.assertTrue(path.name.endswith(".txt"))
 
 
+class FeedbackTest(unittest.TestCase):
+    """Pomoć → Prijavi problem ili prijedlog: javna adresa projekta, bez ličnih podataka u poruci."""
+
+    def test_mailto_goes_to_public_address_with_encoded_text(self):
+        from urllib.parse import parse_qs, urlsplit
+        url = diagnostics.feedback_url("Video Download 1.0: problem", "Red 1\nRed 2 & ć")
+        parts = urlsplit(url)
+        self.assertEqual((parts.scheme, parts.path), ("mailto", diagnostics.CONTACT_EMAIL))
+        query = parse_qs(parts.query)
+        self.assertEqual(query["subject"], ["Video Download 1.0: problem"])
+        self.assertEqual(query["body"], ["Red 1\nRed 2 & ć"])
+
+    def test_info_has_versions_but_no_personal_data(self):
+        info = diagnostics.feedback_info()
+        self.assertIn(__version__, info)
+        self.assertNotIn(getpass.getuser(), info)
+        self.assertNotIn(str(Path.home()), info)
+
+    def test_same_contact_as_the_website(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+        import build_site
+        self.assertEqual(build_site.CONTACT_EMAIL, diagnostics.CONTACT_EMAIL)
+
+
 if __name__ == "__main__":
     unittest.main()

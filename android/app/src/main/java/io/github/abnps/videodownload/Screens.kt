@@ -509,7 +509,7 @@ private fun startOfToday(): Long = Calendar.getInstance().apply {
 
 @Composable
 fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocation, onLocation: (SaveLocation) -> Unit,
-                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit,
+                   onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, onFeedback: () -> Unit,
                    instagram: Boolean, onLogin: () -> Unit, onLogout: () -> Unit, appVersion: String,
                    readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit,
                    onBack: () -> Unit) {
@@ -537,6 +537,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             stringResource(if (instagram) R.string.login_on else R.string.login_off)) {
             if (instagram) askLogout = true else onLogin()
         }
+        SettingRow(R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
+            onClick = onFeedback)
         SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
             onClick = onInvite)
         SettingRow(R.drawable.ic_heart, stringResource(R.string.set_support), null) { onOpenLink(Links.SUPPORT) }

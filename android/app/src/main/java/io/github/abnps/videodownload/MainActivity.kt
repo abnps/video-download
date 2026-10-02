@@ -144,6 +144,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Postavke → Prijavi problem ili prijedlog: e-pošta na javnu adresu projekta, uz siguran izvještaj
+     *  (vrsta događaja, domen, HTTP status; bez linkova i podataka o nalogu). Bez programa za poštu: kopira adresu. */
+    private fun sendFeedback() {
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        val report = runCatching {
+            Python.getInstance().getModule("vd_core").callAttr("report", cacheDir.absolutePath).toString()
+        }.getOrDefault("")
+        val body = getString(R.string.feedback_body) + "\n\n" +
+            "Video Download $version · Android ${Build.VERSION.RELEASE} · ${Build.MANUFACTURER} ${Build.MODEL}\n\n" + report
+        val mail = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).putExtra(Intent.EXTRA_EMAIL, arrayOf(Links.CONTACT_EMAIL))
+            .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject, version)).putExtra(Intent.EXTRA_TEXT, body)
+        if (runCatching { startActivity(mail) }.isFailure) {
+            getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("e-mail", Links.CONTACT_EMAIL))
+            Toast.makeText(this, getString(R.string.feedback_no_mail, Links.CONTACT_EMAIL), Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun copyReport() {
         val text = Python.getInstance().getModule("vd_core").callAttr("report", cacheDir.absolutePath).toString()
         getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Video Download", text))
@@ -309,7 +326,7 @@ class MainActivity : ComponentActivity() {
                         location = location.value,
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                         onLanguage = { openLanguage() }, onOpenLink = { openLink(it) },
-                        onInvite = { scope.launch { invite() } },
+                        onInvite = { scope.launch { invite() } }, onFeedback = { sendFeedback() },
                         instagram = instagram.value, onLogin = { openLogin() },
                         onLogout = { SiteLogin.logout(); instagram.value = false },
                         update = update, onInstallUpdate = { installUpdate() },

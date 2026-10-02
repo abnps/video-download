@@ -126,4 +126,9 @@
         <item quantity="few">Preuzmi %d videa</item>
         <item quantity="other">Preuzmi %d videa</item>
     </plurals>
+    <string name="feedback_title">Prijavi problem ili prijedlog</string>
+    <string name="feedback_sub">E-pošta autoru, uz siguran izvještaj</string>
+    <string name="feedback_subject">Video Download %1$s: problem ili prijedlog</string>
+    <string name="feedback_body">Opiši šta se desilo ili šta predlažeš:</string>
+    <string name="feedback_no_mail">Nema aplikacije za e-poštu. Adresa %1$s je kopirana.</string>
 </resources>
