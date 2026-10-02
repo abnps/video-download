@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import site_guides  # noqa: E402  (vodiči: MP3, isječak, plejlista…)
 import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
 import site_android  # noqa: E402  (Android tutorijal)
+import site_impressum  # noqa: E402  (Impressum, tek kad ima podataka)
 
 SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
@@ -519,7 +520,7 @@ def footer_html(lang: str) -> str:
     <span>© 2026 Video Download</span>
     <div class="links">
       <a href="guides.html">{site_guides.HUB[lang][0]}</a><a href="changelog.html">{site_home.HOME[lang]["nav"][3]}</a>
-      <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>
+      <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>{site_impressum.footer_link(lang)}
       <a href="{REPO}">GitHub</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>
     </div>
   </div>
@@ -946,6 +947,9 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
         pages[f"{prefix}extension.html"] = page_extension(lang)
+        if site_impressum.enabled():
+            pages[f"{prefix}{site_impressum.PAGE}"] = _page(lang, site_impressum.PAGE,
+                                                            *site_impressum.body(lang, CONTACT_EMAIL))
     pages["sitemap.xml"] = sitemap_xml()
     pages["404.html"] = page_not_found()
     return pages

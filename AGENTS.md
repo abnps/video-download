@@ -84,8 +84,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   program ostaje besplatan uz dobrovoljne priloge): folder `site/`, objavljuje ga `.github/workflows/pages.yml`
   pri svakom push-u na `main`. Pravne stranice, „Šta je novo" i verziju pravi `python tools/build_site.py`
   iz istih izvora kao aplikacija (poziva ga i `build_release.py`); `tests/test_site.py` pada ako sajt nije
-  ažuran ili ako početna/dodatak sadrže zabranjene izraze (npr. imena platformi). Impressum još nije
-  objavljen (čeka Ahmedovu odluku o imenu i adresi).
+  ažuran ili ako početna/dodatak sadrže zabranjene izraze (npr. imena platformi). Impressum (Ahmed 3.10.2026:
+  „napravi to", bez pravnika): `tools/site_impressum.py`, stranica i link u podnožju nastaju tek kad se `DATA` popuni
+  Ahmedovim podacima (ime, adresa za dostavu, drugi kontakt); e-pošta samo `CONTACT_EMAIL`. Test: `test_impressum.py`.
 - 25.9.2026 Ahmed: repo je prebačen iz naloga `npgamy` u organizaciju `abnps` (nalog `npgamy` ostaje,
   da GitHub-ovo preusmjeravanje starih linkova za programe v0.9.0 i starije ostane sigurno; u nalogu
   `npgamy` se NIKAD ne smije napraviti repo `video-download`).
