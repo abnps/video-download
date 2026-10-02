@@ -154,20 +154,17 @@ def probe(url: str, cache_dir: str, cookie_file: str = "") -> str:
 
 
 def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = ""):
-    """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno) i isCancelled().
+    """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno, brzina, preostalo) i isCancelled().
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
     # u kojoj su pročitani; nova sesija za preuzimanje dobije HTTP 403 (nađeno na S26 Ultra, 27.9.2026).
-    part = {"before": 0.0, "weight": 1.0}
+    part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0}
 
     def hook(status):
         if listener.isCancelled():
             raise Cancelled()
         if status.get("status") == "downloading":
-            total = status.get("total_bytes") or status.get("total_bytes_estimate") or 0
-            done = status.get("downloaded_bytes") or 0
-            fraction = part["before"] + (done / total) * part["weight"] if total else -1.0
-            listener.onProgress(fraction, int(done), int(total))
+            listener.onProgress(*progress(part, status))
 
     hook.cancelled = listener.isCancelled
 
@@ -183,6 +180,19 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
         raise
     finally:
         log.close()
+
+
+def progress(part: dict, status: dict) -> tuple[float, int, int, float, int]:
+    """Napredak CIJELOG preuzimanja (video + zvuk su dva dijela): udio, preuzeto i ukupno u bajtovima,
+    brzina (B/s, 0 = nepoznato) i preostalo vrijeme u sekundama (-1 = nepoznato), kao na računaru."""
+    total = status.get("total_bytes") or status.get("total_bytes_estimate") or 0
+    done = status.get("downloaded_bytes") or 0
+    fraction = part["before"] + (done / total) * part["weight"] if total else -1.0
+    all_done = part["done_before"] + done
+    all_total = part["done_before"] + total + part["rest"] if total else 0
+    speed = float(status.get("speed") or 0)
+    eta = int((all_total - all_done) / speed) if speed > 0 and all_total > all_done else -1
+    return fraction, int(all_done), int(all_total), speed, eta
 
 
 def listener_cancelled(options) -> bool:
@@ -206,8 +216,10 @@ def _run(url, kind, work_dir, options, part, log, height=0):
                  for spec in specs]
         weights = [size / sum(sizes) for size in sizes] if all(sizes) else [1 / len(specs)] * len(specs)
         paths = []
+        finished = 0  # stvarni bajtovi završenih dijelova
         for index, spec in enumerate(specs):
-            part.update(before=sum(weights[:index]), weight=weights[index])
+            part.update(before=sum(weights[:index]), weight=weights[index], done_before=finished,
+                        rest=int(sum(sizes[index + 1:])))
             # yt-dlp izbor formata sastavi jednom, u konstruktoru; za svaki dio se sastavlja ponovo.
             ydl.params["format"] = spec
             ydl.format_selector = ydl.build_format_selector(spec)
@@ -220,6 +232,8 @@ def _run(url, kind, work_dir, options, part, log, height=0):
                 if _has_video(selected) or not _has_audio(selected) or selected.get("ext") != "m4a":
                     raise ValueError("AUDIO_UNAVAILABLE")
             paths.append(downloads[-1]["filepath"] if downloads else result.get("filepath"))
+            if paths[-1] and os.path.isfile(paths[-1]):
+                finished += os.path.getsize(paths[-1])
 
     title = info.get("title") or info.get("id") or "video"
     name = f"{sanitize_filename(title).strip()[:120].rstrip('. ') or 'video'} [{info.get('id', '')}]"

@@ -35,7 +35,8 @@ data class Job(
 
 enum class Phase { QUEUED, READING, DOWNLOADING, SAVING, INTERRUPTED }
 
-data class ActiveJob(val job: Job, val phase: Phase, val fraction: Float? = null, val done: Long = 0, val total: Long = 0)
+data class ActiveJob(val job: Job, val phase: Phase, val fraction: Float? = null, val done: Long = 0, val total: Long = 0,
+                     val speed: Double = 0.0, val eta: Long = -1)
 
 /** Šta usluga za preuzimanje trenutno radi; ekrani samo prikazuju. */
 object Downloads {

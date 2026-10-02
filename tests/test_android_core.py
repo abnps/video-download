@@ -120,5 +120,30 @@ class AndroidLoginCookiesTest(unittest.TestCase):
             vd_core.YoutubeDL = original
 
 
+
+class AndroidProgressTest(unittest.TestCase):
+    """Napredak kao na računaru: ukupno za video + zvuk, brzina i preostalo vrijeme."""
+
+    def test_second_part_counts_whole_download(self):
+        # Video (80 MB) je gotov, zvuk (20 MB) je na pola, 2 MB/s.
+        part = {"before": 0.8, "weight": 0.2, "done_before": 80_000_000, "rest": 0}
+        status = {"total_bytes": 20_000_000, "downloaded_bytes": 10_000_000, "speed": 2_000_000}
+        fraction, done, total, speed, eta = vd_core.progress(part, status)
+        self.assertAlmostEqual(fraction, 0.9)
+        self.assertEqual((done, total), (90_000_000, 100_000_000))
+        self.assertEqual((speed, eta), (2_000_000.0, 5))
+
+    def test_first_part_includes_remaining_parts_and_unknown_speed(self):
+        part = {"before": 0.0, "weight": 0.8, "done_before": 0, "rest": 20_000_000}
+        status = {"total_bytes_estimate": 80_000_000, "downloaded_bytes": 0, "speed": None}
+        fraction, done, total, speed, eta = vd_core.progress(part, status)
+        self.assertEqual((fraction, done, total, speed, eta), (0.0, 0, 100_000_000, 0.0, -1))
+
+    def test_unknown_size(self):
+        part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0}
+        fraction, done, total, _speed, eta = vd_core.progress(part, {"downloaded_bytes": 5, "speed": 10})
+        self.assertEqual((fraction, done, total, eta), (-1.0, 5, 0, -1))
+
+
 if __name__ == "__main__":
     unittest.main()

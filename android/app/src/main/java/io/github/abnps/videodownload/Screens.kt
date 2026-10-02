@@ -412,7 +412,9 @@ private fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (Jo
                 if (active.phase == Phase.DOWNLOADING && fraction != null) {
                     LinearProgressIndicator(progress = { fraction }, modifier = Modifier.fillMaxWidth())
                     Row {
-                        Text(if (active.total > 0) "${formatSize(active.done.toDouble())} / ${formatSize(active.total.toDouble())}" else "",
+                        val context = LocalContext.current
+                        val size = if (active.total > 0) "${formatSize(active.done.toDouble())} / ${formatSize(active.total.toDouble())}" else null
+                        Text(listOfNotNull(size, formatSpeed(active.speed), formatEta(context, active.eta)).joinToString(" · "),
                             style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f),
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,

@@ -100,6 +100,21 @@ fun formatDuration(seconds: Int): String {
     return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%02d:%02d".format(m, s)
 }
 
+/** „3,2 MB/s" ili null dok brzina nije poznata. */
+fun formatSpeed(bytesPerSecond: Double): String? =
+    if (bytesPerSecond > 0) formatSize(bytesPerSecond) + "/s" else null
+
+/** „još 1:05" / „još 12 s" (kao na računaru) ili null dok nije poznato. */
+fun formatEta(context: android.content.Context, seconds: Long): String? {
+    if (seconds < 0) return null
+    val text = when {
+        seconds >= 3600 -> "%d:%02d:%02d".format(seconds / 3600, seconds % 3600 / 60, seconds % 60)
+        seconds >= 60 -> "%d:%02d".format(seconds / 60, seconds % 60)
+        else -> "$seconds s"
+    }
+    return context.getString(R.string.progress_eta, text)
+}
+
 fun formatSize(bytes: Double): String = when {
     bytes >= 1e9 -> "%.1f GB".format(bytes / 1e9)
     bytes >= 1e6 -> "%.0f MB".format(bytes / 1e6)

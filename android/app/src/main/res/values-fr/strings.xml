@@ -98,4 +98,5 @@
     <string name="dialog_cancel">Annuler</string>
     <string name="set_licenses">Licences open source</string>
     <string name="dialog_close">Fermer</string>
+    <string name="progress_eta">encore %1$s</string>
 </resources>

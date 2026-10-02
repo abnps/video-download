@@ -98,4 +98,5 @@
     <string name="dialog_cancel">Otkaži</string>
     <string name="set_licenses">Licence otvorenog koda</string>
     <string name="dialog_close">Zatvori</string>
+    <string name="progress_eta">još %1$s</string>
 </resources>

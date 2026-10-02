@@ -119,14 +119,19 @@ class DownloadService : Service() {
     inner class Listener(private val job: Job) {
         private var lastUpdate = 0L
 
-        fun onProgress(fraction: Double, done: Long, total: Long) {
+        fun onProgress(fraction: Double, done: Long, total: Long, speed: Double, eta: Long) {
             val now = SystemClock.elapsedRealtime()
             if (now - lastUpdate < 400) return // ekran i obavještenje najviše ~2,5 puta u sekundi
             lastUpdate = now
             val value = fraction.takeIf { it >= 0 }?.toFloat()
-            Downloads.update(job.id) { it.copy(phase = Phase.DOWNLOADING, fraction = value, done = done, total = total) }
+            Downloads.update(job.id) {
+                it.copy(phase = Phase.DOWNLOADING, fraction = value, done = done, total = total, speed = speed, eta = eta)
+            }
             val percent = ((value ?: 0f) * 100).toInt()
-            notify(progressNotification("${job.title} · ${getString(R.string.status_downloading, percent)}", value))
+            // Kao na računaru: „Preuzimanje 45% · 3,2 MB/s · još 0:12"
+            val details = listOfNotNull(getString(R.string.status_downloading, percent), formatSpeed(speed),
+                formatEta(this@DownloadService, eta)).joinToString(" · ")
+            notify(progressNotification("${job.title} · $details", value))
         }
 
         fun isCancelled(): Boolean = job.id in cancelled
