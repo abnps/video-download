@@ -30,7 +30,8 @@ object MediaSaver {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, source.name)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeType(source.extension, isAudio))
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "$folder/Video Download")
+            // Folder nosi ime aplikacije, pa Galerija pokazuje poseban album „Video Download".
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "$folder/${context.getString(R.string.app_name)}")
             put(MediaStore.MediaColumns.IS_PENDING, 1) // drugi ga ne vide dok se kopira
         }
         val uri = resolver.insert(collection, values) ?: error("MediaStore nije napravio fajl")

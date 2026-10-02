@@ -7,15 +7,16 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-/** Gdje ide gotov fajl: Downloads/Video Download (podrazumijevano) ili Galerija/Muzika. */
+/** Gdje ide gotov fajl: Galerija/Muzika u folder s imenom aplikacije (podrazumijevano, Ahmed 2.10.2026)
+ *  ili Downloads/Video Download. */
 enum class SaveLocation { DOWNLOADS, GALLERY }
 
 object Settings {
     private const val FILE = "postavke"
 
     fun location(context: Context): SaveLocation = runCatching {
-        SaveLocation.valueOf(prefs(context).getString("location", SaveLocation.DOWNLOADS.name)!!)
-    }.getOrDefault(SaveLocation.DOWNLOADS)
+        SaveLocation.valueOf(prefs(context).getString("location", SaveLocation.GALLERY.name)!!)
+    }.getOrDefault(SaveLocation.GALLERY)
 
     fun setLocation(context: Context, value: SaveLocation) = prefs(context).edit().putString("location", value.name).apply()
 
