@@ -520,4 +520,44 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/licenses.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/licenses.html"/>
   </url>
+  <url><loc>https://abnps.github.io/video-download/impressum.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/bs/impressum.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/de/impressum.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/es/impressum.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/fr/impressum.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
+  </url>
 </urlset>

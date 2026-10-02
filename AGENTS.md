@@ -108,8 +108,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   programa `site/assets/screenshot-{light,dark}-<jezik>.png`.
 - Kontakt na sajtu (Ahmedova odluka 26.9.2026): javno se prikazuje SAMO `abnpsdev@gmail.com`
   (`CONTACT_EMAIL` u `tools/build_site.py`, podnožje svih stranica + stavka u privatnosti). Ahmedov lični
-  e-mail, ime i adresa ne idu na sajt; test pada ako se lični e-mail pojavi. Pun Impressum (ime + adresa,
-  § 5 DDG) Ahmed za sada ne želi; stranica se zato NE zove „Impressum". Commiti idu s GitHub noreply adresom.
+  e-mail ne ide na sajt (test: jedina e-adresa je CONTACT_EMAIL). Ime, adresa i telefon su SAMO u Impressumu
+  (Ahmed 3.10.2026: „Objavi"; `tools/site_impressum.py`). Commiti idu s GitHub noreply adresom.
 - Mac verzija (beta, grana `macos`, 26.9.2026; Ahmed: bez Appleovog potpisa za sada): isti kod, razlike su
   u `runtime.py` (user_data_base, bundle_dir = Contents/Frameworks), `native_messaging.py` (manifest u
   ~/Library/Application Support/<browser>/NativeMessagingHosts, samo za postojeće browsere), `native_host.py`

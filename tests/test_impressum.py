@@ -1,5 +1,6 @@
 """Impressum (§ 5 DDG): nastaje tek s podacima; tada je na svim jezicima, u podnožju i bez ličnog e-maila."""
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -32,7 +33,7 @@ class ImpressumTest(unittest.TestCase):
                 self.assertIn("Angaben gemäß § 5 DDG", page)
                 self.assertIn("Probna 1", page)
                 self.assertIn(build_site.CONTACT_EMAIL, page)
-                self.assertNotIn("bisevac", page.lower())
+                self.assertEqual(set(re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", page)), {build_site.CONTACT_EMAIL})
                 self.assertIn(f'href="{site_impressum.PAGE}"', pages[f"{prefix}terms.html"])
 
 

@@ -18,7 +18,7 @@ import site_home  # noqa: E402
 from videodl import __version__, changelog  # noqa: E402
 
 PAGES = ("index.html", "guides.html", "android-guide.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
-         "terms.html", "privacy.html", "licenses.html", "extension.html")
+         "terms.html", "privacy.html", "licenses.html", "extension.html", "impressum.html")
 
 
 class SiteTest(unittest.TestCase):
@@ -102,7 +102,9 @@ class SiteTest(unittest.TestCase):
                 continue
             with self.subTest(page=name):
                 self.assertIn(f'href="mailto:{build_site.CONTACT_EMAIL}"', text)
-                self.assertNotIn("bisevac", text.lower())  # lični e-mail nikad na sajtu
+                # Jedina e-adresa na sajtu je javni kontakt projekta; lični e-mail nikad (ime je samo u Impressumu).
+                emails = set(re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", text))
+                self.assertLessEqual(emails, {build_site.CONTACT_EMAIL})
         for lang in build_site.LANGUAGES:
             self.assertIn(build_site.CONTACT_EMAIL, self.pages[build_site.TEXTS[lang]["dir"] + "privacy.html"])
 

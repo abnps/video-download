@@ -495,7 +495,8 @@ def software_jsonld(lang: str) -> str:
 
 
 SITEMAP_PAGES = ("index.html", "guides.html", site_android.PAGE, *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
-                 "extension.html", "terms.html", "privacy.html", "licenses.html")
+                 "extension.html", "terms.html", "privacy.html", "licenses.html",
+                 *((site_impressum.PAGE,) if site_impressum.enabled() else ()))
 
 
 def sitemap_xml() -> str:
