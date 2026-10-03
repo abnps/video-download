@@ -172,4 +172,8 @@
     <string name="system_colors_title">Phone colors</string>
     <string name="system_colors_on">Uses the color palette of your phone</string>
     <string name="system_colors_off">App blue (turn on for the phone\'s color palette)</string>
+    <string name="widget_label">Paste and download</string>
+    <string name="widget_desc">Downloads the link you copied, in one tap</string>
+    <string name="tile_label">Paste link</string>
+    <string name="paste_empty">No link was copied.</string>
 </resources>

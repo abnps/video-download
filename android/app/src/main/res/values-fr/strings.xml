@@ -174,4 +174,8 @@
     <string name="system_colors_title">Couleurs du téléphone</string>
     <string name="system_colors_on">Utilise la palette de couleurs du téléphone</string>
     <string name="system_colors_off">Bleu de l\'appli (activez pour la palette du téléphone)</string>
+    <string name="widget_label">Coller et télécharger</string>
+    <string name="widget_desc">Télécharge le lien copié en une touche</string>
+    <string name="tile_label">Coller le lien</string>
+    <string name="paste_empty">Aucun lien copié.</string>
 </resources>

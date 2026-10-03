@@ -174,4 +174,8 @@
     <string name="system_colors_title">Colores del móvil</string>
     <string name="system_colors_on">Usa la paleta de colores de tu móvil</string>
     <string name="system_colors_off">Azul de la app (activa para la paleta del móvil)</string>
+    <string name="widget_label">Pegar y descargar</string>
+    <string name="widget_desc">Descarga el enlace que copiaste con un toque</string>
+    <string name="tile_label">Pegar enlace</string>
+    <string name="paste_empty">No hay ningún enlace copiado.</string>
 </resources>

@@ -171,4 +171,8 @@
     <string name="system_colors_title">Handyfarben</string>
     <string name="system_colors_on">Nutzt die Farbpalette deines Handys</string>
     <string name="system_colors_off">App-Blau (einschalten für die Farbpalette des Handys)</string>
+    <string name="widget_label">Einfügen und laden</string>
+    <string name="widget_desc">Lädt den kopierten Link mit einem Tipp</string>
+    <string name="tile_label">Link einfügen</string>
+    <string name="paste_empty">Kein Link kopiert.</string>
 </resources>

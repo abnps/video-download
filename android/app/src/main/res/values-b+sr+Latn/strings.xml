@@ -174,4 +174,8 @@
     <string name="system_colors_title">Boje telefona</string>
     <string name="system_colors_on">Koristi paletu boja telefona</string>
     <string name="system_colors_off">Plava aplikacije (uključi za paletu boja telefona)</string>
+    <string name="widget_label">Nalepi i preuzmi</string>
+    <string name="widget_desc">Preuzima link koji si kopirao, jednim dodirom</string>
+    <string name="tile_label">Nalepi link</string>
+    <string name="paste_empty">Nema kopiranog linka.</string>
 </resources>

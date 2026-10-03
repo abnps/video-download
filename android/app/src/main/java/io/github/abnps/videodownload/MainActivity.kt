@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
     private val location = mutableStateOf(SaveLocation.DOWNLOADS)
     private val quality = mutableIntStateOf(0)
     private var autoFind by mutableStateOf(false)
+    private var pasteOnFocus = false // widget/pločica: zalijepi čim prozor bude u fokusu
     private var fromShare = false // link je stigao iz „Podijeli" (za brzo preuzimanje)
     private val welcome = mutableStateOf(false)
     private val loggedIn = mutableStateOf(emptySet<LoginSite>()) // na koje sajtove je korisnik prijavljen
@@ -86,6 +87,16 @@ class MainActivity : ComponentActivity() {
         startActivity(Intent(this, LoginActivity::class.java).putExtra(LoginActivity.EXTRA_SITE, site.name))
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && pasteOnFocus) {
+            pasteOnFocus = false
+            paste()
+            if (findUrl(link.value) != null) lifecycleScope.launch { find() }
+            else Toast.makeText(this, R.string.paste_empty, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handle(intent)
@@ -93,6 +104,14 @@ class MainActivity : ComponentActivity() {
 
     /** „Podijeli" iz druge aplikacije: link odmah ide na „Izaberi kvalitet"; obavještenje otvara Preuzimanja. */
     private fun handle(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_PASTE, false) == true) {
+            // Widget ili pločica: međuspremnik se smije čitati tek kad prozor dobije fokus (onWindowFocusChanged).
+            pasteOnFocus = true
+            tab.intValue = TAB_HOME
+            info.value = null
+            playlist.value = null
+            return
+        }
         if (intent?.getBooleanExtra(EXTRA_OPEN_DOWNLOADS, false) == true) {
             tab.intValue = TAB_DOWNLOADS
             return
@@ -376,6 +395,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_OPEN_DOWNLOADS = "otvori_preuzimanja"
+        const val EXTRA_PASTE = "zalijepi_i_preuzmi"
         private const val TAB_HOME = 0
         private const val TAB_DOWNLOADS = 1
         private const val TAB_SETTINGS = 2
