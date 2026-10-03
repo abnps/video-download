@@ -79,7 +79,7 @@ def record(message, level="info"):
         event = "format"
     elif "unsupported url" in lower:
         event = "unsupported"
-    elif any(word in lower for word in ("sign in", "login required", "log in", "confirm you're", "cookies")):
+    elif any(word in lower for word in ("sign in", "login required", "log in", "confirm you're", "cookies", "authentication", "nsfw")):
         event = "login"
     elif any(word in lower for word in ("timed out", "timeout", "connection", "network", "name resolution")):
         event = "network"

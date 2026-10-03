@@ -154,4 +154,8 @@
     <string name="login_off_tiktok">Inicia sesión para vídeos de TikTok</string>
     <string name="login_button_tiktok">Iniciar sesión en TikTok</string>
     <string name="logout_title_tiktok">¿Cerrar sesión en TikTok?</string>
+    <string name="login_title_x">Cuenta de X</string>
+    <string name="login_off_x">Inicia sesión para publicaciones sensibles de X</string>
+    <string name="login_button_x">Iniciar sesión en X</string>
+    <string name="logout_title_x">¿Cerrar sesión en X?</string>
 </resources>

@@ -202,5 +202,17 @@ class AndroidSubtitlesTest(unittest.TestCase):
                                      presets.pick_subtitles(info, presets.subtitle_languages(language)))
 
 
+
+class AndroidLoginMessagesTest(unittest.TestCase):
+    """Poruke „samo za prijavljene" (TikTok, X) dnevnik vodi kao prijavu, ne kao opštu grešku."""
+
+    def test_sensitive_posts_are_login_events(self):
+        from vd_diagnostics import record
+        for message in ("ERROR: [twitter] 1: NSFW tweet requires authentication. Use --cookies",
+                        "ERROR: [TikTok] 7: This post may not be comfortable for some audiences. Log in for access."):
+            with self.subTest(message=message):
+                self.assertEqual(record(message, "error")["event"], "login")
+
+
 if __name__ == "__main__":
     unittest.main()

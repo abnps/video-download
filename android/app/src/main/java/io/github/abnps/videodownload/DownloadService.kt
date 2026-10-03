@@ -268,7 +268,8 @@ class DownloadService : Service() {
             return when {
                 "audio_unavailable" in raw -> context.getString(R.string.audio_unavailable)
                 "unsupported url" in raw -> context.getString(R.string.error_unsupported)
-                "sign in" in raw || "login" in raw || "cookies" in raw -> context.getString(R.string.error_login)
+                "sign in" in raw || "login" in raw || "log in" in raw || "cookies" in raw ||
+                    "authentication" in raw || "nsfw" in raw -> context.getString(R.string.error_login)
                 else -> {
                     val status = Regex("\\bhttp(?: error)?[ :]+([45]\\d\\d)\\b").find(raw)?.groupValues?.get(1)
                     when {

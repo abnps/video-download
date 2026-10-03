@@ -152,4 +152,8 @@
     <string name="login_off_tiktok">Sign in for TikTok videos</string>
     <string name="login_button_tiktok">Sign in to TikTok</string>
     <string name="logout_title_tiktok">Sign out of TikTok?</string>
+    <string name="login_title_x">X account</string>
+    <string name="login_off_x">Sign in for sensitive X posts</string>
+    <string name="login_button_x">Sign in to X</string>
+    <string name="logout_title_x">Sign out of X?</string>
 </resources>

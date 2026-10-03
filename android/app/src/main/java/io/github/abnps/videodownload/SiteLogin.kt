@@ -39,18 +39,22 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /** Sajtovi na koje se korisnik može prijaviti (Ahmed 2.10. Instagram, 3.10.2026 TikTok); svaki ima svoje kolačiće. */
-enum class LoginSite(val loginUrl: String, val siteUrl: String, val domain: String, val host: String,
-                     val title: Int, val offText: Int, val button: Int, val logoutTitle: Int) {
-    INSTAGRAM("https://www.instagram.com/accounts/login/", "https://www.instagram.com", ".instagram.com", "instagram.com",
-        R.string.login_title, R.string.login_off, R.string.login_button, R.string.logout_title),
-    TIKTOK("https://www.tiktok.com/login", "https://www.tiktok.com", ".tiktok.com", "tiktok.com",
-        R.string.login_title_tiktok, R.string.login_off_tiktok, R.string.login_button_tiktok, R.string.logout_title_tiktok);
+enum class LoginSite(val loginUrl: String, val siteUrl: String, val domain: String, val hosts: List<String>,
+                     val title: Int, val offText: Int, val button: Int, val logoutTitle: Int,
+                     val session: String = "sessionid") {
+    INSTAGRAM("https://www.instagram.com/accounts/login/", "https://www.instagram.com", ".instagram.com",
+        listOf("instagram.com"), R.string.login_title, R.string.login_off, R.string.login_button, R.string.logout_title),
+    TIKTOK("https://www.tiktok.com/login", "https://www.tiktok.com", ".tiktok.com", listOf("tiktok.com"),
+        R.string.login_title_tiktok, R.string.login_off_tiktok, R.string.login_button_tiktok, R.string.logout_title_tiktok),
+    // X (3.10.2026): osjetljive objave („NSFW tweet requires authentication") vide samo prijavljeni; sesija je auth_token.
+    X("https://x.com/i/flow/login", "https://x.com", ".x.com", listOf("x.com", "twitter.com"),
+        R.string.login_title_x, R.string.login_off_x, R.string.login_button_x, R.string.logout_title_x, session = "auth_token");
 
     companion object {
         /** Sajt kojem link pripada (i kratki linkovi, npr. vt.tiktok.com), ili null. */
         fun forUrl(url: String): LoginSite? {
             val host = runCatching { java.net.URI(url.trim()).host }.getOrNull()?.lowercase()?.removePrefix("www.") ?: return null
-            return entries.firstOrNull { host == it.host || host.endsWith("." + it.host) }
+            return entries.firstOrNull { site -> site.hosts.any { host == it || host.endsWith(".$it") } }
         }
     }
 }
@@ -90,8 +94,8 @@ object SiteLogin {
         return result.get() ?: block()
     }
 
-    /** Prijavljen = sajt je postavio kolačić sesije (i Instagram i TikTok ga zovu „sessionid"). */
-    fun isLoggedIn(site: LoginSite): Boolean = cookies(site).any { it.first == "sessionid" && it.second.isNotEmpty() }
+    /** Prijavljen = sajt je postavio kolačić sesije (Instagram i TikTok „sessionid", X „auth_token"). */
+    fun isLoggedIn(site: LoginSite): Boolean = cookies(site).any { it.first == site.session && it.second.isNotEmpty() }
 
     /**
      * Privremeni cookies fajl u `dir` (poziva se iz posla koji ga sam briše) s kolačićima SAMO sajta kojem `url`
@@ -100,13 +104,14 @@ object SiteLogin {
     fun cookieFile(dir: File, url: String): String {
         val site = LoginSite.forUrl(url) ?: return ""
         val list = cookies(site)
-        if (list.none { it.first == "sessionid" }) return ""
+        if (list.none { it.first == site.session }) return ""
         val expires = System.currentTimeMillis() / 1000 + FILE_DAYS * 24 * 3600
         val file = File(dir, "kolacici-${System.nanoTime()}.txt")
         file.bufferedWriter().use { out ->
             out.write("# Netscape HTTP Cookie File\n")
-            for ((name, value) in list) {
-                out.write(listOf(site.domain, "TRUE", "/", "TRUE", expires.toString(), name, value).joinToString("\t"))
+            // Isti kolačići za svaku adresu sajta (X: x.com i stari twitter.com), nikad za druge sajtove.
+            for (domain in site.hosts.map { ".$it" }) for ((name, value) in list) {
+                out.write(listOf(domain, "TRUE", "/", "TRUE", expires.toString(), name, value).joinToString("\t"))
                 out.write("\n")
             }
         }

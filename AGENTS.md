@@ -245,7 +245,7 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
   (mobilni UA ne radi).
 - Desktop `videodl/{__init__,runtime,ytdlp_update}.py` se kopiraju u APK pri gradnji (Gradle `sharedPython`) —
   izmjena tih fajlova utiče i na Android.
-- Prijava na sajt (`SiteLogin.kt`; Instagram 1.10.2026, TikTok 3.10.2026, `LoginSite` po linku; svaki sajt dobija
+- Prijava na sajt (`SiteLogin.kt`; Instagram 1.10.2026, TikTok i X 3.10.2026, `LoginSite` po linku; svaki sajt dobija
   SAMO svoje kolačiće). Prvobitno: Instagram prijava (`SiteLogin.kt`, 1.10.2026): korisnik se sam prijavi u ugrađenom WebView-u (Postavke →
   Instagram nalog ili dugme uz grešku „traži prijavu"); kolačići ostaju u WebView-u, a za svako čitanje/preuzimanje
   ide privremeni Netscape fajl (`cookie_file` u `vd_core.probe/download`) koji se briše na kraju. Nikad u dnevnik.

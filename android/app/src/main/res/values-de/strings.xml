@@ -151,4 +151,8 @@
     <string name="login_off_tiktok">Für TikTok-Videos anmelden</string>
     <string name="login_button_tiktok">Bei TikTok anmelden</string>
     <string name="logout_title_tiktok">Von TikTok abmelden?</string>
+    <string name="login_title_x">X-Konto</string>
+    <string name="login_off_x">Für sensible X-Beiträge anmelden</string>
+    <string name="login_button_x">Bei X anmelden</string>
+    <string name="logout_title_x">Von X abmelden?</string>
 </resources>

@@ -154,4 +154,8 @@
     <string name="login_off_tiktok">Connectez-vous pour les vidéos TikTok</string>
     <string name="login_button_tiktok">Se connecter à TikTok</string>
     <string name="logout_title_tiktok">Se déconnecter de TikTok ?</string>
+    <string name="login_title_x">Compte X</string>
+    <string name="login_off_x">Connectez-vous pour les publications X sensibles</string>
+    <string name="login_button_x">Se connecter à X</string>
+    <string name="logout_title_x">Se déconnecter de X ?</string>
 </resources>

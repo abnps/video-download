@@ -154,4 +154,8 @@
     <string name="login_off_tiktok">Prijavi se za TikTok video snimke</string>
     <string name="login_button_tiktok">Prijavi se na TikTok</string>
     <string name="logout_title_tiktok">Odjaviti se sa TikToka?</string>
+    <string name="login_title_x">X nalog</string>
+    <string name="login_off_x">Prijavi se za osetljive X objave</string>
+    <string name="login_button_x">Prijavi se na X</string>
+    <string name="logout_title_x">Odjaviti se sa X-a?</string>
 </resources>
