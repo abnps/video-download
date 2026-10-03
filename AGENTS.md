@@ -29,6 +29,7 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   otvara Ahmed, a dokaz potpisa pravi agent lokalno (ključ nikad ne napušta %USERPROFILE%\.videodl).
 - yt-dlp logika ostaje u `videodl/presets.py`, `probe.py`, `download.py` i
   `jobs.py`, bez Qt-a. `gui.py` samo prikazuje stanje i pokreće poslove.
+  Raspored preuzimanja (ko kreće, ko čeka, isti izlazni fajl) je u `videodl/scheduler.py` (bez Qt-a, test_scheduler).
   Pozadinski poslovi (Qt niti) su u `videodl/workers.py`; Android ekrani su po fajlovima (`HomeScreen.kt`,
   `QualityScreen.kt`, `DownloadsScreen.kt`, `SettingsScreen.kt`, `PlaylistScreen.kt`; zajedničko u `Screens.kt`).
 - Prekid preuzimanja briše samo privremene fajlove tog pokušaja, nikad ranije

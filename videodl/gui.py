@@ -39,7 +39,7 @@ from .presets import (
     direct_output_name, section_label, subtitle_languages, title_identity,
 )
 from .probe import ProbeResult, probe
-from . import convert, diagnostics, parental, release_signing, store, support, theme, winshell
+from . import convert, diagnostics, parental, release_signing, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import DropZone, QueueRow, display_message, set_state
 from .desktop import play_file, reveal
@@ -69,8 +69,7 @@ DEFAULT_PARALLEL = 2
 
 
 
-def _needs_adult_ok(item) -> bool:
-    return item.adult and not item.adult_ok
+_needs_adult_ok = scheduler.needs_adult_ok  # i dalje dostupno kao gui._needs_adult_ok
 
 
 def adult_thumbnail(pixmap: QPixmap) -> QPixmap:
@@ -1010,21 +1009,8 @@ class MainWindow(QMainWindow):
     # ---------- red preuzimanja ----------
 
     def _output_key(self, item: QueueItem) -> tuple:
-        """Šta određuje ime izlaznog fajla, po ISTIM pravilima kao samo ime (presets): folder, format (kvalitet je
-        u imenu), isječak i identitet videa. Isti ključ = isti fajl, pa dva takva posla ne rade istovremeno.
-        Kad nije sigurno, ključ je radije isti (drugi posao samo sačeka) nego različit (dva pisanja u isti fajl)."""
-        subfolder = safe_folder_name(item.subfolder) if item.subfolder else ""
-        folder = os.path.normcase(os.path.normpath(os.path.join(item.output_dir, subfolder)))
-        if item.filename_title:
-            # direktan tok: ime je naslov stranice + otisak toka (parametri koji određuju video su u otisku)
-            identity = ("stream", direct_output_name(item.filename_title, item.url).casefold())
-        elif item.force_id_name or self._name_template == DEFAULT_NAME_TEMPLATE:
-            # „naslov [id]": dva linka istog videa (npr. kratka i duga adresa) daju isti ID, pa i isto ime
-            identity = ("id", item.video_id or item.url)
-        else:
-            # šablon bez ID-a: ime daje naslov, skraćen kao u imenu fajla (dugi naslovi istog početka = isto ime)
-            identity = ("title", title_identity(item.title or item.url))
-        return folder, item.preset_key, section_label(item.section), identity
+        """Isti ključ = isti izlazni fajl (pravila su u scheduler.output_key)."""
+        return scheduler.output_key(item, self._name_template)
 
     def _same_output_running(self, item: QueueItem) -> bool:
         """Posao koji bi pisao ISTI fajl već radi (isti link dvaput, ili dva videa istog naslova uz šablon bez ID-a):
@@ -1046,22 +1032,10 @@ class MainWindow(QMainWindow):
             return  # program se zatvara: gase se samo postojeći poslovi, novi ne kreću
         started = []
         while len(self._download_jobs) < self._parallel:
-            item = None
-            postponed = []
-            while self._manual and item is None:
-                candidate = self._queue.get(self._manual.pop(0))
-                if candidate is None or candidate.status != ItemStatus.WAITING or _needs_adult_ok(candidate) \
-                        or self._retry_pending(candidate):
-                    continue
-                if self._same_output_running(candidate):
-                    postponed.append(candidate.id)  # čeka da isti posao završi, pa kreće
-                else:
-                    item = candidate
-            self._manual[:0] = postponed
-            if item is None and self._running:
-                item = next((candidate for candidate in self._queue.items()
-                             if candidate.status == ItemStatus.WAITING and not self._same_output_running(candidate)
-                             and not _needs_adult_ok(candidate) and not self._retry_pending(candidate)), None)
+            # Izbor je u scheduler.pick_next (bez Qt-a, s vlastitim testovima); prozor samo pokreće izabrano.
+            active = [job_item for job_item in map(self._queue.get, self._download_jobs) if job_item is not None]
+            item, self._manual = scheduler.pick_next(self._manual, self._queue.items(), self._queue.get, active,
+                                                     self._name_template, self._running, self._retry_pending)
             if item is None:
                 if not self._download_jobs:
                     self._running = False
