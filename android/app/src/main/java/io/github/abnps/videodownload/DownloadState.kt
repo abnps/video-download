@@ -21,11 +21,17 @@ data class Job(
     val adult: Boolean = false, // sajt ga je označio kao 18+ (sličica zamućena); čuva se
     // Potvrda „imam 18+" važi SAMO za ovo preuzimanje i nikad se ne upisuje na disk (pravilo kao na računaru).
     val adultOk: Boolean = false,
+    val subtitles: Boolean = false, // .srt/.vtt pored videa (jezik aplikacije + engleski), kao na računaru
+    val clipStart: Int = -1, // isječak u sekundama; -1 = cijeli video
+    val clipEnd: Int = -1,
 ) {
+    val hasClip get() = clipStart >= 0 && clipEnd > clipStart
+
     fun toBundle() = Bundle().apply {
         putLong("id", id); putString("url", url); putString("title", title); putString("thumbnail", thumbnail)
         putInt("duration", duration); putBoolean("audio", isAudio); putInt("height", height); putString("label", label)
         putBoolean("adult", adult); putBoolean("adult_ok", adultOk)
+        putBoolean("subtitles", subtitles); putInt("clip_start", clipStart); putInt("clip_end", clipEnd)
     }
 
     companion object {
@@ -33,7 +39,8 @@ data class Job(
             bundle.getLong("id"), bundle.getString("url").orEmpty(), bundle.getString("title").orEmpty(),
             bundle.getString("thumbnail").orEmpty(), bundle.getInt("duration"), bundle.getBoolean("audio"),
             bundle.getInt("height"), bundle.getString("label").orEmpty(), bundle.getBoolean("adult"),
-            bundle.getBoolean("adult_ok"),
+            bundle.getBoolean("adult_ok"), bundle.getBoolean("subtitles"), bundle.getInt("clip_start", -1),
+            bundle.getInt("clip_end", -1),
         )
     }
 }
@@ -63,7 +70,9 @@ object Downloads {
                     val value = array.getJSONObject(index)
                     ActiveJob(Job(value.getLong("id"), value.getString("url"), value.getString("title"),
                         value.optString("thumbnail"), value.optInt("duration"), value.getBoolean("audio"),
-                        value.optInt("height"), value.optString("label"), value.optBoolean("adult")), Phase.INTERRUPTED)
+                        value.optInt("height"), value.optString("label"), value.optBoolean("adult"),
+                        subtitles = value.optBoolean("subtitles"), clipStart = value.optInt("clip_start", -1),
+                        clipEnd = value.optInt("clip_end", -1)), Phase.INTERRUPTED)
                 }.getOrNull()
             }.distinctBy { it.job.id }
         }.getOrDefault(emptyList())
@@ -90,7 +99,8 @@ object Downloads {
             val job = active.job
             array.put(JSONObject().put("id", job.id).put("url", job.url).put("title", job.title)
                 .put("thumbnail", job.thumbnail).put("duration", job.duration).put("audio", job.isAudio)
-                .put("height", job.height).put("label", job.label).put("adult", job.adult)) // adultOk nikad
+                .put("height", job.height).put("label", job.label).put("adult", job.adult) // adultOk nikad
+                .put("subtitles", job.subtitles).put("clip_start", job.clipStart).put("clip_end", job.clipEnd))
         }
         check(app.getSharedPreferences("pending_jobs", Context.MODE_PRIVATE).edit()
             .putString("jobs", array.toString()).commit()) { "Lista preuzimanja nije sačuvana" }

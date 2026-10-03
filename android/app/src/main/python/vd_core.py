@@ -150,6 +150,32 @@ def is_adult(info: dict, url: str | None = None) -> bool:
     return marked and not is_youtube(info, url)
 
 
+# Titlovi (isto kao videodl/presets.py na računaru, test poredi): jezik aplikacije (za bs i srodni hr, sr), pa
+# engleski; najviše dva, ručni imaju prednost pred automatskim. Bez ffmpeg-a se ne ugrađuju u video nego se
+# čuvaju kao zaseban .srt/.vtt pored videa (plejeri ga nađu po istom imenu).
+def subtitle_languages(language: str) -> list[str]:
+    wanted = ["bs", "hr", "sr"] if language == "bs" else [language]
+    return [code for code in wanted if code != "en"] + ["en"]
+
+
+def pick_subtitles(info: dict, wanted: list[str]) -> list[str]:
+    manual = [key for key in (info.get("subtitles") or {}) if key != "live_chat"]
+    auto = [key for key in (info.get("automatic_captions") or {}) if not key.endswith("-orig")]
+    auto += [key for key in (info.get("automatic_captions") or {}) if key.endswith("-orig")]
+
+    def first(codes: list[str]) -> str | None:
+        for keys in (manual, auto):
+            for code in codes:
+                for key in keys:
+                    if key == code or key.startswith(code + "-"):
+                        return key
+        return None
+
+    own = [code for code in wanted if code != "en"]
+    chosen = [first(own) if own else None, first(["en"]) if "en" in wanted else None]
+    return [key for key in chosen if key]
+
+
 def _thumbnail(entry: dict) -> str:
     if entry.get("thumbnail"):
         return entry["thumbnail"]
@@ -207,7 +233,7 @@ def probe(url: str, cache_dir: str, cookie_file: str = "") -> str:
 
 
 def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = "",
-             adult_ok: bool = False):
+             adult_ok: bool = False, subtitles: str = ""):
     """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno, brzina, preostalo) i isCancelled().
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
@@ -229,7 +255,7 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
                "progress_hooks": [hook], "logger": log, "verbose": False, "dump_intermediate_pages": False}
     _with_cookies(options, cookie_file)
     try:
-        return _run(url, kind, work_dir, options, part, log, height, adult_ok)
+        return _run(url, kind, work_dir, options, part, log, height, adult_ok, subtitles)
     except Exception as error:
         log.error(f"{type(error).__name__}: {error}")
         raise
@@ -254,7 +280,7 @@ def listener_cancelled(options) -> bool:
     return any(getattr(hook, "cancelled", lambda: False)() for hook in options["progress_hooks"])
 
 
-def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False):
+def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False, subtitles=""):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=False)
         if info.get("_type") == "playlist":  # prototip: iz plejliste samo prvi video
@@ -274,6 +300,9 @@ def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False):
                  for spec in specs]
         weights = [size / sum(sizes) for size in sizes] if all(sizes) else [1 / len(specs)] * len(specs)
         paths = []
+        subtitle_files = []
+        # `subtitles` = jezik aplikacije ("" = bez titlova); titlovi se preuzimaju samo uz sliku (prvi dio).
+        subtitle_keys = pick_subtitles(info, subtitle_languages(subtitles)) if subtitles and kind == "video" else []
         finished = 0  # stvarni bajtovi završenih dijelova
         for index, spec in enumerate(specs):
             part.update(before=sum(weights[:index]), weight=weights[index], done_before=finished,
@@ -282,6 +311,9 @@ def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False):
             ydl.params["format"] = spec
             ydl.format_selector = ydl.build_format_selector(spec)
             ydl.params["outtmpl"] = {"default": os.path.join(work_dir, f"dio{index}.%(ext)s")}
+            with_subs = bool(subtitle_keys) and index == 0
+            ydl.params.update(writesubtitles=with_subs, writeautomaticsub=with_subs,
+                              subtitleslangs=subtitle_keys if with_subs else [], subtitlesformat="srt/vtt/best")
             # Link se čita ponovo pa odmah preuzima: kopija ranije pročitanih podataka daje YouTubeu HTTP 403.
             result = ydl.extract_info(url, download=True)
             downloads = result.get("requested_downloads") or []
@@ -290,12 +322,16 @@ def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False):
                 if _has_video(selected) or not _has_audio(selected) or selected.get("ext") != "m4a":
                     raise ValueError("AUDIO_UNAVAILABLE")
             paths.append(downloads[-1]["filepath"] if downloads else result.get("filepath"))
+            if with_subs:
+                for sub in (result.get("requested_subtitles") or {}).values():
+                    if sub.get("filepath") and os.path.isfile(sub["filepath"]):
+                        subtitle_files.append(sub["filepath"])
             if paths[-1] and os.path.isfile(paths[-1]):
                 finished += os.path.getsize(paths[-1])
 
     title = info.get("title") or info.get("id") or "video"
     name = f"{sanitize_filename(title).strip()[:120].rstrip('. ') or 'video'} [{info.get('id', '')}]"
-    return [title, name, paths[0], paths[1] if len(paths) > 1 else ""]
+    return [title, name, paths[0], paths[1] if len(paths) > 1 else "", "|".join(subtitle_files)]
 
 
 def clean_diagnostics(cache_dir: str) -> None:

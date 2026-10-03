@@ -63,6 +63,8 @@ object MediaSaver {
         "m4a" -> "audio/mp4"
         "mp3" -> "audio/mpeg"
         "opus", "ogg" -> "audio/ogg"
+        "srt" -> "application/x-subrip"
+        "vtt" -> "text/vtt"
         else -> if (isAudio) "audio/*" else "video/*"
     }
 }

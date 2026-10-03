@@ -141,4 +141,10 @@
     <string name="parental_pin_wrong">Falsche PIN.</string>
     <string name="parental_blocked">Durch Jugendschutz gesperrt (18+).</string>
     <string name="parental_save">Speichern</string>
+    <string name="subtitles_option">Untertitel</string>
+    <string name="subtitles_note">App-Sprache und Englisch, als eigene Datei neben dem Video (in Downloads)</string>
+    <string name="clip_option">Nur einen Teil des Videos</string>
+    <string name="clip_note">Von–bis (z. B. 0:30–2:15); beginnt am nächsten Bild einige Sekunden früher</string>
+    <string name="clip_from">Von</string>
+    <string name="clip_to">Bis</string>
 </resources>

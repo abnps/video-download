@@ -181,5 +181,26 @@ class AndroidAdultAndPlaylistTest(unittest.TestCase):
             vd_core.playlist_json({"entries": [{"url": "x"}]}, "u")
 
 
+
+class AndroidSubtitlesTest(unittest.TestCase):
+    """Titlovi: isti jezici i isti izbor kao na računaru (videodl/presets.py)."""
+
+    def test_same_choice_as_desktop(self):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from videodl import presets
+        infos = [
+            {"subtitles": {"en": [], "de": []}, "automatic_captions": {"bs": [], "en-orig": []}},
+            {"subtitles": {}, "automatic_captions": {"en": [], "hr": [], "sr-orig": []}},
+            {"subtitles": {"en-GB": [], "live_chat": []}},
+            {},
+        ]
+        for language in ("bs", "en", "de", "es", "fr"):
+            for info in infos:
+                with self.subTest(language=language, info=info):
+                    self.assertEqual(vd_core.subtitle_languages(language), presets.subtitle_languages(language))
+                    self.assertEqual(vd_core.pick_subtitles(info, vd_core.subtitle_languages(language)),
+                                     presets.pick_subtitles(info, presets.subtitle_languages(language)))
+
+
 if __name__ == "__main__":
     unittest.main()

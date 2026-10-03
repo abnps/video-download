@@ -144,4 +144,10 @@
     <string name="parental_pin_wrong">Pogrešan PIN.</string>
     <string name="parental_blocked">Blokirano roditeljskom zaštitom (18+).</string>
     <string name="parental_save">Sačuvaj</string>
+    <string name="subtitles_option">Titlovi</string>
+    <string name="subtitles_note">Jezik aplikacije i engleski, kao poseban fajl pored videa (u Preuzimanjima)</string>
+    <string name="clip_option">Samo dio videa</string>
+    <string name="clip_note">Od–do (npr. 0:30–2:15); počinje od najbližeg kadra par sekundi ranije</string>
+    <string name="clip_from">Od</string>
+    <string name="clip_to">Do</string>
 </resources>

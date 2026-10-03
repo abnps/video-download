@@ -268,6 +268,11 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     }
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
+    var subtitles by remember { mutableStateOf(false) }
+    var clip by remember { mutableStateOf(false) }
+    var clipFrom by remember { mutableStateOf("") }
+    var clipTo by remember { mutableStateOf("") }
+    val clipRange = parseClip(clipFrom, clipTo, info.duration)
     // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
     val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
     Column(Modifier.fillMaxSize()) {
@@ -308,6 +313,19 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                     val title = if (option.label > 0) "${option.label}p" else stringResource(R.string.best_quality)
                     OptionRow(option == chosen, title, sizeText("MP4", option.size)) { chosen = option }
                 }
+                CheckRow(subtitles, stringResource(R.string.subtitles_option), stringResource(R.string.subtitles_note)) {
+                    subtitles = it
+                }
+            }
+            CheckRow(clip, stringResource(R.string.clip_option), stringResource(R.string.clip_note)) { clip = it }
+            if (clip) Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(clipFrom, { clipFrom = it.take(8) }, Modifier.weight(1f), singleLine = true,
+                    label = { Text(stringResource(R.string.clip_from)) }, placeholder = { Text("0:30") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(clipTo, { clipTo = it.take(8) }, Modifier.weight(1f), singleLine = true,
+                    label = { Text(stringResource(R.string.clip_to)) }, placeholder = { Text(formatDuration(info.duration)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = (clipFrom.isNotBlank() || clipTo.isNotBlank()) && clipRange == null)
             }
             CardBox(Modifier.fillMaxWidth(), onClick = { pickLocation = true }) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -323,10 +341,12 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
         }
         Button(onClick = {
             val label = if (audio) (if (mp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
+            val range = if (clip) clipRange else null
             val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
-                if (audio) 0 else chosen.height, label, adult = info.adult)
+                if (audio) 0 else chosen.height, label, adult = info.adult, subtitles = subtitles && !audio,
+                clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1)
             if (info.adult) askAdult = job else onDownload(job)
-        }, enabled = !blockedByParental, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
+        }, enabled = !blockedByParental && (!clip || clipRange != null), modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
             shape = RoundedCornerShape(12.dp)) {
             AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
             Text(stringResource(if (audio) R.string.download_btn_audio else R.string.download_btn_video),
@@ -800,4 +820,33 @@ private fun ParentalDialog(enabled: Boolean, onCancel: () -> Unit, onSave: (Bool
             }) { Text(stringResource(R.string.parental_save)) }
         },
         dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
+}
+
+
+/** Red s kvačicom i kratkim objašnjenjem (titlovi, isječak). */
+@Composable
+private fun CheckRow(checked: Boolean, title: String, note: String, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable { onChange(!checked) }, verticalAlignment = Alignment.CenterVertically) {
+        Checkbox(checked = checked, onCheckedChange = onChange)
+        Column(Modifier.weight(1f)) {
+            Text(title)
+            Text(note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+/** „2:30", „150" ili „1:02:03" u sekunde; null ako nije ispravno. */
+fun parseClock(text: String): Int? {
+    val parts = text.trim().split(":")
+    if (parts.isEmpty() || parts.size > 3 || parts.any { it.isEmpty() || !it.all(Char::isDigit) }) return null
+    val numbers = parts.map { it.toIntOrNull() ?: return null }
+    if (numbers.drop(1).any { it >= 60 }) return null
+    return numbers.fold(0) { total, value -> total * 60 + value }
+}
+
+/** Isječak od–do (prazno „do" = do kraja); null kad nije ispravan ili je van trajanja videa. */
+fun parseClip(from: String, to: String, duration: Int): Pair<Int, Int>? {
+    val start = if (from.isBlank()) 0 else parseClock(from) ?: return null
+    val end = if (to.isBlank()) duration else parseClock(to) ?: return null
+    return if (start >= 0 && end > start && (duration <= 0 || end <= duration)) start to end else null
 }

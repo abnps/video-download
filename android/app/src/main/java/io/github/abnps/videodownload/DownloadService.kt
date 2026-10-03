@@ -64,7 +64,7 @@ class DownloadService : Service() {
             val cookies = SiteLogin.cookieFile(work)
             val result = Python.getInstance().getModule("vd_core").callAttr(
                 "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
-                cookies, job.adultOk,
+                cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "",
             ).asList()
             val name = result[1].toString()
             val first = File(result[2].toString())
@@ -77,11 +77,20 @@ class DownloadService : Service() {
             } else {
                 File(work, "$name.${first.extension}").also { check(first.renameTo(it)) { "Privremeni fajl nije premješten" } }
             }
+            if (job.hasClip) {
+                // Isječak bez ffmpeg-a (Muxer.trim); ime kao na računaru: „Naslov [id] (2.30–6.10).mp4".
+                Downloads.update(job.id) { it.copy(phase = Phase.SAVING) }
+                notify(progressNotification(getString(R.string.status_saving), null))
+                val clip = File(work, "$name (${clipLabel(job.clipStart)}–${clipLabel(job.clipEnd)}).${file.extension}")
+                Muxer.trim(file, clip, job.clipStart * 1_000_000L, job.clipEnd * 1_000_000L) { job.id in cancelled }
+                file.delete()
+                file = clip
+            }
             if (job.isAudio && job.label == MP3_LABEL) {
                 // MP3 se pravi na telefonu iz preuzetog M4A (LAME, 192 kbps); M4A ostaje samo privremeno.
                 Downloads.update(job.id) { it.copy(phase = Phase.CONVERTING, fraction = 0f, done = 0, total = 0) }
                 notify(progressNotification(getString(R.string.status_converting), null))
-                val mp3 = File(work, "$name.mp3")
+                val mp3 = File(work, "${file.nameWithoutExtension}.mp3")
                 var last = 0L
                 Mp3.convert(file, mp3, { job.id in cancelled }) { fraction ->
                     val now = SystemClock.elapsedRealtime()
@@ -98,7 +107,16 @@ class DownloadService : Service() {
             }
             if (job.id in cancelled) throw CancelledHere()
             val size = file.length()
-            val uri = MediaSaver.save(this, file, job.isAudio, Settings.location(this)) { job.id in cancelled }
+            // Titlovi su tekst: MediaStore ih prima samo u Download/, pa tada i video ide tamo (plejer ih nađe zajedno).
+            val subtitleFiles = result.getOrNull(4)?.toString().orEmpty().split("|").filter { it.isNotEmpty() }.map(::File)
+                .filter { it.isFile }
+            val location = if (subtitleFiles.isNotEmpty()) SaveLocation.DOWNLOADS else Settings.location(this)
+            val uri = MediaSaver.save(this, file, job.isAudio, location) { job.id in cancelled }
+            subtitleFiles.forEach { sub ->
+                // „dio0.en.srt" → „Naslov [id].en.srt" (isto ime kao video, da ga plejer učita sam)
+                val renamed = File(work, file.nameWithoutExtension + "." + sub.name.substringAfter("."))
+                if (sub.renameTo(renamed)) runCatching { MediaSaver.save(this, renamed, false, SaveLocation.DOWNLOADS) }
+            }
             if (job.id in cancelled) {
                 contentResolver.delete(uri, null, null)
                 throw CancelledHere()
@@ -142,6 +160,14 @@ class DownloadService : Service() {
     }
 
     private class CancelledHere : Exception()
+
+    /** 150 → „2.30", 3723 → „1.02.03" (kao section_label na računaru: dvotačka nije dozvoljena u imenu fajla). */
+    private fun clipLabel(seconds: Int): String {
+        val h = seconds / 3600
+        val m = seconds % 3600 / 60
+        val s = seconds % 60
+        return if (h > 0) "%d.%02d.%02d".format(h, m, s) else "%d.%02d".format(m, s)
+    }
 
     private fun formatLabel(job: Job, extension: String): String =
         if (job.isAudio || job.label.isBlank() || job.label.equals(extension, ignoreCase = true)) extension.uppercase()

@@ -144,4 +144,10 @@
     <string name="parental_pin_wrong">Code PIN incorrect.</string>
     <string name="parental_blocked">Bloqué par le contrôle parental (18+).</string>
     <string name="parental_save">Enregistrer</string>
+    <string name="subtitles_option">Sous-titres</string>
+    <string name="subtitles_note">Langue de l\'application et anglais, en fichier séparé à côté de la vidéo (dans Téléchargements)</string>
+    <string name="clip_option">Seulement une partie de la vidéo</string>
+    <string name="clip_note">De–à (p. ex. 0:30–2:15) ; commence à l\'image la plus proche quelques secondes avant</string>
+    <string name="clip_from">De</string>
+    <string name="clip_to">À</string>
 </resources>

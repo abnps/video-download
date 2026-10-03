@@ -59,6 +59,13 @@ object Links {
     const val CONTACT_EMAIL = "abnpsdev@gmail.com"
     private const val SITE = "https://abnps.github.io/video-download/"
 
+    /** Jezik aplikacije kao na računaru: bs (i za sr, hr), de, es, fr, inače en. */
+    fun language(): String = when (val code = java.util.Locale.getDefault().language) {
+        "sr", "hr", "bs" -> "bs"
+        "de", "es", "fr" -> code
+        else -> "en"
+    }
+
     fun site(page: String): String {
         val language = when (val code = java.util.Locale.getDefault().language) {
             "sr", "hr", "bs" -> "bs"
