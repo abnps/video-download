@@ -188,9 +188,20 @@ def copy_to_installers_repo(tag: str) -> None:
     with tempfile.TemporaryDirectory(prefix="videodl-winget-") as temp:
         run("gh", "release", "download", tag, "--repo", REPO, "--dir", temp,
             *[arg for name in names for arg in ("--pattern", name)])
-        run("gh", "release", "create", tag, *(str(Path(temp) / name) for name in names), "--repo", INSTALLERS_REPO,
-            "--title", f"Video Download {version} (Windows installer)",
-            "--notes", f"Same installer as https://github.com/{REPO}/releases/tag/{tag}")
+        files = [str(Path(temp) / name) for name in names]
+        try:
+            run("gh", "release", "view", tag, "--repo", INSTALLERS_REPO, "--json", "tagName")
+            exists = True
+        except subprocess.CalledProcessError:
+            exists = False
+        if exists:
+            # Prekinut raniji pokušaj (0.9.8, 3.10.2026: ostao nacrt bez instalera): dopuni i objavi isto izdanje.
+            run("gh", "release", "upload", tag, *files, "--repo", INSTALLERS_REPO, "--clobber")
+            run("gh", "release", "edit", tag, "--repo", INSTALLERS_REPO, "--draft=false")
+        else:
+            run("gh", "release", "create", tag, *files, "--repo", INSTALLERS_REPO,
+                "--title", f"Video Download {version} (Windows installer)",
+                "--notes", f"Same installer as https://github.com/{REPO}/releases/tag/{tag}")
     print(f"Instaler {version} je i u {INSTALLERS_REPO} (winget).")
 
 
@@ -229,8 +240,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tag", required=True, help="tačan tag postojećeg nacrta, npr. v0.9.8")
     parser.add_argument("--publish", action="store_true", help="poslije uspješne provjere objavi nacrt")
+    parser.add_argument("--installers-only", action="store_true",
+                        help="samo ponovi kopiju instalera za winget (kad je pala poslije objave)")
     args = parser.parse_args()
     try:
+        if args.installers_only:
+            check_tag(args.tag)
+            copy_to_installers_repo(args.tag)
+            return 0
         validate_draft(args.tag, publish=args.publish)
     except (ReleaseError, release_signing.SignatureError, OSError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"Izdanje nije objavljeno: {exc}", file=sys.stderr)

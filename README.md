@@ -78,7 +78,9 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    prethodno izdanje sam vrati u nacrt (ne briše ga).
 
 7. **winget** (`winget install abnps.VideoDownload`): `--publish` sam kopira instaler u
-   `abnps/video-download-installers` (stalni link). Zatim novi opis paketa: kopiraj `tools/winget/*.yaml`, promijeni
+   `abnps/video-download-installers` (stalni link). Ako ta kopija pukne poslije objave, ponovi samo nju:
+   `python tools/publish_release.py --tag v<verzija> --installers-only` (dopuni postojeće izdanje, ne pravi drugo).
+   Provjera bez `--publish` poslije objave uvijek pada: tada nema prethodnog izdanja za poređenje (nije kvar). Zatim novi opis paketa: kopiraj `tools/winget/*.yaml`, promijeni
    `PackageVersion`, `ReleaseDate`, `InstallerUrl` i `InstallerSha256`, provjeri s `winget validate --manifest <folder>`
    i pošalji pull request u `microsoft/winget-pkgs` (folder `manifests/a/abnps/VideoDownload/<verzija>`).
 

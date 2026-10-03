@@ -1,5 +1,6 @@
 """Provjere nacrta izdanja ne smiju pokrenuti objavu kada neki fajl nedostaje."""
 
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -30,7 +31,12 @@ class ReleaseReadinessTest(unittest.TestCase):
 
     def test_publish_moves_previous_release_to_draft(self):
         # Javno je samo posljednje izdanje: novo postaje latest, prethodno ide u nacrt (ne briše se).
-        with patch.object(publish_release, "run", return_value="v0.9.7") as run:
+        def fake_run(*args, **kwargs):
+            if args[1:3] == ("release", "view") and publish_release.INSTALLERS_REPO in args:
+                raise subprocess.CalledProcessError(1, args)  # u repou za winget izdanja još nema
+            return "v0.9.7"
+
+        with patch.object(publish_release, "run", side_effect=fake_run) as run:
             publish_release.publish_latest("v0.9.8")
         edits = [call.args for call in run.call_args_list if call.args[2] == "edit"]
         self.assertEqual(edits[0][3:], ("v0.9.8", "--repo", publish_release.REPO, "--draft=false", "--latest"))
@@ -41,6 +47,18 @@ class ReleaseReadinessTest(unittest.TestCase):
         self.assertEqual(len(create), 1)
         self.assertIn(publish_release.INSTALLERS_REPO, create[0])
         self.assertTrue(any(str(arg).endswith("VideoDownload-Setup-0.9.8.exe") for arg in create[0]))
+
+    def test_interrupted_installers_copy_is_completed_not_duplicated(self):
+        # 0.9.8: kopija za winget pala usred slanja i ostala nacrt; ponovni pokušaj dopuni i objavi to izdanje.
+        with patch.object(publish_release, "run", return_value="") as run:
+            publish_release.copy_to_installers_repo("v0.9.8")
+        steps = [call.args[1:3] for call in run.call_args_list]
+        self.assertNotIn(("release", "create"), steps)
+        upload = next(call.args for call in run.call_args_list if call.args[1:3] == ("release", "upload"))
+        self.assertIn("--clobber", upload)
+        self.assertIn(publish_release.INSTALLERS_REPO, upload)
+        edit = next(call.args for call in run.call_args_list if call.args[1:3] == ("release", "edit"))
+        self.assertIn("--draft=false", edit)
 
     def test_mac_signature_is_required_and_made_from_the_draft_dmg(self):
         # Plan 1.0, tačka 7: bez release-macos.json(.sig) Mac ne može sam preći na novo izdanje.

@@ -307,3 +307,13 @@ PayPal probna uplata 1 €; izvještaj prijatelja s Macom i prvi utisci s Androi
 brisanje starih nacrta 0.9.4/0.9.5 (traži potvrdu); čišćenje e-maila u `abnps/.github` i GitHub privatnost
 e-maila; prazan stari OneDrive folder (briše Ahmed); Trusted Signing (ponuđeno istraživanje).
 Kasnije: roditeljska zaštita (blokada 18+ + PIN), privatni repo, Video Toolkit.
+
+## Izdanje 0.9.8 / Android 0.2.4 (objavljeno 3.10.2026, Ahmed: „kreni")
+
+- Javno: v0.9.8 sa 14 fajlova (Windows, Mac + `release-macos.json`, Android 0.2.4); v0.9.7 vraćena u nacrt;
+  winget repo ima 0.9.8. Winget PR za 0.9.7 (#445943) još čeka moderatora; opis za 0.9.8 tek poslije njega.
+- Naučeno: GitHub `releases/tags/<tag>` NE vraća nacrte (popravljeno u `publish_release.draft` i `macos.yml`).
+  Skripte objave traže HEAD = commit taga; ako popravka alata dođe poslije taga, tag se pomjera (to radi Ahmed,
+  agentu je force push zabranjen). Kopija za winget se ponavlja s `--installers-only`.
+- Prvo samostalno ažuriranje na Macu: 0.9.8 → sljedeće izdanje (pratiti izvještaje).
+
