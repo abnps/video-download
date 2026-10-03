@@ -61,7 +61,7 @@ class DownloadService : Service() {
             Downloads.update(job.id) { it.copy(phase = Phase.READING) }
             notify(progressNotification(job.title, null))
             // Kolačići Instagram prijave (ako postoji) idu u privremeni fajl u `work`, koji se briše na kraju.
-            val cookies = SiteLogin.cookieFile(work)
+            val cookies = SiteLogin.cookieFile(work, job.url)
             val result = Python.getInstance().getModule("vd_core").callAttr(
                 "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
                 cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "",

@@ -38,22 +38,36 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+/** Sajtovi na koje se korisnik može prijaviti (Ahmed 2.10. Instagram, 3.10.2026 TikTok); svaki ima svoje kolačiće. */
+enum class LoginSite(val loginUrl: String, val siteUrl: String, val domain: String, val host: String,
+                     val title: Int, val offText: Int, val button: Int, val logoutTitle: Int) {
+    INSTAGRAM("https://www.instagram.com/accounts/login/", "https://www.instagram.com", ".instagram.com", "instagram.com",
+        R.string.login_title, R.string.login_off, R.string.login_button, R.string.logout_title),
+    TIKTOK("https://www.tiktok.com/login", "https://www.tiktok.com", ".tiktok.com", "tiktok.com",
+        R.string.login_title_tiktok, R.string.login_off_tiktok, R.string.login_button_tiktok, R.string.logout_title_tiktok);
+
+    companion object {
+        /** Sajt kojem link pripada (i kratki linkovi, npr. vt.tiktok.com), ili null. */
+        fun forUrl(url: String): LoginSite? {
+            val host = runCatching { java.net.URI(url.trim()).host }.getOrNull()?.lowercase()?.removePrefix("www.") ?: return null
+            return entries.firstOrNull { host == it.host || host.endsWith("." + it.host) }
+        }
+    }
+}
+
 /**
- * Prijava na Instagram za yt-dlp. Instagram često odbija čitanje bez prijave („Sajt traži prijavu ili potvrdu"),
- * pa se korisnik SAM prijavi u ugrađenom pregledniku (aplikacija nikad ne vidi ni ne pamti lozinku). Kolačići
- * ostaju samo u WebView-u aplikacije; za svako čitanje/preuzimanje pravi se privremeni Netscape fajl za yt-dlp
+ * Prijava za yt-dlp kad sajt odbija čitanje bez nje („Sajt traži prijavu ili potvrdu"): korisnik se SAM prijavi u
+ * ugrađenom pregledniku (aplikacija nikad ne vidi ni ne pamti lozinku). Kolačići ostaju samo u WebView-u aplikacije;
+ * za svako čitanje/preuzimanje pravi se privremeni Netscape fajl SAMO s kolačićima sajta kojem link pripada,
  * koji se briše čim posao završi. Kolačići se nikad ne upisuju u dnevnik ni u izvještaj.
  */
 object SiteLogin {
-    const val LOGIN_URL = "https://www.instagram.com/accounts/login/"
-    private const val SITE_URL = "https://www.instagram.com"
-    private const val DOMAIN = ".instagram.com"
     private const val MAX_COOKIES = 100
     private const val FILE_DAYS = 30L
 
     /** Raščlanjeni kolačići „ime=vrijednost; …" iz WebView-a (bez neispravnih i prevelikih). */
-    private fun cookies(): List<Pair<String, String>> {
-        val raw = onMainThread { runCatching { CookieManager.getInstance().getCookie(SITE_URL) }.getOrNull().orEmpty() }
+    private fun cookies(site: LoginSite): List<Pair<String, String>> {
+        val raw = onMainThread { runCatching { CookieManager.getInstance().getCookie(site.siteUrl) }.getOrNull().orEmpty() }
         return raw.split(";").mapNotNull { part ->
             val index = part.indexOf('=')
             if (index <= 0) return@mapNotNull null
@@ -76,41 +90,49 @@ object SiteLogin {
         return result.get() ?: block()
     }
 
-    /** Prijavljen = Instagram je postavio kolačić sesije. */
-    fun isLoggedIn(): Boolean = cookies().any { it.first == "sessionid" && it.second.isNotEmpty() }
+    /** Prijavljen = sajt je postavio kolačić sesije (i Instagram i TikTok ga zovu „sessionid"). */
+    fun isLoggedIn(site: LoginSite): Boolean = cookies(site).any { it.first == "sessionid" && it.second.isNotEmpty() }
 
     /**
-     * Privremeni cookies fajl u `dir` (poziva se iz posla koji ga sam briše), ili "" ako korisnik nije prijavljen.
-     * yt-dlp kolačiće s domenom .instagram.com šalje SAMO Instagramu, pa se fajl može dati svakom linku.
+     * Privremeni cookies fajl u `dir` (poziva se iz posla koji ga sam briše) s kolačićima SAMO sajta kojem `url`
+     * pripada, ili "" kad link nije sa sajta s prijavom ili korisnik tamo nije prijavljen.
      */
-    fun cookieFile(dir: File): String {
-        val list = cookies()
+    fun cookieFile(dir: File, url: String): String {
+        val site = LoginSite.forUrl(url) ?: return ""
+        val list = cookies(site)
         if (list.none { it.first == "sessionid" }) return ""
         val expires = System.currentTimeMillis() / 1000 + FILE_DAYS * 24 * 3600
         val file = File(dir, "kolacici-${System.nanoTime()}.txt")
         file.bufferedWriter().use { out ->
             out.write("# Netscape HTTP Cookie File\n")
             for ((name, value) in list) {
-                out.write(listOf(DOMAIN, "TRUE", "/", "TRUE", expires.toString(), name, value).joinToString("\t"))
+                out.write(listOf(site.domain, "TRUE", "/", "TRUE", expires.toString(), name, value).joinToString("\t"))
                 out.write("\n")
             }
         }
         return file.absolutePath
     }
 
-    /** Odjava: brišu se samo Instagramovi kolačići (ostali sajtovi ostaju netaknuti). */
-    fun logout() {
+    /** Odjava: brišu se samo kolačići tog sajta (ostali sajtovi ostaju netaknuti). */
+    fun logout(site: LoginSite) {
         val manager = CookieManager.getInstance()
-        for ((name, _) in cookies()) {
-            manager.setCookie(SITE_URL, "$name=; Max-Age=0; Path=/; Domain=$DOMAIN")
-            manager.setCookie(SITE_URL, "$name=; Max-Age=0; Path=/")
+        for ((name, _) in cookies(site)) {
+            manager.setCookie(site.siteUrl, "$name=; Max-Age=0; Path=/; Domain=${site.domain}")
+            manager.setCookie(site.siteUrl, "$name=; Max-Age=0; Path=/")
         }
         manager.flush()
     }
 }
 
-/** Ugrađeni preglednik samo za prijavu na Instagram; zatvara se sam čim prijava uspije (ili dugmetom Gotovo). */
+/** Ugrađeni preglednik samo za prijavu na jedan sajt (EXTRA_SITE); zatvara se sam čim prijava uspije. */
 class LoginActivity : ComponentActivity() {
+    companion object {
+        const val EXTRA_SITE = "site"
+    }
+
+    private val site by lazy {
+        runCatching { LoginSite.valueOf(intent.getStringExtra(EXTRA_SITE).orEmpty()) }.getOrDefault(LoginSite.INSTAGRAM)
+    }
     private var webView: WebView? = null
     private var finished = false
     private var loading by mutableStateOf(true)
@@ -128,7 +150,7 @@ class LoginActivity : ComponentActivity() {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.login_button), style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(site.button), style = MaterialTheme.typography.titleMedium)
                                 Text(stringResource(R.string.login_note), style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
@@ -180,7 +202,7 @@ class LoginActivity : ComponentActivity() {
                                         if (request.isForMainFrame) failed = true
                                     }
                                 }
-                                loadUrl(SiteLogin.LOGIN_URL)
+                                loadUrl(site.loginUrl)
                             }
                         })
                     }
@@ -190,14 +212,14 @@ class LoginActivity : ComponentActivity() {
     }
 
     private fun check() {
-        if (SiteLogin.isLoggedIn()) done()
+        if (SiteLogin.isLoggedIn(site)) done()
     }
 
     private fun done() {
         if (finished) return
         finished = true
         CookieManager.getInstance().flush()
-        if (SiteLogin.isLoggedIn()) Toast.makeText(this, R.string.login_on, Toast.LENGTH_SHORT).show()
+        if (SiteLogin.isLoggedIn(site)) Toast.makeText(this, R.string.login_on, Toast.LENGTH_SHORT).show()
         finish()
     }
 

@@ -147,4 +147,8 @@
     <string name="clip_note">Von–bis (z. B. 0:30–2:15); beginnt am nächsten Bild einige Sekunden früher</string>
     <string name="clip_from">Von</string>
     <string name="clip_to">Bis</string>
+    <string name="login_title_tiktok">TikTok-Konto</string>
+    <string name="login_off_tiktok">Für TikTok-Videos anmelden</string>
+    <string name="login_button_tiktok">Bei TikTok anmelden</string>
+    <string name="logout_title_tiktok">Von TikTok abmelden?</string>
 </resources>

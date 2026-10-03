@@ -150,4 +150,8 @@
     <string name="clip_note">De–à (p. ex. 0:30–2:15) ; commence à l\'image la plus proche quelques secondes avant</string>
     <string name="clip_from">De</string>
     <string name="clip_to">À</string>
+    <string name="login_title_tiktok">Compte TikTok</string>
+    <string name="login_off_tiktok">Connectez-vous pour les vidéos TikTok</string>
+    <string name="login_button_tiktok">Se connecter à TikTok</string>
+    <string name="logout_title_tiktok">Se déconnecter de TikTok ?</string>
 </resources>

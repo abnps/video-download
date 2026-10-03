@@ -75,12 +75,12 @@ import java.util.Calendar
 @Composable
 fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocation, onLocation: (SaveLocation) -> Unit,
                    onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, onFeedback: () -> Unit,
-                   instagram: Boolean, onLogin: () -> Unit, onLogout: () -> Unit, appVersion: String,
+                   loggedIn: Set<LoginSite>, onLogin: (LoginSite) -> Unit, onLogout: (LoginSite) -> Unit, appVersion: String,
                    readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit,
                    onBack: () -> Unit) {
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
-    var askLogout by remember { mutableStateOf(false) }
+    var askLogout by remember { mutableStateOf<LoginSite?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var parentalOn by remember { mutableStateOf(Parental.enabled(context)) }
@@ -102,9 +102,11 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_language, stringResource(R.string.set_language),
             LocalConfiguration.current.locales[0].displayLanguage,
             onClick = onLanguage)
-        SettingRow(R.drawable.ic_link, stringResource(R.string.login_title),
-            stringResource(if (instagram) R.string.login_on else R.string.login_off)) {
-            if (instagram) askLogout = true else onLogin()
+        LoginSite.entries.forEach { site ->
+            SettingRow(R.drawable.ic_link, stringResource(site.title),
+                stringResource(if (site in loggedIn) R.string.login_on else site.offText)) {
+                if (site in loggedIn) askLogout = site else onLogin(site)
+            }
         }
         SettingRow(R.drawable.ic_info, stringResource(R.string.parental_title),
             stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off)) {
@@ -136,11 +138,11 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         parentalOn = on
         editParental = false
     }
-    if (askLogout) {
-        AlertDialog(onDismissRequest = { askLogout = false },
-            title = { Text(stringResource(R.string.logout_title)) },
-            confirmButton = { TextButton(onClick = { onLogout(); askLogout = false }) { Text(stringResource(R.string.logout)) } },
-            dismissButton = { TextButton(onClick = { askLogout = false }) { Text(stringResource(R.string.dialog_cancel)) } })
+    askLogout?.let { site ->
+        AlertDialog(onDismissRequest = { askLogout = null },
+            title = { Text(stringResource(site.logoutTitle)) },
+            confirmButton = { TextButton(onClick = { onLogout(site); askLogout = null }) { Text(stringResource(R.string.logout)) } },
+            dismissButton = { TextButton(onClick = { askLogout = null }) { Text(stringResource(R.string.dialog_cancel)) } })
     }
     if (pickQuality) {
         AlertDialog(onDismissRequest = { pickQuality = false }, confirmButton = {},

@@ -150,4 +150,8 @@
     <string name="clip_note">Desde–hasta (p. ej. 0:30–2:15); empieza en el fotograma más cercano unos segundos antes</string>
     <string name="clip_from">Desde</string>
     <string name="clip_to">Hasta</string>
+    <string name="login_title_tiktok">Cuenta de TikTok</string>
+    <string name="login_off_tiktok">Inicia sesión para vídeos de TikTok</string>
+    <string name="login_button_tiktok">Iniciar sesión en TikTok</string>
+    <string name="logout_title_tiktok">¿Cerrar sesión en TikTok?</string>
 </resources>

@@ -81,7 +81,8 @@ fun HomeScreen(
     finding: Boolean,
     error: String?,
     onCopyReport: () -> Unit,
-    onLogin: (() -> Unit)?,
+    loginSite: LoginSite?,
+    onLogin: (LoginSite) -> Unit,
     history: List<HistoryItem>,
     onShowAll: () -> Unit,
     actions: ItemActions,
@@ -136,8 +137,9 @@ fun HomeScreen(
                 if (error != null) {
                     Text(stringResource(R.string.status_failed, error), color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium)
-                    if (onLogin != null) {
-                        FilledTonalButton(onClick = onLogin) { Text(stringResource(R.string.login_button)) }
+                    // Prijava samo za sajt kojem link pripada (Instagram ili TikTok).
+                    if (loginSite != null) {
+                        FilledTonalButton(onClick = { onLogin(loginSite) }) { Text(stringResource(loginSite.button)) }
                     }
                     TextButton(onClick = onCopyReport) { Text(stringResource(R.string.copy_report)) }
                 }

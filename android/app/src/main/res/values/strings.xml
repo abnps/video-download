@@ -148,4 +148,8 @@
     <string name="clip_note">From–to (e.g. 0:30–2:15); starts at the nearest frame a few seconds earlier</string>
     <string name="clip_from">From</string>
     <string name="clip_to">To</string>
+    <string name="login_title_tiktok">TikTok account</string>
+    <string name="login_off_tiktok">Sign in for TikTok videos</string>
+    <string name="login_button_tiktok">Sign in to TikTok</string>
+    <string name="logout_title_tiktok">Sign out of TikTok?</string>
 </resources>

@@ -150,4 +150,8 @@
     <string name="clip_note">Od–do (npr. 0:30–2:15); počinje od najbližeg kadra par sekundi ranije</string>
     <string name="clip_from">Od</string>
     <string name="clip_to">Do</string>
+    <string name="login_title_tiktok">TikTok nalog</string>
+    <string name="login_off_tiktok">Prijavi se za TikTok video snimke</string>
+    <string name="login_button_tiktok">Prijavi se na TikTok</string>
+    <string name="logout_title_tiktok">Odjaviti se sa TikToka?</string>
 </resources>

@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
     private val quality = mutableIntStateOf(0)
     private var autoFind by mutableStateOf(false)
     private val welcome = mutableStateOf(false)
-    private val instagram = mutableStateOf(false)
+    private val loggedIn = mutableStateOf(emptySet<LoginSite>()) // na koje sajtove je korisnik prijavljen
     private val playlist = mutableStateOf<PlaylistInfo?>(null)
     private val askAdultFor = mutableStateOf<List<Job>>(emptyList()) // 18+ koji čekaju potvrdu (jedan prozor)
 
@@ -77,12 +77,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        instagram.value = SiteLogin.isLoggedIn() // osvježi i poslije povratka s ekrana prijave
+        loggedIn.value = LoginSite.entries.filter { SiteLogin.isLoggedIn(it) }.toSet() // i poslije povratka s prijave
     }
 
-    private fun openLogin() {
+    private fun openLogin(site: LoginSite) {
         findError.value = null
-        startActivity(Intent(this, LoginActivity::class.java))
+        startActivity(Intent(this, LoginActivity::class.java).putExtra(LoginActivity.EXTRA_SITE, site.name))
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
         findError.value = null
         try {
             val json = withContext(Dispatchers.IO) {
-                val cookies = SiteLogin.cookieFile(cacheDir)
+                val cookies = SiteLogin.cookieFile(cacheDir, url)
                 try {
                     Python.getInstance().getModule("vd_core").callAttr("probe", url, cacheDir.absolutePath, cookies)
                         .toString()
@@ -299,8 +299,8 @@ class MainActivity : ComponentActivity() {
                         onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
                         onCopyReport = { copyReport() }, history = history,
                         // Prijava postoji samo za Instagram; za druge sajtove (npr. TikTok) dugme bi zbunjivalo.
-                        onLogin = if (findError.value == getString(R.string.error_login) &&
-                            "instagram.com" in link.value.lowercase()) ({ openLogin() }) else null,
+                        loginSite = LoginSite.forUrl(link.value).takeIf { findError.value == getString(R.string.error_login) },
+                        onLogin = { openLogin(it) },
                         onShowAll = { downloadsTab.intValue = 1; tab.intValue = TAB_DOWNLOADS }, actions = actions,
                         update = update, onInstallUpdate = { installUpdate() }, onSettings = openSettings,
                     )
@@ -333,8 +333,8 @@ class MainActivity : ComponentActivity() {
                         onLocation = { location.value = it; Settings.setLocation(this@MainActivity, it) },
                         onLanguage = { openLanguage() }, onOpenLink = { openLink(it) },
                         onInvite = { scope.launch { invite() } }, onFeedback = { sendFeedback() },
-                        instagram = instagram.value, onLogin = { openLogin() },
-                        onLogout = { SiteLogin.logout(); instagram.value = false },
+                        loggedIn = loggedIn.value, onLogin = { openLogin(it) },
+                        onLogout = { site -> SiteLogin.logout(site); loggedIn.value = loggedIn.value - site },
                         update = update, onInstallUpdate = { installUpdate() },
                         onCheckUpdate = { Thread { AppUpdater.check(this@MainActivity, force = true) }.start() },
                         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty(),
