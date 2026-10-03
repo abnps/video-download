@@ -42,6 +42,49 @@ class ReleaseReadinessTest(unittest.TestCase):
         self.assertIn(publish_release.INSTALLERS_REPO, create[0])
         self.assertTrue(any(str(arg).endswith("VideoDownload-Setup-0.9.8.exe") for arg in create[0]))
 
+    def test_mac_signature_is_required_and_made_from_the_draft_dmg(self):
+        # Plan 1.0, tačka 7: bez release-macos.json(.sig) Mac ne može sam preći na novo izdanje.
+        names = publish_release.required_assets(publish_release.__version__, "0.2.0")
+        self.assertIn("release-macos.json", names)
+        self.assertIn("release-macos.json.sig", names)
+
+        import hashlib
+        import os
+        import tempfile
+
+        import sign_macos
+        from Cryptodome.PublicKey import ECC
+        from videodl import release_signing
+
+        version = publish_release.__version__
+        dmg_name = f"VideoDownload-macOS-arm64-{version}.dmg"
+        uploaded = {}
+
+        def fake_run(*args, **kwargs):
+            if args[1:3] == ("release", "download"):
+                folder = Path(args[args.index("--dir") + 1])
+                (folder / dmg_name).write_bytes(b"dmg" * 100)
+                digest = hashlib.sha256(b"dmg" * 100).hexdigest()
+                (folder / (dmg_name + ".sha256")).write_text(f"{digest}  {dmg_name}\n", encoding="ascii")
+            elif args[1:3] == ("release", "upload"):
+                for arg in args:
+                    if arg.endswith((".json", ".sig")):
+                        uploaded[Path(arg).name] = Path(arg).read_bytes()
+            return ""
+
+        key = ECC.generate(curve="ed25519")
+        with tempfile.TemporaryDirectory() as temp:
+            key_file = Path(temp) / "test-key.pem"
+            key_file.write_text(key.export_key(format="PEM"), encoding="ascii")
+            with patch.dict(os.environ, {"VIDEODL_SIGNING_KEY": str(key_file)}), \
+                    patch.object(sign_macos, "draft"), patch.object(sign_macos, "run", side_effect=fake_run):
+                sign_macos.sign_mac(f"v{version}")
+        self.assertEqual(set(uploaded), {"release-macos.json", "release-macos.json.sig"})
+        manifest = release_signing.verify_manifest(uploaded["release-macos.json"],
+                                                   uploaded["release-macos.json.sig"].decode("ascii"),
+                                                   public_keys=(release_signing.public_key_hex(key),))
+        self.assertEqual((manifest["installer"], manifest["version"]), (dmg_name, version))
+
 
 if __name__ == "__main__":
     unittest.main()

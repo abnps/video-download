@@ -6,6 +6,8 @@ Testovi zadaju sistem sami (platform="darwin"), pa prolaze i na Windowsu i na Ma
 import json
 import os
 import plistlib
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -181,6 +183,145 @@ class MacUpdateTest(unittest.TestCase):
         with mock.patch.object(updater, "PLATFORM", "win32"):
             self.assertEqual(updater.parse_release(windows_only).installer_name, "VideoDownload-Setup-9.9.9.exe")
             self.assertTrue(updater.can_self_install())
+
+
+def _fake_app(folder: Path, version: str, bundle_id: str = "io.github.abnps.videodownload") -> Path:
+    app = folder / "Video Download.app"
+    (app / "Contents" / "MacOS").mkdir(parents=True)
+    (app / "Contents" / "MacOS" / "VideoDownload").write_text("#!/bin/sh\n", encoding="utf-8")
+    (app / "Contents" / "Info.plist").write_bytes(plistlib.dumps({
+        "CFBundleIdentifier": bundle_id, "CFBundleShortVersionString": version,
+        "CFBundleExecutable": "VideoDownload", "CFBundlePackageType": "APPL"}))
+    return app
+
+
+class MacSelfUpdateTest(unittest.TestCase):
+    """Plan 1.0, tačka 7: Mac sam preuzme potpisan .dmg, pripremi novu aplikaciju i zamijeni je poslije gašenja."""
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.bundle = _fake_app(self.root / "Applications", "9.9.8")
+        self.staged = self.bundle.with_name(".Video Download.app.novo")
+        self.dmg = self.root / "VideoDownload-macOS-arm64-9.9.9.dmg"
+        self.dmg.write_bytes(b"dmg")
+
+    def signed_release(self):
+        return updater.Release("9.9.9", "", self.dmg.name, "https://g/x.dmg", "https://g/x.dmg.sha256", 3,
+                               manifest_url="https://g/release-macos.json",
+                               signature_url="https://g/release-macos.json.sig")
+
+    def test_mac_uses_its_own_signed_manifest(self):
+        names = ["VideoDownload-Setup-9.9.9.exe", "VideoDownload-Setup-9.9.9.exe.sha256", "release.json",
+                 "release.json.sig", "VideoDownload-macOS-arm64-9.9.9.dmg",
+                 "VideoDownload-macOS-arm64-9.9.9.dmg.sha256", "release-macos.json", "release-macos.json.sig"]
+        data = {"tag_name": "v9.9.9", "assets": [{"name": n, "browser_download_url": f"https://g/{n}"} for n in names]}
+        with mock.patch.object(updater, "PLATFORM", "darwin"):
+            mac = updater.parse_release(data)
+        with mock.patch.object(updater, "PLATFORM", "win32"):
+            windows = updater.parse_release(data)
+        self.assertEqual((mac.manifest_url, mac.signature_url),
+                         ("https://g/release-macos.json", "https://g/release-macos.json.sig"))
+        self.assertEqual(windows.manifest_url, "https://g/release.json")
+
+    def test_self_install_only_when_signed_and_replaceable(self):
+        release = self.signed_release()
+        self.assertTrue(updater.can_self_install(release, "darwin", self.bundle))
+        unsigned = updater.Release("9.9.9", "", self.dmg.name, "https://g/x.dmg", "https://g/x.dmg.sha256", 3)
+        self.assertFalse(updater.can_self_install(unsigned, "darwin", self.bundle))  # izdanja prije 0.9.8
+        translocated = Path("/private/var/folders/x/AppTranslocation/1/d/Video Download.app")
+        self.assertFalse(updater.can_self_install(release, "darwin", translocated))
+        self.assertFalse(updater.can_self_install(release, "darwin", Path("/Volumes/Video Download/Video Download.app")))
+        self.assertFalse(updater.can_self_install(release, "linux", self.bundle))
+        self.assertTrue(updater.can_self_install(platform="win32"))
+        with mock.patch.object(updater.runtime, "mac_app_bundle", return_value=None):
+            self.assertFalse(updater.can_self_install(release, "darwin"))  # nije instalirana aplikacija
+
+    def fake_runner(self, version="9.9.9", bundle_id="io.github.abnps.videodownload", codesign=0):
+        mount = self.root / "Volumes" / "Video Download"
+        shutil.rmtree(mount, ignore_errors=True)
+        calls = []
+
+        def run(args, **kwargs):
+            calls.append(args[:2])
+            result = mock.Mock(returncode=0, stdout=b"")
+            if args[:2] == ["hdiutil", "attach"]:
+                _fake_app(mount, version, bundle_id)
+                result.stdout = plistlib.dumps({"system-entities": [{"dev-entry": "/dev/disk9"},
+                                                                    {"mount-point": str(mount)}]})
+            elif args[0] == "ditto":
+                shutil.copytree(args[1], args[2])
+            elif args[0] == "codesign":
+                result.returncode = codesign
+            return result
+        return run, calls
+
+    def test_prepare_copies_checks_and_always_detaches(self):
+        run, calls = self.fake_runner()
+        staged = updater.prepare_mac_app(self.dmg, self.bundle, runner=run)
+        self.assertEqual(staged, self.staged)
+        self.assertEqual(plistlib.loads((staged / "Contents/Info.plist").read_bytes())["CFBundleShortVersionString"],
+                         "9.9.9")
+        self.assertIn(["hdiutil", "detach"], calls)
+        self.assertFalse(self.dmg.exists())
+
+    def test_prepare_refuses_wrong_app_version_or_signature(self):
+        for name, options in {"version": {"version": "1.0.0"}, "other_app": {"bundle_id": "com.example.other"},
+                              "codesign": {"codesign": 1}}.items():
+            with self.subTest(case=name):
+                run, calls = self.fake_runner(**options)
+                with self.assertRaises(updater.UpdateError) as caught:
+                    updater.prepare_mac_app(self.dmg, self.bundle, runner=run)
+                self.assertEqual(caught.exception.key, "update.unsigned")
+                self.assertFalse(self.staged.exists())  # ništa neprovjereno ne ostaje pored aplikacije
+                self.assertIn(["hdiutil", "detach"], calls)
+
+    def test_verified_dmg_is_prepared_in_the_worker(self):
+        prepared = self.root / "novo.app"
+        with mock.patch.object(updater, "PLATFORM", "darwin"), \
+                mock.patch.object(updater, "_download_http"), mock.patch.object(updater, "_fetch_small"), \
+                mock.patch.object(updater, "_verify"), \
+                mock.patch.object(updater, "_verified_manifest", return_value={}) as verified, \
+                mock.patch.object(updater.release_signing, "check_installer"), \
+                mock.patch.object(updater.runtime, "mac_app_bundle", return_value=self.bundle), \
+                mock.patch.object(updater, "prepare_mac_app", return_value=prepared) as prepare:
+            result = updater.download_installer(self.signed_release(), self.root / "dl")
+        self.assertEqual(result, prepared)
+        prepare.assert_called_once_with(self.root / "dl" / self.dmg.name, self.bundle)
+        self.assertEqual(verified.call_args.args[1].name, "release-macos.json")
+
+    @unittest.skipUnless(sys.platform == "darwin" or shutil.which("sh"), "treba sh")
+    def test_swap_script_replaces_app_and_launches_it(self):
+        shell = shutil.which("sh") if sys.platform == "win32" else "/bin/sh"
+        staged = _fake_app(self.root / "staged", "9.9.9")
+        launched = self.root / "pokrenuto.txt"
+        finished = subprocess.Popen([sys.executable, "-c", "pass"])
+        finished.wait()  # program je već ugašen: zamjena kreće odmah
+        launcher = self.root / "launch.sh"
+        launcher.write_text('#!/bin/sh\necho "$1" > "' + launched.as_posix() + '"\n', encoding="utf-8")
+        launcher.chmod(0o755)
+        process = updater.launch_mac_swap(staged, self.bundle, pid=finished.pid, launch=launcher.as_posix(),
+                                          shell=shell)
+        process.wait(timeout=30)
+        info = plistlib.loads((self.bundle / "Contents/Info.plist").read_bytes())
+        self.assertEqual(info["CFBundleShortVersionString"], "9.9.9")
+        self.assertFalse(staged.exists())
+        self.assertFalse(self.bundle.with_name("Video Download.app.staro").exists())
+        self.assertIn("Video Download.app", launched.read_text(encoding="utf-8"))
+
+    @unittest.skipUnless(sys.platform == "darwin", "hdiutil i codesign postoje samo na Macu")
+    def test_real_dmg_on_mac(self):
+        source = self.root / "dmg-src"
+        app = _fake_app(source, "9.9.9")
+        if subprocess.run(["codesign", "--force", "--deep", "--sign", "-", str(app)], capture_output=True).returncode:
+            self.skipTest("ad-hoc potpis probne aplikacije nije uspio")
+        self.dmg.unlink()
+        subprocess.run(["hdiutil", "create", "-volname", "Video Download", "-srcfolder", str(source), "-ov",
+                        "-format", "UDZO", str(self.dmg)], check=True, capture_output=True)
+        staged = updater.prepare_mac_app(self.dmg, self.bundle)
+        self.assertEqual(plistlib.loads((staged / "Contents/Info.plist").read_bytes())["CFBundleShortVersionString"],
+                         "9.9.9")
 
 
 if __name__ == "__main__":

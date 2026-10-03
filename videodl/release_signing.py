@@ -19,6 +19,10 @@ from Cryptodome.Signature import eddsa
 
 MANIFEST_NAME = "release.json"
 SIGNATURE_NAME = "release.json.sig"
+# Mac .dmg ima svoj potpisan opis (isti oblik, isti ključ): .dmg pravi CI tek poslije Windows builda, pa ga
+# vlasnik potpisuje zasebno (tools/sign_macos.py) prije objave.
+MAC_MANIFEST_NAME = "release-macos.json"
+MAC_SIGNATURE_NAME = "release-macos.json.sig"
 # Javni ključevi kojima aplikacija vjeruje (više njih = moguća zamjena ključa bez prekida ažuriranja).
 PUBLIC_KEYS = ("8ce3563b3c8ba4bbba778fc6c6f1cd3e569a13f94ffdae2a7e61b293344347f2",)  # 26.9.2026
 
@@ -68,11 +72,12 @@ def sign(data: bytes, key: ECC.EccKey) -> bytes:
     return eddsa.new(key, "rfc8032").sign(data)
 
 
-def write_signed_manifest(version: str, installer: Path, key: ECC.EccKey | None = None) -> tuple[Path, Path]:
+def write_signed_manifest(version: str, installer: Path, key: ECC.EccKey | None = None,
+                          names: tuple[str, str] = (MANIFEST_NAME, SIGNATURE_NAME)) -> tuple[Path, Path]:
     key = key or load_key()
     data = manifest_bytes(version, installer)
-    manifest = installer.with_name(MANIFEST_NAME)
-    signature = installer.with_name(SIGNATURE_NAME)
+    manifest = installer.with_name(names[0])
+    signature = installer.with_name(names[1])
     manifest.write_bytes(data)
     signature.write_text(sign(data, key).hex() + "\n", encoding="ascii")
     return manifest, signature

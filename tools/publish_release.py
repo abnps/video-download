@@ -77,6 +77,7 @@ def required_assets(version: str, android_name: str) -> list[str]:
     apk = f"VideoDownload-android-{android_name}.apk"
     return [windows, windows + ".sha256", "VideoDownload-Setup.exe", "release.json", "release.json.sig",
             mac, mac + ".sha256", "VideoDownload-macOS-arm64.dmg",
+            release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME,
             apk, apk + ".sha256", "VideoDownload-android.apk", "android.json"]
 
 
@@ -133,6 +134,13 @@ def validate_assets(folder: Path, version: str, code: int, name: str) -> dict:
         raise ReleaseError("Windows manifest pripada drugom programu.")
     release_signing.check_installer(manifest, version, windows)
     mac = folder / f"VideoDownload-macOS-arm64-{version}.dmg"
+    # Mac potpis (tools/sign_macos.py): bez njega Mac verzija ne bi mogla sama preći na ovo izdanje.
+    mac_manifest = release_signing.verify_manifest(
+        (folder / release_signing.MAC_MANIFEST_NAME).read_bytes(),
+        (folder / release_signing.MAC_SIGNATURE_NAME).read_text(encoding="ascii"))
+    if mac_manifest.get("app") != "Video Download":
+        raise ReleaseError("Mac manifest pripada drugom programu.")
+    release_signing.check_installer(mac_manifest, version, mac)
     apk = folder / f"VideoDownload-android-{name}.apk"
     for versioned, stable in ((windows, "VideoDownload-Setup.exe"),
                               (mac, "VideoDownload-macOS-arm64.dmg"), (apk, "VideoDownload-android.apk")):
@@ -205,7 +213,7 @@ def validate_draft(tag: str, *, publish: bool = False) -> None:
     after = draft(tag)
     if before["id"] != after["id"] or snapshot(before) != snapshot(after):
         raise ReleaseError("Nacrt se promijenio tokom provjere. Ponovi provjeru.")
-    print(f"{tag}: Windows potpis i SHA-256, Mac SHA-256, Android potpis, verzije i sva tri stalna linka su ispravni.")
+    print(f"{tag}: Windows i Mac potpis i SHA-256, Android potpis, verzije i sva tri stalna linka su ispravni.")
     if publish:
         publish_latest(tag)
     else:

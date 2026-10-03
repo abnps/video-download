@@ -1720,8 +1720,8 @@ class MainWindow(QMainWindow):
         if not updater.is_installed_app():
             QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
             return
-        if not updater.can_self_install():
-            # Mac (beta): nova verzija se preuzima kao .dmg u browseru i prevuče u Applications.
+        if not updater.can_self_install(release):
+            # Mac bez potpisanog .dmg-a ili bez prava zamjene: .dmg se preuzima u browseru i prevuče u Applications.
             QDesktopServices.openUrl(QUrl(release.installer_url))
             QMessageBox.information(self, tr("update.available_title"), tr("update.open_download", new=release.version))
             return

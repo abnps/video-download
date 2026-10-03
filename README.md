@@ -60,7 +60,9 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
 4. Pokreni Mac paket za taj nacrt: `gh workflow run macos.yml --repo abnps/video-download
    --ref main -f tag=v<verzija>`. Posao gradi iz taga, provjerava verziju i da je izdanje nacrt,
    pa dodaje `.dmg`, `.sha256` i `VideoDownload-macOS-arm64.dmg`. Sačekaj uspješan završetak
-   (`gh run list --workflow macos.yml`); grešku popravi prije objave.
+   (`gh run list --workflow macos.yml`); grešku popravi prije objave. Zatim na računaru s ključem za
+   potpis izdanja: `python tools/sign_macos.py --tag v<verzija>` (dodaje `release-macos.json` i `.sig`;
+   bez njih Mac verzija ne može sama preći na novo izdanje, pa objava odbija nacrt).
 
 5. Na računaru sa Android ključem (`%USERPROFILE%/.videodl/android-release.*`) pokreni
    `python tools/publish_android.py --tag v<verzija>`. Skripta provjerava lint, testove, potpis,
@@ -69,7 +71,7 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    Samo Android (bez novog desktop izdanja): poveća se `versionCode`/`versionName`, commit i push, pa
    `python tools/publish_android.py --android-update` (APK u postojeće javno izdanje; provjerava potpis i veći versionCode).
 
-6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 12 fajlova,
+6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 14 fajlova,
    hashove, Windows manifest, Android potpis, verzije i nepromijenjen nacrt. Tek po odluci za
    objavu pokreni istu naredbu uz `--publish`; ona ponovi provjere i zatim objavi cjelinu kao `latest`.
    Javno ostaje samo posljednje izdanje (Ahmedova odluka 23.9.2026): `--publish` poslije objave

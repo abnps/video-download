@@ -7,6 +7,11 @@ instaliran i prijavljen, koristi se on. Izdanje mora imati `VideoDownload-Setup-
 tek kad je opis potpisan našim ključem i instaler mu odgovara (verzija, ime, veličina, SHA-256).
 U aplikaciji nema tokena.
 
+Mac (od 0.9.8, plan 1.0 tačka 7): isto, s `.dmg`-om i `release-macos.json` + `.sig`. Provjeren .dmg se
+otvori bez prikaza, aplikacija iz njega se kopira pored instalirane, a mala skripta je zamijeni čim se
+program ugasi i pokrene novu. Izdanje bez Mac potpisa ili aplikacija na mjestu bez prava pisanja: kao
+ranije, otvara se link za preuzimanje.
+
 VIDEODL_UPDATE_URL (testovi) zamjenjuje GitHub lokalnim HTTP serverom sa istim JSON-om.
 """
 
@@ -14,6 +19,7 @@ import dataclasses
 import hashlib
 import json
 import os
+import plistlib
 import re
 import shutil
 import subprocess
@@ -27,7 +33,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from . import __version__, release_signing
+from . import __version__, release_signing, runtime
 
 RELEASES_REPO = "abnps/video-download"
 LATEST_URL = f"https://api.github.com/repos/{RELEASES_REPO}/releases/latest"
@@ -78,9 +84,25 @@ def is_installed_app() -> bool:
     return bool(getattr(sys, "frozen", False))
 
 
-def can_self_install(platform: str | None = None) -> bool:
-    """Samo Windows verzija sama preuzima i pokreće instaler; Mac otvara link za preuzimanje."""
-    return (platform or PLATFORM) == "win32"
+def can_self_install(release: "Release | None" = None, platform: str | None = None,
+                     bundle: Path | None = None) -> bool:
+    """Windows uvijek sam instalira. Mac samo kad je .dmg potpisan (izdanja od 0.9.8) i kad se aplikacija
+    smije zamijeniti: prava pisanja, a ne pokrenuta iz .dmg-a ili iz macOS-ove privremene kopije (App
+    Translocation). Inače se otvara link za preuzimanje."""
+    platform = platform or PLATFORM
+    if platform == "win32":
+        return True
+    if platform != "darwin" or release is None or not release.manifest_url:
+        return False
+    bundle = bundle or runtime.mac_app_bundle()
+    return bool(bundle and "AppTranslocation" not in str(bundle) and not str(bundle).startswith("/Volumes/")
+                and os.access(bundle.parent, os.W_OK) and os.access(bundle, os.W_OK))
+
+
+def _signed_names() -> tuple[str, str]:
+    if PLATFORM == "win32":
+        return release_signing.MANIFEST_NAME, release_signing.SIGNATURE_NAME
+    return release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME
 
 
 def parse_release(data) -> Release | None:
@@ -88,6 +110,7 @@ def parse_release(data) -> Release | None:
         return None
     assets = {asset.get("name"): asset for asset in data.get("assets") or [] if isinstance(asset, dict)}
     pattern = INSTALLER_NAME if PLATFORM == "win32" else MAC_INSTALLER_NAME
+    manifest_name, signature_name = _signed_names()
     for name, asset in assets.items():
         match = pattern.match(name or "")
         checksum = assets.get(f"{name}.sha256")
@@ -101,8 +124,8 @@ def parse_release(data) -> Release | None:
                 checksum_url=checksum.get("browser_download_url") or "",
                 size=int(asset.get("size") or 0),
                 tag=data.get("tag_name") or "",
-                manifest_url=(assets.get(release_signing.MANIFEST_NAME) or {}).get("browser_download_url") or "",
-                signature_url=(assets.get(release_signing.SIGNATURE_NAME) or {}).get("browser_download_url") or "",
+                manifest_url=(assets.get(manifest_name) or {}).get("browser_download_url") or "",
+                signature_url=(assets.get(signature_name) or {}).get("browser_download_url") or "",
             )
     if PLATFORM != "win32":
         return None  # izdanje bez Mac verzije: za ovaj sistem nema ništa novo
@@ -152,8 +175,9 @@ def download_installer(release: Release, target_dir: Path, on_progress: Callable
     target_dir.mkdir(parents=True, exist_ok=True)
     final = target_dir / release.installer_name
     checksum_file = target_dir / f"{release.installer_name}.sha256"
-    manifest_file = target_dir / release_signing.MANIFEST_NAME
-    signature_file = target_dir / release_signing.SIGNATURE_NAME
+    manifest_name, signature_name = _signed_names()
+    manifest_file = target_dir / manifest_name
+    signature_file = target_dir / signature_name
     extras = (checksum_file, manifest_file, signature_file)
     for stale in (final, *extras):
         stale.unlink(missing_ok=True)
@@ -167,7 +191,7 @@ def download_installer(release: Release, target_dir: Path, on_progress: Callable
             _verified_manifest(release, manifest_file, signature_file)
             _download_http(release, final, checksum_file, on_progress, cancel, opener, timeout)
         else:
-            _download_gh(release, target_dir, final, on_progress, cancel, popen)
+            _download_gh(release, target_dir, final, on_progress, cancel, popen, (manifest_name, signature_name))
         _verify(final, checksum_file)
         manifest = _verified_manifest(release, manifest_file, signature_file)
         try:
@@ -180,15 +204,99 @@ def download_installer(release: Release, target_dir: Path, on_progress: Callable
     finally:
         for extra in extras:
             extra.unlink(missing_ok=True)
+    if PLATFORM == "darwin":
+        # I ovo je u radnoj niti: otvaranje .dmg-a i kopiranje traju, a prozor ne smije stati.
+        bundle = runtime.mac_app_bundle()
+        if bundle is None:
+            final.unlink(missing_ok=True)
+            raise UpdateError("Not an installed Mac app")
+        return prepare_mac_app(final, bundle)
     return final
 
 
 def launch_installer(path: Path, language: str) -> subprocess.Popen:
-    """Tiha instalacija preko postojeće; instaler sačeka gašenje aplikacije i ponovo je pokrene."""
+    """Tiha instalacija preko postojeće; instaler sačeka gašenje aplikacije i ponovo je pokrene.
+    Mac: `path` je već pripremljena nova .app (download_installer); zamjenu radi skripta poslije gašenja."""
+    if PLATFORM == "darwin":
+        return launch_mac_swap(path, runtime.mac_app_bundle() or path)
     return subprocess.Popen([
         str(path), "/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS",
         f"/LANG={INSTALLER_LANGUAGES.get(language, 'english')}", "/update=1",
     ], close_fds=True)
+
+
+# ---------- Mac: .dmg → nova aplikacija ----------
+
+# Čeka da se program ugasi (najviše ~60 s), pa staru aplikaciju skloni, novu stavi na njeno mjesto i pokrene.
+# Ako premještanje ne uspije, stara se vraća. Argumenti: pid, stara .app, nova .app, naredba za pokretanje.
+MAC_SWAP_SCRIPT = r'''
+pid="$1"; app="$2"; new="$3"; launch="$4"; old="$app.staro"
+i=0
+while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+kill -0 "$pid" 2>/dev/null && exit 1
+rm -rf "$old"
+mv "$app" "$old" || exit 1
+if mv "$new" "$app"; then rm -rf "$old"; else mv "$old" "$app"; fi
+xattr -dr com.apple.quarantine "$app" 2>/dev/null
+"$launch" "$app"
+'''
+
+
+def _staged_path(bundle: Path) -> Path:
+    return bundle.with_name(f".{bundle.name}.novo")  # isti disk kao stara: zamjena je samo preimenovanje
+
+
+def _bundle_info(app: Path) -> dict:
+    with (app / "Contents" / "Info.plist").open("rb") as file:
+        return plistlib.load(file)
+
+
+def prepare_mac_app(dmg: Path, bundle: Path, runner=subprocess.run) -> Path:
+    """Otvori provjeren .dmg (bez prikaza u Finderu), kopiraj aplikaciju pored instalirane i provjeri je:
+    ista oznaka paketa, verzija iz imena .dmg-a, ispravan (ad-hoc) potpis. Vraća kopiju; .dmg se briše."""
+    version = MAC_INSTALLER_NAME.match(dmg.name)
+    if not version:
+        raise UpdateError(f"Unexpected Mac package name: {dmg.name}")
+    staged = _staged_path(bundle)
+    shutil.rmtree(staged, ignore_errors=True)
+    attached = runner(["hdiutil", "attach", "-nobrowse", "-readonly", "-noautoopen", "-plist", str(dmg)],
+                      capture_output=True, timeout=120)
+    if attached.returncode != 0:
+        raise UpdateError("Could not open the Mac package (hdiutil attach)")
+    mounts = [entity["mount-point"] for entity in plistlib.loads(attached.stdout).get("system-entities", [])
+              if entity.get("mount-point")]
+    if not mounts:
+        raise UpdateError("Could not open the Mac package (no volume)")
+    try:
+        apps = sorted(Path(mounts[0]).glob("*.app"))
+        if len(apps) != 1:
+            raise UpdateError("The Mac package must contain exactly one app")
+        copied = runner(["ditto", str(apps[0]), str(staged)], capture_output=True, timeout=600)
+        if copied.returncode != 0:
+            raise UpdateError("Could not copy the new app (ditto)")
+    finally:
+        runner(["hdiutil", "detach", mounts[0], "-force"], capture_output=True, timeout=120)
+    try:
+        new, current = _bundle_info(staged), _bundle_info(bundle)
+        if new.get("CFBundleIdentifier") != current.get("CFBundleIdentifier") \
+                or new.get("CFBundleShortVersionString") != version.group(1):
+            raise UpdateError("The new app does not match this program or version", key="update.unsigned")
+        checked = runner(["codesign", "--verify", "--deep", "--strict", str(staged)], capture_output=True, timeout=300)
+        if checked.returncode != 0:
+            raise UpdateError("The new app's code signature is broken", key="update.unsigned")
+    except BaseException:
+        shutil.rmtree(staged, ignore_errors=True)
+        raise
+    dmg.unlink(missing_ok=True)
+    return staged
+
+
+def launch_mac_swap(staged: Path, bundle: Path, pid: int | None = None, launch: str = "open",
+                    popen=subprocess.Popen, shell: str = "/bin/sh") -> subprocess.Popen:
+    """Zamjena poslije gašenja: skripta radi u svojoj sesiji, pa preživi zatvaranje programa."""
+    return popen([shell, "-c", MAC_SWAP_SCRIPT, "videodl-update", str(pid or os.getpid()), str(bundle),
+                  str(staged), launch], start_new_session=True, close_fds=True,
+                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 # ---------- gh ----------
@@ -212,10 +320,11 @@ def _gh_error(stderr: str | None) -> str:
     return lines[-1] if lines else "gh"
 
 
-def _download_gh(release: Release, target_dir: Path, final: Path, on_progress, cancel, popen) -> None:
+def _download_gh(release: Release, target_dir: Path, final: Path, on_progress, cancel, popen,
+                 signed_names: tuple[str, str]) -> None:
     process = popen([gh_path(), "release", "download", release.tag, "--repo", RELEASES_REPO,
                      "--pattern", release.installer_name, "--pattern", f"{release.installer_name}.sha256",
-                     "--pattern", release_signing.MANIFEST_NAME, "--pattern", release_signing.SIGNATURE_NAME,
+                     "--pattern", signed_names[0], "--pattern", signed_names[1],
                      "--dir", str(target_dir), "--clobber"],
                     stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, encoding="utf-8",
                     creationflags=_NO_WINDOW)

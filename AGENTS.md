@@ -123,7 +123,11 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   u `runtime.py` (user_data_base, bundle_dir = Contents/Frameworks), `native_messaging.py` (manifest u
   ~/Library/Application Support/<browser>/NativeMessagingHosts, samo za postojeće browsere), `native_host.py`
   (na Macu je host SAMA aplikacija: pokreni.pyw prepozna poziv browsera), Finder (`open -R`), ~/Movies,
-  ažuriranje otvara .dmg link. Build: `tools/build_macos.py` (samo na arm64 Macu; alati iz `macos_tools` u
+  ažuriranje (od 0.9.8, plan 1.0 tačka 7): Mac SAM preuzme .dmg potpisan u `release-macos.json`+`.sig`
+  (pravi ih `tools/sign_macos.py --tag vX` kod vlasnika ključa, poslije posla „Mac paket”; `publish_release.py`
+  bez njih odbija nacrt), `updater.prepare_mac_app` kopira .app pored instalirane i provjeri ID/verziju/codesign,
+  `launch_mac_swap` zamijeni poslije gašenja. Bez potpisa, iz .dmg-a, App Translocation ili bez prava pisanja:
+  otvara se .dmg link kao ranije. Build: `tools/build_macos.py` (samo na arm64 Macu; alati iz `macos_tools` u
   lock-u), CI `.github/workflows/macos.yml` pravi .dmg kao artefakt. Ad-hoc potpis poslije izmjene Info.plist-a
   je obavezan. Testovi koji zavise od sistema zadaju `platform=`/`updater.PLATFORM`/`i18n.PLATFORM` sami.
 - Mac beta je JAVNA od 26.9.2026 (Ahmed: „Beta je dobra ideja"): blok na početnoj stranici (MAC_TEXT u
