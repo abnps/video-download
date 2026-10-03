@@ -6,9 +6,9 @@ import subprocess
 import sys
 from PySide6.QtCore import QUrl, Qt, Signal
 from PySide6.QtGui import QDesktopServices, QPixmap
-from PySide6.QtWidgets import QApplication, QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QTabWidget, QTextBrowser, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QTabWidget, QTextBrowser, QVBoxLayout
 from pathlib import Path
-from . import __version__, changelog, legal, store
+from . import __version__, changelog, legal, parental, store
 from .desktop import reveal
 from .i18n import get_language, tr
 from .widgets import format_size
@@ -118,6 +118,67 @@ class WhatsNewDialog(QDialog):
         buttons.addStretch(1)
         buttons.addWidget(close_button)
         layout.addLayout(buttons)
+
+class ParentalDialog(QDialog):
+    """Preuzimanja → Roditeljska zaštita: uključi/isključi blokadu 18+ i (opciono) postavi PIN."""
+
+    def __init__(self, enabled: bool, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("parental.title"))
+        layout = QVBoxLayout(self)
+        self.enabled_box = QCheckBox(tr("parental.enable"))
+        self.enabled_box.setChecked(enabled)
+        layout.addWidget(self.enabled_box)
+        note = QLabel(tr("parental.note"))
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        self.pin = QLineEdit()
+        self.pin.setEchoMode(QLineEdit.EchoMode.Password)
+        self.pin.setPlaceholderText(tr("parental.pin"))
+        self.pin.setMaxLength(8)
+        self.repeat = QLineEdit()
+        self.repeat.setEchoMode(QLineEdit.EchoMode.Password)
+        self.repeat.setPlaceholderText(tr("parental.pin_repeat"))
+        self.repeat.setMaxLength(8)
+        layout.addWidget(self.pin)
+        layout.addWidget(self.repeat)
+        self.error = QLabel("")
+        self.error.setObjectName("errorLabel")
+        layout.addWidget(self.error)
+        self.enabled_box.toggled.connect(self._sync)
+        buttons = QHBoxLayout()
+        buttons.addStretch(1)
+        save = QPushButton(tr("parental.save"))
+        save.setDefault(True)
+        save.clicked.connect(self._accept)
+        cancel = QPushButton(tr("adult.cancel"))
+        cancel.clicked.connect(self.reject)
+        buttons.addWidget(save)
+        buttons.addWidget(cancel)
+        layout.addLayout(buttons)
+        self._sync()
+
+    def _sync(self) -> None:
+        on = self.enabled_box.isChecked()
+        self.pin.setEnabled(on)
+        self.repeat.setEnabled(on)
+
+    def _accept(self) -> None:
+        pin = self.chosen_pin()
+        if pin and not parental.valid_pin(pin):
+            self.error.setText(tr("parental.pin_invalid"))
+        elif pin != (self.repeat.text().strip() if self.enabled_box.isChecked() else ""):
+            self.error.setText(tr("parental.pin_mismatch"))
+        else:
+            self.accept()
+
+    def chosen_enabled(self) -> bool:
+        return self.enabled_box.isChecked()
+
+    def chosen_pin(self) -> str:
+        """Novi PIN ili "" (bez PIN-a); isključena zaštita nikad ne nosi PIN."""
+        return self.pin.text().strip() if self.enabled_box.isChecked() else ""
+
 
 HISTORY_KINDS = ("all", "video", "audio", "missing")
 

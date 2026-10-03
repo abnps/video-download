@@ -312,7 +312,11 @@ class MainActivity : ComponentActivity() {
                             }, onRetry = { job ->
                                 // 18+: jedan prozor za SVE koji čekaju potvrdu (kao na računaru), potvrda ne ostaje.
                                 val adults = active.filter { it.phase == Phase.NEEDS_ADULT }.map { it.job }
-                                if (job.id in adults.map { it.id }) askAdultFor.value = adults
+                                if (job.id in adults.map { it.id } && Parental.enabled(this@MainActivity)) {
+                                    // Roditeljska zaštita: bez potvrde, ti videi se uklanjaju sa liste.
+                                    adults.forEach { Downloads.remove(it.id) }
+                                    Toast.makeText(this@MainActivity, R.string.parental_blocked, Toast.LENGTH_LONG).show()
+                                } else if (job.id in adults.map { it.id }) askAdultFor.value = adults
                                 else DownloadService.start(this@MainActivity, job)
                             }, actions = actions,
                             onSettings = openSettings)

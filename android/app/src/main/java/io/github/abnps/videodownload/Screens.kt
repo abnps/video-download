@@ -62,6 +62,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -265,6 +268,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     }
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
+    // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
+    val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
@@ -290,6 +295,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                     shape = SegmentedButtonDefaults.itemShape(1, 2),
                     icon = { AppIcon(R.drawable.ic_music, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_audio)) }
             }
+            if (blockedByParental) Text(stringResource(R.string.parental_blocked),
+                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
             if (!info.audioAvailable) Text(stringResource(R.string.audio_unavailable),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (audio) {
@@ -319,7 +326,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
                 if (audio) 0 else chosen.height, label, adult = info.adult)
             if (info.adult) askAdult = job else onDownload(job)
-        }, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp), shape = RoundedCornerShape(12.dp)) {
+        }, enabled = !blockedByParental, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
+            shape = RoundedCornerShape(12.dp)) {
             AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
             Text(stringResource(if (audio) R.string.download_btn_audio else R.string.download_btn_video),
                 Modifier.padding(start = 10.dp), fontSize = 16.sp)
@@ -517,6 +525,10 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     var pickLocation by remember { mutableStateOf(false) }
     var askLogout by remember { mutableStateOf(false) }
     var showLicenses by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var parentalOn by remember { mutableStateOf(Parental.enabled(context)) }
+    var askPin by remember { mutableStateOf(false) }
+    var editParental by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
     // Standardna Android traka: strelica nazad + naslov (kao ekran „Izaberi kvalitet").
     Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -537,6 +549,10 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             stringResource(if (instagram) R.string.login_on else R.string.login_off)) {
             if (instagram) askLogout = true else onLogin()
         }
+        SettingRow(R.drawable.ic_info, stringResource(R.string.parental_title),
+            stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off)) {
+            if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true
+        }
         SettingRow(R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
             onClick = onFeedback)
         SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
@@ -553,6 +569,16 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     }
     }
     if (showLicenses) LicensesDialog { showLicenses = false }
+    if (askPin) PinDialog(onCancel = { askPin = false }) { pin ->
+        if (Parental.checkPin(context, pin)) { askPin = false; editParental = true } else false.also {
+            android.widget.Toast.makeText(context, R.string.parental_pin_wrong, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+    if (editParental) ParentalDialog(parentalOn, onCancel = { editParental = false }) { on, pin ->
+        Parental.save(context, on, pin)
+        parentalOn = on
+        editParental = false
+    }
     if (askLogout) {
         AlertDialog(onDismissRequest = { askLogout = false },
             title = { Text(stringResource(R.string.logout_title)) },
@@ -635,7 +661,9 @@ fun AdultDialog(count: Int, onCancel: () -> Unit, onConfirm: () -> Unit) {
 /** Spisak videa iz plejliste: izbor (sve ili neki), video ili zvuk, pa redom preuzimanje kao zasebni poslovi. */
 @Composable
 fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (List<Job>) -> Unit) {
-    val selected = remember(playlist) { mutableStateListOf<Int>().apply { addAll(playlist.entries.indices) } }
+    val parental = Parental.enabled(LocalContext.current)
+    val allowed = playlist.entries.indices.filter { !(parental && playlist.entries[it].adult) }
+    val selected = remember(playlist) { mutableStateListOf<Int>().apply { addAll(allowed) } }
     var audio by remember { mutableStateOf(false) }
     var mp3 by remember { mutableStateOf(true) }
     var askAdult by remember { mutableStateOf<List<Job>?>(null) }
@@ -648,8 +676,8 @@ fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Uni
                 Text(pluralStringResource(R.plurals.playlist_count, playlist.entries.size, playlist.entries.size),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            val all = selected.size == playlist.entries.size
-            TextButton(onClick = { selected.clear(); if (!all) selected.addAll(playlist.entries.indices) }) {
+            val all = selected.size == allowed.size
+            TextButton(onClick = { selected.clear(); if (!all) selected.addAll(allowed) }) {
                 Text(stringResource(if (all) R.string.select_none else R.string.select_all))
             }
         }
@@ -672,9 +700,11 @@ fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Uni
             items(playlist.entries.size) { index ->
                 val entry = playlist.entries[index]
                 val checked = index in selected
-                Row(Modifier.fillMaxWidth().clickable { if (checked) selected.remove(index) else selected.add(index) }
+                val canSelect = index in allowed
+                Row(Modifier.fillMaxWidth().clickable(enabled = canSelect) { if (checked) selected.remove(index) else selected.add(index) }
                     .padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = checked, onCheckedChange = { if (it) selected.add(index) else selected.remove(index) })
+                    Checkbox(checked = checked, enabled = canSelect,
+                        onCheckedChange = { if (it) selected.add(index) else selected.remove(index) })
                     Thumb(entry.thumbnail, null, entry.title, entry.duration, Modifier.width(96.dp).height(54.dp), audio,
                         entry.adult)
                     Text(entry.title, Modifier.weight(1f).padding(start = 10.dp), maxLines = 2,
@@ -712,4 +742,62 @@ fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Uni
 @Composable
 private fun ChoiceButton(selected: Boolean, text: String, onClick: () -> Unit) {
     if (selected) FilledTonalButton(onClick = onClick) { Text(text) } else OutlinedButton(onClick = onClick) { Text(text) }
+}
+
+
+/** Unos PIN-a roditeljske zaštite prije izmjene; `onPin` vraća false kad je PIN pogrešan (prozor ostaje). */
+@Composable
+private fun PinDialog(onCancel: () -> Unit, onPin: (String) -> Any) {
+    var pin by remember { mutableStateOf("") }
+    AlertDialog(onDismissRequest = onCancel, title = { Text(stringResource(R.string.parental_title)) },
+        text = {
+            OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) }, label = { Text(stringResource(R.string.parental_ask_pin)) },
+                singleLine = true, visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+        },
+        confirmButton = { TextButton(onClick = { onPin(pin) }) { Text("OK") } },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
+}
+
+/** Uključi/isključi blokadu 18+ i (opciono) postavi PIN od 4–8 cifara, kao na računaru. */
+@Composable
+private fun ParentalDialog(enabled: Boolean, onCancel: () -> Unit, onSave: (Boolean, String) -> Unit) {
+    var on by remember { mutableStateOf(enabled) }
+    var pin by remember { mutableStateOf("") }
+    var repeat by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<Int?>(null) }
+    AlertDialog(onDismissRequest = onCancel, title = { Text(stringResource(R.string.parental_title)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = on, onCheckedChange = { on = it })
+                    Text(stringResource(R.string.parental_enable))
+                }
+                Text(stringResource(R.string.parental_note), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (on) {
+                    OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) },
+                        label = { Text(stringResource(R.string.parental_pin)) }, singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                    OutlinedTextField(repeat, { repeat = it.filter(Char::isDigit).take(8) },
+                        label = { Text(stringResource(R.string.parental_pin_repeat)) }, singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
+                }
+                error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val chosen = if (on) pin else ""
+                error = when {
+                    chosen.isNotEmpty() && !Parental.validPin(chosen) -> R.string.parental_pin_invalid
+                    on && chosen != repeat -> R.string.parental_pin_mismatch
+                    else -> null
+                }
+                if (error == null) onSave(on, chosen)
+            }) { Text(stringResource(R.string.parental_save)) }
+        },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
 }

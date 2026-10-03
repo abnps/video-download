@@ -131,4 +131,17 @@
     <string name="feedback_subject">Video Download %1$s: problem ili prijedlog</string>
     <string name="feedback_body">Opiši šta se desilo ili šta predlažeš:</string>
     <string name="feedback_no_mail">Nema aplikacije za e-poštu. Adresa %1$s je kopirana.</string>
+    <string name="parental_title">Roditeljska zaštita</string>
+    <string name="parental_on">Uključena: sadržaj 18+ je blokiran</string>
+    <string name="parental_off">Isključena</string>
+    <string name="parental_enable">Blokiraj sadržaj za odrasle (18+)</string>
+    <string name="parental_note">Videi koje sajt označi kao sadržaj samo za odrasle se ne preuzimaju i ne nudi se potvrda „Imam 18 godina“. PIN (4–8 cifara) je opcion: ako ga postaviš, isključivanje zaštite ga traži. Ovo sprečava slučajno preuzimanje; nije brava koja se ne može zaobići.</string>
+    <string name="parental_pin">PIN (opciono, 4–8 cifara)</string>
+    <string name="parental_pin_repeat">Ponovi PIN</string>
+    <string name="parental_pin_invalid">PIN mora imati 4 do 8 cifara.</string>
+    <string name="parental_pin_mismatch">PIN-ovi se ne poklapaju.</string>
+    <string name="parental_ask_pin">Unesi PIN</string>
+    <string name="parental_pin_wrong">Pogrešan PIN.</string>
+    <string name="parental_blocked">Blokirano roditeljskom zaštitom (18+).</string>
+    <string name="parental_save">Sačuvaj</string>
 </resources>

@@ -49,7 +49,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   oznaka (`adult`) se čuva u redu. Sličica 18+ je uvijek zamućena s oznakom „18+". NE ide u bilješke o verziji
   (Ahmedova odluka). YouTube je IZUZET (Ahmed: „YT treba isključiti“; `probe.is_youtube`: adresa ili
   yt-dlp extractor). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita
-  (blokada 18+, po želji PIN) je sljedeći korak, poslije ovoga.
+  (3.10.2026): `videodl/parental.py` + Preuzimanja → Roditeljska zaštita; Android `Parental.kt` + Postavke. Uključena
+  → 18+ se ne preuzima i NE nudi potvrdu (stavka „blokirana"); PIN 4–8 cifara opcion, čuva se samo PBKDF2 otisak
+  (isti zapis na oba sistema). Nije neprobojna brava — tako je i opisana korisniku.
 
 ## Okruženje
 

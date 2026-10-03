@@ -129,4 +129,17 @@
     <string name="feedback_subject">Video Download %1$s: problem or suggestion</string>
     <string name="feedback_body">Describe what happened or what you suggest:</string>
     <string name="feedback_no_mail">No e-mail app found. The address %1$s was copied.</string>
+    <string name="parental_title">Parental control</string>
+    <string name="parental_on">On: adult content (18+) is blocked</string>
+    <string name="parental_off">Off</string>
+    <string name="parental_enable">Block adult content (18+)</string>
+    <string name="parental_note">Videos that the site marks as adults only are not downloaded and the “I am 18” confirmation is not offered. The PIN (4–8 digits) is optional: if set, turning protection off asks for it. This prevents accidental downloads; it is not a lock that cannot be bypassed.</string>
+    <string name="parental_pin">PIN (optional, 4–8 digits)</string>
+    <string name="parental_pin_repeat">Repeat the PIN</string>
+    <string name="parental_pin_invalid">The PIN must have 4 to 8 digits.</string>
+    <string name="parental_pin_mismatch">The PINs do not match.</string>
+    <string name="parental_ask_pin">Enter the PIN</string>
+    <string name="parental_pin_wrong">Wrong PIN.</string>
+    <string name="parental_blocked">Blocked by parental control (18+).</string>
+    <string name="parental_save">Save</string>
 </resources>

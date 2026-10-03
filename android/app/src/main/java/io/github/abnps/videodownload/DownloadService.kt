@@ -113,6 +113,9 @@ class DownloadService : Service() {
         } catch (error: Exception) {
             if (job.id in cancelled || error is CancelledHere || error is InterruptedException) {
                 notifyFinished(getString(R.string.status_cancelled), null)
+            } else if ("ADULT_CONFIRM" in error.message.orEmpty() && Parental.enabled(this)) {
+                // Roditeljska zaštita: 18+ se ne preuzima i ne čeka potvrdu.
+                notifyFinished(getString(R.string.status_failed, getString(R.string.parental_blocked)), null)
             } else if ("ADULT_CONFIRM" in error.message.orEmpty()) {
                 // Video za odrasle bez potvrde: čeka na listi (dugme „Imam 18+"), ostali poslovi idu dalje.
                 waitsForAdult = true

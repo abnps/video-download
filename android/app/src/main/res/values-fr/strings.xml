@@ -131,4 +131,17 @@
     <string name="feedback_subject">Video Download %1$s : problème ou suggestion</string>
     <string name="feedback_body">Décrivez ce qui s\'est passé ou ce que vous suggérez :</string>
     <string name="feedback_no_mail">Aucune app de messagerie. L\'adresse %1$s a été copiée.</string>
+    <string name="parental_title">Contrôle parental</string>
+    <string name="parental_on">Activé : contenu pour adultes (18+) bloqué</string>
+    <string name="parental_off">Désactivé</string>
+    <string name="parental_enable">Bloquer le contenu pour adultes (18+)</string>
+    <string name="parental_note">Les vidéos que le site marque comme réservées aux adultes ne sont pas téléchargées et la confirmation « J\'ai 18 ans » n\'est pas proposée. Le code PIN (4 à 8 chiffres) est facultatif : s\'il est défini, il est demandé pour désactiver la protection. Cela évite les téléchargements accidentels ; ce n\'est pas un verrou infranchissable.</string>
+    <string name="parental_pin">Code PIN (facultatif, 4 à 8 chiffres)</string>
+    <string name="parental_pin_repeat">Répétez le code PIN</string>
+    <string name="parental_pin_invalid">Le code PIN doit comporter 4 à 8 chiffres.</string>
+    <string name="parental_pin_mismatch">Les codes PIN ne correspondent pas.</string>
+    <string name="parental_ask_pin">Saisissez le code PIN</string>
+    <string name="parental_pin_wrong">Code PIN incorrect.</string>
+    <string name="parental_blocked">Bloqué par le contrôle parental (18+).</string>
+    <string name="parental_save">Enregistrer</string>
 </resources>

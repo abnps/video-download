@@ -131,4 +131,17 @@
     <string name="feedback_subject">Video Download %1$s: problema o sugerencia</string>
     <string name="feedback_body">Describe qué pasó o qué sugieres:</string>
     <string name="feedback_no_mail">No hay app de correo. Se copió la dirección %1$s.</string>
+    <string name="parental_title">Control parental</string>
+    <string name="parental_on">Activado: contenido para adultos (+18) bloqueado</string>
+    <string name="parental_off">Desactivado</string>
+    <string name="parental_enable">Bloquear contenido para adultos (+18)</string>
+    <string name="parental_note">Los vídeos que el sitio marca como solo para adultos no se descargan y no se ofrece la confirmación «Tengo 18». El PIN (4–8 dígitos) es opcional: si lo pones, se pedirá para desactivar la protección. Esto evita descargas accidentales; no es un bloqueo imposible de saltar.</string>
+    <string name="parental_pin">PIN (opcional, 4–8 dígitos)</string>
+    <string name="parental_pin_repeat">Repite el PIN</string>
+    <string name="parental_pin_invalid">El PIN debe tener de 4 a 8 dígitos.</string>
+    <string name="parental_pin_mismatch">Los PIN no coinciden.</string>
+    <string name="parental_ask_pin">Introduce el PIN</string>
+    <string name="parental_pin_wrong">PIN incorrecto.</string>
+    <string name="parental_blocked">Bloqueado por el control parental (+18).</string>
+    <string name="parental_save">Guardar</string>
 </resources>

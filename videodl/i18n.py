@@ -122,6 +122,51 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                                 "Der Link wird noch gelesen – der Download startet, sobald er bereit ist.",
                                 "El enlace aún se está leyendo: la descarga empieza en cuanto esté listo.",
                                 "Le lien est encore en cours de lecture : le téléchargement démarre dès qu'il est prêt."),
+    "menu.parental": ("Roditeljska zaštita…", "Parental control…", "Jugendschutz…", "Control parental…",
+                      "Contrôle parental…"),
+    "parental.title": ("Roditeljska zaštita", "Parental control", "Jugendschutz", "Control parental", "Contrôle parental"),
+    "parental.enable": ("Blokiraj sadržaj za odrasle (18+)", "Block adult content (18+)", "Inhalte für Erwachsene (18+) sperren",
+                        "Bloquear contenido para adultos (+18)", "Bloquer le contenu pour adultes (18+)"),
+    "parental.note": (
+        "Videi koje sajt označi kao sadržaj samo za odrasle se ne preuzimaju i ne nudi se potvrda „Imam 18 godina“. "
+        "PIN (4–8 cifara) je opcion: ako ga postaviš, isključivanje zaštite ga traži. Ovo sprečava slučajno "
+        "preuzimanje; nije brava koja se ne može zaobići.",
+        "Videos that the site marks as adults only are not downloaded and the “I am 18” confirmation is not offered. "
+        "The PIN (4–8 digits) is optional: if you set one, turning protection off asks for it. This prevents "
+        "accidental downloads; it is not a lock that cannot be bypassed.",
+        "Videos, die die Website als nur für Erwachsene markiert, werden nicht geladen, und die Bestätigung „Ich bin 18“ "
+        "wird nicht angeboten. Die PIN (4–8 Ziffern) ist optional: Ist eine gesetzt, wird sie zum Ausschalten verlangt. "
+        "Das verhindert versehentliche Downloads; es ist keine unüberwindbare Sperre.",
+        "Los vídeos que el sitio marca como solo para adultos no se descargan y no se ofrece la confirmación «Tengo 18». "
+        "El PIN (4–8 dígitos) es opcional: si lo pones, se pedirá para desactivar la protección. Esto evita descargas "
+        "accidentales; no es un bloqueo imposible de saltar.",
+        "Les vidéos que le site marque comme réservées aux adultes ne sont pas téléchargées et la confirmation « J'ai 18 ans » "
+        "n'est pas proposée. Le code PIN (4 à 8 chiffres) est facultatif : s'il est défini, il est demandé pour désactiver "
+        "la protection. Cela évite les téléchargements accidentels ; ce n'est pas un verrou infranchissable."),
+    "parental.pin": ("PIN (opciono, 4–8 cifara)", "PIN (optional, 4–8 digits)", "PIN (optional, 4–8 Ziffern)",
+                     "PIN (opcional, 4–8 dígitos)", "Code PIN (facultatif, 4 à 8 chiffres)"),
+    "parental.pin_repeat": ("Ponovi PIN", "Repeat the PIN", "PIN wiederholen", "Repite el PIN", "Répétez le code PIN"),
+    "parental.save": ("Sačuvaj", "Save", "Speichern", "Guardar", "Enregistrer"),
+    "parental.pin_invalid": ("PIN mora imati 4 do 8 cifara.", "The PIN must have 4 to 8 digits.",
+                             "Die PIN muss 4 bis 8 Ziffern haben.", "El PIN debe tener de 4 a 8 dígitos.",
+                             "Le code PIN doit comporter 4 à 8 chiffres."),
+    "parental.pin_mismatch": ("PIN-ovi se ne poklapaju.", "The PINs do not match.", "Die PINs stimmen nicht überein.",
+                              "Los PIN no coinciden.", "Les codes PIN ne correspondent pas."),
+    "parental.ask_pin": ("Unesi PIN roditeljske zaštite:", "Enter the parental control PIN:", "Jugendschutz-PIN eingeben:",
+                         "Introduce el PIN del control parental:", "Saisissez le code PIN du contrôle parental :"),
+    "parental.pin_wrong": ("Pogrešan PIN.", "Wrong PIN.", "Falsche PIN.", "PIN incorrecto.", "Code PIN incorrect."),
+    "parental.blocked": ("Blokirano roditeljskom zaštitom (18+)", "Blocked by parental control (18+)",
+                         "Durch Jugendschutz gesperrt (18+)", "Bloqueado por el control parental (+18)",
+                         "Bloqué par le contrôle parental (18+)"),
+    "parental.blocked_status": ("Roditeljska zaštita je blokirala videa za odrasle: {count}.",
+                                "Parental control blocked adult videos: {count}.",
+                                "Jugendschutz hat Videos für Erwachsene gesperrt: {count}.",
+                                "El control parental bloqueó vídeos para adultos: {count}.",
+                                "Le contrôle parental a bloqué des vidéos pour adultes : {count}."),
+    "parental.on": ("Roditeljska zaštita je uključena.", "Parental control is on.", "Jugendschutz ist eingeschaltet.",
+                    "El control parental está activado.", "Le contrôle parental est activé."),
+    "parental.off": ("Roditeljska zaštita je isključena.", "Parental control is off.", "Jugendschutz ist ausgeschaltet.",
+                     "El control parental está desactivado.", "Le contrôle parental est désactivé."),
     "adult.title": ("Sadržaj za odrasle (18+)", "Adult content (18+)", "Inhalte für Erwachsene (18+)",
                     "Contenido para adultos (18+)", "Contenu pour adultes (18+)"),
     "adult.one": ("„{title}“ je označen kao sadržaj samo za odrasle (18+).\n\nPotvrdi da imaš najmanje 18 godina.",

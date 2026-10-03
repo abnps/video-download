@@ -20,7 +20,7 @@ from PySide6.QtGui import (
     QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPainter, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox,
+    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
     QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
 )
 
@@ -39,12 +39,12 @@ from .presets import (
     direct_output_name, section_label, subtitle_languages, title_identity,
 )
 from .probe import ProbeResult, probe
-from . import convert, diagnostics, release_signing, store, support, theme, winshell
+from . import convert, diagnostics, parental, release_signing, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import DropZone, QueueRow, display_message, set_state
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
-    AUDIO_EXTENSIONS, BROWSERS, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog,
+    AUDIO_EXTENSIONS, BROWSERS, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
     SupportDialog, WhatsNewDialog, browser_exe, filter_history,
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
@@ -532,6 +532,7 @@ class MainWindow(QMainWindow):
         self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
         self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
         self.history_action = self.downloads_menu.addAction("", self._show_history)
+        self.parental_action = self.downloads_menu.addAction("", self._show_parental)
         self.downloads_menu.addSeparator()
         self.subtitles_action = self.downloads_menu.addAction(
             "", lambda checked: self._set_option("_subtitles", checked))
@@ -629,6 +630,7 @@ class MainWindow(QMainWindow):
         self.clear_action.setText(tr("menu.clear_finished"))
         self.remove_all_action.setText(tr("menu.remove_all"))
         self.history_action.setText(tr("menu.history"))
+        self.parental_action.setText(tr("menu.parental"))
         self.subtitles_action.setText(tr("menu.subtitles"))
         self.thumbnail_action.setText(tr("menu.thumbnail"))
         self.whole_playlist_action.setText(tr("menu.whole_playlist"))
@@ -1749,8 +1751,24 @@ class MainWindow(QMainWindow):
         if row is not None:
             row.thumbnail.set_pixmap(adult_thumbnail(pixmap) if item is not None and item.adult else pixmap)
 
+    def _parental_on(self) -> bool:
+        return self._settings.value("parental/enabled", False, type=bool)
+
     def _confirm_adult(self, items) -> bool:
-        """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti."""
+        """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti.
+        Uz roditeljsku zaštitu 18+ se ne nudi: stavka se odmah označi kao blokirana (ostale idu)."""
+        if self._parental_on():
+            blocked = [item for item in items if parental.blocks(True, item)]
+            for item in blocked:
+                item.status = ItemStatus.FAILED
+                item.message = tr("parental.blocked")
+                item.adult_ok = False
+                self._manual = [item_id for item_id in self._manual if item_id != item.id]
+                self._refresh_row(item)
+            if blocked:
+                self._set_status(tr("parental.blocked_status", count=len(blocked)))
+                self._schedule_save()
+            return not blocked
         pending = [item for item in items if _needs_adult_ok(item)]
         if not pending:
             return True
@@ -1760,6 +1778,28 @@ class MainWindow(QMainWindow):
             return True
         self._set_status(tr("adult.skipped"))
         return False
+
+    @Slot()
+    def _show_parental(self) -> None:
+        """Preuzimanja → Roditeljska zaštita. Uključena zaštita s PIN-om se mijenja tek uz tačan PIN."""
+        stored = self._settings.value("parental/pin", "", type=str)
+        if self._parental_on() and stored:
+            pin, ok = QInputDialog.getText(self, tr("parental.title"), tr("parental.ask_pin"), QLineEdit.EchoMode.Password)
+            if not ok:
+                return
+            if not parental.check_pin(pin.strip(), stored):
+                QMessageBox.warning(self, tr("parental.title"), tr("parental.pin_wrong"))
+                return
+        dialog = ParentalDialog(self._parental_on(), self)
+        if not dialog.exec():
+            return
+        enabled, pin = dialog.chosen_enabled(), dialog.chosen_pin()
+        self._settings.setValue("parental/enabled", enabled)
+        if not enabled:
+            self._settings.remove("parental/pin")
+        elif pin:
+            self._settings.setValue("parental/pin", parental.hash_pin(pin))
+        self._set_status(tr("parental.on" if enabled else "parental.off"))
 
     def _ask_adult_dialog(self, items) -> bool:
         box = QMessageBox(QMessageBox.Icon.Warning, tr("adult.title"),
