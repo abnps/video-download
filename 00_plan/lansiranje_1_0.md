@@ -8,7 +8,8 @@ Važi pravilo „ništa plaćeno do zarade" (AGENTS.md) i „bez imena platformi
 - Računar **1.0.0**, Android **1.0.0** (versionCode +1), dodatak **1.0.0**: isti dan, jedno izdanje na GitHubu.
 - Mac i Android ostaju označeni „beta" na sajtu dok nemaju Appleov potpis, odnosno punu Google provjeru
   (dogovor: plaćeno tek uz zaradu). 1.0 se odnosi na program, ne na potpise.
-- Na sajtu kratka stranica „Video Download 1.0" (šta je novo od 0.9, za koga je, preuzimanje za sve tri platforme).
+- Na sajtu kratka stranica „Video Download 1.0": `tools/site_release.py` (`version-1.html`, 5 jezika). Spremna je i
+  uključuje se SAMA kad `__version__` postane 1.0.0 (stranica, sitemap, link na vrhu „Šta je novo"); do tada se sajt ne mijenja.
 
 ## 2. Redoslijed (svaki korak čeka Ahmedovo „objavi")
 

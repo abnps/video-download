@@ -24,6 +24,7 @@ import site_guides  # noqa: E402  (vodiči: MP3, isječak, plejlista…)
 import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
 import site_android  # noqa: E402  (Android tutorijal)
 import site_impressum  # noqa: E402  (Impressum, tek kad ima podataka)
+import site_release  # noqa: E402  (stranica „1.0", sama se uključi od verzije 1.0.0)
 
 SITE = ROOT / "site"
 ASSETS = ROOT / "videodl" / "assets"
@@ -101,7 +102,7 @@ FORBIDDEN = re.compile(r"youtube|\byt\b(?!-dlp)|tiktok|netflix|spotify|zaobi[đd
                        r"|free music|bypass|umgeh|kostenlose musik|eludir|música gratis|contourn|musique gratuite",
                        re.IGNORECASE)
 PROMO_PAGES = ("index.html", "extension.html", "changelog.html", "guides.html",
-               *(f"{slug}.html" for slug in site_guides.GUIDES))
+               *(f"{slug}.html" for slug in site_guides.GUIDES), site_release.PAGE)
 
 # Tekstovi stranica po jeziku. Prvi jezik je glavni (korijen sajta).
 TEXTS = {
@@ -503,7 +504,7 @@ def sitemap_xml() -> str:
     """Mapa sajta za Google/Bing: svaka stranica na svakom jeziku, uz veze među jezicima (hreflang)."""
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
-    for page in SITEMAP_PAGES:
+    for page in SITEMAP_PAGES + ((site_release.PAGE,) if site_release.enabled() else ()):
         for lang in LANGUAGES:
             lines.append(f"  <url><loc>{page_url(lang, page)}</loc>")
             for other in LANGUAGES:
@@ -859,6 +860,8 @@ def page_changelog(lang: str) -> str:
     title = site_home.HOME[lang]["nav"][3]
     parts = [f"<h1>{html.escape(title)}</h1>",
              f'<p class="lead">{html.escape(intro)} {site_home.HOME[lang]["news"][2]}</p>']
+    if site_release.enabled():
+        parts.append(site_release.banner(lang))  # do 1.0 se ništa ne dodaje, ni prazan red
     for version, date, items in changelog.entries(lang):
         anchor = "v" + version.replace(".", "-")
         points = "\n".join(f"<li>{html.escape(item)}</li>" for item in items)
@@ -948,6 +951,9 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
         pages[f"{prefix}extension.html"] = page_extension(lang)
+        if site_release.enabled():
+            pages[f"{prefix}{site_release.PAGE}"] = _page(lang, site_release.PAGE, *site_release.body(
+                lang, INSTALLER_URL, MAC_DMG_URL, ANDROID_APK_URL))
         if site_impressum.enabled():
             pages[f"{prefix}{site_impressum.PAGE}"] = _page(lang, site_impressum.PAGE,
                                                             *site_impressum.body(lang, CONTACT_EMAIL))

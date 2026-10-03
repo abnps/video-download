@@ -265,5 +265,36 @@ class SiteTest(unittest.TestCase):
         self.assertIn('<a href="https://x.test/a">https://x.test/a</a>.', body)
 
 
+class ReleasePageTest(unittest.TestCase):
+    """Stranica „Video Download 1.0": skrivena do verzije 1.0.0, a tada na svih 5 jezika, u sitemapu i povezana."""
+
+    def test_hidden_before_1_0(self):
+        import site_release
+
+        self.assertFalse(site_release.enabled("0.9.8"))
+        self.assertTrue(site_release.enabled("1.0.0"))
+        if not site_release.enabled():
+            self.assertFalse(any(name.endswith(site_release.PAGE) for name in build_site.build()))
+
+    def test_page_in_every_language_when_1_0_is_out(self):
+        from unittest import mock
+
+        import site_release
+
+        with mock.patch.object(site_release, "VERSION", "1.0.0"):
+            pages = build_site.build()
+            sitemap = build_site.sitemap_xml()
+        self.assertEqual(build_site.forbidden_words(pages), [])
+        for lang in build_site.LANGUAGES:
+            prefix = build_site.TEXTS[lang]["dir"]
+            with self.subTest(lang=lang):
+                page = pages[prefix + site_release.PAGE]
+                self.assertIn(html.escape(site_release.TEXT[lang]["lead"]), page)
+                self.assertIn(build_site.INSTALLER_URL, page)
+                self.assertIn(f'href="{site_release.PAGE}"', pages[prefix + "changelog.html"])
+                self.assertIn(build_site.page_url(lang, site_release.PAGE), sitemap)
+                self.assertEqual(len(site_release.TEXT[lang]["sections"]), len(site_release.TEXT["en"]["sections"]))
+
+
 if __name__ == "__main__":
     unittest.main()
