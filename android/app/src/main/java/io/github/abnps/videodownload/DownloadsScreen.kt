@@ -74,7 +74,8 @@ import java.util.Calendar
 
 @Composable
 fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: Int, onTab: (Int) -> Unit,
-                    onCancel: (Long) -> Unit, onRetry: (Job) -> Unit, actions: ItemActions, onSettings: () -> Unit) {
+                    onCancel: (Long) -> Unit, onRetry: (Job) -> Unit, actions: ItemActions, onSettings: () -> Unit,
+                    lastError: String? = null, onCopyReport: () -> Unit = {}) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.nav_downloads), fontSize = 30.sp, fontWeight = FontWeight.Bold,
@@ -86,7 +87,9 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
             Tab(selected = tab == 1, onClick = { onTab(1) }, text = { Text(stringResource(R.string.tab_done)) })
         }
         if (tab == 0) {
-            if (active.isEmpty()) Empty(stringResource(R.string.no_active))
+            // Posljednja greška zamjenjuje „Ništa se ne preuzima" (bila je iscrtana preko tog teksta).
+            if (active.isEmpty() && lastError != null) ErrorBanner(lastError, onCopyReport)
+            else if (active.isEmpty()) Empty(stringResource(R.string.no_active))
             LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(active, key = { it.job.id }) { ActiveCard(it, onCancel, onRetry) }
             }

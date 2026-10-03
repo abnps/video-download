@@ -366,10 +366,7 @@ class MainActivity : ComponentActivity() {
                                 } else if (job.id in adults.map { it.id }) askAdultFor.value = adults
                                 else DownloadService.start(this@MainActivity, job)
                             }, actions = actions,
-                            onSettings = openSettings)
-                        if (error != null && active.isEmpty() && downloadsTab.intValue == 0) {
-                            ErrorBanner(error!!) { copyReport() }
-                        }
+                            onSettings = openSettings, lastError = error, onCopyReport = { copyReport() })
                     }
                     else -> SettingsScreen(
                         quality = quality.intValue,
@@ -421,8 +418,9 @@ private fun WelcomeDialog(onOpenLink: (String) -> Unit, onAccept: () -> Unit) {
 
 /** Posljednja greška ispod praznog „Aktivno": šta nije uspjelo i „Kopiraj izvještaj". */
 @Composable
-private fun ErrorBanner(message: String, onCopyReport: () -> Unit) {
-    Column(Modifier.padding(top = 140.dp, start = 20.dp, end = 20.dp)) {
+internal fun ErrorBanner(message: String, onCopyReport: () -> Unit) {
+    // U rasporedu ekrana (ispod kartica), ne preko njega: fiksni razmak od vrha se preklapao s naslovom.
+    Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
         Text(stringResource(R.string.status_failed, message), color = MaterialTheme.colorScheme.error)
         TextButton(onClick = onCopyReport) { Text(stringResource(R.string.copy_report)) }
     }
