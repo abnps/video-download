@@ -228,6 +228,33 @@ def write_legal(target: Path | None = None, installer_documents: bool = True) ->
         (documents / f"agreement_{language}.txt").write_bytes(b"\xef\xbb\xbf" + agreement.encode("utf-8"))
 
 
+# Dijelovi koje PyInstaller pokupi, a program ih nikad ne učita (plan 1.0, tačka 9: manji instaler, 3.10.2026):
+# softverski OpenGL (Qt Widgets ga ne koristi), virtuelna tastatura na ekranu i QML/Quick koje samo ona vuče,
+# PDF dodatak za slike i Qt prevodi (program nema QTranslator; tekstove daje videodl/i18n.py).
+UNUSED_QT = (
+    "PySide6/opengl32sw.dll", "PySide6/Qt6Pdf.dll", "PySide6/Qt6Qml.dll", "PySide6/Qt6QmlMeta.dll",
+    "PySide6/Qt6QmlModels.dll", "PySide6/Qt6QmlWorkerScript.dll", "PySide6/Qt6Quick.dll",
+    "PySide6/Qt6VirtualKeyboard.dll", "PySide6/plugins/platforminputcontexts", "PySide6/plugins/imageformats/qpdf.dll",
+    "PySide6/translations",
+)
+# Python paketi koje neki paket opciono uvozi, a u programu se nikad ne učitaju (yt-dlp koristi Cryptodome).
+UNUSED_MODULES = ("cryptography", "Crypto")
+
+
+def trim_package() -> int:
+    """Briše nekorištene dijelove iz paketa; vraća uštedu u bajtovima. Self-test poslije provjerava prozor."""
+    saved = 0
+    for relative in UNUSED_QT:
+        path = APP / "_internal" / relative
+        if path.is_dir():
+            saved += sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+            shutil.rmtree(path)
+        elif path.is_file():
+            saved += path.stat().st_size
+            path.unlink()
+    return saved
+
+
 def verify_package() -> None:
     """Prekinut build je jednom ostavio male fajlove pune nula (ikone dodatka, DRM skripte)."""
     problems = []
@@ -266,7 +293,9 @@ def main() -> int:
     pyinstaller("--windowed", "--name", "VideoDownload", "--icon", str(icon),
                 "--add-data", f"{PROJECT / 'videodl' / 'assets'}{os.pathsep}videodl/assets",
                 "--collect-data", "yt_dlp_ejs", "--collect-all", "curl_cffi",
+                *[arg for module in UNUSED_MODULES for arg in ("--exclude-module", module)],
                 str(PROJECT / "pokreni.pyw"))
+    print(f"Uklonjeno nekorištenih Qt dijelova: {trim_package() / 1_048_576:.1f} MB")
     pyinstaller("--onefile", "--console", "--name", "videodl-host", "--icon", str(icon),
                 str(PROJECT / "videodl" / "native_host.py"))
     shutil.move(str(DIST / "videodl-host.exe"), APP / "videodl-host.exe")

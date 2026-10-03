@@ -1876,6 +1876,20 @@ def _signing_works() -> bool:
         return False
 
 
+def _window_works() -> bool:
+    """Pravi Qt prozor (platforma, stil, ikone, slike) se može napraviti i prikazati: paket nije previše očišćen."""
+    try:
+        app = QApplication.instance() or QApplication([])
+        window = QWidget()
+        window.setWindowIcon(icon("plus"))  # crtana ikona (QPainter)
+        window.show()
+        app.processEvents()
+        window.close()
+        return QImage(4, 4, QImage.Format.Format_ARGB32).isNull() is False
+    except Exception:
+        return False
+
+
 def self_test(report_path: str) -> int:
     """Provjera paketa bez prozora: uvozi, alati i yt-dlp dodaci. Rezultat ide u JSON fajl."""
     import importlib.util
@@ -1896,9 +1910,10 @@ def self_test(report_path: str) -> int:
         "extension_manifest": (extension_dir() / "manifest.json").is_file(),
         "languages": sorted(LANGUAGES),
         "update_signing": _signing_works(),
+        "window": _window_works(),
     }
     ok = all(checks[key] for key in ("ffmpeg", "ffprobe", "node", "yt_dlp_ejs", "curl_cffi", "extension_manifest",
-                                     "update_signing"))
+                                     "update_signing", "window"))
     checks["ok"] = ok
     Path(report_path).write_text(json.dumps(checks, indent=2), encoding="utf-8")
     return 0 if ok else 1
