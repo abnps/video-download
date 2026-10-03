@@ -23,6 +23,7 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 - Bez zaobilaženja DRM-a i bez piratskih izvora. Prodaja i sajt traže pravnu provjeru;
   repo i izdanja su javni od 22.9.2026.
+  Advokat (§ 95a UrhG) za sada OTPADA (Ahmed 3.10.2026): tek ako program počne donositi zaradu; ne predlagati ranije.
 - yt-dlp logika ostaje u `videodl/presets.py`, `probe.py`, `download.py` i
   `jobs.py`, bez Qt-a. `gui.py` samo prikazuje stanje i pokreće poslove.
   Pozadinski poslovi (Qt niti) su u `videodl/workers.py`; Android ekrani su po fajlovima (`HomeScreen.kt`,
