@@ -75,7 +75,24 @@ def _close(p: QPainter, _color: QColor) -> None:
     p.drawLine(QPointF(17, 7), QPointF(7, 17))
 
 
+def _settings(p: QPainter, _color: QColor) -> None:
+    """Zupčanik: krug u sredini i osam zubaca (kao Postavke u Android aplikaciji)."""
+    import math
+
+    p.drawEllipse(QPointF(12, 12), 2.8, 2.8)
+    p.drawEllipse(QPointF(12, 12), 6.2, 6.2)
+    teeth = QPen(p.pen())
+    teeth.setWidthF(3.6)
+    teeth.setCapStyle(Qt.PenCapStyle.FlatCap)  # široki, ravni zupci: zupčanik, a ne sunce
+    p.setPen(teeth)
+    for step in range(8):
+        angle = step * math.pi / 4 + math.pi / 8
+        p.drawLine(QPointF(12 + 6.0 * math.cos(angle), 12 + 6.0 * math.sin(angle)),
+                   QPointF(12 + 9.0 * math.cos(angle), 12 + 9.0 * math.sin(angle)))
+
+
 _DRAW = {
+    "settings": _settings,
     "plus": _plus,
     "download": _download,
     "download-solid": _download_solid,

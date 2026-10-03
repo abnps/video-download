@@ -206,6 +206,28 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                     "Terminés ({count})"),
     "filter.failed": ("Neuspjelo ({count})", "Failed ({count})", "Fehlgeschlagen ({count})", "Fallidos ({count})",
                       "Échoués ({count})"),
+    "menu.settings": ("Postavke…", "Settings…", "Einstellungen…", "Ajustes…", "Paramètres…"),
+    "settings.title": ("Postavke", "Settings", "Einstellungen", "Ajustes", "Paramètres"),
+    "settings.group_download": ("Preuzimanje", "Downloading", "Herunterladen", "Descarga", "Téléchargement"),
+    "settings.group_content": ("Uz video", "With the video", "Zum Video", "Con el vídeo", "Avec la vidéo"),
+    "settings.group_behavior": ("Ponašanje", "Behaviour", "Verhalten", "Comportamiento", "Comportement"),
+    "settings.group_look": ("Izgled i jezik", "Look and language", "Aussehen und Sprache", "Apariencia e idioma",
+                            "Apparence et langue"),
+    "settings.group_protection": ("Zaštita", "Protection", "Schutz", "Protección", "Protection"),
+    "settings.folder": ("Folder", "Folder", "Ordner", "Carpeta", "Dossier"),
+    "settings.change": ("Promijeni…", "Change…", "Ändern…", "Cambiar…", "Modifier…"),
+    "settings.format_hint": (
+        "Format izabran u traci gore važi za sva sljedeća preuzimanja. Za jedan video ga mijenjaš klikom na "
+        "format u njegovom redu.",
+        "The format chosen in the bar at the top applies to all following downloads. To change it for one video, "
+        "click the format in its row.",
+        "Das oben in der Leiste gewählte Format gilt für alle folgenden Downloads. Für ein einzelnes Video "
+        "änderst du es mit einem Klick auf das Format in seiner Zeile.",
+        "El formato elegido en la barra superior se aplica a todas las descargas siguientes. Para cambiarlo en un "
+        "solo vídeo, haz clic en el formato de su fila.",
+        "Le format choisi dans la barre du haut s'applique à tous les téléchargements suivants. Pour le changer "
+        "pour une seule vidéo, cliquez sur le format dans sa ligne."),
+    "settings.close": ("Zatvori", "Close", "Schließen", "Cerrar", "Fermer"),
     "summary.active": ("u toku: {count}", "downloading: {count}", "läuft: {count}", "en curso: {count}",
                        "en cours : {count}"),
     "menu.watch_clipboard": ("Hvataj kopirane linkove", "Catch copied links", "Kopierte Links erfassen",
@@ -444,6 +466,13 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                    "Déposez un lien ici"),
     "drop.paste": ("ili ga zalijepi iz clipboarda", "or paste it from the clipboard", "oder aus der Zwischenablage einfügen",
                    "o pégalo desde el portapapeles", "ou collez-le depuis le presse-papiers"),
+    "drop.extension": ("ili pošalji video koji gledaš iz browsera, ikonom dodatka Video Download",
+                       "or send the video you're watching from your browser with the Video Download extension icon",
+                       "oder schick das Video, das du gerade ansiehst, mit dem Symbol der Video-Download-Erweiterung "
+                       "aus dem Browser",
+                       "o envía el vídeo que estás viendo desde el navegador con el icono de la extensión Video Download",
+                       "ou envoyez la vidéo que vous regardez depuis le navigateur avec l'icône de l'extension Video "
+                       "Download"),
     "drop.folder": ("Preuzimanja idu u: {folder}", "Downloads go to: {folder}", "Downloads werden gespeichert in: {folder}",
                     "Las descargas se guardan en: {folder}", "Les téléchargements vont dans : {folder}"),
 

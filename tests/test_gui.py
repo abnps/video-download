@@ -199,6 +199,26 @@ class MainWindowTest(unittest.TestCase):
         window.filter_bar.select("all")
         self.assertTrue(all(not window._rows[item.id].isHidden() for item in window._queue.items()))
 
+    def test_settings_dialog_changes_the_same_options_as_the_menus(self):
+        from videodl.gui import NAME_TEMPLATES, PARALLEL_CHOICES, RATE_CHOICES
+        from videodl.settings_dialog import SettingsDialog
+
+        window = self.make_window(self.quick_download)
+        dialog = SettingsDialog(window, RATE_CHOICES, PARALLEL_CHOICES, NAME_TEMPLATES)
+        self.addCleanup(dialog.deleteLater)
+        dialog.subtitles.setChecked(not window._subtitles)
+        self.assertEqual(window.subtitles_action.isChecked(), window._subtitles)  # meni prati Postavke
+        dialog.parallel.setCurrentIndex(dialog.parallel.findData(3))
+        self.assertEqual(window._parallel, 3)
+        dialog.rate.setCurrentIndex(dialog.rate.findData(5))
+        self.assertEqual(window._rate_limit, 5)
+        self.assertTrue(next(a for a in window.rate_actions.actions() if a.data() == 5).isChecked())
+        dialog.clipboard.setChecked(False)
+        self.assertFalse(window._watch_clipboard)
+        dialog.theme.setCurrentIndex(dialog.theme.findData("dark"))
+        self.assertEqual(window._theme, "dark")
+        self.assertEqual(self.settings.value("rate_limit", type=int), 5)  # sačuvano odmah, bez „Sačuvaj"
+
     def test_play_button_opens_downloaded_file(self):
         target = os.path.join(self.tmp.name, "a.mp4")
 

@@ -21,7 +21,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
-    QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon, QVBoxLayout, QWidget,
+    QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon, QToolButton, QVBoxLayout, QWidget,
 )
 
 from . import __version__
@@ -289,6 +289,8 @@ class MainWindow(QMainWindow):
         self.file_menu.addSeparator()
         self.choose_folder_action = self.file_menu.addAction("", self._choose_folder)
         self.open_folder_action = self.file_menu.addAction("", self._open_folder)
+        self.settings_action = self.file_menu.addAction("", self.show_settings)
+        self.settings_action.setShortcut(QKeySequence("Ctrl+,"))
         self.file_menu.addSeparator()
         self.exit_action = self.file_menu.addAction("", self.close)
         self.exit_action.setShortcut(QKeySequence("Ctrl+Q"))
@@ -438,6 +440,9 @@ class MainWindow(QMainWindow):
         self.support_banner_later.setText(tr("support.later"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{theme.c("link")}">{tr("corner.open_folder")}</a>')
+        self.settings_action.setText(tr("menu.settings"))
+        self.settings_button.setIcon(icon("settings", theme.c("icon")))
+        self.settings_button.setToolTip(tr("settings.title"))
 
         self.paste_button.setText(tr("toolbar.paste"))
         self.paste_button.setToolTip(tr("toolbar.paste_tip"))
@@ -491,6 +496,13 @@ class MainWindow(QMainWindow):
         self.download_button.setIconSize(QSize(14, 14))
         self.download_button.clicked.connect(self._toggle_running)
         bar.addWidget(self.download_button)
+        # Zupčanik: sve postavke na jednom mjestu (meniji ostaju za one koji su navikli).
+        self.settings_button = QToolButton()
+        self.settings_button.setObjectName("rowAction")
+        self.settings_button.setIconSize(QSize(20, 20))
+        self.settings_button.setFixedSize(34, 34)
+        self.settings_button.clicked.connect(self.show_settings)
+        bar.addWidget(self.settings_button)
         layout.addWidget(toolbar)
 
         self.warning_label = QLabel()
@@ -697,6 +709,13 @@ class MainWindow(QMainWindow):
         LegalDialog(self).exec()
 
     @Slot()
+    def show_settings(self) -> None:
+        from .settings_dialog import SettingsDialog
+
+        dialog = SettingsDialog(self, RATE_CHOICES, PARALLEL_CHOICES, NAME_TEMPLATES)
+        self._settings_dialog = dialog  # testovi ga nađu; prozor je modalan
+        dialog.exec()
+
     def _show_whats_new(self) -> None:
         WhatsNewDialog(self).exec()
 

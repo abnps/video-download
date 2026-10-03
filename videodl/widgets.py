@@ -378,6 +378,11 @@ class DropZone(QWidget):
         self.paste_link.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.paste_link.linkActivated.connect(lambda _href: self.paste_requested.emit())
         layout.addWidget(self.paste_link)
+        # Drugi put do preuzimanja: dodatak u browseru (novi korisnik ga često ne zna).
+        self.extension_hint = QLabel()
+        self.extension_hint.setObjectName("dropHint")
+        self.extension_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.extension_hint)
         self.folder_hint = QLabel()
         self.folder_hint.setObjectName("dropHint")
         self.folder_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -390,6 +395,7 @@ class DropZone(QWidget):
     def retranslate(self) -> None:
         self.title.setText(tr("drop.title"))
         self.paste_link.setText(f'<a href="paste" style="color:{theme.c("link")}">{tr("drop.paste")}</a>')
+        self.extension_hint.setText(tr("drop.extension"))
         self.folder_hint.setText(tr("drop.folder", folder=self._folder))
 
     def set_folder(self, folder: str) -> None:
