@@ -1,5 +1,7 @@
 package io.github.abnps.videodownload
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -91,6 +93,14 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     val clipRange = parseClip(clipFrom, clipTo, info.duration)
     // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
     val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
+    fun start(asAudio: Boolean, asMp3: Boolean) {
+        val label = if (asAudio) (if (asMp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
+        val range = if (clip) clipRange else null
+        val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, asAudio,
+            if (asAudio) 0 else chosen.height, label, adult = info.adult, subtitles = subtitles && !asAudio,
+            clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1)
+        if (info.adult) askAdult = job else onDownload(job)
+    }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
@@ -102,9 +112,13 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             Box {
                 Thumb(info.thumbnail, null, info.title, info.duration, Modifier.fillMaxWidth().aspectRatio(16f / 9f),
                     adult = info.adult)
-                Box(Modifier.align(Alignment.Center).size(56.dp).background(Color(0x99000000), CircleShape),
-                    contentAlignment = Alignment.Center) {
-                    AppIcon(R.drawable.ic_play, Modifier.size(32.dp), tint = Color.White)
+                // Brzo preuzimanje jednim dodirom (kao kod sličnih aplikacija): zvuk kao MP3 ili video u
+                // izabranom kvalitetu, bez traženja dugmeta ispod. Isti posao kao glavno dugme.
+                Row(Modifier.align(Alignment.BottomEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (info.audioAvailable) QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio),
+                        enabled = !blockedByParental) { start(true, true) }
+                    QuickButton(R.drawable.ic_videocam, stringResource(R.string.quick_video),
+                        enabled = !blockedByParental) { start(false, mp3) }
                 }
             }
             Text(info.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, maxLines = 3,
@@ -122,12 +136,12 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (audio) {
                 // MP3 192 kbps: veličina ≈ trajanje × 24 KB/s.
-                OptionRow(mp3, "MP3 · ${Mp3.KBPS} kbps", sizeText("MP3", info.duration * Mp3.KBPS * 125.0)) { mp3 = true }
-                OptionRow(!mp3, stringResource(R.string.audio_m4a_original), sizeText("M4A", info.audioSize)) { mp3 = false }
+                OptionRow(mp3, "MP3 · ${Mp3.KBPS} kbps", sizePills("MP3", info.duration * Mp3.KBPS * 125.0)) { mp3 = true }
+                OptionRow(!mp3, stringResource(R.string.audio_m4a_original), sizePills("M4A", info.audioSize)) { mp3 = false }
             } else {
                 options.forEach { option ->
                     val title = if (option.label > 0) "${option.label}p" else stringResource(R.string.best_quality)
-                    OptionRow(option == chosen, title, sizeText("MP4", option.size)) { chosen = option }
+                    OptionRow(option == chosen, title, sizePills("MP4", option.size)) { chosen = option }
                 }
                 CheckRow(subtitles, stringResource(R.string.subtitles_option), stringResource(R.string.subtitles_note)) {
                     subtitles = it
@@ -155,14 +169,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 }
             }
         }
-        Button(onClick = {
-            val label = if (audio) (if (mp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
-            val range = if (clip) clipRange else null
-            val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, audio,
-                if (audio) 0 else chosen.height, label, adult = info.adult, subtitles = subtitles && !audio,
-                clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1)
-            if (info.adult) askAdult = job else onDownload(job)
-        }, enabled = !blockedByParental && (!clip || clipRange != null), modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
+        Button(onClick = { start(audio, mp3) }, enabled = !blockedByParental && (!clip || clipRange != null), modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
             shape = RoundedCornerShape(12.dp)) {
             AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
             Text(stringResource(if (audio) R.string.download_btn_audio else R.string.download_btn_video),
@@ -178,12 +185,21 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
 }
 
 @Composable
-internal fun sizeText(format: String, size: Double): String =
-    if (size > 0) "$format • ${stringResource(R.string.about_size, formatSize(size))}"
-    else "$format • ${stringResource(R.string.size_unknown)}"
+internal fun sizePills(format: String, size: Double): List<String> =
+    listOf(format, if (size > 0) stringResource(R.string.about_size, formatSize(size)) else stringResource(R.string.size_unknown))
+
+/** Okruglo dugme preko sličice (zvuk / video jednim dodirom). */
+@Composable
+internal fun QuickButton(icon: Int, description: String, enabled: Boolean, onClick: () -> Unit) {
+    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(52.dp)
+        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f), RoundedCornerShape(16.dp))
+        .semantics { contentDescription = description }) {
+        AppIcon(icon, Modifier.size(26.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+    }
+}
 
 @Composable
-internal fun OptionRow(selected: Boolean, title: String, subtitle: String, onClick: () -> Unit) {
+internal fun OptionRow(selected: Boolean, title: String, pills: List<String>, onClick: () -> Unit) {
     // One UI 9: ispunjene zaobljene kartice; izabrana dobija boju aplikacije i tanak obojen rub.
     val border = if (selected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null
     Card(onClick = onClick, shape = RoundedCornerShape(22.dp), border = border, modifier = Modifier.fillMaxWidth(),
@@ -193,7 +209,7 @@ internal fun OptionRow(selected: Boolean, title: String, subtitle: String, onCli
             RadioButton(selected = selected, onClick = onClick)
             Column(Modifier.padding(start = 6.dp)) {
                 Text(title, fontWeight = FontWeight.SemiBold)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                PillRow(pills, Modifier.padding(top = 4.dp))
             }
         }
     }

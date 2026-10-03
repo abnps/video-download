@@ -160,3 +160,21 @@ fun FloatingTabBar(items: List<TabItem>, selected: Int, action: TabItem? = null,
         }
     }
 }
+
+/** Mala zaobljena oznaka („1080P", „MP4", „46 MB"), kao kod sličnih aplikacija (Ahmed 3.10.2026). */
+@Composable
+internal fun Pill(text: String, accent: Boolean = false) {
+    val colors = MaterialTheme.colorScheme
+    Text(text, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold,
+        color = if (accent) colors.onPrimaryContainer else colors.onSurfaceVariant,
+        modifier = Modifier.background(if (accent) colors.primaryContainer else colors.surfaceContainerHighest,
+            RoundedCornerShape(8.dp)).padding(horizontal = 7.dp, vertical = 2.dp))
+}
+
+@Composable
+internal fun PillRow(texts: List<String>, modifier: Modifier = Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+        texts.filter { it.isNotBlank() }.forEachIndexed { index, text -> Pill(text, accent = index == 0) }
+    }
+}
+

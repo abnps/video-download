@@ -179,4 +179,7 @@
     <string name="failed_label">Failed</string>
     <string name="copy_link">Copy link</string>
     <string name="link_copied">Link copied</string>
+    <string name="filter_all">All</string>
+    <string name="quick_audio">Download audio now</string>
+    <string name="quick_video">Download video now</string>
 </resources>

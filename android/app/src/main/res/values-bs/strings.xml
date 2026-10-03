@@ -181,4 +181,7 @@
     <string name="failed_label">Nije uspjelo</string>
     <string name="copy_link">Kopiraj link</string>
     <string name="link_copied">Link je kopiran</string>
+    <string name="filter_all">Sve</string>
+    <string name="quick_audio">Preuzmi zvuk odmah</string>
+    <string name="quick_video">Preuzmi video odmah</string>
 </resources>

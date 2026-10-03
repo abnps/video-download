@@ -1,5 +1,7 @@
 package io.github.abnps.videodownload
 
+import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -95,9 +97,25 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
             }
         } else {
             if (history.isEmpty()) Empty(stringResource(R.string.no_done))
+            // Filter čipovi (kao kod sličnih aplikacija): Sve, Video, Zvuk, Nije uspjelo.
+            var filter by remember { mutableStateOf(0) }
+            val filters = listOf(R.string.filter_all, R.string.tab_video, R.string.tab_audio, R.string.failed_label)
+            val shown = when (filter) {
+                1 -> history.filter { !it.failed && !it.isAudio }
+                2 -> history.filter { !it.failed && it.isAudio }
+                3 -> history.filter { it.failed }
+                else -> history
+            }
+            if (history.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                filters.forEachIndexed { index, label ->
+                    FilterChip(selected = filter == index, onClick = { filter = index }, label = { Text(stringResource(label)) },
+                        shape = RoundedCornerShape(50))
+                }
+            }
             val today = startOfToday()
             LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                val (recent, older) = history.partition { it.finishedAt >= today }
+                val (recent, older) = shown.partition { it.finishedAt >= today }
                 if (recent.isNotEmpty()) item { SectionTitle(stringResource(R.string.today)) }
                 items(recent, key = { it.id }) { DoneCard(it, actions) }
                 if (older.isNotEmpty()) item { SectionTitle(stringResource(R.string.earlier)) }
@@ -184,8 +202,7 @@ internal fun DoneCard(item: HistoryItem, actions: ItemActions) {
                     Text(stringResource(R.string.done_label), color = Brand.Green, style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 4.dp))
                 }
-                Text("${item.format} • ${formatSize(item.size.toDouble())}", style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                PillRow(item.format.split(" • ") + formatSize(item.size.toDouble()), Modifier.padding(top = 4.dp))
                 Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilledTonalButton(onClick = { actions.open(item) }, shape = RoundedCornerShape(10.dp)) {
                         AppIcon(R.drawable.ic_play, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)

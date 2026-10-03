@@ -181,4 +181,7 @@
     <string name="failed_label">Ha fallado</string>
     <string name="copy_link">Copiar enlace</string>
     <string name="link_copied">Enlace copiado</string>
+    <string name="filter_all">Todo</string>
+    <string name="quick_audio">Descargar audio ahora</string>
+    <string name="quick_video">Descargar vídeo ahora</string>
 </resources>
