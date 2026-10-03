@@ -70,7 +70,9 @@ class ConfirmationTest(unittest.TestCase):
     def setUp(self):
         self.language = get_language()
         set_language("bs")
-        self.tmp = tempfile.TemporaryDirectory()
+        # Prozor (radna nit, odloženo čuvanje reda) zna upisati fajl baš dok se folder briše: na Windowsu je to
+        # povremeno rušilo test (WinError 145, CI 3.10.2026), a ne ponašanje programa.
+        self.tmp = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.settings = QSettings(os.path.join(self.tmp.name, "s.ini"), QSettings.Format.IniFormat)
         self.settings.setValue("language", "bs")
         self.asked = []
