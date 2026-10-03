@@ -42,13 +42,17 @@ object AppUpdater {
         val now = System.currentTimeMillis()
         if (!force && now - prefs.getLong("provjereno", 0) < CHECK_INTERVAL) return
         try {
-            val json = JSONObject(read(BASE + "android.json"))
+            // Jedan novi pokušaj: dok se izdanje objavljuje, GitHub kratko vraća 404 za „latest" (3.10.2026).
+            val json = JSONObject(runCatching { read(BASE + "android.json") }.getOrElse {
+                Thread.sleep(3000)
+                read(BASE + "android.json")
+            })
             prefs.edit().putLong("provjereno", now).apply()
             val release = AppRelease(json.getInt("versionCode"), json.getString("versionName"), json.getString("apk"),
                 json.getString("sha256").lowercase(), json.optLong("size"))
             state.value = if (release.versionCode > installedCode(context)) UpdateState.Available(release) else UpdateState.UpToDate
         } catch (error: Exception) {
-            if (force) state.value = UpdateState.Failed(error.message ?: error.javaClass.simpleName)
+            if (force) state.value = UpdateState.Failed(reason(error))
         }
     }
 
@@ -83,7 +87,7 @@ object AppUpdater {
             }
             state.value = UpdateState.Available(release) // dalje vodi Androidov prozor za potvrdu
         } catch (error: Exception) {
-            state.value = UpdateState.Failed(error.message ?: error.javaClass.simpleName)
+            state.value = UpdateState.Failed(reason(error))
         }
     }
 
@@ -104,11 +108,22 @@ object AppUpdater {
         return mine.isNotEmpty() && theirs == mine
     }
 
+    /** Razumljiv razlog umjesto gole adrese (Java za HTTP 404 javlja samo URL). */
+    private fun reason(error: Exception): String = when (error) {
+        is java.net.UnknownHostException, is java.net.ConnectException, is java.net.SocketTimeoutException ->
+            "nema veze s GitHubom"
+        is HttpError -> "GitHub HTTP ${error.code}"
+        else -> error.message ?: error.javaClass.simpleName
+    }
+
+    private class HttpError(val code: Int) : java.io.IOException("HTTP $code")
+
     private fun read(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 15000
         connection.readTimeout = 15000
         return try {
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) throw HttpError(connection.responseCode)
             connection.inputStream.bufferedReader().use { it.readText() }
         } finally {
             connection.disconnect()
@@ -120,6 +135,7 @@ object AppUpdater {
         connection.connectTimeout = 15000
         connection.readTimeout = 30000
         try {
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) throw HttpError(connection.responseCode)
             val total = connection.contentLengthLong
             var done = 0L
             connection.inputStream.use { input ->
