@@ -159,4 +159,13 @@
     <string name="quick_on">An: geteilte Links werden sofort in der Standardqualität geladen</string>
     <string name="quick_off">Aus: geteilte Links öffnen die Qualitätsauswahl</string>
     <string name="quick_started">Download gestartet: %1$s</string>
+    <string name="settings_downloads">Herunterladen</string>
+    <string name="settings_accounts">Konten</string>
+    <string name="settings_accounts_note">Nur für Seiten, die manche Videos nur angemeldeten Nutzern zeigen. Die Anmeldung bleibt in dieser App.</string>
+    <string name="settings_protection">Schutz</string>
+    <string name="settings_app">App</string>
+    <string name="settings_support">Hilfe und Informationen</string>
+    <string name="chip_on">An</string>
+    <string name="chip_off">Aus</string>
+    <string name="chip_login">Anmelden</string>
 </resources>

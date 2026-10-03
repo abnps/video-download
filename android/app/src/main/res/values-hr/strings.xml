@@ -162,4 +162,13 @@
     <string name="quick_on">Uključeno: podijeljena poveznica odmah se preuzima u zadanoj kvaliteti</string>
     <string name="quick_off">Isključeno: podijeljena poveznica otvara izbor kvalitete</string>
     <string name="quick_started">Preuzimanje je počelo: %1$s</string>
+    <string name="settings_downloads">Preuzimanje</string>
+    <string name="settings_accounts">Računi</string>
+    <string name="settings_accounts_note">Samo za stranice koje neke videozapise daju prijavljenima. Prijava ostaje u ovoj aplikaciji.</string>
+    <string name="settings_protection">Zaštita</string>
+    <string name="settings_app">Aplikacija</string>
+    <string name="settings_support">Podrška i informacije</string>
+    <string name="chip_on">Uključena</string>
+    <string name="chip_off">Isključena</string>
+    <string name="chip_login">Prijavi se</string>
 </resources>

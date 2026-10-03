@@ -162,4 +162,13 @@
     <string name="quick_on">Activado: los enlaces compartidos se descargan al instante en la calidad predeterminada</string>
     <string name="quick_off">Desactivado: los enlaces compartidos abren la selección de calidad</string>
     <string name="quick_started">Descarga iniciada: %1$s</string>
+    <string name="settings_downloads">Descargas</string>
+    <string name="settings_accounts">Cuentas</string>
+    <string name="settings_accounts_note">Solo para sitios que muestran algunos vídeos a usuarios con sesión. La sesión queda en esta app.</string>
+    <string name="settings_protection">Protección</string>
+    <string name="settings_app">Aplicación</string>
+    <string name="settings_support">Ayuda e información</string>
+    <string name="chip_on">Activado</string>
+    <string name="chip_off">Desactivado</string>
+    <string name="chip_login">Iniciar sesión</string>
 </resources>

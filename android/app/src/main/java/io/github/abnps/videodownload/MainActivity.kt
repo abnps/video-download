@@ -282,16 +282,19 @@ class MainActivity : ComponentActivity() {
         }
         Scaffold(bottomBar = {
             // Donja traka samo na glavnim ekranima; Postavke se otvaraju zupčanikom gore desno.
-            if (tab.intValue != TAB_SETTINGS) NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                listOf(
-                    Triple(TAB_HOME, R.drawable.ic_home, R.string.nav_home),
-                    Triple(TAB_DOWNLOADS, R.drawable.ic_download, R.string.nav_downloads),
-                ).forEach { (index, icon, label) ->
-                    NavigationBarItem(selected = tab.intValue == index,
-                        onClick = { tab.intValue = index; if (index != TAB_HOME) { info.value = null; playlist.value = null } },
-                        icon = { AppIcon(icon) }, label = { Text(stringResource(label)) })
-                }
-            }
+            // One UI 9 stil (Ahmed 3.10.2026): plutajuća zaobljena traka umjesto trake preko cijele širine.
+            if (tab.intValue != TAB_SETTINGS) FloatingTabBar(
+                listOf(TabItem(R.drawable.ic_home, stringResource(R.string.nav_home)),
+                    TabItem(R.drawable.ic_download, stringResource(R.string.nav_downloads))),
+                selected = tab.intValue,
+                // Glavna radnja: zalijepi link iz međuspremnika i odmah ga pročitaj (kao „Zalijepi" + „Preuzmi video").
+                action = TabItem(R.drawable.ic_paste, stringResource(R.string.paste)),
+                onAction = {
+                    tab.intValue = TAB_HOME; info.value = null; playlist.value = null
+                    paste()
+                    if (findUrl(link.value) != null) lifecycleScope.launch { find() }
+                },
+            ) { index -> tab.intValue = index; if (index != TAB_HOME) { info.value = null; playlist.value = null } }
         }) { padding ->
             Box(Modifier.fillMaxSize().padding(padding)) {
                 when {

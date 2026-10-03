@@ -25,6 +25,8 @@ private val Light = lightColorScheme(
     onSurface = Color(0xFF111827),
     onSurfaceVariant = Color(0xFF5B6474),
     outlineVariant = Color(0xFFE3E8EF),
+    surfaceContainerHigh = Color.White,
+    surfaceContainerHighest = Color.White,
 )
 
 private val Dark = darkColorScheme(
@@ -38,6 +40,9 @@ private val Dark = darkColorScheme(
     onSurface = Color(0xFFEEF1F6),
     onSurfaceVariant = Color(0xFFA2ABBB),
     outlineVariant = Color(0xFF2A3140),
+    // Kartice postavki i plutajuća traka (One UI 9 stil): ista plavkasta paleta, bez Androidovih podrazumijevanih.
+    surfaceContainerHigh = Color(0xFF1A202B),
+    surfaceContainerHighest = Color(0xFF232A37),
 )
 
 @Composable

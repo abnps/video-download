@@ -45,6 +45,8 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -87,50 +89,74 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     var askPin by remember { mutableStateOf(false) }
     var editParental by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
-    // Standardna Android traka: strelica nazad + naslov (kao ekran „Izaberi kvalitet").
-    Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack) { AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface) }
-        Text(stringResource(R.string.nav_settings), style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold)
+    // One UI 9 stil (Ahmed 3.10.2026): strelica gore, veliki naslov nisko u zaglavlju — dohvatljiv palcem.
+    IconButton(onClick = onBack, modifier = Modifier.padding(start = 4.dp, top = 4.dp)) {
+        AppIcon(R.drawable.ic_back, tint = MaterialTheme.colorScheme.onSurface)
+    }
+    Box(Modifier.fillMaxWidth().height(120.dp).padding(horizontal = 24.dp), contentAlignment = Alignment.BottomStart) {
+        Text(stringResource(R.string.nav_settings), fontSize = 34.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 12.dp))
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
         UpdateBanner(update, onInstallUpdate)
-        SettingRow(R.drawable.ic_videocam, stringResource(R.string.set_quality),
-            if (quality == 0) stringResource(R.string.best_quality) else "${quality}p") { pickQuality = true }
-        SettingRow(R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location)) { pickLocation = true }
-        SettingRow(R.drawable.ic_language, stringResource(R.string.set_language),
-            LocalConfiguration.current.locales[0].displayLanguage,
-            onClick = onLanguage)
-        var quick by remember { mutableStateOf(Settings.quickShare(context)) }
-        SettingRow(R.drawable.ic_download, stringResource(R.string.quick_title),
-            stringResource(if (quick) R.string.quick_on else R.string.quick_off)) {
-            quick = !quick
-            Settings.setQuickShare(context, quick)
-        }
-        LoginSite.entries.forEach { site ->
-            SettingRow(R.drawable.ic_link, stringResource(site.title),
-                stringResource(if (site in loggedIn) R.string.login_on else site.offText)) {
-                if (site in loggedIn) askLogout = site else onLogin(site)
+        // Moderne postavke (Ahmed 3.10.2026): grupe u zaobljenim karticama, mreže na jednom mjestu.
+        SettingsGroup(stringResource(R.string.settings_downloads)) {
+            GroupRow(OneUi.Blue, R.drawable.ic_videocam, stringResource(R.string.set_quality),
+                if (quality == 0) stringResource(R.string.best_quality) else "${quality}p", onClick = { pickQuality = true })
+            GroupDivider()
+            GroupRow(OneUi.Orange, R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location),
+                onClick = { pickLocation = true })
+            GroupDivider()
+            var quick by remember { mutableStateOf(Settings.quickShare(context)) }
+            val toggleQuick = { quick = !quick; Settings.setQuickShare(context, quick) }
+            GroupRow(OneUi.Green, R.drawable.ic_download, stringResource(R.string.quick_title),
+                stringResource(if (quick) R.string.quick_on else R.string.quick_off), onClick = toggleQuick) {
+                Switch(checked = quick, onCheckedChange = { toggleQuick() })
             }
         }
-        SettingRow(R.drawable.ic_info, stringResource(R.string.parental_title),
-            stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off)) {
-            if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true
+        SettingsGroup(stringResource(R.string.settings_accounts), stringResource(R.string.settings_accounts_note)) {
+            LoginSite.entries.forEachIndexed { index, site ->
+                if (index > 0) GroupDivider()
+                val on = site in loggedIn
+                AccountRow(site, on) { if (on) askLogout = site else onLogin(site) }
+            }
         }
-        SettingRow(R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
-            onClick = onFeedback)
-        SettingRow(R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
-            onClick = onInvite)
-        SettingRow(R.drawable.ic_heart, stringResource(R.string.set_support), null) { onOpenLink(Links.SUPPORT) }
-        SettingRow(R.drawable.ic_info, stringResource(R.string.set_terms), null) { onOpenLink(Links.site("terms.html")) }
-        SettingRow(R.drawable.ic_info, stringResource(R.string.set_privacy), null) { onOpenLink(Links.site("privacy.html")) }
-        SettingRow(R.drawable.ic_info, stringResource(R.string.set_licenses), null) { showLicenses = true }
-        SettingRow(R.drawable.ic_download, stringResource(R.string.set_version),
-            "$appVersion · ${stringResource(R.string.test_version)}", null)
-        SettingRow(R.drawable.ic_download, stringResource(R.string.update_check),
-            if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
-        SettingRow(R.drawable.ic_settings, stringResource(R.string.set_reader), readerVersion, null)
+        SettingsGroup(stringResource(R.string.settings_protection)) {
+            GroupRow(OneUi.Purple, R.drawable.ic_info, stringResource(R.string.parental_title),
+                stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off),
+                onClick = { if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true }) {
+                StatusChip(stringResource(if (parentalOn) R.string.chip_on else R.string.chip_off), parentalOn)
+            }
+        }
+        SettingsGroup(stringResource(R.string.settings_app)) {
+            GroupRow(OneUi.Teal, R.drawable.ic_language, stringResource(R.string.set_language),
+                LocalConfiguration.current.locales[0].displayLanguage, onClick = onLanguage)
+            GroupDivider()
+            GroupRow(OneUi.Blue, R.drawable.ic_download, stringResource(R.string.update_check),
+                if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
+            GroupDivider()
+            GroupRow(OneUi.Gray, R.drawable.ic_settings, stringResource(R.string.set_version),
+                "$appVersion · ${stringResource(R.string.test_version)} · yt-dlp $readerVersion", onClick = null)
+        }
+        SettingsGroup(stringResource(R.string.settings_support)) {
+            GroupRow(OneUi.Orange, R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
+                onClick = onFeedback)
+            GroupDivider()
+            GroupRow(OneUi.Green, R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
+                onClick = onInvite)
+            GroupDivider()
+            GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.set_support), null,
+                onClick = { onOpenLink(Links.SUPPORT) })
+            GroupDivider()
+            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_terms), null, onClick = { onOpenLink(Links.site("terms.html")) })
+            GroupDivider()
+            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_privacy), null,
+                onClick = { onOpenLink(Links.site("privacy.html")) })
+            GroupDivider()
+            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_licenses), null, onClick = { showLicenses = true })
+        }
+        Spacer(Modifier.height(12.dp))
     }
     }
     if (showLicenses) LicensesDialog { showLicenses = false }
@@ -261,4 +287,85 @@ internal fun ParentalDialog(enabled: Boolean, onCancel: () -> Unit, onSave: (Boo
             }) { Text(stringResource(R.string.parental_save)) }
         },
         dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
+}
+
+
+/** Naslov grupe (boja aplikacije) i jedna zaobljena kartica sa svim redovima grupe, kao Postavke na Androidu 15+. */
+@Composable
+private fun SettingsGroup(title: String, note: String? = null, content: @Composable () -> Unit) {
+    Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 20.dp, top = 18.dp, bottom = 4.dp))
+    if (note != null) Text(note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 20.dp, end = 12.dp, bottom = 6.dp))
+    Card(shape = RoundedCornerShape(26.dp), modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+        Column { content() }
+    }
+}
+
+@Composable
+private fun GroupDivider() = HorizontalDivider(Modifier.padding(start = 68.dp, end = 16.dp),
+    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+/** Red u grupi: ikona u obojenom krugu, naslov, opis i desno strelica ili kontrola (prekidač, oznaka). */
+@Composable
+private fun GroupRow(accent: Color, icon: Int, title: String, value: String?,
+                     onClick: (() -> Unit)?, trailing: (@Composable () -> Unit)? = null) {
+    Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        .padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(36.dp).background(accent, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
+            AppIcon(icon, Modifier.size(21.dp), tint = Color.White)
+        }
+        Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            if (value != null) Text(value, style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        when {
+            trailing != null -> trailing()
+            onClick != null -> AppIcon(R.drawable.ic_chevron)
+        }
+    }
+}
+
+/** Mreža u kartici „Nalozi": inicijali u krugu (bez tuđih logotipa), stanje prijave desno. */
+@Composable
+private fun AccountRow(site: LoginSite, loggedIn: Boolean, onClick: () -> Unit) {
+    val (initials, color) = when (site) {
+        LoginSite.INSTAGRAM -> "IG" to Color(0xFFD9467A)
+        LoginSite.TIKTOK -> "TT" to Color(0xFF25C2C8)
+        LoginSite.X -> "X" to Color(0xFF8A94A6)
+    }
+    Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(36.dp).background(color, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
+            Text(initials, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+        Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
+            Text(stringResource(site.title), style = MaterialTheme.typography.bodyLarge)
+            if (!loggedIn) Text(stringResource(site.offText), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        StatusChip(stringResource(if (loggedIn) R.string.login_on else R.string.chip_login), loggedIn)
+    }
+}
+
+/** Mala oznaka stanja: zelena kad je nešto uključeno/prijavljeno, inače tiha. */
+@Composable
+private fun StatusChip(text: String, on: Boolean) {
+    val color = if (on) Brand.Green else MaterialTheme.colorScheme.primary
+    Text(text, color = color, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.background(color.copy(alpha = 0.14f), RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp))
+}
+
+
+/** Boje ikona u stilu Samsung One UI (puni zaobljeni kvadrati s bijelim simbolom). */
+private object OneUi {
+    val Blue = Color(0xFF3E7BFA)
+    val Orange = Color(0xFFF59A23)
+    val Green = Color(0xFF34B36B)
+    val Purple = Color(0xFF8B5CF6)
+    val Teal = Color(0xFF1FA7B4)
+    val Pink = Color(0xFFE5486B)
+    val Gray = Color(0xFF7D8696)
 }

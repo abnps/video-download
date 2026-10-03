@@ -54,6 +54,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -112,3 +115,40 @@ internal fun ItemMenu(item: HistoryItem, actions: ItemActions) {
 
 /** Šta se može uraditi s gotovim fajlom (ekran Početna i Preuzimanja). */
 class ItemActions(val open: (HistoryItem) -> Unit, val share: (HistoryItem) -> Unit, val remove: (HistoryItem) -> Unit)
+
+
+class TabItem(val icon: Int, val label: String)
+
+/**
+ * Donja traka u stilu One UI 9 (kao Samsung Health, Ahmed 3.10.2026): plutajuća poluprozirna kapsula s karticama
+ * (ikona iznad naziva, izabrana na svjetlijoj podlozi) i odvojeno okruglo dugme za glavnu radnju desno.
+ */
+@Composable
+fun FloatingTabBar(items: List<TabItem>, selected: Int, action: TabItem? = null, onAction: () -> Unit = {},
+                   onSelect: (Int) -> Unit) {
+    val bar = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.94f)
+    Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.shadow(10.dp, RoundedCornerShape(36.dp)).background(bar, RoundedCornerShape(36.dp)).padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            items.forEachIndexed { index, item ->
+                val on = index == selected
+                val color = if (on) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                Column(Modifier.clip(RoundedCornerShape(30.dp))
+                    .background(if (on) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f) else Color.Transparent)
+                    .clickable { onSelect(index) }.padding(horizontal = 24.dp, vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    AppIcon(item.icon, Modifier.size(24.dp), tint = color)
+                    Text(item.label, color = color, fontSize = 12.sp,
+                        fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, modifier = Modifier.padding(top = 2.dp))
+                }
+            }
+        }
+        if (action != null) {
+            Box(Modifier.padding(start = 10.dp).size(58.dp).shadow(10.dp, CircleShape).background(bar, CircleShape)
+                .clip(CircleShape).clickable(onClick = onAction), contentAlignment = Alignment.Center) {
+                AppIcon(action.icon, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}

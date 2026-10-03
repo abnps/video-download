@@ -162,4 +162,13 @@
     <string name="quick_on">Activé : les liens partagés sont téléchargés tout de suite dans la qualité par défaut</string>
     <string name="quick_off">Désactivé : les liens partagés ouvrent le choix de la qualité</string>
     <string name="quick_started">Téléchargement lancé : %1$s</string>
+    <string name="settings_downloads">Téléchargements</string>
+    <string name="settings_accounts">Comptes</string>
+    <string name="settings_accounts_note">Uniquement pour les sites qui réservent certaines vidéos aux utilisateurs connectés. La connexion reste dans cette appli.</string>
+    <string name="settings_protection">Protection</string>
+    <string name="settings_app">Application</string>
+    <string name="settings_support">Aide et informations</string>
+    <string name="chip_on">Activé</string>
+    <string name="chip_off">Désactivé</string>
+    <string name="chip_login">Se connecter</string>
 </resources>

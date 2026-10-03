@@ -160,4 +160,13 @@
     <string name="quick_on">On: shared links download right away in the default quality</string>
     <string name="quick_off">Off: shared links open the quality screen</string>
     <string name="quick_started">Download started: %1$s</string>
+    <string name="settings_downloads">Downloads</string>
+    <string name="settings_accounts">Accounts</string>
+    <string name="settings_accounts_note">Only for sites that show some videos to signed-in users. The sign-in stays in this app.</string>
+    <string name="settings_protection">Protection</string>
+    <string name="settings_app">App</string>
+    <string name="settings_support">Support and information</string>
+    <string name="chip_on">On</string>
+    <string name="chip_off">Off</string>
+    <string name="chip_login">Sign in</string>
 </resources>
