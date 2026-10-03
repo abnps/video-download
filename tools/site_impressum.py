@@ -51,6 +51,6 @@ def body(lang: str, email: str) -> tuple[str, str, str]:
 <p>{esc['name']}<br>{esc['street']}<br>{esc['city']}<br>{esc.get('country', 'Deutschland')}</p>
 <h2>Kontakt</h2>
 <p>{'<br>'.join(contact)}</p>
-<p>Video Download ist ein privates, kostenloses Open-Source-Projekt; freiwillige Unterstützung schaltet nichts frei.</p>
+<p>Video Download ist ein privates, kostenloses Projekt; freiwillige Unterstützung schaltet nichts frei.</p>
 </div>"""
     return title, lead or title, content
