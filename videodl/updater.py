@@ -138,7 +138,10 @@ def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, runner=s
     test_url = url or os.environ.get("VIDEODL_UPDATE_URL")
     try:
         with opener(_request(test_url or LATEST_URL), timeout=timeout) as response:
-            return parse_release(json.loads(response.read(2 * 1024 * 1024).decode("utf-8")))
+            release = parse_release(json.loads(response.read(2 * 1024 * 1024).decode("utf-8")))
+        if release and release.manifest_url and not test_url:
+            _count_check(release.manifest_url, opener, timeout)
+        return release
     except urllib.error.HTTPError as exc:
         if test_url or exc.code not in _NEEDS_LOGIN:
             raise UpdateError(f"HTTP {exc.code}") from exc
@@ -153,6 +156,17 @@ def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, runner=s
             return None  # javan repo bez ijednog izdanja izgleda isto kao privatan
         raise
     return _fetch_with_gh(gh, runner, timeout)
+
+
+def _count_check(url: str, opener, timeout: float) -> None:
+    """Brojač aktivnih instalacija bez praćenja (Ahmed 4.10.2026): uz dnevnu provjeru preuzme se i mali potpisani
+    opis izdanja, pa GitHub-ov brojač preuzimanja tog fajla pokaže koliko se instalacija javi (kao android.json na
+    Androidu). Ništa se ne šalje osim istog zahtjeva GitHub-u; autor vidi samo ukupan broj. Greška ne smeta provjeri."""
+    try:
+        with opener(_request(url), timeout=timeout) as response:
+            response.read(64 * 1024)
+    except Exception:  # brojanje nikad ne smije pokvariti provjeru ažuriranja
+        pass
 
 
 def _fetch_with_gh(gh: str, runner, timeout: float) -> Release | None:

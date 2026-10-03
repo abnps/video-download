@@ -237,6 +237,17 @@ class UpdaterTest(unittest.TestCase):
                 self.assertEqual(path.read_bytes(), self.installer)
         self.assertEqual(self.urls[0], updater.LATEST_URL)
 
+    def test_daily_check_also_fetches_the_signed_description_for_counting(self):
+        # Brojač aktivnih instalacija bez praćenja: isti GitHub, jedan mali fajl više; greška ne smeta provjeri.
+        manifest_url = "https://github.com/r/release.json"
+        with mock.patch.dict(os.environ, {"VIDEODL_UPDATE_URL": ""}):
+            pages = {updater.LATEST_URL: self.release_json(), manifest_url: b"{}"}
+            self.assertEqual(updater.fetch_latest(opener=self.opener(pages)).version, "9.9.9")
+            self.assertEqual(self.urls, [updater.LATEST_URL, manifest_url])
+            self.urls.clear()
+            broken = {updater.LATEST_URL: self.release_json()}  # opis izdanja nedostupan
+            self.assertEqual(updater.fetch_latest(opener=self.opener(broken)).version, "9.9.9")
+
     def test_private_repo_falls_back_to_gh(self):
         release_data = json.loads(self.release_json(version="9.9.9"))
         calls = []
