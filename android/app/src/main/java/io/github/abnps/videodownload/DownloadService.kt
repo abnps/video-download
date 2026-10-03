@@ -124,7 +124,7 @@ class DownloadService : Service() {
             History.add(HistoryItem(job.id, job.title.ifBlank { result[0].toString() }, uri.toString(), job.isAudio,
                 formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis(),
                 adult = job.adult))
-            notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio))
+            notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio), shareIntent(uri, job.isAudio))
             // Kao na računaru: traka zazeleni, kratko pulsira, pa kartica nestane.
             Downloads.update(job.id) { it.copy(phase = Phase.DONE, fraction = 1f) }
             Thread.sleep(1100)
@@ -212,15 +212,18 @@ class DownloadService : Service() {
             .build()
     }
 
-    private fun notifyFinished(text: String, open: PendingIntent?) {
-        val notification = Notification.Builder(this, VideoDownloadApp.CHANNEL_DOWNLOADS)
+    private fun notifyFinished(text: String, open: PendingIntent?, share: PendingIntent? = null) {
+        val builder = Notification.Builder(this, VideoDownloadApp.CHANNEL_DOWNLOADS)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(text)
             .setStyle(Notification.BigTextStyle().bigText(text))
             .setAutoCancel(true)
             .setContentIntent(open ?: appIntent())
-            .build()
+        // Gotov fajl: „Otvori" i „Podijeli" pravo iz obavještenja (plan 1.0).
+        if (open != null) builder.addAction(Notification.Action.Builder(null, getString(R.string.open), open).build())
+        if (share != null) builder.addAction(Notification.Action.Builder(null, getString(R.string.share), share).build())
+        val notification = builder.build()
         getSystemService(NotificationManager::class.java).notify(DONE_NOTIFICATION_ID, notification)
     }
 
@@ -239,6 +242,13 @@ class DownloadService : Service() {
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
         PendingIntent.FLAG_IMMUTABLE,
     )
+
+    private fun shareIntent(uri: Uri, isAudio: Boolean): PendingIntent {
+        val send = Intent(Intent.ACTION_SEND).setType(if (isAudio) "audio/*" else "video/*")
+            .putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        return PendingIntent.getActivity(this, 3, Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 
     override fun onDestroy() {
         worker.shutdownNow()
