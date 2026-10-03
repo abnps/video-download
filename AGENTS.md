@@ -23,7 +23,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 - Bez zaobilaženja DRM-a i bez piratskih izvora. Prodaja i sajt traže pravnu provjeru;
   repo i izdanja su javni od 22.9.2026.
-  Advokat (§ 95a UrhG) za sada OTPADA (Ahmed 3.10.2026): tek ako program počne donositi zaradu; ne predlagati ranije.
+- NIŠTA PLAĆENO dok program ne donosi zaradu (Ahmed 3.10.2026): advokat (§ 95a UrhG), potpis koda (Trusted
+  Signing), Apple nalog (Mac ostaje beta), puni Google nalog — tek uz zaradu; ne predlagati ranije. Besplatno je OK:
+  Google provjera programera samo kao BESPLATNI ograničeni nalog (do 20 uređaja), nalog otvara Ahmed.
 - yt-dlp logika ostaje u `videodl/presets.py`, `probe.py`, `download.py` i
   `jobs.py`, bez Qt-a. `gui.py` samo prikazuje stanje i pokreće poslove.
   Pozadinski poslovi (Qt niti) su u `videodl/workers.py`; Android ekrani su po fajlovima (`HomeScreen.kt`,
