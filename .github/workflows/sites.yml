@@ -1,0 +1,27 @@
+# Svako jutro: da li najnoviji yt-dlp (isti koji program sam preuzima) još čita po jedan javni video po sajtu.
+# Blokada GitHubovog servera je samo upozorenje; posao pada (i stiže e-pošta) samo kad je čitanje stvarno pokvareno.
+name: Provjera sajtova
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Najnoviji yt-dlp (kao u programu poslije ažuriranja)
+        run: python -m pip install --upgrade "yt-dlp[default,curl-cffi]"
+      - name: Provjera
+        run: python tools/site_check.py

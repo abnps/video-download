@@ -207,6 +207,9 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 
 - Testovi: `python -m unittest discover -s tests` (GUI testovi rade offscreen) i
   `node --test "tests/extension/*.test.mjs"`.
+- Provjera sajtova (plan 1.0, 3.10.2026): `.github/workflows/sites.yml` svako jutro pokreće `tools/site_check.py`
+  s najnovijim yt-dlp-om (YouTube, TikTok, Instagram, X, Dailymotion). Blokada GitHub servera = upozorenje; pad =
+  sajt se promijenio. Mrtav testni video zamijeni drugim javnim (lista SITES).
 - Poslije izmjene ekstenzije, hosta ili mosta: `node tools/e2e_browser/run.mjs`
   (pravi Edge sa privremenim profilom i `--load-extension`; ne dira Ahmedov profil).
 - Najmanja izmjena koja rješava zahtjev; bez refaktorisanja nepovezanog koda.
