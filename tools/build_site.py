@@ -24,6 +24,7 @@ import site_guides  # noqa: E402  (vodiči: MP3, isječak, plejlista…)
 import site_home  # noqa: E402  (početna stranica: šablon i tekstovi)
 import site_android  # noqa: E402  (Android tutorijal)
 import site_impressum  # noqa: E402  (Impressum, tek kad ima podataka)
+import site_winget  # noqa: E402  (winget vodič, tek kad Microsoft prihvati paket)
 import site_release  # noqa: E402  (stranica „1.0", sama se uključi od verzije 1.0.0)
 
 SITE = ROOT / "site"
@@ -102,7 +103,7 @@ FORBIDDEN = re.compile(r"youtube|\byt\b(?!-dlp)|tiktok|netflix|spotify|zaobi[đd
                        r"|free music|bypass|umgeh|kostenlose musik|eludir|música gratis|contourn|musique gratuite",
                        re.IGNORECASE)
 PROMO_PAGES = ("index.html", "extension.html", "changelog.html", "guides.html",
-               *(f"{slug}.html" for slug in site_guides.GUIDES), site_release.PAGE)
+               *(f"{slug}.html" for slug in site_guides.GUIDES), site_release.PAGE, site_winget.PAGE)
 
 # Tekstovi stranica po jeziku. Prvi jezik je glavni (korijen sajta).
 TEXTS = {
@@ -504,7 +505,7 @@ def sitemap_xml() -> str:
     """Mapa sajta za Google/Bing: svaka stranica na svakom jeziku, uz veze među jezicima (hreflang)."""
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
-    for page in SITEMAP_PAGES + ((site_release.PAGE,) if site_release.enabled() else ()):
+    for page in SITEMAP_PAGES + ((site_release.PAGE,) if site_release.enabled() else ())             + ((site_winget.PAGE,) if site_winget.enabled() else ()):
         for lang in LANGUAGES:
             lines.append(f"  <url><loc>{page_url(lang, page)}</loc>")
             for other in LANGUAGES:
@@ -941,7 +942,8 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             + "\n" + software_jsonld(lang), page_url=page_url(lang), news_more=CHANGELOG_TEXT[lang][2],
             guides_link=site_guides.HUB[lang][9])
         pages[f"{prefix}changelog.html"] = page_changelog(lang)
-        pages[f"{prefix}guides.html"] = _page(lang, "guides.html", *site_guides.hub_body(lang, extra_card=site_android.hub_card(lang)))
+        pages[f"{prefix}guides.html"] = _page(lang, "guides.html", *site_guides.hub_body(
+            lang, extra_card=site_winget.hub_card(lang) + site_android.hub_card(lang)))
         pages[f"{prefix}{site_android.PAGE}"] = _page(lang, site_android.PAGE, *site_android.guide_body(
             lang, ANDROID_APK_URL, ANDROID_TEXT[lang][1]))
         for slug in site_guides.GUIDES:
@@ -951,6 +953,9 @@ def build(size_mb: int | None = None) -> dict[str, str]:
         pages[f"{prefix}privacy.html"] = page_privacy(lang)
         pages[f"{prefix}licenses.html"] = page_licenses(lang)
         pages[f"{prefix}extension.html"] = page_extension(lang)
+        if site_winget.enabled():
+            pages[f"{prefix}{site_winget.PAGE}"] = _page(lang, site_winget.PAGE, *site_winget.guide_body(
+                lang, INSTALLER_URL, site_home.HOME[lang]["win_btn"], site_guides.HUB[lang]))
         if site_release.enabled():
             pages[f"{prefix}{site_release.PAGE}"] = _page(lang, site_release.PAGE, *site_release.body(
                 lang, INSTALLER_URL, MAC_DMG_URL, ANDROID_APK_URL))

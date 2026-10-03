@@ -296,5 +296,34 @@ class ReleasePageTest(unittest.TestCase):
                 self.assertEqual(len(site_release.TEXT[lang]["sections"]), len(site_release.TEXT["en"]["sections"]))
 
 
+class WingetGuideTest(unittest.TestCase):
+    """Vodič za winget: skriven dok Microsoft ne prihvati paket, a tada na 5 jezika, u vodičima i u sitemapu."""
+
+    def test_hidden_until_package_is_accepted(self):
+        import site_winget
+
+        if not site_winget.LIVE:
+            self.assertFalse(any(name.endswith(site_winget.PAGE) for name in build_site.build()))
+
+    def test_guide_in_every_language_when_live(self):
+        from unittest import mock
+
+        import site_winget
+
+        with mock.patch.object(site_winget, "LIVE", True):
+            pages = build_site.build()
+            sitemap = build_site.sitemap_xml()
+        self.assertEqual(build_site.forbidden_words(pages), [])
+        for lang in build_site.LANGUAGES:
+            prefix = build_site.TEXTS[lang]["dir"]
+            with self.subTest(lang=lang):
+                page = pages[prefix + site_winget.PAGE]
+                for command in site_winget.COMMANDS.values():
+                    self.assertIn(f"<code>{command}</code>", page)
+                self.assertIn(build_site.INSTALLER_URL, page)
+                self.assertIn(f'href="{site_winget.PAGE}"', pages[prefix + "guides.html"])
+                self.assertIn(build_site.page_url(lang, site_winget.PAGE), sitemap)
+
+
 if __name__ == "__main__":
     unittest.main()

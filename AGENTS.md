@@ -316,4 +316,6 @@ Kasnije: roditeljska zaštita (blokada 18+ + PIN), privatni repo, Video Toolkit.
   Skripte objave traže HEAD = commit taga; ako popravka alata dođe poslije taga, tag se pomjera (to radi Ahmed,
   agentu je force push zabranjen). Kopija za winget se ponavlja s `--installers-only`.
 - Prvo samostalno ažuriranje na Macu: 0.9.8 → sljedeće izdanje (pratiti izvještaje).
+- Winget vodič na sajtu (`tools/site_winget.py`, `winget.html`, 5 jezika) je spreman ali SKRIVEN (`LIVE = False`).
+  Kad Microsoft spoji PR #445943: `LIVE = True`, `python tools/build_site.py`, commit (Ahmed 3.10.2026).
 
