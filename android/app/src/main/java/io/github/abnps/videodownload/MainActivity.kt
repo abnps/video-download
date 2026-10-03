@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
     private val location = mutableStateOf(SaveLocation.DOWNLOADS)
     private val quality = mutableIntStateOf(0)
     private var autoFind by mutableStateOf(false)
+    private var fromShare = false // link je stigao iz „Podijeli" (za brzo preuzimanje)
     private val welcome = mutableStateOf(false)
     private val loggedIn = mutableStateOf(emptySet<LoginSite>()) // na koje sajtove je korisnik prijavljen
     private val playlist = mutableStateOf<PlaylistInfo?>(null)
@@ -101,6 +102,7 @@ class MainActivity : ComponentActivity() {
             link.value = it
             tab.intValue = TAB_HOME
             info.value = null
+            fromShare = true
             autoFind = true
         }
     }
@@ -134,7 +136,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
             val list = PlaylistInfo.parseOrNull(json)
-            if (list != null) playlist.value = list else info.value = VideoInfo.parse(json)
+            val video = if (list == null) VideoInfo.parse(json) else null
+            val quick = fromShare && Settings.quickShare(this)
+            fromShare = false
+            when {
+                list != null -> playlist.value = list
+                // Brzo preuzimanje: samo običan video; plejlista, 18+ i roditeljska zaštita idu kroz ekran (odluka korisnika).
+                quick && video != null && !video.adult -> quickDownload(video)
+                else -> info.value = video
+            }
         } catch (error: CancellationException) {
             throw error // prekid nije greška sajta
         } catch (error: Exception) {
@@ -142,6 +152,19 @@ class MainActivity : ComponentActivity() {
         } finally {
             finding.value = false
         }
+    }
+
+    /** Kao „Preuzmi" na ekranu kvaliteta s podrazumijevanim kvalitetom; korisnik ostaje u aplikaciji iz koje je dijelio. */
+    private fun quickDownload(video: VideoInfo) {
+        val wanted = Settings.quality(this)
+        val options = video.video
+        val chosen = options.firstOrNull { wanted == 0 || it.label <= wanted } ?: options.firstOrNull()
+        val label = chosen?.label?.takeIf { it > 0 }?.let { "${it}p" } ?: "MP4"
+        DownloadService.start(this, Job(System.currentTimeMillis(), video.url, video.title, video.thumbnail, video.duration,
+            false, chosen?.height ?: 0, label))
+        link.value = ""
+        Toast.makeText(this, getString(R.string.quick_started, video.title), Toast.LENGTH_SHORT).show()
+        moveTaskToBack(true)
     }
 
     /** Postavke → Prijavi problem ili prijedlog: e-pošta na javnu adresu projekta, uz siguran izvještaj

@@ -155,4 +155,8 @@
     <string name="login_off_x">Für sensible X-Beiträge anmelden</string>
     <string name="login_button_x">Bei X anmelden</string>
     <string name="logout_title_x">Von X abmelden?</string>
+    <string name="quick_title">Schnell-Download</string>
+    <string name="quick_on">An: geteilte Links werden sofort in der Standardqualität geladen</string>
+    <string name="quick_off">Aus: geteilte Links öffnen die Qualitätsauswahl</string>
+    <string name="quick_started">Download gestartet: %1$s</string>
 </resources>

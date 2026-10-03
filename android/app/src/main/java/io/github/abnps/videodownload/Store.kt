@@ -25,6 +25,11 @@ object Settings {
 
     fun setQuality(context: Context, value: Int) = prefs(context).edit().putInt("quality", value).apply()
 
+    /** Brzo preuzimanje (plan 1.0): link iz „Podijeli" odmah ide na preuzimanje u podrazumijevanom kvalitetu. */
+    fun quickShare(context: Context): Boolean = prefs(context).getBoolean("quick_share", false)
+
+    fun setQuickShare(context: Context, value: Boolean) = prefs(context).edit().putBoolean("quick_share", value).apply()
+
     private fun prefs(context: Context) = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 }
 

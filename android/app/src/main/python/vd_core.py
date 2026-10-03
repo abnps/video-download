@@ -56,10 +56,25 @@ def _size(fmt: dict) -> float:
     return float(fmt.get("filesize") or fmt.get("filesize_approx") or 0)
 
 
+# AV1 (plan 1.0, tačka 5): YouTube 1440p/4K postoji samo kao AV1/VP9. Kotlin uključuje AV1 tek kad telefon ima
+# Android 14+ (MediaMuxer spaja AV1 u MP4) i HARDVERSKI AV1 dekoder (inače bi se video gledao seckavo).
+_AV1 = False
+
+
+def set_av1(enabled: bool) -> None:
+    global _AV1
+    _AV1 = bool(enabled)
+
+
+def _is_h264(fmt: dict) -> bool:
+    return str(fmt.get("vcodec") or "").startswith("avc1")
+
+
 def _video_candidates(formats: list) -> list:
-    """Formati slike koje telefon spaja bez ponovnog kodiranja: H.264 MP4 bez zvuka (za spajanje sa M4A)."""
+    """Formati slike koje telefon spaja bez ponovnog kodiranja: MP4 bez zvuka (za spajanje sa M4A) — H.264,
+    a na telefonima s AV1 i AV1."""
     return [f for f in formats if _has_video(f) and not _has_audio(f) and f.get("ext") == "mp4"
-            and str(f.get("vcodec") or "").startswith("avc1")]
+            and (_is_h264(f) or (_AV1 and str(f.get("vcodec") or "").startswith("av01")))]
 
 
 def _best_audio(formats: list):
@@ -78,7 +93,8 @@ def plan(info: dict, kind: str, height: int = 0) -> list[str]:
             raise ValueError("AUDIO_UNAVAILABLE")
         return [audio.get("format_id") or "ba[ext=m4a]"]
     fits = (lambda f: (f.get("height") or 0) <= height) if height else (lambda f: True)
-    key = lambda f: (f.get("height") or 0, f.get("fps") or 0, _size(f))  # noqa: E731
+    # Na istoj visini H.264 ima prednost (svaki telefon i plejer ga pušta); AV1 samo kad je jedini za tu visinu.
+    key = lambda f: (f.get("height") or 0, f.get("fps") or 0, _is_h264(f), _size(f))  # noqa: E731
     video_h264 = sorted((f for f in _video_candidates(formats) if fits(f)), key=key)
     combined = sorted((f for f in formats if _has_video(f) and _has_audio(f) and f.get("ext") == "mp4" and fits(f)),
                       key=lambda f: (f.get("height") or 0, _size(f)))
@@ -99,9 +115,9 @@ def options(info: dict) -> dict:
     audio = _best_audio(formats)
     audio_size = _size(audio) if audio else 0.0
     by_height, labels = {}, {}
-    for fmt in _video_candidates(formats):
+    for fmt in sorted(_video_candidates(formats), key=_is_h264):  # H.264 zadnji: njegova veličina važi za tu visinu
         height = fmt.get("height") or 0
-        if height and _size(fmt) + audio_size >= by_height.get(height, 0):
+        if height and (_is_h264(fmt) or _size(fmt) + audio_size >= by_height.get(height, 0)):
             by_height[height] = _size(fmt) + audio_size
             labels[height] = _label(fmt)
     for fmt in formats:  # sajtovi s jednim fajlom (slika i zvuk zajedno)

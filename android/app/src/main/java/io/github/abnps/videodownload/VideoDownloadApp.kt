@@ -14,6 +14,8 @@ class VideoDownloadApp : Application() {
         History.load(this)
         Downloads.load(this)
         runCatching { Python.getInstance().getModule("vd_core").callAttr("clean_diagnostics", cacheDir.absolutePath) }
+        // 1440p/4K (AV1) samo gdje se sigurno spaja i glatko gleda: Android 14+ i hardverski AV1 dekoder.
+        runCatching { Python.getInstance().getModule("vd_core").callAttr("set_av1", supportsAv1()) }
         val staleWork = cacheDir.listFiles()?.filter { it.isDirectory && it.name.startsWith("preuzimanje-") }.orEmpty()
         Thread { staleWork.forEach { it.deleteRecursively() } }.start()
         // Za sajtove koji traže pravi preglednik (TikTok): Chrome za računar, iste verzije kao Chrome ovog telefona.
@@ -29,6 +31,11 @@ class VideoDownloadApp : Application() {
         )
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
+
+    private fun supportsAv1(): Boolean = android.os.Build.VERSION.SDK_INT >= 34 &&
+        android.media.MediaCodecList(android.media.MediaCodecList.REGULAR_CODECS).codecInfos.any { codec ->
+            !codec.isEncoder && codec.isHardwareAccelerated && codec.supportedTypes.any { it.equals("video/av01", true) }
+        }
 
     companion object {
         const val CHANNEL_DOWNLOADS = "downloads"

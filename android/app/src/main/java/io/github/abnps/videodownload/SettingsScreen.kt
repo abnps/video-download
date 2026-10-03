@@ -102,6 +102,12 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingRow(R.drawable.ic_language, stringResource(R.string.set_language),
             LocalConfiguration.current.locales[0].displayLanguage,
             onClick = onLanguage)
+        var quick by remember { mutableStateOf(Settings.quickShare(context)) }
+        SettingRow(R.drawable.ic_download, stringResource(R.string.quick_title),
+            stringResource(if (quick) R.string.quick_on else R.string.quick_off)) {
+            quick = !quick
+            Settings.setQuickShare(context, quick)
+        }
         LoginSite.entries.forEach { site ->
             SettingRow(R.drawable.ic_link, stringResource(site.title),
                 stringResource(if (site in loggedIn) R.string.login_on else site.offText)) {

@@ -158,4 +158,8 @@
     <string name="login_off_x">Connectez-vous pour les publications X sensibles</string>
     <string name="login_button_x">Se connecter à X</string>
     <string name="logout_title_x">Se déconnecter de X ?</string>
+    <string name="quick_title">Téléchargement rapide</string>
+    <string name="quick_on">Activé : les liens partagés sont téléchargés tout de suite dans la qualité par défaut</string>
+    <string name="quick_off">Désactivé : les liens partagés ouvrent le choix de la qualité</string>
+    <string name="quick_started">Téléchargement lancé : %1$s</string>
 </resources>

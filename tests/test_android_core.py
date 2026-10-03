@@ -214,5 +214,34 @@ class AndroidLoginMessagesTest(unittest.TestCase):
                 self.assertEqual(record(message, "error")["event"], "login")
 
 
+
+class AndroidAv1Test(unittest.TestCase):
+    """1440p/4K preko AV1 samo kad ga telefon podržava; na istoj visini H.264 ima prednost."""
+
+    INFO = {"formats": [
+        {"format_id": "a", "ext": "m4a", "vcodec": "none", "acodec": "mp4a", "abr": 128, "filesize": 3},
+        {"format_id": "h1080", "ext": "mp4", "vcodec": "avc1.640028", "acodec": "none", "height": 1080, "width": 1920, "filesize": 50},
+        {"format_id": "a1080", "ext": "mp4", "vcodec": "av01.0.08M.08", "acodec": "none", "height": 1080, "width": 1920, "filesize": 30},
+        {"format_id": "a2160", "ext": "mp4", "vcodec": "av01.0.12M.08", "acodec": "none", "height": 2160, "width": 3840, "filesize": 200},
+        {"format_id": "v2160", "ext": "webm", "vcodec": "vp9", "acodec": "none", "height": 2160, "width": 3840, "filesize": 210},
+    ]}
+
+    def tearDown(self):
+        vd_core.set_av1(False)
+
+    def test_without_av1_phone_stays_on_h264(self):
+        vd_core.set_av1(False)
+        self.assertEqual(vd_core.plan(self.INFO, "video"), ["h1080", "a"])
+        self.assertEqual([v["height"] for v in vd_core.options(self.INFO)["video"]], [1080])
+
+    def test_with_av1_4k_is_offered_and_h264_wins_at_same_height(self):
+        vd_core.set_av1(True)
+        self.assertEqual(vd_core.plan(self.INFO, "video"), ["a2160", "a"])
+        self.assertEqual(vd_core.plan(self.INFO, "video", 1080), ["h1080", "a"])
+        video = vd_core.options(self.INFO)["video"]
+        self.assertEqual([v["height"] for v in video], [2160, 1080])
+        self.assertEqual(video[1]["size"], 53)  # veličina H.264 za 1080p, ne AV1
+
+
 if __name__ == "__main__":
     unittest.main()

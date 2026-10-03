@@ -158,4 +158,8 @@
     <string name="login_off_x">Prijavi se za osetljive X objave</string>
     <string name="login_button_x">Prijavi se na X</string>
     <string name="logout_title_x">Odjaviti se sa X-a?</string>
+    <string name="quick_title">Brzo preuzimanje</string>
+    <string name="quick_on">Uključeno: podeljen link se odmah preuzima u podrazumevanom kvalitetu</string>
+    <string name="quick_off">Isključeno: podeljen link otvara izbor kvaliteta</string>
+    <string name="quick_started">Preuzimanje je počelo: %1$s</string>
 </resources>
