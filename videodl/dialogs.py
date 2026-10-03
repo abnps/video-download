@@ -65,6 +65,12 @@ class SupportDialog(QDialog):
         buttons.addWidget(self.later_button)
         buttons.addWidget(self.already_button)
         layout.addLayout(buttons)
+        from . import support  # bez kružnog uvoza pri učitavanju
+
+        self.kofi_link = QLabel(f'<a href="{support.KOFI_URL}">{tr("support.kofi")}</a>')
+        self.kofi_link.setObjectName("supportNote")
+        self.kofi_link.setOpenExternalLinks(True)
+        layout.addWidget(self.kofi_link)
 
 class LegalDialog(QDialog):
     """Pomoć → Ugovori i licence: isti tekstovi kao u instaleru, na jeziku aplikacije."""

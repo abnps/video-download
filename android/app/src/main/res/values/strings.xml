@@ -182,4 +182,5 @@
     <string name="filter_all">All</string>
     <string name="quick_audio">Download audio now</string>
     <string name="quick_video">Download video now</string>
+    <string name="set_support_kofi">By card, without a PayPal account</string>
 </resources>

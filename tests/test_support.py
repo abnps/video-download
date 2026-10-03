@@ -79,6 +79,18 @@ class SupportStateTest(unittest.TestCase):
     def test_link_is_the_paypal_page(self):
         self.assertEqual(support.SUPPORT_URL, "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ")
 
+    def test_kofi_is_offered_as_second_channel(self):
+        # Karticom, bez PayPal naloga (Ahmed 3.10.2026): isti link u programu, na sajtu i na GitHubu.
+        from videodl.dialogs import SupportDialog
+
+        self.assertEqual(support.KOFI_URL, "https://ko-fi.com/abnps")
+        dialog = SupportDialog("x")
+        self.addCleanup(dialog.deleteLater)
+        self.assertIn(f'href="{support.KOFI_URL}"', dialog.kofi_link.text())
+        root = Path(__file__).resolve().parents[1]
+        self.assertIn(support.KOFI_URL, (root / "site" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("ko_fi: abnps", (root / ".github" / "FUNDING.yml").read_text(encoding="utf-8"))
+
 
 class SupportWindowTest(unittest.TestCase):
     def setUp(self):

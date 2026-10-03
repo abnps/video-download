@@ -55,6 +55,7 @@ data class PlaylistInfo(val url: String, val title: String, val site: String, va
 /** Javne adrese (iste kao program za računar): sajt na jeziku telefona i dobrovoljni prilog. */
 object Links {
     const val SUPPORT = "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ"
+    const val KOFI = "https://ko-fi.com/abnps" // karticom, bez PayPal naloga
     // Javni kontakt projekta (isti kao na sajtu i u programu za računar); lični e-mail nikad.
     const val CONTACT_EMAIL = "abnpsdev@gmail.com"
     private const val SITE = "https://abnps.github.io/video-download/"

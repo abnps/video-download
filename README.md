@@ -87,7 +87,8 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
 ## Podrži projekat
 
 Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, možeš dobrovoljno
-podržati razvoj: **[PayPal — Support for Video Download](https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ)**. Prilog ništa ne otključava;
+podržati razvoj: **[PayPal — Support for Video Download](https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ)**
+ili **[Ko-fi](https://ko-fi.com/abnps)** (karticom, bez PayPal naloga). Prilog ništa ne otključava;
 program je isti za sve.
 
 <img src="videodl/assets/support-qr.png" alt="QR kod za prilog preko PayPal-a" width="160">

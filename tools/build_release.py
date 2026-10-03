@@ -326,7 +326,7 @@ def main() -> int:
     from videodl import changelog
 
     notes = INSTALLER_OUT / "release-notes.md"
-    notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ\n",
+    notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ · Ko-fi: https://ko-fi.com/abnps\n",
                      encoding="utf-8")
     # Potpisan opis izdanja (release.json + .sig): aplikacije od v0.9.6 bez njega ne instaliraju ažuriranje.
     from videodl import release_signing

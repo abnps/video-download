@@ -735,6 +735,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <p class="sub" style="margin-bottom:26px">{s_text}</p>
           <div class="support-actions">
             <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">{s_btn}</a>
+            <a class="btn ghost" href="https://ko-fi.com/abnps">Ko-fi</a>
 {share_html(lang, page_url, up)}
           </div>
         </div>
