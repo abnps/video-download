@@ -175,4 +175,7 @@
     <string name="widget_desc">Lädt den kopierten Link mit einem Tipp</string>
     <string name="tile_label">Link einfügen</string>
     <string name="paste_empty">Kein Link kopiert.</string>
+    <string name="failed_label">Fehlgeschlagen</string>
+    <string name="copy_link">Link kopieren</string>
+    <string name="link_copied">Link kopiert</string>
 </resources>

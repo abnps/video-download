@@ -178,4 +178,7 @@
     <string name="widget_desc">Télécharge le lien copié en une touche</string>
     <string name="tile_label">Coller le lien</string>
     <string name="paste_empty">Aucun lien copié.</string>
+    <string name="failed_label">Échec</string>
+    <string name="copy_link">Copier le lien</string>
+    <string name="link_copied">Lien copié</string>
 </resources>

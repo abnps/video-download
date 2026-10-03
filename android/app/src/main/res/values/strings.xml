@@ -176,4 +176,7 @@
     <string name="widget_desc">Downloads the link you copied, in one tap</string>
     <string name="tile_label">Paste link</string>
     <string name="paste_empty">No link was copied.</string>
+    <string name="failed_label">Failed</string>
+    <string name="copy_link">Copy link</string>
+    <string name="link_copied">Link copied</string>
 </resources>

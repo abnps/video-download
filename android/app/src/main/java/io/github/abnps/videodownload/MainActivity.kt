@@ -222,6 +222,21 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent.createChooser(send, null))
         },
         remove = { item -> History.remove(item.id) }, // uklanja samo s liste; fajl ostaje u folderu
+        retry = { item ->
+            // Isti link ponovo kroz Početnu (svjež izbor kvaliteta); stara crvena kartica nestaje.
+            History.remove(item.id)
+            link.value = item.url
+            findError.value = null
+            info.value = null
+            playlist.value = null
+            tab.intValue = TAB_HOME
+            lifecycleScope.launch { find() }
+        },
+        copyLink = { item ->
+            getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Video Download", item.url))
+            Toast.makeText(this, R.string.link_copied, Toast.LENGTH_SHORT).show()
+        },
+        copyReport = { copyReport() },
     )
 
     /** „Pozovi prijatelja": šalje samu aplikaciju (kopija instaliranog APK-a) uz kratku poruku, preko menija Podijeli. */
@@ -342,7 +357,7 @@ class MainActivity : ComponentActivity() {
                     tab.intValue == TAB_HOME -> HomeScreen(
                         link = link.value, onLinkChange = { link.value = it; findError.value = null }, onPaste = { paste() },
                         onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
-                        onCopyReport = { copyReport() }, history = history,
+                        onCopyReport = { copyReport() }, history = history.filterNot { it.failed },
                         // Prijava postoji samo za Instagram; za druge sajtove (npr. TikTok) dugme bi zbunjivalo.
                         loginSite = LoginSite.forUrl(link.value).takeIf { findError.value == getString(R.string.error_login) },
                         onLogin = { openLogin(it) },

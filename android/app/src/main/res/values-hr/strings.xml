@@ -178,4 +178,7 @@
     <string name="widget_desc">Preuzima poveznicu koju si kopirao, jednim dodirom</string>
     <string name="tile_label">Zalijepi poveznicu</string>
     <string name="paste_empty">Nema kopirane poveznice.</string>
+    <string name="failed_label">Nije uspjelo</string>
+    <string name="copy_link">Kopiraj poveznicu</string>
+    <string name="link_copied">Poveznica je kopirana</string>
 </resources>

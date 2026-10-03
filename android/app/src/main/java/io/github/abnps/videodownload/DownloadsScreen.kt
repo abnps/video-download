@@ -168,6 +168,7 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
 
 @Composable
 internal fun DoneCard(item: HistoryItem, actions: ItemActions) {
+    if (item.failed) return FailedCard(item, actions)
     CardBox(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp)) {
             Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(120.dp).height(80.dp), item.isAudio,
@@ -193,6 +194,39 @@ internal fun DoneCard(item: HistoryItem, actions: ItemActions) {
                     OutlinedButton(onClick = { actions.share(item) }, shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp)) {
                         AppIcon(R.drawable.ic_share, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Neuspjelo preuzimanje: naslov, poruka i link, uz „Pokušaj ponovo" i „Kopiraj link" (izvještaj je u meniju). */
+@Composable
+internal fun FailedCard(item: HistoryItem, actions: ItemActions) {
+    CardBox(Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(12.dp)) {
+            Thumb(item.thumbnail, "", item.title, item.duration, Modifier.width(120.dp).height(80.dp), item.isAudio,
+                item.adult)
+            Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(item.title, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f))
+                    ItemMenu(item, actions)
+                }
+                Text(stringResource(R.string.failed_label), color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                Text(item.error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall,
+                    maxLines = 3, overflow = TextOverflow.Ellipsis)
+                Text(item.url, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilledTonalButton(onClick = { actions.retry(item) }, shape = RoundedCornerShape(10.dp)) {
+                        Text(stringResource(R.string.retry))
+                    }
+                    OutlinedButton(onClick = { actions.copyLink(item) }, shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp)) {
+                        AppIcon(R.drawable.ic_link, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }

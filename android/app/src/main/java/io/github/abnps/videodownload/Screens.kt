@@ -104,8 +104,13 @@ internal fun ItemMenu(item: HistoryItem, actions: ItemActions) {
     Box {
         IconButton(onClick = { open = true }) { AppIcon(R.drawable.ic_more) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            DropdownMenuItem(text = { Text(stringResource(R.string.open)) }, onClick = { open = false; actions.open(item) })
-            DropdownMenuItem(text = { Text(stringResource(R.string.share)) }, onClick = { open = false; actions.share(item) })
+            if (item.failed) {
+                DropdownMenuItem(text = { Text(stringResource(R.string.copy_report)) },
+                    onClick = { open = false; actions.copyReport() })
+            } else {
+                DropdownMenuItem(text = { Text(stringResource(R.string.open)) }, onClick = { open = false; actions.open(item) })
+                DropdownMenuItem(text = { Text(stringResource(R.string.share)) }, onClick = { open = false; actions.share(item) })
+            }
             DropdownMenuItem(text = { Text(stringResource(R.string.remove_from_list)) },
                 onClick = { open = false; actions.remove(item) })
         }
@@ -113,7 +118,11 @@ internal fun ItemMenu(item: HistoryItem, actions: ItemActions) {
 }
 
 /** Šta se može uraditi s gotovim fajlom (ekran Početna i Preuzimanja). */
-class ItemActions(val open: (HistoryItem) -> Unit, val share: (HistoryItem) -> Unit, val remove: (HistoryItem) -> Unit)
+class ItemActions(
+    val open: (HistoryItem) -> Unit, val share: (HistoryItem) -> Unit, val remove: (HistoryItem) -> Unit,
+    // Za neuspjela preuzimanja:
+    val retry: (HistoryItem) -> Unit = {}, val copyLink: (HistoryItem) -> Unit = {}, val copyReport: () -> Unit = {},
+)
 
 
 class TabItem(val icon: Int, val label: String)

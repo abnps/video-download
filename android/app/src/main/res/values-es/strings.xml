@@ -178,4 +178,7 @@
     <string name="widget_desc">Descarga el enlace que copiaste con un toque</string>
     <string name="tile_label">Pegar enlace</string>
     <string name="paste_empty">No hay ningún enlace copiado.</string>
+    <string name="failed_label">Ha fallado</string>
+    <string name="copy_link">Copiar enlace</string>
+    <string name="link_copied">Enlace copiado</string>
 </resources>

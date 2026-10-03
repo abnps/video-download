@@ -45,16 +45,21 @@ data class HistoryItem(
     val thumbnail: String,
     val finishedAt: Long,
     val adult: Boolean = false, // 18+: sličica ostaje zamućena i u istoriji
+    // Neuspjelo preuzimanje (Ahmed 3.10.2026): ostaje na listi s linkom i porukom, da se ne izgubi šta je bilo.
+    val failed: Boolean = false,
+    val url: String = "",
+    val error: String = "",
 ) {
     fun toJson(): JSONObject = JSONObject().put("id", id).put("title", title).put("uri", uri).put("audio", isAudio)
         .put("format", format).put("size", size).put("duration", duration).put("thumbnail", thumbnail)
-        .put("finished", finishedAt).put("adult", adult)
+        .put("finished", finishedAt).put("adult", adult).put("failed", failed).put("url", url).put("error", error)
 
     companion object {
         fun fromJson(json: JSONObject) = HistoryItem(
             json.optLong("id"), json.optString("title"), json.optString("uri"), json.optBoolean("audio"),
             json.optString("format"), json.optLong("size"), json.optInt("duration"), json.optString("thumbnail"),
-            json.optLong("finished"), json.optBoolean("adult"),
+            json.optLong("finished"), json.optBoolean("adult"), json.optBoolean("failed"), json.optString("url"),
+            json.optString("error"),
         )
     }
 }
