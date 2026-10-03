@@ -25,6 +25,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   repo i izdanja su javni od 22.9.2026.
 - yt-dlp logika ostaje u `videodl/presets.py`, `probe.py`, `download.py` i
   `jobs.py`, bez Qt-a. `gui.py` samo prikazuje stanje i pokreće poslove.
+  Pozadinski poslovi (Qt niti) su u `videodl/workers.py`; Android ekrani su po fajlovima (`HomeScreen.kt`,
+  `QualityScreen.kt`, `DownloadsScreen.kt`, `SettingsScreen.kt`, `PlaylistScreen.kt`; zajedničko u `Screens.kt`).
 - Prekid preuzimanja briše samo privremene fajlove tog pokušaja, nikad ranije
   preuzete fajlove.
 
