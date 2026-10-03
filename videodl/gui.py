@@ -41,7 +41,7 @@ from .presets import (
 from .probe import ProbeResult, probe
 from . import convert, diagnostics, parental, release_signing, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
-from .widgets import DropZone, QueueRow, display_message, set_state
+from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
     AUDIO_EXTENSIONS, BROWSERS, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
@@ -212,6 +212,7 @@ class MainWindow(QMainWindow):
         self._queue = DownloadQueue()
         self._rows: dict[int, QueueRow] = {}
         self._sizes: dict[int, int] = {}
+        self._heights: dict[int, int] = {}  # stvarna visina gotovog videa, za oznaku „1080p"
         self._running = False  # „Preuzmi" je pokrenut: red se obrađuje dok ima stavki koje čekaju
         # „Preuzmi" kliknut dok se link još čita: red kreće čim čitanje završi (inače bi klik propao).
         self._start_when_read = False
@@ -450,6 +451,7 @@ class MainWindow(QMainWindow):
         self.warning_label.setText(tr("warning.missing", items="; ".join(tr(key) for key in missing)))
         self.warning_label.setVisible(bool(missing))
         self.drop_zone.retranslate()
+        self.filter_bar.retranslate()
         self._update_folder_label()
         for item in self._queue.items():
             self._refresh_row(item)
@@ -530,6 +532,11 @@ class MainWindow(QMainWindow):
         banner.addWidget(self.support_banner_later)
         self.support_banner.hide()
         layout.addWidget(self.support_banner)
+
+        self.filter_bar = FilterBar()
+        self.filter_bar.changed.connect(lambda _key: self._update_controls())
+        self.filter_bar.hide()
+        layout.addWidget(self.filter_bar)
 
         self.stack = QStackedWidget()
         self.drop_zone = DropZone()
@@ -1089,6 +1096,8 @@ class MainWindow(QMainWindow):
                 self._note_error(result.message or "")
             if result.filepath and os.path.isfile(result.filepath):
                 self._sizes[item_id] = os.path.getsize(result.filepath)
+            if result.height:
+                self._heights[item_id] = result.height
             if result.status == ItemStatus.DONE and result.filepath:
                 self._report_save(store.append_history(item, store.history_path(self._data_dir),
                                                        self._sizes.get(item_id)))
@@ -1445,7 +1454,7 @@ class MainWindow(QMainWindow):
             return
         row = self._rows.get(item.id)
         if row is not None:
-            row.update_item(item, self._sizes.get(item.id))
+            row.update_item(item, self._sizes.get(item.id), self._heights.get(item.id))
         self._update_controls()
         self._schedule_save()
 
@@ -1464,6 +1473,7 @@ class MainWindow(QMainWindow):
         self._retry_at.pop(item_id, None)
         self._schedule_save()
         self._sizes.pop(item_id, None)
+        self._heights.pop(item_id, None)
         row = self._rows.pop(item_id, None)
         if row is not None:
             self.rows_layout.removeWidget(row)
@@ -1571,6 +1581,14 @@ class MainWindow(QMainWindow):
         busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs) or bool(self._convert_jobs)
 
         self.stack.setCurrentIndex(1 if items else 0)
+        # Kartice za filter: broj po stanju, a redovi van izabrane kartice se sakriju.
+        counts = {key: sum(filter_matches(key, item.status) for item in items) for key in FILTERS}
+        self.filter_bar.set_counts(counts)
+        self.filter_bar.setVisible(bool(items))
+        for item in items:
+            row = self._rows.get(item.id)
+            if row is not None:
+                row.setVisible(filter_matches(self.filter_bar.current, item.status))
         if busy:
             self.download_button.setText(tr("toolbar.stop"))
             self.download_button.setIcon(icon("stop"))

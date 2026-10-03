@@ -14,6 +14,7 @@ LIGHT = {
     "drop_title": "#5f6368", "status_bg": "#fafafa", "status_fg": "#666666",
     "thumb": "#2f3136", "progress_track": "#e3ecf8", "dash": "#9aa0a6", "arrow": "#7d8288",
     "download_disabled": "#a9cdf2", "support_link": "#c2185b", "alt_base": "#f5f5f5", "button": "#f3f3f3",
+    "pill_bg": "#eef1f5", "pill_fg": "#3c4043", "tab_active_bg": "#e8f0fe", "tab_active_fg": "#1a73e8",
 }
 
 DARK = {
@@ -28,6 +29,7 @@ DARK = {
     "drop_title": "#bdc1c6", "status_bg": "#1b1c1e", "status_fg": "#9aa0a6",
     "thumb": "#2f3136", "progress_track": "#33404f", "dash": "#6f7478", "arrow": "#8a8f95",
     "download_disabled": "#2c4a6b", "support_link": "#f48fb1", "alt_base": "#292a2d", "button": "#303134",
+    "pill_bg": "#33363b", "pill_fg": "#c4c7cc", "tab_active_bg": "#394457", "tab_active_fg": "#8ab4f8",
 }
 
 THEMES = ("light", "dark", "system")
@@ -89,6 +91,13 @@ QFrame#queueRow {{ background: {k['bg']}; border-bottom: 1px solid {k['row_borde
 QFrame#queueRow:hover {{ background: {k['row_hover']}; }}
 QLabel#rowTitle {{ color: {k['text']}; font-size: 10pt; }}
 QLabel#rowStatus {{ color: {k['muted']}; }}
+QLabel#pill {{ background: {k['pill_bg']}; color: {k['pill_fg']}; border-radius: 8px;
+    padding: 1px 7px; font-size: 11px; font-weight: 600; }}
+QToolButton#filterTab {{ border: none; border-radius: 13px; padding: 4px 12px; background: transparent;
+    color: {k['muted']}; }}
+QToolButton#filterTab:hover {{ background: {k['row_hover']}; color: {k['text']}; }}
+QToolButton#filterTab:checked {{ background: {k['tab_active_bg']}; color: {k['tab_active_fg']}; font-weight: 600; }}
+QToolButton#filterTab:disabled {{ color: {k['hint']}; }}
 QLabel#rowStatus[state="done"] {{ color: {k['done']}; }}
 QLabel#rowStatus[state="failed"] {{ color: {k['failed']}; }}
 QToolButton#rowAction {{ border: none; border-radius: 17px; background: transparent; }}

@@ -172,6 +172,9 @@ class AnimatedProgress(QWidget):
     def finish(self) -> None:
         """Gotovo: traka se puni do kraja, zazeleni, kratko pulsira i nestane."""
         if not self.isVisible():
+            # Prozor skriven (npr. u sistemskoj traci): bez animacije, ali traka ne smije ostati na gotovom redu.
+            self.reset()
+            self.hide()
             return
         self._slide.stop()
         self._value = self.target = 1.0
@@ -447,6 +450,21 @@ class QueueRow(QFrame):
         self.format_link.setObjectName("rowLink")
         self.format_link.linkActivated.connect(self._on_format_link)
         detail.addWidget(self.format_link)
+        # Oznake gotovog fajla kao „pilule" (stvarna rezolucija i veličina), kao kod sličnih programa.
+        self.ext_pill = QLabel()
+        self.ext_pill.setObjectName("pill")
+        self.ext_pill.setToolTip(tr("row.format_tip"))
+        self.ext_pill.linkActivated.connect(self._on_format_link)
+        self.ext_pill.hide()
+        detail.addWidget(self.ext_pill)
+        self.height_pill = QLabel()
+        self.height_pill.setObjectName("pill")
+        self.height_pill.hide()
+        detail.addWidget(self.height_pill)
+        self.size_pill = QLabel()
+        self.size_pill.setObjectName("pill")
+        self.size_pill.hide()
+        detail.addWidget(self.size_pill)
         self.status_label = ElidedLabel()
         self.status_label.setObjectName("rowStatus")
         detail.addWidget(self.status_label, 1)
@@ -497,10 +515,15 @@ class QueueRow(QFrame):
         self.update_item(item)
 
     def _on_format_link(self, _href: str) -> None:
-        self.format_clicked.emit(self.item_id, self.format_link.mapToGlobal(self.format_link.rect().bottomLeft()))
+        label = self.ext_pill if self.ext_pill.isVisible() else self.format_link
+        self.format_clicked.emit(self.item_id, label.mapToGlobal(label.rect().bottomLeft()))
 
-    def update_item(self, item: QueueItem, size: int | None = None) -> None:
+    def update_item(self, item: QueueItem, size: int | None = None, height: int | None = None) -> None:
         preset = get_preset(item.preset_key).short_label
+        finished = item.status == ItemStatus.DONE and bool(item.filepath)
+        if finished:
+            # Gotov fajl: format je ono što je stvarno nastalo (ekstenzija), a ne izbor prije preuzimanja.
+            preset = (os.path.splitext(item.filepath)[1].lstrip(".").upper() or preset)
         if item.section:
             preset = f"{preset} · {format_section(item.section)}"
         active = item.status == ItemStatus.ACTIVE
@@ -508,6 +531,15 @@ class QueueRow(QFrame):
             self.format_link.setText(f'<span style="color:{theme.c("muted")}">{preset}</span>')
         else:
             self.format_link.setText(f'<a href="format" style="color:{theme.c("link")}">{preset}</a>')
+        # Gotov fajl: format kao „pilula" (posebna oznaka; ista oznaka koja mijenja stil dok je red vidljiv
+        # zadrži staru veličinu), i dalje klik za promjenu formata.
+        self.ext_pill.setText(f'<a href="format" style="color:{theme.c("link")};text-decoration:none">{preset}</a>')
+        self.ext_pill.setVisible(finished)
+        self.format_link.setVisible(not finished)
+        self.height_pill.setText(f"{height}p" if height else "")
+        self.height_pill.setVisible(finished and bool(height))
+        self.size_pill.setText(format_size(size) if size else "")
+        self.size_pill.setVisible(finished and bool(size))
 
         self.format_link.setToolTip(tr("row.format_tip"))
         self.play_button.setIcon(icon("play", theme.c("icon")))
@@ -523,7 +555,7 @@ class QueueRow(QFrame):
                 self.progress.set_fraction(None)  # priprema: traka klizi dok ne stigne prvi procenat
         elif item.status == ItemStatus.DONE:
             text = tr("row.exists") if item.message == MESSAGE_EXISTS else tr("row.done")
-            if size:
+            if size and not item.filepath:
                 text += f" · {format_size(size)}"
             if item.message == MESSAGE_NO_SUBS:
                 text += f" · {tr('row.no_subs')}"
@@ -575,3 +607,61 @@ class QueueRow(QFrame):
         self.action_button.setIcon(icon(kind, color))
         self.action_button.setToolTip(tooltip)
         self.action_button.setProperty("kind", kind)
+
+
+FILTERS = ("all", "active", "waiting", "done", "failed")
+
+
+def filter_matches(key: str, status: ItemStatus) -> bool:
+    """Kartica za filter iznad liste: kojoj kartici pripada stanje stavke (prekinuto ide uz neuspjelo)."""
+    return {"all": True, "active": status == ItemStatus.ACTIVE, "waiting": status == ItemStatus.WAITING,
+            "done": status == ItemStatus.DONE,
+            "failed": status in (ItemStatus.FAILED, ItemStatus.CANCELLED)}[key]
+
+
+class FilterBar(QWidget):
+    """Kartice „Sve · U toku · Na čekanju · Završeno · Neuspjelo" s brojem stavki (kao kod sličnih programa).
+    Prazne kartice su isključene, osim izabrane i „Sve"."""
+
+    changed = Signal(str)
+
+    def __init__(self, parent: QWidget | None = None):
+        super().__init__(parent)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(10, 6, 10, 6)
+        layout.setSpacing(4)
+        self.buttons: dict[str, QToolButton] = {}
+        self.current = "all"
+        self._counts = {key: 0 for key in FILTERS}
+        for key in FILTERS:
+            button = QToolButton()
+            button.setObjectName("filterTab")
+            button.setCheckable(True)
+            button.setAutoRaise(True)
+            button.clicked.connect(lambda _checked=False, k=key: self.select(k))
+            layout.addWidget(button)
+            self.buttons[key] = button
+        layout.addStretch(1)
+        self.buttons["all"].setChecked(True)
+        self.retranslate()
+
+    def select(self, key: str) -> None:
+        self.current = key
+        for name, button in self.buttons.items():
+            button.setChecked(name == key)
+        self._apply_enabled()
+        self.changed.emit(key)
+
+    def set_counts(self, counts: dict[str, int]) -> None:
+        self._counts = {key: counts.get(key, 0) for key in FILTERS}
+        self.retranslate()
+
+    def _apply_enabled(self) -> None:
+        for key, button in self.buttons.items():
+            button.setEnabled(key in ("all", self.current) or self._counts[key] > 0)
+
+    def retranslate(self) -> None:
+        for key, button in self.buttons.items():
+            button.setText(tr(f"filter.{key}", count=self._counts[key]))
+        self._apply_enabled()
+

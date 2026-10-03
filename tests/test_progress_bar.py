@@ -63,6 +63,14 @@ class AnimatedProgressTest(unittest.TestCase):
         self.assertTrue(self.bar.indeterminate)
         self.assertTrue(self.bar.is_animating())
 
+    def test_finish_while_window_hidden_does_not_leave_the_bar(self):
+        # Preuzimanje završi dok je prozor u sistemskoj traci: traka ne smije ostati na gotovom redu.
+        self.bar.set_fraction(None)
+        self.host.hide()
+        self.bar.finish()
+        self.host.show()
+        self.assertTrue(self.bar.isHidden())
+
     def test_finish_turns_green_pulses_and_hides(self):
         self.bar.set_fraction(0.7)
         self.bar.finish()

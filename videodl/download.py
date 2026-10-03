@@ -49,6 +49,7 @@ class DownloadResult:
     filepath: str | None = None
     message: str = ""
     already_existed: bool = False
+    height: int | None = None  # stvarna visina preuzetog videa (oznaka „1080p" u redu); None za zvuk
 
 
 class RateBudget:
@@ -260,7 +261,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                               section=section, subtitles=False, thumbnail=thumbnail, ratelimit=ratelimit,
                               name_template=name_template)
             if result.status == ItemStatus.DONE:
-                return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed)
+                return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed,
+                                      result.height)
             return result
         return DownloadResult(ItemStatus.FAILED, message=error_message(exc))
 
@@ -270,8 +272,10 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         return DownloadResult(ItemStatus.FAILED, filepath, MESSAGE_NO_OUTPUT)
     if subtitles and not no_subtitles and filepath:
         _plain_name_for_first_subtitle(filepath, (info or {}).get("requested_subtitles") or {})
+    height = (info or {}).get("height")
     return DownloadResult(ItemStatus.DONE, filepath, MESSAGE_NO_SUBS if no_subtitles else "",
-                          already_existed=not attempt.real_download)
+                          already_existed=not attempt.real_download,
+                          height=height if isinstance(height, int) and height > 0 else None)
 
 
 def _download_audio(url: str, preset: Preset, output_dir: str, subfolder: str | None, on_progress, cancel_event,

@@ -160,6 +160,45 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(window._rows, {})
         self.assertEqual(window.stack.currentIndex(), 0)
 
+    def test_finished_row_shows_real_format_height_and_size_as_pills(self):
+        target = os.path.join(self.tmp.name, "Video [a].mp4")
+
+        def download(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
+            with open(target, "wb") as file:
+                file.write(b"x" * 2048)
+            return DownloadResult(ItemStatus.DONE, filepath=target, height=1080)
+
+        window = self.make_window(download)
+        window.add_links_from_text("https://v/a")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        item = window._queue.items()[0]
+        row = window._rows[item.id]
+        self.assertTrue(row.height_pill.isHidden())  # prije preuzimanja nema oznaka
+        window._start_all()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        self.assertEqual(row.height_pill.text(), "1080p")
+        self.assertIn(">MP4<", row.ext_pill.text())  # stvarni format fajla, ne izbor „MP4 najbolji"
+        self.assertFalse(row.ext_pill.isHidden())
+        self.assertTrue(row.format_link.isHidden())
+
+    def test_filter_tabs_count_and_hide_other_rows(self):
+        window = self.make_window(lambda *args, **kwargs: DownloadResult(ItemStatus.FAILED, message="x"))
+        window.add_links_from_text("https://v/a https://v/b https://v/c")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 3))
+        first = window._queue.items()[0]
+        first.status = ItemStatus.FAILED
+        window._refresh_row(first)
+        self.assertFalse(window.filter_bar.isHidden())
+        self.assertIn("(3)", window.filter_bar.buttons["all"].text())
+        self.assertIn("(1)", window.filter_bar.buttons["failed"].text())
+        self.assertIn("(2)", window.filter_bar.buttons["waiting"].text())
+        self.assertFalse(window.filter_bar.buttons["done"].isEnabled())  # prazna kartica je isključena
+        window.filter_bar.select("failed")
+        visible = [item.id for item in window._queue.items() if not window._rows[item.id].isHidden()]
+        self.assertEqual(visible, [first.id])
+        window.filter_bar.select("all")
+        self.assertTrue(all(not window._rows[item.id].isHidden() for item in window._queue.items()))
+
     def test_play_button_opens_downloaded_file(self):
         target = os.path.join(self.tmp.name, "a.mp4")
 
@@ -179,7 +218,8 @@ class MainWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
         self.assertFalse(row.play_button.isHidden())
         self.assertEqual(row.play_button.toolTip(), "Pusti video")
-        self.assertIn("2 KB", row.status_label.text())
+        self.assertEqual(row.size_pill.text(), "2 KB")  # veličina je oznaka („pilula"), ne dio teksta
+        self.assertFalse(row.size_pill.isHidden())
         if os.environ.get("VIDEODL_SCREENSHOT"):
             window.resize(820, 200)
             window.show()
