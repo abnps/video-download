@@ -185,4 +185,5 @@
     <string name="quick_audio">Télécharger l\'audio maintenant</string>
     <string name="quick_video">Télécharger la vidéo maintenant</string>
     <string name="set_support_kofi">Par carte, sans compte PayPal</string>
+    <string name="set_support_card">Carte, Apple Pay ou Google Pay</string>
 </resources>

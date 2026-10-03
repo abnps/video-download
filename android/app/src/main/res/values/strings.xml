@@ -183,4 +183,5 @@
     <string name="quick_audio">Download audio now</string>
     <string name="quick_video">Download video now</string>
     <string name="set_support_kofi">By card, without a PayPal account</string>
+    <string name="set_support_card">Card, Apple Pay or Google Pay</string>
 </resources>

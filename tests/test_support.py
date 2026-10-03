@@ -87,8 +87,12 @@ class SupportStateTest(unittest.TestCase):
         dialog = SupportDialog("x")
         self.addCleanup(dialog.deleteLater)
         self.assertIn(f'href="{support.KOFI_URL}"', dialog.kofi_link.text())
+        self.assertIn(f'href="{support.STRIPE_URL}"', dialog.kofi_link.text())
+        self.assertTrue(support.STRIPE_URL.startswith("https://buy.stripe.com/"))
         root = Path(__file__).resolve().parents[1]
-        self.assertIn(support.KOFI_URL, (root / "site" / "index.html").read_text(encoding="utf-8"))
+        home = (root / "site" / "index.html").read_text(encoding="utf-8")
+        self.assertIn(support.KOFI_URL, home)
+        self.assertIn(support.STRIPE_URL, home)
         self.assertIn("ko_fi: abnps", (root / ".github" / "FUNDING.yml").read_text(encoding="utf-8"))
 
 

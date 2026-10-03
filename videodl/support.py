@@ -11,6 +11,8 @@ from dataclasses import dataclass
 SUPPORT_URL = "https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ"
 # Drugi kanal (Ahmed 3.10.2026): karticom i bez PayPal naloga; Ko-fi ne uzima proviziju na priloge.
 KOFI_URL = "https://ko-fi.com/abnps"
+# Direktno karticom, Apple Payem ili Google Payem (Stripe Payment Link, iznos bira podržavalac; samo Stripeova provizija).
+STRIPE_URL = "https://buy.stripe.com/14A4gA9GnfcSgjVdAV8Vi00"
 BANNER_EVERY = 10  # traka iznad liste poslije svakih N novih preuzimanja
 DIALOG_INTERVAL = 7 * 24 * 60 * 60  # prozor najviše jednom sedmično
 SNOOZE = 90 * 24 * 60 * 60  # „Već sam podržao" gasi podsjetnik na 90 dana

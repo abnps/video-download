@@ -67,7 +67,8 @@ class SupportDialog(QDialog):
         layout.addLayout(buttons)
         from . import support  # bez kružnog uvoza pri učitavanju
 
-        self.kofi_link = QLabel(f'<a href="{support.KOFI_URL}">{tr("support.kofi")}</a>')
+        self.kofi_link = QLabel(tr("support.other", card=f'<a href="{support.STRIPE_URL}">{tr("support.card")}</a>',
+                                   kofi=f'<a href="{support.KOFI_URL}">Ko-fi</a>'))
         self.kofi_link.setObjectName("supportNote")
         self.kofi_link.setOpenExternalLinks(True)
         layout.addWidget(self.kofi_link)

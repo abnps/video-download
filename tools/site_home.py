@@ -50,7 +50,7 @@ HOME = {
         "download_short": "Download", "new": "New", "eyebrow": "<b>Android and macOS</b> in beta",
         "h1": ("Video and audio.", "In one click."),
         "lead": "A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.",
-        "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
+        "support_card": "Card / Apple Pay", "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
         "note": "The app is meant for your own videos, content you have the author's permission for, and content under a free "
                 "license. By downloading you accept the <a href=\"terms.html\">Terms of use</a>. DRM-protected content is not downloaded.",
         "try_it": "Try it: click <b>{paste}</b>.",
@@ -117,7 +117,7 @@ HOME = {
         "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android i macOS</b> u probnoj fazi",
         "h1": ("Video i zvuk.", "Jednim klikom."),
         "lead": "Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.",
-        "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
+        "support_card": "Kartica / Apple Pay", "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
         "note": "Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. "
                 "Preuzimanjem prihvataš <a href=\"terms.html\">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.",
         "try_it": "Probaj: klikni <b>{paste}</b>.",
@@ -186,7 +186,7 @@ HOME = {
         "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android und macOS</b> in der Beta",
         "h1": ("Video und Audio.", "Mit einem Klick."),
         "lead": "Eine kostenlose App für Windows und Mac: MP4 in voller Qualität oder MP3, direkt aus dem Browser oder aus einem kopierten Link.",
-        "win_btn": "Für Windows herunterladen", "win_req": "Windows 10 und 11 (64 Bit)", "install_help": "Hilfe zur Installation",
+        "support_card": "Karte / Apple Pay", "win_btn": "Für Windows herunterladen", "win_req": "Windows 10 und 11 (64 Bit)", "install_help": "Hilfe zur Installation",
         "note": "Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte "
                 "unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href=\"terms.html\">Nutzungsbedingungen</a>. "
                 "DRM-geschützte Inhalte werden nicht heruntergeladen.",
@@ -260,7 +260,7 @@ HOME = {
         "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android y macOS</b> en beta",
         "h1": ("Vídeo y audio.", "Con un clic."),
         "lead": "Una aplicación gratuita para Windows y Mac: MP4 en calidad completa o MP3, directamente desde el navegador o desde un enlace copiado.",
-        "win_btn": "Descargar para Windows", "win_req": "Windows 10 y 11 (64 bits)", "install_help": "ayuda para instalar",
+        "support_card": "Tarjeta / Apple Pay", "win_btn": "Descargar para Windows", "win_req": "Windows 10 y 11 (64 bits)", "install_help": "ayuda para instalar",
         "note": "La aplicación está pensada para tus propios vídeos, contenido para el que tienes permiso del autor y contenido con "
                 "licencia libre. Al descargar aceptas las <a href=\"terms.html\">Condiciones de uso</a>. El contenido protegido con "
                 "DRM no se descarga.",
@@ -333,7 +333,7 @@ HOME = {
         "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android et macOS</b> en bêta",
         "h1": ("La vidéo et le son.", "En un clic."),
         "lead": "Une application gratuite pour Windows et Mac : MP4 en pleine qualité ou MP3, directement depuis le navigateur ou depuis un lien copié.",
-        "win_btn": "Télécharger pour Windows", "win_req": "Windows 10 et 11 (64 bits)", "install_help": "aide à l'installation",
+        "support_card": "Carte / Apple Pay", "win_btn": "Télécharger pour Windows", "win_req": "Windows 10 et 11 (64 bits)", "install_help": "aide à l'installation",
         "note": "L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur "
                 "et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href=\"terms.html\">Conditions "
                 "d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.",
@@ -735,6 +735,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <p class="sub" style="margin-bottom:26px">{s_text}</p>
           <div class="support-actions">
             <a class="btn" href="https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ">{s_btn}</a>
+            <a class="btn ghost" href="https://buy.stripe.com/14A4gA9GnfcSgjVdAV8Vi00">{h["support_card"]}</a>
             <a class="btn ghost" href="https://ko-fi.com/abnps">Ko-fi</a>
 {share_html(lang, page_url, up)}
           </div>

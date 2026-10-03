@@ -185,4 +185,5 @@
     <string name="quick_audio">Preuzmi zvuk odmah</string>
     <string name="quick_video">Preuzmi video odmah</string>
     <string name="set_support_kofi">Karticom, bez PayPal naloga</string>
+    <string name="set_support_card">Kartica, Apple Pay ili Google Pay</string>
 </resources>

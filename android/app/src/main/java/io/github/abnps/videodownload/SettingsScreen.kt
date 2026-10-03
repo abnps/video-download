@@ -158,6 +158,9 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.set_support), null,
                 onClick = { onOpenLink(Links.SUPPORT) })
             GroupDivider()
+            GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.set_support_card), null,
+                onClick = { onOpenLink(Links.CARD) })
+            GroupDivider()
             GroupRow(OneUi.Pink, R.drawable.ic_heart, "Ko-fi", stringResource(R.string.set_support_kofi),
                 onClick = { onOpenLink(Links.KOFI) })
             GroupDivider()
