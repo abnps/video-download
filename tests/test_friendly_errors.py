@@ -39,6 +39,12 @@ class FriendlyErrorTest(unittest.TestCase):
                 self.assertEqual(display_message(message), friendly_error(message))
                 self.assertEqual(display_message(message, friendly=False), message)  # original za oblačić
 
+    def test_tiktok_sensitive_post_is_a_login_message(self):
+        # TikTok „osjetljiv sadržaj": video vide samo prijavljeni (3.10.2026, isti video na računaru i telefonu).
+        message = ("ERROR: [TikTok] 7691847713507314962: This post may not be comfortable for some audiences. "
+                   "Log in for access. Use --cookies-from-browser or --cookies for the authentication.")
+        self.assertEqual(friendly_error(message), tr("error.friendly.login"))
+
     def test_menu_names_are_filled_in_and_unknown_errors_stay_as_they_are(self):
         self.assertIn("Pomoć → Ažuriraj čitač sajtova (yt-dlp)", friendly_error(SAMPLES["forbidden"]))
         self.assertIsNone(friendly_error("Postprocessing: ffprobe and ffmpeg not found"))

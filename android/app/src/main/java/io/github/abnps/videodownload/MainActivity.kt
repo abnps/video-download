@@ -298,7 +298,9 @@ class MainActivity : ComponentActivity() {
                         link = link.value, onLinkChange = { link.value = it; findError.value = null }, onPaste = { paste() },
                         onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
                         onCopyReport = { copyReport() }, history = history,
-                        onLogin = if (findError.value == getString(R.string.error_login)) ({ openLogin() }) else null,
+                        // Prijava postoji samo za Instagram; za druge sajtove (npr. TikTok) dugme bi zbunjivalo.
+                        onLogin = if (findError.value == getString(R.string.error_login) &&
+                            "instagram.com" in link.value.lowercase()) ({ openLogin() }) else null,
                         onShowAll = { downloadsTab.intValue = 1; tab.intValue = TAB_DOWNLOADS }, actions = actions,
                         update = update, onInstallUpdate = { installUpdate() }, onSettings = openSettings,
                     )

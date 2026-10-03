@@ -52,7 +52,7 @@ _FRIENDLY_ERRORS = (
     ("age", re.compile(r"confirm your age|age[- ]restricted|inappropriate for some users", re.I)),
     ("private", re.compile(r"private video|video is private", re.I)),
     ("geo", re.compile(r"available in your country|geo[- ]?restrict|blocked in your country", re.I)),
-    ("login", re.compile(r"login required|log in to|sign in to|registered users|members[- ]only|requires authentication", re.I)),
+    ("login", re.compile(r"login required|log in to|log in for|sign in to|registered users|members[- ]only|requires authentication", re.I)),
     ("unavailable", re.compile(r"video unavailable|has been removed|no longer available|video does not exist|HTTP Error 404", re.I)),
     ("forbidden", re.compile(r"HTTP Error 403", re.I)),
     ("rate", re.compile(r"HTTP Error 429|too many requests", re.I)),
