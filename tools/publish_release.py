@@ -60,7 +60,12 @@ def check_checkout(tag: str) -> None:
 
 def draft(tag: str) -> dict:
     check_tag(tag)
-    data = json.loads(run("gh", "api", f"repos/{REPO}/releases/tags/{tag}"))
+    # GitHub API po tagu (releases/tags/…) ne vraća nacrte, pa se nacrt traži u spisku izdanja.
+    found = json.loads(run("gh", "api", f"repos/{REPO}/releases?per_page=100", "--jq",
+                           f'[.[] | select(.tag_name == "{tag}")]'))
+    if len(found) != 1:
+        raise ReleaseError(f"Za tag {tag} mora postojati tačno jedno izdanje (nađeno: {len(found)}).")
+    data = found[0]
     if data.get("tag_name") != tag or data.get("draft") is not True or data.get("prerelease"):
         raise ReleaseError("Cilj mora biti postojeći nacrt konačnog izdanja sa tačnim tagom.")
     return data

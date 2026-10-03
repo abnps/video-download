@@ -38,7 +38,8 @@ jobs:
         run: |
           VERSION=$(python3 -c 'import re,pathlib; print(re.search(r"__version__ = \"([^\"]+)\"", pathlib.Path("videodl/__init__.py").read_text(encoding="utf-8")).group(1))')
           test "v$VERSION" = "$TAG" || { echo "Tag $TAG ne odgovara verziji $VERSION"; exit 1; }
-          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq .draft)" = true || { echo "Izdanje mora biti nacrt"; exit 1; }
+          # releases/tags/… ne vraća nacrte; nacrt se traži u spisku izdanja
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq "[.[] | select(.tag_name == \"$TAG\") | .draft] | tostring")" = "[true]" || { echo "Izdanje mora biti nacrt"; exit 1; }
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
