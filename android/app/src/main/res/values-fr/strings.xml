@@ -171,4 +171,7 @@
     <string name="chip_on">Activé</string>
     <string name="chip_off">Désactivé</string>
     <string name="chip_login">Se connecter</string>
+    <string name="system_colors_title">Couleurs du téléphone</string>
+    <string name="system_colors_on">Utilise la palette de couleurs du téléphone</string>
+    <string name="system_colors_off">Bleu de l\'appli (activez pour la palette du téléphone)</string>
 </resources>

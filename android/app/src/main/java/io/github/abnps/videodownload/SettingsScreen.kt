@@ -130,6 +130,15 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             }
         }
         SettingsGroup(stringResource(R.string.settings_app)) {
+            if (ThemeState.supported) {
+                val toggleColors = { ThemeState.set(context, !ThemeState.systemColors) }
+                GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.system_colors_title),
+                    stringResource(if (ThemeState.systemColors) R.string.system_colors_on else R.string.system_colors_off),
+                    onClick = toggleColors) {
+                    Switch(checked = ThemeState.systemColors, onCheckedChange = { toggleColors() })
+                }
+                GroupDivider()
+            }
             GroupRow(OneUi.Teal, R.drawable.ic_language, stringResource(R.string.set_language),
                 LocalConfiguration.current.locales[0].displayLanguage, onClick = onLanguage)
             GroupDivider()

@@ -169,4 +169,7 @@
     <string name="chip_on">On</string>
     <string name="chip_off">Off</string>
     <string name="chip_login">Sign in</string>
+    <string name="system_colors_title">Phone colors</string>
+    <string name="system_colors_on">Uses the color palette of your phone</string>
+    <string name="system_colors_off">App blue (turn on for the phone\'s color palette)</string>
 </resources>

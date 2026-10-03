@@ -171,4 +171,7 @@
     <string name="chip_on">Uključena</string>
     <string name="chip_off">Isključena</string>
     <string name="chip_login">Prijavi se</string>
+    <string name="system_colors_title">Boje mobitela</string>
+    <string name="system_colors_on">Koristi paletu boja mobitela</string>
+    <string name="system_colors_off">Plava aplikacije (uključi za paletu boja mobitela)</string>
 </resources>

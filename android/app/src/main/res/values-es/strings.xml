@@ -171,4 +171,7 @@
     <string name="chip_on">Activado</string>
     <string name="chip_off">Desactivado</string>
     <string name="chip_login">Iniciar sesión</string>
+    <string name="system_colors_title">Colores del móvil</string>
+    <string name="system_colors_on">Usa la paleta de colores de tu móvil</string>
+    <string name="system_colors_off">Azul de la app (activa para la paleta del móvil)</string>
 </resources>

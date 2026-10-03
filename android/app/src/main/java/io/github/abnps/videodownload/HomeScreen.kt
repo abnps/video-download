@@ -44,6 +44,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -146,7 +147,7 @@ fun HomeScreen(
             }
         }
         Spacer(Modifier.height(14.dp))
-        Card(onClick = { help = true }, shape = RoundedCornerShape(16.dp),
+        Card(onClick = { help = true }, shape = RoundedCornerShape(26.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)),
             modifier = Modifier.fillMaxWidth()) {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -164,12 +165,17 @@ fun HomeScreen(
         }
         if (history.isNotEmpty()) {
             Spacer(Modifier.height(24.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+            // One UI: sivi naslov grupe i sve stavke u jednoj zaobljenoj kartici, s tankim linijama između.
+            Row(Modifier.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.recent), style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                 TextButton(onClick = onShowAll) { Text(stringResource(R.string.show_all)) }
             }
-            history.take(3).forEach { item ->
-                Row(Modifier.fillMaxWidth().clickable { actions.open(item) }.padding(vertical = 6.dp),
+            CardBox(Modifier.fillMaxWidth()) { Column {
+            history.take(3).forEachIndexed { index, item ->
+                if (index > 0) HorizontalDivider(Modifier.padding(start = 140.dp, end = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Row(Modifier.fillMaxWidth().clickable { actions.open(item) }.padding(horizontal = 14.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Thumb(item.thumbnail, item.uri, item.title, item.duration, Modifier.width(112.dp).height(64.dp), item.isAudio,
                         item.adult)
@@ -181,6 +187,7 @@ fun HomeScreen(
                     ItemMenu(item, actions)
                 }
             }
+            } }
         }
         Spacer(Modifier.height(16.dp))
     }

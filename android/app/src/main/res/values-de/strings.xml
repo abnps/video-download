@@ -168,4 +168,7 @@
     <string name="chip_on">An</string>
     <string name="chip_off">Aus</string>
     <string name="chip_login">Anmelden</string>
+    <string name="system_colors_title">Handyfarben</string>
+    <string name="system_colors_on">Nutzt die Farbpalette deines Handys</string>
+    <string name="system_colors_off">App-Blau (einschalten für die Farbpalette des Handys)</string>
 </resources>

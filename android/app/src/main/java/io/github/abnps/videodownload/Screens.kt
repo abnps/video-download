@@ -88,14 +88,13 @@ fun SettingsButton(onClick: () -> Unit) = IconButton(onClick = onClick) {
 
 @Composable
 fun CardBox(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
-    val colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    val border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    // One UI 9 stil (Ahmed 3.10.2026): ispunjena kartica bez ruba, jače zaobljena — ista u cijeloj aplikaciji.
+    val colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+    val shape = RoundedCornerShape(26.dp)
     if (onClick != null) {
-        Card(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(16.dp), colors = colors, border = border) {
-            content()
-        }
+        Card(onClick = onClick, modifier = modifier, shape = shape, colors = colors) { content() }
     } else {
-        Card(modifier = modifier, shape = RoundedCornerShape(16.dp), colors = colors, border = border) { content() }
+        Card(modifier = modifier, shape = shape, colors = colors) { content() }
     }
 }
 

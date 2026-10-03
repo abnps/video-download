@@ -4,7 +4,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 
 /** Boje iz Ahmedovog prijedloga dizajna (27.9.2026): plava dugmad, bijele kartice s tankim rubom, zelena kvačica. */
@@ -47,5 +53,33 @@ private val Dark = darkColorScheme(
 
 @Composable
 fun AppTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) Dark else Light, content = content)
+    val dark = isSystemInDarkTheme() // tema uvijek prati telefon (svijetla/tamna)
+    val context = LocalContext.current
+    val scheme = when {
+        // Boje iz palete telefona (One UI „Paleta boja", Android 12+), kad ih korisnik izabere u Postavkama.
+        ThemeState.systemColors && android.os.Build.VERSION.SDK_INT >= 31 ->
+            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        dark -> Dark
+        else -> Light
+    }
+    MaterialTheme(colorScheme = scheme, content = content)
+}
+
+/** Izbor boja: plava aplikacije (podrazumijevano) ili paleta telefona; mijenja se odmah, bez ponovnog pokretanja. */
+object ThemeState {
+    private const val FILE = "postavke"
+    var systemColors by mutableStateOf(false)
+        private set
+
+    fun load(context: android.content.Context) {
+        systemColors = context.getSharedPreferences(FILE, android.content.Context.MODE_PRIVATE)
+            .getBoolean("system_colors", false)
+    }
+
+    fun set(context: android.content.Context, value: Boolean) {
+        systemColors = value
+        context.getSharedPreferences(FILE, android.content.Context.MODE_PRIVATE).edit().putBoolean("system_colors", value).apply()
+    }
+
+    val supported get() = android.os.Build.VERSION.SDK_INT >= 31
 }

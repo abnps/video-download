@@ -184,11 +184,11 @@ internal fun sizeText(format: String, size: Double): String =
 
 @Composable
 internal fun OptionRow(selected: Boolean, title: String, subtitle: String, onClick: () -> Unit) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-    else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    Card(onClick = onClick, shape = RoundedCornerShape(14.dp), border = border, modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-        else MaterialTheme.colorScheme.surface)) {
+    // One UI 9: ispunjene zaobljene kartice; izabrana dobija boju aplikacije i tanak obojen rub.
+    val border = if (selected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null
+    Card(onClick = onClick, shape = RoundedCornerShape(22.dp), border = border, modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surfaceContainerHigh)) {
         Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = selected, onClick = onClick)
             Column(Modifier.padding(start = 6.dp)) {

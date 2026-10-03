@@ -12,6 +12,7 @@ class VideoDownloadApp : Application() {
         super.onCreate()
         if (!Python.isStarted()) Python.start(AndroidPlatform(this))
         History.load(this)
+        ThemeState.load(this)
         Downloads.load(this)
         runCatching { Python.getInstance().getModule("vd_core").callAttr("clean_diagnostics", cacheDir.absolutePath) }
         // 1440p/4K (AV1) samo gdje se sigurno spaja i glatko gleda: Android 14+ i hardverski AV1 dekoder.
