@@ -248,6 +248,8 @@ Ahmedov prijatelj potvrdio da instaler i program rade na njegovom računaru.
   programera; provjeriti uslove za DE/RS), (3) odgovor šta radimo bolje od Seal/YTDLnis/NewPipe.
   Prvi korak: prototip „podijeli link → MP4/MP3" na Ahmedovom telefonu.
   Detaljan plan (27.9.2026): [android_plan.md](android_plan.md) — faze, licenca (GPL ili naša), rizici.
+- [ ] **Lansiranje 1.0** (plan 1.0, tačke 8 i 13; 3.10.2026): redoslijed izdanja, katalozi i tekstovi u
+  [lansiranje_1_0.md](lansiranje_1_0.md). IzzyOnDroid/F-Droid otpadaju (samo otvoren kod), Chrome Web Store čeka (5 $).
 - [ ] **Video Toolkit Pro** (ideja): tek poslije razgovora s poreskim savjetnikom (Njemačka ili Srbija)
   i jasnog odgovora „zašto bi neko platio" pored besplatnih HandBrake/LosslessCut/Shutter Encoder.
   Od početka u privatnom repou.
