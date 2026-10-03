@@ -65,8 +65,7 @@ HOME = {
             "clips": ("Clips, subtitles, cover art", "Just a part of a video, subtitles in the MP4 and the thumbnail as the file's cover."),
             "theme": ("Light and dark theme", "Or same as your system. Progress on the taskbar and a notification at the end."),
             "safe": ("Always up to date, and safe", "The app checks for new versions itself, updates the part that reads websites without "
-                     "reinstalling. On Windows it installs only updates digitally signed by us; on Mac (beta) new versions are "
-                     "downloaded by hand for now."),
+                     "reinstalling. On Windows and Mac it installs only updates digitally signed by us."),
         },
         "chips": ("5 languages", "No account", "No ads", "No tracking", "Signed updates on Windows"),
         "shot_alt": "The Video Download window with four downloads",
@@ -103,7 +102,7 @@ HOME = {
                 ("What does the app send to the internet?", "Only what's needed: the link you download goes to that website, and "
                  "update checks go to GitHub and PyPI. No accounts, statistics or tracking."),
                 ("Is it safe?", "The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only "
-                 "updates digitally signed by us on Windows (on Mac, beta, you download new versions by hand for now).")),
+                 "updates digitally signed by us, on Windows and on Mac.")),
         "demo_titles": ("Mountain hike – Prokosko lake (4K)", "My live concert – filmed from the crowd",
                         "Lecture: photography basics", "Podcast #12 – a talk about travel"),
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
@@ -133,8 +132,7 @@ HOME = {
             "clips": ("Isječak, titlovi, omot", "Samo dio videa, titlovi u MP4 i sličica kao omot fajla."),
             "theme": ("Svijetla i tamna tema", "Ili kao sistem. Napredak na traci zadataka i obavještenje na kraju."),
             "safe": ("Uvijek ažuran i siguran", "Program sam provjerava nove verzije, ažurira dio koji čita sajtove bez ponovne "
-                     "instalacije. Na Windowsu instalira samo ažuriranja koja smo mi digitalno potpisali; na Macu (beta) se nova "
-                     "verzija za sada preuzima ručno."),
+                     "instalacije. Na Windowsu i Macu instalira samo ažuriranja koja smo mi digitalno potpisali."),
         },
         "chips": ("5 jezika", "Bez naloga", "Bez reklama", "Bez praćenja", "Potpisana ažuriranja na Windowsu"),
         "shot_alt": "Prozor programa Video Download sa četiri preuzimanja",
@@ -173,7 +171,7 @@ HOME = {
                 ("Šta program šalje na internet?", "Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera "
                  "ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja."),
                 ("Da li je siguran?", "Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo "
-                 "ažuriranja koja smo mi digitalno potpisali na Windowsu (na Macu, beta, nova verzija se za sada preuzima ručno).")),
+                 "ažuriranja koja smo mi digitalno potpisali, na Windowsu i na Macu.")),
         "demo_titles": ("Planinarska tura – Prokoško jezero (4K)", "Moj koncert uživo – snimak iz publike",
                         "Predavanje: osnove fotografije", "Podcast #12 – razgovor o putovanjima"),
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
@@ -204,8 +202,8 @@ HOME = {
             "clips": ("Ausschnitte, Untertitel, Cover", "Nur ein Teil eines Videos, Untertitel in der MP4 und das Vorschaubild als Cover der Datei."),
             "theme": ("Helles und dunkles Design", "Oder wie das System. Fortschritt in der Taskleiste und eine Benachrichtigung am Ende."),
             "safe": ("Immer aktuell – und sicher", "Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten "
-                     "liest, ohne Neuinstallation. Unter Windows installiert sie nur Updates, die wir digital signiert haben; auf dem "
-                     "Mac (Beta) werden neue Versionen vorerst von Hand geladen."),
+                     "liest, ohne Neuinstallation. Unter Windows und auf dem Mac installiert sie nur Updates, die wir digital "
+                     "signiert haben."),
         },
         "chips": ("5 Sprachen", "Kein Konto", "Keine Werbung", "Kein Tracking", "Signierte Updates unter Windows"),
         "shot_alt": "Das Fenster von Video Download mit vier Downloads",
@@ -247,7 +245,7 @@ HOME = {
                 ("Was sendet die App ins Internet?", "Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und "
                  "die Update-Prüfung an GitHub und PyPI. Keine Konten, Statistiken oder Tracking."),
                 ("Ist die App sicher?", "Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die "
-                 "App installiert unter Windows nur Updates, die wir digital signiert haben (auf dem Mac, Beta, vorerst von Hand).")),
+                 "App installiert unter Windows und auf dem Mac nur Updates, die wir digital signiert haben.")),
         "demo_titles": ("Bergwanderung – Prokoško-See (4K)", "Mein Live-Konzert – aus dem Publikum gefilmt",
                         "Vortrag: Grundlagen der Fotografie", "Podcast #12 – ein Gespräch übers Reisen"),
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
@@ -278,8 +276,8 @@ HOME = {
             "clips": ("Fragmentos, subtítulos, portada", "Solo una parte del vídeo, subtítulos en el MP4 y la miniatura como portada del archivo."),
             "theme": ("Tema claro y oscuro", "O igual que el sistema. Progreso en la barra de tareas y un aviso al final."),
             "safe": ("Siempre al día y seguro", "La aplicación busca nuevas versiones por sí sola, actualiza la parte que lee los "
-                     "sitios web sin reinstalar. En Windows instala solo actualizaciones firmadas digitalmente por nosotros; en Mac "
-                     "(beta) las nuevas versiones se descargan a mano por ahora."),
+                     "sitios web sin reinstalar. En Windows y en Mac instala solo actualizaciones firmadas digitalmente por "
+                     "nosotros."),
         },
         "chips": ("5 idiomas", "Sin cuenta", "Sin anuncios", "Sin rastreo", "Actualizaciones firmadas en Windows"),
         "shot_alt": "La ventana de Video Download con cuatro descargas",
@@ -320,7 +318,7 @@ HOME = {
                 ("¿Qué envía la aplicación a internet?", "Solo lo necesario: el enlace que descargas va a ese sitio web y la "
                  "búsqueda de actualizaciones, a GitHub y PyPI. Sin cuentas, estadísticas ni rastreo."),
                 ("¿Es segura?", "El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo "
-                 "instala en Windows actualizaciones firmadas digitalmente por nosotros (en Mac, beta, por ahora a mano).")),
+                 "instala actualizaciones firmadas digitalmente por nosotros, en Windows y en Mac.")),
         "demo_titles": ("Ruta de montaña – lago Prokoško (4K)", "Mi concierto en directo – grabado desde el público",
                         "Clase: fundamentos de fotografía", "Pódcast #12 – una charla sobre viajes"),
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
@@ -351,8 +349,8 @@ HOME = {
             "clips": ("Extraits, sous-titres, pochette", "Seulement une partie d'une vidéo, les sous-titres dans le MP4 et la miniature comme pochette du fichier."),
             "theme": ("Thème clair et sombre", "Ou comme le système. La progression dans la barre des tâches et une notification à la fin."),
             "safe": ("Toujours à jour, et sûr", "L'application cherche elle-même les nouvelles versions, met à jour la partie qui "
-                     "lit les sites sans réinstallation. Sous Windows, elle n'installe que des mises à jour signées numériquement par "
-                     "nous ; sur Mac (bêta), les nouvelles versions se téléchargent à la main pour l'instant."),
+                     "lit les sites sans réinstallation. Sous Windows et sur Mac, elle n'installe que des mises à jour signées "
+                     "numériquement par nous."),
         },
         "chips": ("5 langues", "Sans compte", "Sans publicité", "Sans pistage", "Mises à jour signées sous Windows"),
         "shot_alt": "La fenêtre de Video Download avec quatre téléchargements",
@@ -395,7 +393,7 @@ HOME = {
                 ("Qu'envoie l'application sur Internet ?", "Seulement le nécessaire : le lien que vous téléchargez va vers ce "
                  "site, et la recherche de mises à jour vers GitHub et PyPI. Ni compte, ni statistiques, ni pistage."),
                 ("Est-ce sûr ?", "Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et "
-                 "l'application n'installe sous Windows que des mises à jour signées par nous (sur Mac, bêta, à la main pour l'instant).")),
+                 "l'application n'installe que des mises à jour signées par nous, sous Windows et sur Mac.")),
         "demo_titles": ("Randonnée en montagne – lac de Prokoško (4K)", "Mon concert en direct – filmé depuis le public",
                         "Cours : les bases de la photographie", "Podcast #12 – une discussion sur le voyage"),
         "demo": ("Téléchargement · {p}% · {v} MB/s · encore {s} s", ","),

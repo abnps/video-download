@@ -8,6 +8,33 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.8", "3.10.2026", {
+        "bs": ["Preuzimanja → Roditeljska zaštita, po želji zaštićena PIN-om.",
+               "Pomoć → Prijavi problem ili prijedlog: otvara e-poruku za autora, uz verziju programa.",
+               "Mac se sada ažurira sam, kao Windows: preuzme novu verziju, provjeri naš digitalni potpis i zamijeni program (od sljedećeg izdanja).",
+               "Manji instaler (oko 117 MB umjesto 130 MB), bez dijelova koje program ne koristi.",
+               "Jasnija poruka kad sajt traži prijavu da bi prikazao objavu."],
+        "en": ["Downloads → Parental control, optionally protected by a PIN.",
+               "Help → Report a problem or suggestion: opens an e-mail to the author, with the app version.",
+               "The Mac version now updates itself like Windows: it downloads the new version, checks our digital signature and replaces the app (from the next release on).",
+               "Smaller installer (about 117 MB instead of 130 MB), without parts the app doesn't use.",
+               "A clearer message when a site requires you to log in to show a post."],
+        "de": ["Downloads → Jugendschutz, auf Wunsch mit PIN geschützt.",
+               "Hilfe → Problem oder Vorschlag melden: öffnet eine E-Mail an den Autor, mit der Programmversion.",
+               "Die Mac-Version aktualisiert sich jetzt selbst wie unter Windows: Sie lädt die neue Version, prüft unsere digitale Signatur und ersetzt das Programm (ab der nächsten Version).",
+               "Kleinerer Installer (etwa 117 MB statt 130 MB), ohne Teile, die das Programm nicht nutzt.",
+               "Eine klarere Meldung, wenn eine Seite für einen Beitrag eine Anmeldung verlangt."],
+        "es": ["Descargas → Control parental, opcionalmente protegido con PIN.",
+               "Ayuda → Informar de un problema o sugerencia: abre un correo al autor, con la versión del programa.",
+               "La versión de Mac ahora se actualiza sola como la de Windows: descarga la nueva versión, comprueba nuestra firma digital y sustituye el programa (a partir de la próxima versión).",
+               "Instalador más pequeño (unos 117 MB en lugar de 130 MB), sin partes que el programa no usa.",
+               "Un mensaje más claro cuando un sitio pide iniciar sesión para mostrar una publicación."],
+        "fr": ["Téléchargements → Contrôle parental, protégé par un code PIN si vous le souhaitez.",
+               "Aide → Signaler un problème ou une suggestion : ouvre un e-mail à l'auteur, avec la version du programme.",
+               "La version Mac se met désormais à jour toute seule comme sous Windows : elle télécharge la nouvelle version, vérifie notre signature numérique et remplace le programme (à partir de la prochaine version).",
+               "Programme d'installation plus petit (environ 117 Mo au lieu de 130 Mo), sans les parties inutilisées.",
+               "Un message plus clair quand un site demande une connexion pour afficher une publication."],
+    }),
     ("0.9.7", "27.9.2026", {
         "bs": ["Razumljive poruke o greškama na jeziku programa (npr. „Video više nije dostupan“, „Nema veze sa sajtom“); tehnička poruka ostaje u oblačiću i u izvještaju o problemu.",
                "Dva preuzimanja nikad ne pišu u isti fajl: ni isti video preko dva linka, ni dugi naslovi istog početka, ni isječci unutar iste sekunde; MP3 istog videa više ne briše već preuzeti MP4.",

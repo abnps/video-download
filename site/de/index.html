@@ -26,7 +26,7 @@
  "inLanguage": "de",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.7",
+ "softwareVersion": "0.9.8",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -103,7 +103,7 @@
           <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Kein Konto</li><li>Kein Tageslimit</li><li>Deine Links landen nicht bei uns</li></ul>
-        <div class="meta"><!-- version -->Version 0.9.7 · 130 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
+        <div class="meta"><!-- version -->Version 0.9.8 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
         <p class="note">Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href="terms.html">Nutzungsbedingungen</a>. DRM-geschützte Inhalte werden nicht heruntergeladen.</p>
       </div>
 
@@ -177,7 +177,7 @@
         <div class="tile full" data-reveal>
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
           <h3>Immer aktuell – und sicher</h3>
-          <p>Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten liest, ohne Neuinstallation. Unter Windows installiert sie nur Updates, die wir digital signiert haben; auf dem Mac (Beta) werden neue Versionen vorerst von Hand geladen.</p>
+          <p>Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten liest, ohne Neuinstallation. Unter Windows und auf dem Mac installiert sie nur Updates, die wir digital signiert haben.</p>
           <div class="chips"><span>5 Sprachen</span><span>Kein Konto</span><span>Keine Werbung</span><span>Kein Tracking</span><span>Signierte Updates unter Windows</span></div>
         </div>
       </div>
@@ -277,23 +277,24 @@
       <h2 data-reveal>Jede Woche besser.</h2>
       <p class="sub" data-reveal>Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.7 <span>27.9.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.8 <span>3.10.2026</span></h3><ul>
+          <li>Downloads → Jugendschutz, auf Wunsch mit PIN geschützt.</li>
+          <li>Hilfe → Problem oder Vorschlag melden: öffnet eine E-Mail an den Autor, mit der Programmversion.</li>
+          <li>Die Mac-Version aktualisiert sich jetzt selbst wie unter Windows: Sie lädt die neue Version, prüft unsere digitale Signatur und ersetzt das Programm (ab der nächsten Version).</li>
+          <li>Kleinerer Installer (etwa 117 MB statt 130 MB), ohne Teile, die das Programm nicht nutzt.</li>
+          <li>Eine klarere Meldung, wenn eine Seite für einen Beitrag eine Anmeldung verlangt.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.7 <span>27.9.2026</span></h3><ul>
           <li>Verständliche Fehlermeldungen in der Sprache des Programms (z. B. „Das Video ist nicht mehr verfügbar“, „Keine Verbindung zur Seite“); die technische Meldung bleibt im Tooltip und im Problembericht.</li>
           <li>Zwei Downloads schreiben nie in dieselbe Datei: weder dasselbe Video über zwei Links noch lange Titel mit gleichem Anfang noch Ausschnitte innerhalb derselben Sekunde; eine MP3 desselben Videos löscht die schon geladene MP4 nicht mehr.</li>
           <li>Die Liste speichert sich nach jeder Änderung selbst, daher gehen bei einem Absturz oder Stromausfall keine Links verloren; „Alle herunterladen“, während ein Link noch gelesen wird, startet, sobald der Link da ist.</li>
           <li>„Stoppen“ hält auch die MP3-Umwandlung an, während „Alle aus der Liste entfernen“ und „Fertige entfernen“ eine MP3 behalten, die noch entsteht; das Schließen startet keine neuen Downloads mehr.</li>
           <li>Ein neuer Versuch nach einem Verbindungsabbruch wartet wirklich 5 Sekunden; der Problembericht verbirgt Passwörter und Schlüssel gründlicher.</li>
           <li>Die Browser-Erweiterung öffnet bei der Installation eine Willkommensseite (prüft die Verbindung zum Programm, zeigt das Anheften des Symbols); größere ×-Schaltfläche und schöneres Bild, solange das Vorschaubild lädt.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.6 <span>26.9.2026</span></h3><ul>
           <li>Updates sind digital signiert: Das Programm installiert nur eine von uns signierte neue Version, selbst wenn jemand die Datei am Veröffentlichungsort austauscht.</li>
           <li>Beim ersten Start ein kurzer Hinweis, dass das Programm kopierte Links beobachtet, mit einer Schaltfläche zum sofortigen Abschalten.</li>
           <li>Übrig gebliebene temporäre Cookie-Dateien (nach einem plötzlichen Abbruch) werden beim nächsten Start gelöscht; lange Listen brauchen weniger Speicher.</li>
           <li>Die Verbindung zum Browser-Add-on kommt besser mit langsamen oder hängenden Anfragen zurecht.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.5 <span>26.9.2026</span></h3><ul>
-          <li>1080p, 720p und 480p erhalten eine Markierung im Dateinamen, daher gilt eine andere Qualität desselben Videos nicht mehr als „bereits heruntergeladen“.</li>
-          <li>Zwei Videos mit gleichem Titel (Dateiname ohne ID) werden nicht mehr verwechselt; dasselbe Video, das zweimal gleichzeitig startet, wartet auf das erste.</li>
-          <li>„Fertig“ erst, wenn die Datei existiert und lesbar ist; die MP3-Umwandlung lässt sich immer abbrechen.</li>
-          <li>Das Schließen friert das Fenster nicht mehr ein; das Update wartet auch auf MP3-Umwandlungen.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Alle Versionen →</a></p>
     </div>
@@ -343,7 +344,7 @@
         <details><summary>Ein Video lässt sich plötzlich nicht mehr herunterladen.</summary><p>Webseiten ändern sich oft. Hilfe → Seiten-Reader aktualisieren (yt-dlp), dann erneut versuchen.</p></details>
         <details><summary>Warum werden Livestreams nicht heruntergeladen?</summary><p>Ein Livestream hat kein Ende, der Download würde also nie fertig. Lade ihn herunter, wenn er vorbei ist und die Aufzeichnung veröffentlicht wurde.</p></details>
         <details><summary>Was sendet die App ins Internet?</summary><p>Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und die Update-Prüfung an GitHub und PyPI. Keine Konten, Statistiken oder Tracking.</p></details>
-        <details><summary>Ist die App sicher?</summary><p>Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die App installiert unter Windows nur Updates, die wir digital signiert haben (auf dem Mac, Beta, vorerst von Hand).</p></details>
+        <details><summary>Ist die App sicher?</summary><p>Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die App installiert unter Windows und auf dem Mac nur Updates, die wir digital signiert haben.</p></details>
       </div>
       <p class="more" data-reveal><a href="guides.html">Anleitungen: MP3, Ausschnitte, Playlists, Untertitel →</a></p>
     </div>
