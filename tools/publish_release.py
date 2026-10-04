@@ -17,6 +17,7 @@ import tempfile
 PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT))
 from videodl import __version__, release_signing
+import vlastita  # noqa: E402  (naša preuzimanja se oduzimaju u statistici)
 
 REPO = "abnps/video-download"
 # Stalni linkovi na Windows instalere za winget (Ahmed 3.10.2026): glavni repo javno drži samo posljednje
@@ -25,6 +26,13 @@ INSTALLERS_REPO = "abnps/video-download-installers"
 # Javni certifikat objavljenog Android 0.2.0 APK-a; nikad privatni ključ.
 ANDROID_CERTIFICATE = "83c26828568c1c1fc66be15353650c382a73f9badc5c847b22a7a141ca6b7230"
 ANDROID_PACKAGE = "io.github.abnps.videodownload"
+
+
+def record_own(names, runner=None) -> None:
+    """Naša preuzimanja iz izdanja (provjere, kopije) se upišu za statistiku. Ide kroz `run` modula koji je preuzeo
+    fajlove (`runner`), pa test koji zamijeni taj `run` nikad ne piše na pravi GitHub (4.10.2026)."""
+    runner = runner or run
+    vlastita.record(names, run=lambda *args, stdin=None: runner("gh", *args, input=stdin))
 
 
 class ReleaseError(ValueError):
@@ -188,6 +196,7 @@ def copy_to_installers_repo(tag: str) -> None:
     with tempfile.TemporaryDirectory(prefix="videodl-winget-") as temp:
         run("gh", "release", "download", tag, "--repo", REPO, "--dir", temp,
             *[arg for name in names for arg in ("--pattern", name)])
+        record_own(names)
         files = [str(Path(temp) / name) for name in names]
         try:
             run("gh", "release", "view", tag, "--repo", INSTALLERS_REPO, "--json", "tagName")
@@ -219,11 +228,13 @@ def validate_draft(tag: str, *, publish: bool = False) -> None:
         folder = Path(temp)
         patterns = [arg for name in names for arg in ("--pattern", name)]
         run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder), *patterns)
+        record_own(names)
         current = validate_assets(folder, version, code, name)
         previous_folder = folder / "previous"
         previous_folder.mkdir()
         # Već postoji javno izdanje. Nedostupnost provjere prekida objavu, ne preskače zaštitu.
         run("gh", "release", "download", "--repo", REPO, "--pattern", "android.json", "--dir", str(previous_folder))
+        record_own(["android.json"])
         previous = json.loads((previous_folder / "android.json").read_text(encoding="utf-8"))
         check_android_upgrade(current, previous)
     after = draft(tag)

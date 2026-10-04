@@ -104,5 +104,51 @@ class ReleaseReadinessTest(unittest.TestCase):
         self.assertEqual((manifest["installer"], manifest["version"]), (dmg_name, version))
 
 
+class OwnDownloadsTest(unittest.TestCase):
+    """Naša preuzimanja (provjera izdanja, Mac potpis, kopija za winget) se oduzimaju u statistici."""
+
+    def test_counts_only_installers_and_daily_check_files(self):
+        import vlastita
+
+        counted = vlastita.classify(["VideoDownload-Setup-1.0.0.exe", "VideoDownload-Setup-1.0.0.exe.sha256",
+                                     "VideoDownload-Setup.exe", "VideoDownload-macOS-arm64-1.0.0.dmg",
+                                     "VideoDownload-android-1.0.0.apk", "release.json", "release.json.sig",
+                                     "release-macos.json", "android.json"])
+        self.assertEqual(counted["downloads"], {"windows": 2, "mac": 1, "android": 1})
+        self.assertEqual(counted["checks"], {"windows": 1, "mac": 1, "android": 1})
+
+    def test_record_adds_to_the_stored_total_on_the_statistics_branch(self):
+        import base64
+        import json
+
+        import vlastita
+
+        stored = {"downloads": {"windows": 3, "mac": 0, "android": 1}, "checks": {"windows": 2, "mac": 0, "android": 0}}
+        calls = []
+
+        def fake(*args, stdin=None):
+            calls.append((args, stdin))
+            if args[:2] == ("api", f"repos/{vlastita.REPO}/contents/{vlastita.PATH}?ref={vlastita.BRANCH}"):
+                return json.dumps({"sha": "abc", "content": base64.b64encode(json.dumps(stored).encode()).decode()})
+            return ""
+
+        vlastita.record(["VideoDownload-Setup-1.0.0.exe", "release.json"], run=fake)
+        body = json.loads(calls[-1][1])
+        self.assertEqual((body["branch"], body["sha"]), ("statistika", "abc"))
+        total = json.loads(base64.b64decode(body["content"]))
+        self.assertEqual(total["downloads"]["windows"], 4)
+        self.assertEqual(total["checks"]["windows"], 3)
+
+    def test_failure_never_stops_a_release(self):
+        import subprocess
+
+        import vlastita
+
+        def broken(*args, stdin=None):
+            raise subprocess.CalledProcessError(1, args)
+
+        vlastita.record(["VideoDownload-Setup-1.0.0.exe"], run=broken)  # samo upozorenje, bez izuzetka
+
+
 if __name__ == "__main__":
     unittest.main()

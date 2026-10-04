@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from publish_release import REPO, ReleaseError, check_checksum, check_tag, draft, run  # noqa: E402
+from publish_release import REPO, ReleaseError, check_checksum, check_tag, draft, record_own, run  # noqa: E402
 from videodl import release_signing  # noqa: E402
 
 NAMES = (release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME)
@@ -26,6 +26,7 @@ def sign_mac(tag: str) -> None:
         folder = Path(temp)
         run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder),
             "--pattern", dmg_name, "--pattern", dmg_name + ".sha256")
+        record_own([dmg_name], run)
         dmg = folder / dmg_name
         if not dmg.is_file():
             raise ReleaseError(f"Nacrt nema {dmg_name}; prvo pokreni posao „Mac paket\" (README, korak 4).")

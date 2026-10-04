@@ -30,7 +30,11 @@ svg text { fill:var(--muted); font-size:11px }
 .bar { display:flex; flex-wrap:wrap; gap:10px; align-items:center }
 button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:999px;
   padding:7px 14px; cursor:pointer } button:focus-visible { outline:2px solid var(--win); outline-offset:2px }
-.scroll { overflow-x:auto } table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums }
+.scroll { overflow-x:auto }
+.form { display:flex; flex-wrap:wrap; gap:10px 18px; margin:8px 0 }
+.form label { display:flex; gap:8px; align-items:center; color:var(--muted); font-size:14px }
+.form input { font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:4px 8px }
+.form input[type=number] { width:64px } table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums }
 th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap }
 th { color:var(--muted); font-size:13px; font-weight:600 }
 </style>
@@ -47,12 +51,24 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
   </div>
 
   <div class="tiles">
-    <div class="tile"><small>Preuzimanja ukupno</small><b id="t-all">–</b></div>
+    <div class="tile"><small>Preuzimanja (bez naših)</small><b id="t-all">–</b></div>
     <div class="tile"><small>Windows</small><b id="t-win" style="color:var(--win)">–</b></div>
     <div class="tile"><small>Mac</small><b id="t-mac" style="color:var(--mac)">–</b></div>
     <div class="tile"><small>Android</small><b id="t-and" style="color:var(--and)">–</b></div>
     <div class="tile"><small>Aktivni juče (javljanja)</small><b id="t-active">–</b></div>
   </div>
+
+  <section>
+    <h2>Šta se ne računa</h2>
+    <p class="muted" id="own-note">Naša preuzimanja (provjere i objava izdanja, Mac potpis, kopija za winget) alati sami upišu i ovdje se oduzmu.</p>
+    <div class="form">
+      <label>Brojanje od <input id="since" type="date"></label>
+      <label>Moji uređaji: Windows <input id="dev-windows" type="number" min="0" max="20"></label>
+      <label>Mac <input id="dev-mac" type="number" min="0" max="20"></label>
+      <label>Android <input id="dev-android" type="number" min="0" max="20"></label>
+    </div>
+    <p class="muted">Preuzimanja prije tog dana su skoro sva naša (probe, automatska ažuriranja na tvom računaru), pa se ne broje. Tvoji uređaji se svaki dan jave kao aktivni, pa se oduzmu od dnevnog broja. Podešavanje se pamti samo na ovom uređaju.</p>
+  </section>
 
   <section>
     <h2>Preuzimanja kroz vrijeme</h2>
@@ -76,7 +92,9 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
 <script>
 (() => {
   "use strict";
-  const SRC = "https://raw.githubusercontent.com/abnps/video-download/statistika/istorija.json";
+  const RAW = "https://raw.githubusercontent.com/abnps/video-download/statistika/";
+  const SRC = RAW + "istorija.json", OWN = RAW + "vlastita.json";
+  const START = "2026-10-04";  // nulta tačka: prije toga su preuzimanja skoro sva naša
   const KEY = "vd-admin";
   const KINDS = [["windows", "--win"], ["mac", "--mac"], ["android", "--and"]];
   const $ = (id) => document.getElementById(id);
@@ -90,6 +108,11 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
     label();
   });
   label();
+
+  // Podešavanje (samo ovaj uređaj): od kog dana se broji i koliko mojih uređaja se javlja svaki dan.
+  const pref = (k, d) => { try { return localStorage.getItem("vd-stat-" + k) ?? d; } catch { return d; } };
+  const keep = (k, v) => { try { localStorage.setItem("vd-stat-" + k, v); } catch {} };
+  const DEVICES_DEFAULT = { windows: "1", mac: "0", android: "1" };
 
   const color = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const sum = (o) => o.windows + o.mac + o.android;
@@ -139,34 +162,61 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
     el.innerHTML = s + "</svg>";
   }
 
-  fetch(SRC, { cache: "no-store" })
-    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then((history) => {
-      const rows = days(history);
-      if (!rows.length) throw new Error("istorija je prazna");
-      const last = rows[rows.length - 1];
-      $("t-all").textContent = sum(last.downloads);
-      $("t-win").textContent = last.downloads.windows;
-      $("t-mac").textContent = last.downloads.mac;
-      $("t-and").textContent = last.downloads.android;
-      const a = last.active;
-      $("t-active").textContent = KINDS.some(([k]) => a[k] != null) ? KINDS.reduce((n, [k]) => n + (a[k] || 0), 0) : "–";
-      chart($("chart-downloads"), rows, (r, k) => r.downloads[k], false);
-      const activeRows = rows.slice(1);
-      if (activeRows.some((r) => KINDS.some(([k]) => r.active[k] != null))) {
-        chart($("chart-active"), activeRows, (r, k) => r.active[k], true);
-      } else {
-        $("chart-active").innerHTML = '<p class="muted">Prvi dnevni broj stiže sutra ujutro: računa se kao razlika dva snimka.</p>';
-      }
-      const table = $("days");
-      rows.slice().reverse().slice(0, 60).forEach((r) => {
-        const tr = document.createElement("tr");
-        [r.day, sum(r.downloads), ...KINDS.map(([k]) => r.active[k] ?? "–")].forEach((v) => {
-          const td = document.createElement("td"); td.textContent = v; tr.appendChild(td);
-        });
-        table.appendChild(tr);
-      });
-      $("status").textContent = `Posljednji snimak: ${history[history.length - 1].time.replace("T", " ")} UTC · ${rows.length} dan(a) istorije. Snimak se pravi svako jutro.`;
+  const zero = () => ({ windows: 0, mac: 0, android: 0 });
+  let history = null, own = { downloads: zero(), checks: zero() };
+
+  function render() {
+    const since = $("since").value || START;
+    const devices = {};
+    KINDS.forEach(([k]) => { devices[k] = Math.max(0, parseInt($("dev-" + k).value, 10) || 0); });
+    const all = days(history);
+    const rows = all.filter((r) => r.day >= since);
+    if (!rows.length) throw new Error("nema snimaka od " + since);
+    const base = rows[0].downloads, last = rows[rows.length - 1];
+    // Preuzimanja od nulte tačke, bez naših (alati ih upišu u vlastita.json; svi upisi su poslije nulte tačke).
+    const net = (r, k) => Math.max(0, r.downloads[k] - base[k] - (r === last ? own.downloads[k] : 0));
+    const netAll = {}; KINDS.forEach(([k]) => { netAll[k] = net(last, k); });
+    $("t-all").textContent = sum(netAll);
+    $("t-win").textContent = netAll.windows;
+    $("t-mac").textContent = netAll.mac;
+    $("t-and").textContent = netAll.android;
+    const act = (r, k) => r.active[k] == null ? null : Math.max(0, r.active[k] - devices[k]);
+    $("t-active").textContent = KINDS.some(([k]) => last.active[k] != null) ? KINDS.reduce((n, [k]) => n + (act(last, k) || 0), 0) : "–";
+    chart($("chart-downloads"), rows, (r, k) => Math.max(0, r.downloads[k] - base[k]), false);
+    const activeRows = rows.slice(1);
+    if (activeRows.some((r) => KINDS.some(([k]) => r.active[k] != null))) {
+      chart($("chart-active"), activeRows, act, true);
+    } else {
+      $("chart-active").innerHTML = '<p class="muted">Prvi dnevni broj stiže sutra ujutro: računa se kao razlika dva snimka.</p>';
+    }
+    const table = $("days");
+    table.querySelectorAll("tr:not(:first-child)").forEach((tr) => tr.remove());
+    rows.slice().reverse().slice(0, 60).forEach((r) => {
+      const tr = document.createElement("tr");
+      [r.day, KINDS.reduce((n, [k]) => n + Math.max(0, r.downloads[k] - base[k]), 0), ...KINDS.map(([k]) => act(r, k) ?? "–")]
+        .forEach((v) => { const td = document.createElement("td"); td.textContent = v; tr.appendChild(td); });
+      table.appendChild(tr);
+    });
+    $("own-note").textContent = `Naša preuzimanja (provjere i objava izdanja, Mac potpis, kopija za winget) alati sami upišu i oduzmu se: do sada ${sum(own.downloads)} instalera i ${sum(own.checks)} provjera. Grafikon i tabela ih još sadrže; kartice ne.`;
+    $("status").textContent = `Posljednji snimak: ${history[history.length - 1].time.replace("T", " ")} UTC · broji se od ${since.split("-").reverse().join(".")}. Snimak se pravi svako jutro.`;
+  }
+
+  $("since").value = pref("since", START);
+  KINDS.forEach(([k]) => { $("dev-" + k).value = pref("dev-" + k, DEVICES_DEFAULT[k]); });
+  ["since", ...KINDS.map(([k]) => "dev-" + k)].forEach((id) => $(id).addEventListener("change", () => {
+    keep(id, $(id).value);
+    if (history) { try { render(); } catch (e) { $("status").textContent = e.message; } }
+  }));
+
+  Promise.all([
+    fetch(SRC, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
+    fetch(OWN, { cache: "no-store" }).then((r) => r.ok ? r.json() : null).catch(() => null),
+  ])
+    .then(([h, o]) => {
+      history = h;
+      if (o) own = { downloads: { ...zero(), ...o.downloads }, checks: { ...zero(), ...o.checks } };
+      if (!history.length) throw new Error("istorija je prazna");
+      render();
     })
     .catch((e) => {
       $("status").textContent = `Istorija još nije dostupna (${e.message}). Prvi snimak nastaje kad se pokrene posao „Statistika” na GitHub-u.`;

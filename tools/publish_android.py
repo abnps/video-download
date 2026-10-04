@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from publish_release import ReleaseError, check_android_apk, check_android_upgrade, check_checkout, draft, run
+from publish_release import ReleaseError, check_android_apk, check_android_upgrade, check_checkout, draft, record_own, run
 
 PROJECT = Path(__file__).resolve().parent.parent
 ANDROID = PROJECT / "android"
@@ -78,6 +78,7 @@ def publish_android_update(files: list[Path], code: int, name: str) -> str:
     tag = run("gh", "release", "view", "--repo", REPO, "--json", "tagName", "--jq", ".tagName")
     previous = json.loads(run("gh", "release", "download", tag, "--repo", REPO, "--pattern", "android.json",
                               "--output", "-"))
+    record_own(["android.json"], run)
     current = json.loads((OUT / "android.json").read_text(encoding="utf-8"))
     if current["versionCode"] <= previous["versionCode"]:
         raise ReleaseError(f"versionCode {code} nije veći od objavljenog {previous['versionCode']}.")
