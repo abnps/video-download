@@ -32,7 +32,7 @@
     <string name="about_size">ca. %1$s</string>
     <string name="size_unknown">Größe unbekannt</string>
     <string name="best_audio">Bester Ton</string>
-    <string name="audio_unavailable">Eine separate M4A-Tonspur ist für dieses Video nicht verfügbar.</string>
+    <string name="audio_unavailable">Diese Seite hat keine separate Tonspur, daher wird die MP3 aus dem Video erstellt (der Download ist größer).</string>
     <string name="error_unsupported">Dieser Link wird nicht unterstützt.</string>
     <string name="error_login">Diese Seite verlangt eine Anmeldung oder Bestätigung.</string>
     <string name="error_http">Die Seite meldet HTTP %1$s.</string>

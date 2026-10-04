@@ -32,7 +32,7 @@
     <string name="about_size">env. %1$s</string>
     <string name="size_unknown">taille inconnue</string>
     <string name="best_audio">Meilleur son</string>
-    <string name="audio_unavailable">Aucune piste audio M4A séparée pour cette vidéo.</string>
+    <string name="audio_unavailable">Ce site n’a pas de piste audio séparée : le MP3 est créé à partir de la vidéo (le téléchargement est plus gros).</string>
     <string name="error_unsupported">Ce lien est incompatible.</string>
     <string name="error_login">Ce site demande une connexion ou une confirmation.</string>
     <string name="error_http">Le site a renvoyé HTTP %1$s.</string>

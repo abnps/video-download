@@ -33,7 +33,7 @@
     <string name="about_size">about %1$s</string>
     <string name="size_unknown">size unknown</string>
     <string name="best_audio">Best audio</string>
-    <string name="audio_unavailable">Separate M4A audio is unavailable for this video.</string>
+    <string name="audio_unavailable">This site has no separate audio, so the MP3 is made from the video (the download is larger).</string>
     <string name="error_unsupported">This link is not supported.</string>
     <string name="error_login">This site requires a login or confirmation.</string>
     <string name="error_http">The site returned HTTP %1$s.</string>

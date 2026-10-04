@@ -63,7 +63,7 @@ class DownloadService : Service() {
             // Kolačići Instagram prijave (ako postoji) idu u privremeni fajl u `work`, koji se briše na kraju.
             val cookies = SiteLogin.cookieFile(work, job.url)
             val result = Python.getInstance().getModule("vd_core").callAttr(
-                "download", job.url, if (job.isAudio) "audio" else "video", work.absolutePath, Listener(job), job.height,
+                "download", job.url, if (!job.isAudio) "video" else if (job.label == MP3_LABEL) "mp3" else "audio", work.absolutePath, Listener(job), job.height,
                 cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "",
             ).asList()
             val name = result[1].toString()
@@ -87,7 +87,8 @@ class DownloadService : Service() {
                 file = clip
             }
             if (job.isAudio && job.label == MP3_LABEL) {
-                // MP3 se pravi na telefonu iz preuzetog M4A (LAME, 192 kbps); M4A ostaje samo privremeno.
+                // MP3 se pravi na telefonu iz preuzetog M4A, ili iz videa kad sajt nema poseban zvuk (LAME, 192 kbps);
+                // preuzeti fajl ostaje samo privremeno.
                 Downloads.update(job.id) { it.copy(phase = Phase.CONVERTING, fraction = 0f, done = 0, total = 0) }
                 notify(progressNotification(getString(R.string.status_converting), null))
                 val mp3 = File(work, "${file.nameWithoutExtension}.mp3")

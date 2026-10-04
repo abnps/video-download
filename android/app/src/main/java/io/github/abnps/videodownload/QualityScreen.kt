@@ -115,7 +115,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 // Brzo preuzimanje jednim dodirom (kao kod sličnih aplikacija): zvuk kao MP3 ili video u
                 // izabranom kvalitetu, bez traženja dugmeta ispod. Isti posao kao glavno dugme.
                 Row(Modifier.align(Alignment.BottomEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    if (info.audioAvailable) QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio),
+                    QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio),
                         enabled = !blockedByParental) { start(true, true) }
                     QuickButton(R.drawable.ic_videocam, stringResource(R.string.quick_video),
                         enabled = !blockedByParental) { start(false, mp3) }
@@ -126,18 +126,20 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 SegmentedButton(selected = !audio, onClick = { audio = false }, shape = SegmentedButtonDefaults.itemShape(0, 2),
                     icon = { AppIcon(R.drawable.ic_videocam, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_video)) }
-                SegmentedButton(selected = audio, onClick = { audio = true }, enabled = info.audioAvailable,
+                SegmentedButton(selected = audio, onClick = { audio = true; if (!info.audioAvailable) mp3 = true },
                     shape = SegmentedButtonDefaults.itemShape(1, 2),
                     icon = { AppIcon(R.drawable.ic_music, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_audio)) }
             }
             if (blockedByParental) Text(stringResource(R.string.parental_blocked),
                 style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
-            if (!info.audioAvailable) Text(stringResource(R.string.audio_unavailable),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (audio) {
                 // MP3 192 kbps: veličina ≈ trajanje × 24 KB/s.
                 OptionRow(mp3, "MP3 · ${Mp3.KBPS} kbps", sizePills("MP3", info.duration * Mp3.KBPS * 125.0)) { mp3 = true }
-                OptionRow(!mp3, stringResource(R.string.audio_m4a_original), sizePills("M4A", info.audioSize)) { mp3 = false }
+                // Bez posebnog zvuka nema originalnog M4A; MP3 se pravi iz videa (preuzimanje je veće).
+                if (info.audioAvailable) OptionRow(!mp3, stringResource(R.string.audio_m4a_original),
+                    sizePills("M4A", info.audioSize)) { mp3 = false }
+                else Text(stringResource(R.string.audio_unavailable),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 options.forEach { option ->
                     val title = if (option.label > 0) "${option.label}p" else stringResource(R.string.best_quality)

@@ -32,7 +32,7 @@
     <string name="about_size">oko %1$s</string>
     <string name="size_unknown">veličina nepoznata</string>
     <string name="best_audio">Najbolji zvuk</string>
-    <string name="audio_unavailable">Zaseban M4A zvuk nije dostupan za ovaj video.</string>
+    <string name="audio_unavailable">Sajt nema poseban zvuk, pa se MP3 pravi iz videa (preuzimanje je veće).</string>
     <string name="error_unsupported">Ovaj link nije podržan.</string>
     <string name="error_login">Ovaj sajt traži prijavu ili potvrdu.</string>
     <string name="error_http">Sajt je vratio HTTP %1$s.</string>

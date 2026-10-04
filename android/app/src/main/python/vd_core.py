@@ -88,7 +88,13 @@ def plan(info: dict, kind: str, height: int = 0) -> list[str]:
     `height` > 0 ograničava visinu slike (izbor 1080p/720p/480p); 0 = najbolja dostupna."""
     formats = info.get("formats") or [info]
     audio = _best_audio(formats)
-    if kind == "audio":
+    if kind == "mp3" and audio is None:
+        # Sajt bez posebnog zvuka (Instagram, TikTok…): MP3 se pravi iz videa sa zvukom; najmanji takav fajl,
+        # MP4 prije ostalih (Ahmed 4.10.2026: „Audio dugme je zamrznuto").
+        with_sound = sorted((f for f in formats if _has_video(f) and _has_audio(f)),
+                            key=lambda f: (f.get("ext") != "mp4", -(f.get("abr") or 0), _size(f) or float("inf")))
+        return [with_sound[0].get("format_id") or "b"] if with_sound else ["w*[acodec!=none]/b/w"]
+    if kind in ("audio", "mp3"):
         if audio is None:
             raise ValueError("AUDIO_UNAVAILABLE")
         return [audio.get("format_id") or "ba[ext=m4a]"]
@@ -254,7 +260,7 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
     # u kojoj su pročitani; nova sesija za preuzimanje dobije HTTP 403 (nađeno na S26 Ultra, 27.9.2026).
-    part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0, "audio": kind == "audio"}
+    part = {"before": 0.0, "weight": 1.0, "done_before": 0, "rest": 0, "audio": kind in ("audio", "mp3")}
 
     def hook(status):
         if listener.isCancelled():
@@ -322,7 +328,7 @@ def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False, subt
         finished = 0  # stvarni bajtovi završenih dijelova
         for index, spec in enumerate(specs):
             part.update(before=sum(weights[:index]), weight=weights[index], done_before=finished,
-                        rest=int(sum(sizes[index + 1:])), audio=kind == "audio" or index > 0)
+                        rest=int(sum(sizes[index + 1:])), audio=kind in ("audio", "mp3") or index > 0)
             # yt-dlp izbor formata sastavi jednom, u konstruktoru; za svaki dio se sastavlja ponovo.
             ydl.params["format"] = spec
             ydl.format_selector = ydl.build_format_selector(spec)

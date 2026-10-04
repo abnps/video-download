@@ -21,11 +21,19 @@ class AndroidAudioTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "AUDIO_UNAVAILABLE"):
             vd_core.plan(info, "audio")
         self.assertEqual(vd_core.plan(info, "video"), ["combined"])
+        # MP3 i bez posebnog zvuka: pravi se iz najmanjeg MP4 sa zvukom.
+        small = {**combined, "format_id": "small", "filesize": 100}
+        combined["filesize"] = 900
+        info["formats"].append(small)
+        self.assertEqual(vd_core.plan(info, "mp3"), ["small"])
+        self.assertEqual(vd_core.plan({"formats": [{"format_id": "v", "vcodec": "avc1", "acodec": "none"}]}, "mp3"),
+                         ["w*[acodec!=none]/b/w"])
 
         m4a = {"format_id": "audio", "ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2"}
         info["formats"].append(m4a)
         self.assertTrue(vd_core.options(info)["audio_available"])
         self.assertEqual(vd_core.plan(info, "audio"), ["audio"])
+        self.assertEqual(vd_core.plan(info, "mp3"), ["audio"])
 
     def test_standalone_m4a_and_other_audio(self):
         standalone = {"ext": "m4a", "vcodec": "none", "acodec": "mp4a.40.2"}
