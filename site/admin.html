@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Video Download · statistika</title>
+<!-- Stranica za autora (Ahmed 4.10.2026): brojači preuzimanja i dnevnih provjera ažuriranja, iz istorije na grani
+     „statistika" (.github/workflows/stats.yml). Nije u mapi sajta i nije povezana; dugme 📊 u podnožju vidi samo
+     uređaj označen ovdje. To nije prijava: brojevi su ionako javni na GitHub-u. Bez tuđih skripti. -->
+<style>
+:root { --bg:#f5f6fb; --card:#fff; --fg:#1b2030; --muted:#687087; --line:#e2e5ee;
+  --win:#1a73e8; --mac:#7c4dff; --and:#1e8e3e; color-scheme:light }
+@media (prefers-color-scheme: dark) { :root { --bg:#12141b; --card:#1b1e27; --fg:#e7e9f0; --muted:#98a0b3;
+  --line:#2b2f3b; --win:#6ea8ff; --mac:#a98bff; --and:#6fd08c; color-scheme:dark } }
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif }
+main { max-width:960px; margin:0 auto; padding:28px 16px 56px; display:grid; gap:18px }
+h1 { margin:0; font-size:26px } h2 { margin:0 0 4px; font-size:17px }
+.muted { color:var(--muted) } a { color:var(--win) }
+.tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px }
+.tile, section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; min-width:0 }
+.tile b { display:block; font-size:30px; font-variant-numeric:tabular-nums }
+.tile small { color:var(--muted) }
+.legend { display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--muted); margin:6px 0 4px }
+.legend i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px }
+svg { width:100%; height:auto; display:block }
+svg text { fill:var(--muted); font-size:11px }
+.grid { stroke:var(--line) }
+.bar { display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:999px;
+  padding:7px 14px; cursor:pointer } button:focus-visible { outline:2px solid var(--win); outline-offset:2px }
+.scroll { overflow-x:auto } table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums }
+th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap }
+th { color:var(--muted); font-size:13px; font-weight:600 }
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <h1>Statistika</h1>
+    <p class="muted" id="status">Učitavam istoriju…</p>
+    <div class="bar">
+      <button id="admin" type="button"></button>
+      <a href="./">← Sajt</a>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><small>Preuzimanja ukupno</small><b id="t-all">–</b></div>
+    <div class="tile"><small>Windows</small><b id="t-win" style="color:var(--win)">–</b></div>
+    <div class="tile"><small>Mac</small><b id="t-mac" style="color:var(--mac)">–</b></div>
+    <div class="tile"><small>Android</small><b id="t-and" style="color:var(--and)">–</b></div>
+    <div class="tile"><small>Aktivni juče (javljanja)</small><b id="t-active">–</b></div>
+  </div>
+
+  <section>
+    <h2>Preuzimanja kroz vrijeme</h2>
+    <p class="muted">Ukupno do tog dana; uključuje i automatska ažuriranja.</p>
+    <div class="legend"><span><i style="background:var(--win)"></i>Windows</span><span><i style="background:var(--mac)"></i>Mac</span><span><i style="background:var(--and)"></i>Android</span></div>
+    <div id="chart-downloads"></div>
+  </section>
+
+  <section>
+    <h2>Aktivne instalacije po danu</h2>
+    <p class="muted">Koliko se instalacija javilo pri dnevnoj provjeri ažuriranja (najviše jednom dnevno, pa ≈ aktivni korisnici). Računar se broji od 0.9.9.</p>
+    <div class="legend"><span><i style="background:var(--win)"></i>Windows</span><span><i style="background:var(--mac)"></i>Mac</span><span><i style="background:var(--and)"></i>Android</span></div>
+    <div id="chart-active"></div>
+  </section>
+
+  <section>
+    <h2>Po danima</h2>
+    <div class="scroll"><table id="days"><tr><th>Dan</th><th>Preuzimanja</th><th>Aktivni Windows</th><th>Aktivni Mac</th><th>Aktivni Android</th></tr></table></div>
+  </section>
+</main>
+<script>
+(() => {
+  "use strict";
+  const SRC = "https://raw.githubusercontent.com/abnps/video-download/statistika/istorija.json";
+  const KEY = "vd-admin";
+  const KINDS = [["windows", "--win"], ["mac", "--mac"], ["android", "--and"]];
+  const $ = (id) => document.getElementById(id);
+
+  // „Ovaj uređaj sam ja": samo prikazuje dugme 📊 u podnožju sajta na ovom uređaju.
+  const isAdmin = () => { try { return localStorage.getItem(KEY) === "1"; } catch { return false; } };
+  const adminBtn = $("admin");
+  const label = () => { adminBtn.textContent = isAdmin() ? "✓ Ovaj uređaj je tvoj (sakrij dugme 📊)" : "Označi ovaj uređaj kao svoj (dugme 📊 na sajtu)"; };
+  adminBtn.addEventListener("click", () => {
+    try { isAdmin() ? localStorage.removeItem(KEY) : localStorage.setItem(KEY, "1"); } catch {}
+    label();
+  });
+  label();
+
+  const color = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const sum = (o) => o.windows + o.mac + o.android;
+
+  // Posljednji snimak svakog dana; dnevna javljanja = razlika prema prethodnom danu (novo izdanje kreće od nule).
+  function days(history) {
+    const last = new Map();
+    history.forEach((s) => last.set(s.time.slice(0, 10), s));
+    const list = [...last.entries()].sort((a, b) => a[0] < b[0] ? -1 : 1);
+    return list.map(([day, s], i) => {
+      const prev = i ? list[i - 1][1].checks : null;
+      const active = {};
+      KINDS.forEach(([k]) => { active[k] = prev && s.checks[k] >= prev[k] ? s.checks[k] - prev[k] : null; });
+      return { day, downloads: s.downloads, active };
+    });
+  }
+
+  function chart(el, rows, value, bars) {
+    const W = 900, H = 260, L = 44, R = 12, T = 12, B = 30;
+    const max = Math.max(1, ...rows.flatMap((r) => KINDS.map(([k]) => value(r, k) || 0)));
+    const step = Math.pow(10, Math.floor(Math.log10(max))) || 1;
+    const top = Math.ceil(max / step) * step;
+    const x = (i) => L + (rows.length < 2 ? (W - L - R) / 2 : i * (W - L - R) / (rows.length - 1));
+    const y = (v) => T + (H - T - B) * (1 - v / top);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="grafikon">`;
+    for (let g = 0; g <= 4; g++) {
+      const v = Math.round(top * g / 4);
+      s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+    }
+    const every = Math.max(1, Math.ceil(rows.length / 8));
+    rows.forEach((r, i) => { if (i % every === 0 || i === rows.length - 1) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${r.day.slice(5).split("-").reverse().join(".")}</text>`; });
+    if (bars) {
+      const slot = (W - L - R) / Math.max(rows.length, 1), bw = Math.max(2, slot / 4);
+      rows.forEach((r, i) => KINDS.forEach(([k, c], j) => {
+        const v = value(r, k); if (v == null) return;
+        const cx = L + slot * i + slot / 2 + (j - 1) * bw;
+        s += `<rect x="${cx - bw / 2}" y="${y(v)}" width="${bw}" height="${y(0) - y(v)}" rx="2" fill="${color(c)}"><title>${r.day}: ${v}</title></rect>`;
+      }));
+    } else {
+      KINDS.forEach(([k, c]) => {
+        const pts = rows.map((r, i) => `${x(i)},${y(value(r, k) || 0)}`).join(" ");
+        s += `<polyline points="${pts}" fill="none" stroke="${color(c)}" stroke-width="2.5" stroke-linejoin="round"/>`;
+        const i = rows.length - 1;
+        if (i >= 0) s += `<circle cx="${x(i)}" cy="${y(value(rows[i], k) || 0)}" r="4" fill="${color(c)}"/>`;
+      });
+    }
+    el.innerHTML = s + "</svg>";
+  }
+
+  fetch(SRC, { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then((history) => {
+      const rows = days(history);
+      if (!rows.length) throw new Error("istorija je prazna");
+      const last = rows[rows.length - 1];
+      $("t-all").textContent = sum(last.downloads);
+      $("t-win").textContent = last.downloads.windows;
+      $("t-mac").textContent = last.downloads.mac;
+      $("t-and").textContent = last.downloads.android;
+      const a = last.active;
+      $("t-active").textContent = KINDS.some(([k]) => a[k] != null) ? KINDS.reduce((n, [k]) => n + (a[k] || 0), 0) : "–";
+      chart($("chart-downloads"), rows, (r, k) => r.downloads[k], false);
+      chart($("chart-active"), rows.slice(1), (r, k) => r.active[k], true);
+      const table = $("days");
+      rows.slice().reverse().slice(0, 60).forEach((r) => {
+        const tr = document.createElement("tr");
+        [r.day, sum(r.downloads), ...KINDS.map(([k]) => r.active[k] ?? "–")].forEach((v) => {
+          const td = document.createElement("td"); td.textContent = v; tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+      $("status").textContent = `Posljednji snimak: ${history[history.length - 1].time.replace("T", " ")} UTC · ${rows.length} dan(a) istorije. Snimak se pravi svako jutro.`;
+    })
+    .catch((e) => {
+      $("status").textContent = `Istorija još nije dostupna (${e.message}). Prvi snimak nastaje kad se pokrene posao „Statistika” na GitHub-u.`;
+    });
+})();
+</script>
+</body>
+</html>

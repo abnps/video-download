@@ -1,0 +1,48 @@
+# Svako jutro: snimak brojača preuzimanja i dnevnih provjera ažuriranja (tools/statistika.py) u istoriju na grani
+# „statistika" (ne main). Stranica site/admin.html crta grafikone iz tog fajla. Brojevi su ionako javni na GitHub-u.
+name: Statistika
+
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # nacrti izdanja (stari brojači) i upis na granu statistika
+
+concurrency:
+  group: statistika
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONIOENCODING: utf-8
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Grana statistika (napravi je prvi put)
+        run: |
+          git fetch origin statistika || true
+          if git rev-parse --verify origin/statistika >/dev/null 2>&1; then
+            git worktree add stats origin/statistika
+            cd stats && git switch -c statistika
+          else
+            git worktree add --detach stats
+            cd stats && git switch --orphan statistika
+          fi
+      - name: Snimak
+        run: python tools/statistika.py --history stats/istorija.json --no-page --no-open
+      - name: Upis
+        working-directory: stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add istorija.json
+          git commit -m "Statistika $(date -u +%Y-%m-%d)" || exit 0
+          git push origin statistika

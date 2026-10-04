@@ -28,10 +28,9 @@ CHECKS = {"android.json": "android", "release.json": "windows", "release-macos.j
 
 
 def releases(repo: str) -> list[dict]:
-    raw = subprocess.run(["gh", "api", f"repos/{repo}/releases?per_page=100", "--paginate"], check=True,
-                         capture_output=True, text=True, encoding="utf-8").stdout
-    # --paginate spaja JSON nizove jedan za drugim („][")
-    return json.loads("[" + raw.strip()[1:-1].replace("]\n[", ",").replace("][", ",") + "]") if raw.strip() else []
+    raw = subprocess.run(["gh", "api", f"repos/{repo}/releases?per_page=100", "--paginate", "--jq", ".[]"],
+                         check=True, capture_output=True, text=True, encoding="utf-8").stdout
+    return [json.loads(line) for line in raw.splitlines() if line.strip()]  # jedno izdanje po redu
 
 
 def snapshot() -> dict:
@@ -131,16 +130,20 @@ Android {c['android']}.</p>
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-open", action="store_true", help="ne otvaraj stranicu u browseru")
+    parser.add_argument("--history", type=Path, help="istorija na drugom mjestu (GitHub: grana statistika)")
+    parser.add_argument("--no-page", action="store_true", help="samo dopuni istoriju, bez lokalne stranice")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     snap = snapshot()
-    history_path = OUT / "istorija.json"
+    history_path = args.history or OUT / "istorija.json"
     history = load_history(history_path) + [{k: snap[k] for k in ("time", "downloads", "checks")}]
     history_path.write_text(json.dumps(history[-2000:], indent=1), encoding="utf-8")
-    page = OUT / "index.html"
-    page.write_text(render(snap, per_day(history)), encoding="utf-8")
     d = snap["downloads"]
     print(f"Preuzimanja: {sum(d.values())} (Windows {d['windows']}, Mac {d['mac']}, Android {d['android']})")
+    if args.no_page:
+        return 0
+    page = OUT / "index.html"
+    page.write_text(render(snap, per_day(history)), encoding="utf-8")
     print(f"Stranica: {page}")
     if not args.no_open and os.name == "nt":
         os.startfile(page)  # noqa: S606 - lokalni fajl autora

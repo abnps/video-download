@@ -239,4 +239,16 @@
   };
   selectHash();
   addEventListener("hashchange", selectHash);
+
+  // Dugme 📊 (statistika) samo na uređaju koji je autor označio na admin.html; ostali ga nikad ne vide.
+  try {
+    const links = $("footer .links");
+    if (links && localStorage.getItem("vd-admin") === "1") {
+      const a = document.createElement("a");
+      a.href = "/video-download/admin.html";
+      a.textContent = "📊";
+      a.title = "Statistika";
+      links.appendChild(a);
+    }
+  } catch { /* bez pristupa lokalnoj memoriji: nema dugmeta */ }
 })();
