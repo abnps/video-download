@@ -111,7 +111,7 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
     const W = 900, H = 260, L = 44, R = 12, T = 12, B = 30;
     const max = Math.max(1, ...rows.flatMap((r) => KINDS.map(([k]) => value(r, k) || 0)));
     const step = Math.pow(10, Math.floor(Math.log10(max))) || 1;
-    const top = Math.ceil(max / step) * step;
+    const top = Math.max(4, Math.ceil(max / step) * step);  // najmanje 4, da oznake osi budu različite
     const x = (i) => L + (rows.length < 2 ? (W - L - R) / 2 : i * (W - L - R) / (rows.length - 1));
     const y = (v) => T + (H - T - B) * (1 - v / top);
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="grafikon">`;
@@ -152,7 +152,12 @@ th { color:var(--muted); font-size:13px; font-weight:600 }
       const a = last.active;
       $("t-active").textContent = KINDS.some(([k]) => a[k] != null) ? KINDS.reduce((n, [k]) => n + (a[k] || 0), 0) : "–";
       chart($("chart-downloads"), rows, (r, k) => r.downloads[k], false);
-      chart($("chart-active"), rows.slice(1), (r, k) => r.active[k], true);
+      const activeRows = rows.slice(1);
+      if (activeRows.some((r) => KINDS.some(([k]) => r.active[k] != null))) {
+        chart($("chart-active"), activeRows, (r, k) => r.active[k], true);
+      } else {
+        $("chart-active").innerHTML = '<p class="muted">Prvi dnevni broj stiže sutra ujutro: računa se kao razlika dva snimka.</p>';
+      }
       const table = $("days");
       rows.slice().reverse().slice(0, 60).forEach((r) => {
         const tr = document.createElement("tr");
