@@ -9,6 +9,8 @@ Izvor su GitHub-ovi brojači preuzimanja fajlova iz izdanja (čita se `gh`-om, p
   (android.json na Androidu; release.json na računaru od 0.9.9, release-macos.json na Macu).
 Svako pokretanje upiše snimak u `<Build>/statistika/istorija.json` (van repoa, samo na ovom računaru), pa se iz
 razlike dva dana vidi koliko se instalacija javilo tog dana. Stranica je `<Build>/statistika/index.html`.
+Sve ostaje samo na ovom računaru (Ahmed 4.10.2026: „ne želim da drugi vide te podatke"); nema javne stranice.
+Naša preuzimanja (alati za objavu) se oduzimaju iz `<Build>/statistika/vlastita.json` (tools/vlastita.py).
 """
 
 import argparse
@@ -25,6 +27,12 @@ OUT = PROJECT.parent / "Build" / "statistika"
 REPOS = ("abnps/video-download", "abnps/video-download-installers")
 # Fajl → vrsta brojača
 CHECKS = {"android.json": "android", "release.json": "windows", "release-macos.json": "mac"}
+# Nulta tačka: preuzimanja prije nje su skoro sva naša (probe, automatska ažuriranja na Ahmedovom računaru).
+START = "2026-10-04"
+# Ahmedovi uređaji se javljaju svaki dan kao aktivni: oduzimaju se od dnevnog broja (--devices).
+MY_DEVICES = {"windows": 1, "mac": 0, "android": 1}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import vlastita  # noqa: E402
 
 
 def releases(repo: str) -> list[dict]:
@@ -78,8 +86,21 @@ def per_day(history: list[dict]) -> list[tuple[str, dict]]:
     return rows
 
 
-def render(snap: dict, days: list[tuple[str, dict]]) -> str:
-    d, c = snap["downloads"], snap["checks"]
+def net_downloads(history: list[dict], snap: dict, own: dict, since: str = START) -> dict:
+    """Preuzimanja od nulte tačke, bez naših (alati ih upisuju u vlastita.json, sve poslije nulte tačke)."""
+    base = next((s["downloads"] for s in sorted(history, key=lambda s: s["time"]) if s["time"][:10] >= since),
+                snap["downloads"])
+    return {k: max(0, snap["downloads"][k] - base[k] - own["downloads"][k]) for k in snap["downloads"]}
+
+
+def render(snap: dict, days: list[tuple[str, dict]], net: dict | None = None, devices: dict | None = None,
+           own: dict | None = None) -> str:
+    c = snap["checks"]
+    d = net or snap["downloads"]
+    devices = devices or dict.fromkeys(d, 0)
+    own = own or vlastita.empty()
+    days = [(day, {k: (None if v is None else max(0, v - devices.get(k, 0))) for k, v in vals.items()})
+            for day, vals in days if day >= START]
     esc = html.escape
     day_rows = "".join(
         f"<tr><td>{esc(day)}</td>" + "".join(f"<td>{'—' if v[k] is None else v[k]}</td>" for k in ("windows", "mac", "android"))
@@ -111,7 +132,7 @@ th {{ color:var(--muted); font-weight:600; font-size:13px }}
 <div><h1>Video Download statistika</h1><p class="muted">Osvježeno {esc(snap['time'].replace('T', ' '))} ·
 podaci s GitHub-a, bez praćenja korisnika · <code>python tools/statistika.py</code></p></div>
 <div class="tiles">
-<div class="tile"><span class="muted">Preuzimanja ukupno</span><b>{sum(d.values())}</b></div>
+<div class="tile"><span class="muted">Preuzimanja od {START[8:]}.{START[5:7]}. (bez naših)</span><b>{sum(d.values())}</b></div>
 <div class="tile"><span class="muted">Windows</span><b>{d['windows']}</b></div>
 <div class="tile"><span class="muted">Mac</span><b>{d['mac']}</b></div>
 <div class="tile"><span class="muted">Android</span><b>{d['android']}</b></div>
@@ -122,7 +143,10 @@ Računar se broji od verzije 0.9.9. Ukupno javljanja za posljednje izdanje: Wind
 Android {c['android']}.</p>
 <div class="scroll"><table><tr><th>Dan</th><th>Windows</th><th>Mac</th><th>Android</th></tr>{day_rows}</table></div>
 </section>
-<section><h2>Preuzimanja po izdanju</h2><p class="muted">Uključuju i automatska ažuriranja i probna preuzimanja.</p>
+<p class="muted">Od dnevnog broja su oduzeti tvoji uređaji (Windows {devices.get('windows', 0)}, Mac {devices.get('mac', 0)},
+Android {devices.get('android', 0)}; mijenja se s --devices). Naša preuzimanja do sada: {sum(own['downloads'].values())}
+instalera, oduzeta od kartica.</p>
+<section><h2>Preuzimanja po izdanju</h2><p class="muted">Sva preuzimanja od početka, uključujući naša i automatska ažuriranja.</p>
 <div class="scroll"><table><tr><th>Izdanje</th><th>Datum</th><th>Windows</th><th>Mac</th><th>Android</th></tr>{rel_rows}</table></div>
 </section></main></body></html>"""
 
@@ -132,18 +156,23 @@ def main() -> int:
     parser.add_argument("--no-open", action="store_true", help="ne otvaraj stranicu u browseru")
     parser.add_argument("--history", type=Path, help="istorija na drugom mjestu (GitHub: grana statistika)")
     parser.add_argument("--no-page", action="store_true", help="samo dopuni istoriju, bez lokalne stranice")
+    parser.add_argument("--devices", default=",".join(str(MY_DEVICES[k]) for k in ("windows", "mac", "android")),
+                        help="moji uređaji Windows,Mac,Android (oduzimaju se od dnevnih javljanja), npr. 1,0,1")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     snap = snapshot()
     history_path = args.history or OUT / "istorija.json"
     history = load_history(history_path) + [{k: snap[k] for k in ("time", "downloads", "checks")}]
     history_path.write_text(json.dumps(history[-2000:], indent=1), encoding="utf-8")
-    d = snap["downloads"]
-    print(f"Preuzimanja: {sum(d.values())} (Windows {d['windows']}, Mac {d['mac']}, Android {d['android']})")
+    own = vlastita.load()
+    d = net_downloads(history, snap, own)
+    devices = dict(zip(("windows", "mac", "android"), (int(x) for x in args.devices.split(","))))
+    print(f"Preuzimanja od {START} bez naših: {sum(d.values())} "
+          f"(Windows {d['windows']}, Mac {d['mac']}, Android {d['android']})")
     if args.no_page:
         return 0
     page = OUT / "index.html"
-    page.write_text(render(snap, per_day(history)), encoding="utf-8")
+    page.write_text(render(snap, per_day(history), d, devices, own), encoding="utf-8")
     print(f"Stranica: {page}")
     if not args.no_open and os.name == "nt":
         os.startfile(page)  # noqa: S606 - lokalni fajl autora

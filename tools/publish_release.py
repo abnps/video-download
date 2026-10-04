@@ -28,11 +28,9 @@ ANDROID_CERTIFICATE = "83c26828568c1c1fc66be15353650c382a73f9badc5c847b22a7a141c
 ANDROID_PACKAGE = "io.github.abnps.videodownload"
 
 
-def record_own(names, runner=None) -> None:
-    """Naša preuzimanja iz izdanja (provjere, kopije) se upišu za statistiku. Ide kroz `run` modula koji je preuzeo
-    fajlove (`runner`), pa test koji zamijeni taj `run` nikad ne piše na pravi GitHub (4.10.2026)."""
-    runner = runner or run
-    vlastita.record(names, run=lambda *args, stdin=None: runner("gh", *args, input=stdin))
+def record_own(names, _runner=None) -> None:
+    """Naša preuzimanja iz izdanja (provjere, kopije) se upišu u lokalnu statistiku (samo na ovom računaru)."""
+    vlastita.record(names)
 
 
 class ReleaseError(ValueError):

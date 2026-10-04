@@ -114,11 +114,7 @@ class SiteTest(unittest.TestCase):
         js = (build_site.SITE / "assets" / "site.js").read_text(encoding="utf-8")
         self.assertIn("prefers-reduced-motion", css)
         self.assertIn("prefers-reduced-motion", js)
-        # Jedini izuzetak: ČITANJE oznake „ovo je autorov uređaj" (postavlja je samo admin.html) za dugme 📊.
-        admin_flag = 'localStorage.getItem("vd-admin")'
-        self.assertEqual(js.count("localStorage"), js.count(admin_flag))
-        self.assertNotRegex(css + js.replace(admin_flag, ""),
-                            r"https?://|@import|fetch\(|XMLHttpRequest|localStorage|document\.cookie")
+        self.assertNotRegex(css + js, r"https?://|@import|fetch\(|XMLHttpRequest|localStorage|document\.cookie")
         for name, text in self.pages.items():
             with self.subTest(page=name):
                 self.assertNotRegex(text, r'<script[^>]+src="https?:|<link[^>]+href="https?:[^"]*"[^>]*stylesheet'

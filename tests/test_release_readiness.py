@@ -117,37 +117,25 @@ class OwnDownloadsTest(unittest.TestCase):
         self.assertEqual(counted["downloads"], {"windows": 2, "mac": 1, "android": 1})
         self.assertEqual(counted["checks"], {"windows": 1, "mac": 1, "android": 1})
 
-    def test_record_adds_to_the_stored_total_on_the_statistics_branch(self):
-        import base64
+    def test_record_adds_to_the_local_total_only(self):
         import json
+        import tempfile
 
         import vlastita
 
-        stored = {"downloads": {"windows": 3, "mac": 0, "android": 1}, "checks": {"windows": 2, "mac": 0, "android": 0}}
-        calls = []
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "vlastita.json"
+            vlastita.record(["VideoDownload-Setup-1.0.0.exe", "release.json"], path)
+            vlastita.record(["VideoDownload-Setup-1.0.0.exe"], path)
+            total = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(total["downloads"]["windows"], 2)
+        self.assertEqual(total["checks"]["windows"], 1)
 
-        def fake(*args, stdin=None):
-            calls.append((args, stdin))
-            if args[:2] == ("api", f"repos/{vlastita.REPO}/contents/{vlastita.PATH}?ref={vlastita.BRANCH}"):
-                return json.dumps({"sha": "abc", "content": base64.b64encode(json.dumps(stored).encode()).decode()})
-            return ""
-
-        vlastita.record(["VideoDownload-Setup-1.0.0.exe", "release.json"], run=fake)
-        body = json.loads(calls[-1][1])
-        self.assertEqual((body["branch"], body["sha"]), ("statistika", "abc"))
-        total = json.loads(base64.b64decode(body["content"]))
-        self.assertEqual(total["downloads"]["windows"], 4)
-        self.assertEqual(total["checks"]["windows"], 3)
-
-    def test_failure_never_stops_a_release(self):
-        import subprocess
-
+    def test_tests_never_write_the_real_file(self):
         import vlastita
 
-        def broken(*args, stdin=None):
-            raise subprocess.CalledProcessError(1, args)
-
-        vlastita.record(["VideoDownload-Setup-1.0.0.exe"], run=broken)  # samo upozorenje, bez izuzetka
+        with patch.object(vlastita.Path, "write_text", side_effect=AssertionError("pravi fajl")):
+            vlastita.record(["VideoDownload-Setup-1.0.0.exe"])  # bez putanje u testu: ništa se ne upisuje
 
 
 if __name__ == "__main__":
