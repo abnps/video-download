@@ -8,6 +8,33 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.9", "4.10.2026", {
+        "bs": ["Novi prozor Postavke (zupčanik desno od „Preuzmi“, ili Fajl → Postavke, Ctrl+,): sve opcije na jednom mjestu, u grupama.",
+               "Kartice iznad liste (Sve, U toku, Na čekanju, Završeno, Neuspjelo) i oznake na gotovom fajlu: format, stvarna rezolucija i veličina.",
+               "Kad sajt promijeni nešto, Pomoć → Ažuriraj čitač sajtova nudi i noćnu verziju yt-dlp-a s najnovijim popravkama; popravljeno je i automatsko ažuriranje yt-dlp-a.",
+               "Prilog sada može i karticom, Apple Payem ili Google Payem, ili preko Ko-fija, bez PayPal naloga.",
+               "Traka napretka više ne ostaje na redu koji je završio dok je prozor bio skriven; prazan ekran pominje i dodatak za browser."],
+        "en": ["New Settings window (gear next to “Download”, or File → Settings, Ctrl+,): all options in one place, in groups.",
+               "Tabs above the list (All, Downloading, Waiting, Finished, Failed) and labels on finished files: format, real resolution and size.",
+               "When a site changes something, Help → Update the site reader also offers the nightly yt-dlp with the newest fixes; automatic yt-dlp updates are fixed too.",
+               "You can now contribute by card, Apple Pay or Google Pay, or via Ko-fi, without a PayPal account.",
+               "The progress bar no longer stays on a row that finished while the window was hidden; the empty screen also mentions the browser extension."],
+        "de": ["Neues Fenster Einstellungen (Zahnrad neben „Herunterladen“ oder Datei → Einstellungen, Strg+,): alle Optionen an einem Ort, in Gruppen.",
+               "Tabs über der Liste (Alle, Läuft, Wartend, Fertig, Fehlgeschlagen) und Kennzeichen an fertigen Dateien: Format, echte Auflösung und Größe.",
+               "Ändert eine Seite etwas, bietet Hilfe → Seiten-Reader aktualisieren auch die Nightly-Version von yt-dlp mit den neuesten Korrekturen an; die automatische yt-dlp-Aktualisierung ist ebenfalls repariert.",
+               "Beiträge gehen jetzt auch per Karte, Apple Pay oder Google Pay oder über Ko-fi, ohne PayPal-Konto.",
+               "Der Fortschrittsbalken bleibt nicht mehr an einer Zeile, die fertig wurde, während das Fenster verborgen war; der leere Bildschirm erwähnt auch die Browser-Erweiterung."],
+        "es": ["Nueva ventana Ajustes (engranaje junto a «Descargar», o Archivo → Ajustes, Ctrl+,): todas las opciones en un solo lugar, por grupos.",
+               "Pestañas sobre la lista (Todo, En curso, En espera, Terminados, Fallidos) y etiquetas en los archivos terminados: formato, resolución real y tamaño.",
+               "Cuando un sitio cambia algo, Ayuda → Actualizar el lector de sitios ofrece también la versión nightly de yt-dlp con los arreglos más recientes; también se ha corregido la actualización automática de yt-dlp.",
+               "Ahora puedes aportar con tarjeta, Apple Pay o Google Pay, o a través de Ko-fi, sin cuenta de PayPal.",
+               "La barra de progreso ya no se queda en una fila que terminó con la ventana oculta; la pantalla vacía menciona también la extensión del navegador."],
+        "fr": ["Nouvelle fenêtre Paramètres (engrenage à côté de « Télécharger », ou Fichier → Paramètres, Ctrl+,) : toutes les options au même endroit, par groupes.",
+               "Onglets au-dessus de la liste (Tout, En cours, En attente, Terminés, Échoués) et étiquettes sur les fichiers terminés : format, résolution réelle et taille.",
+               "Quand un site change quelque chose, Aide → Mettre à jour le lecteur de sites propose aussi la version nightly de yt-dlp avec les derniers correctifs ; la mise à jour automatique de yt-dlp est aussi corrigée.",
+               "Vous pouvez maintenant contribuer par carte, Apple Pay ou Google Pay, ou via Ko-fi, sans compte PayPal.",
+               "La barre de progression ne reste plus sur une ligne terminée pendant que la fenêtre était masquée ; l'écran vide mentionne aussi l'extension du navigateur."],
+    }),
     ("0.9.8", "3.10.2026", {
         "bs": ["Preuzimanja → Roditeljska zaštita, po želji zaštićena PIN-om.",
                "Pomoć → Prijavi problem ili prijedlog: otvara e-poruku za autora, uz verziju programa.",
