@@ -265,6 +265,7 @@ class MainWindow(QMainWindow):
         self._update_fetch = update_fetch
         self._update_check_job = None
         self._ytdlp_job = None
+        self._ytdlp_nightly = False  # posljednja provjera je tražila noćnu verziju
         self._build_menu()
         self._build_ui()
         self._load_settings()
@@ -1689,10 +1690,12 @@ class MainWindow(QMainWindow):
 
     # ---------- ažuriranje yt-dlp-a ----------
 
-    def update_ytdlp(self, manual: bool) -> None:
-        """Novi yt-dlp radi od sljedećeg pokretanja; tekući uvoz se ne može zamijeniti u hodu."""
+    def update_ytdlp(self, manual: bool, nightly: bool = False) -> None:
+        """Novi yt-dlp radi od sljedećeg pokretanja; tekući uvoz se ne može zamijeniti u hodu.
+        `nightly`: noćna verzija sa najnovijim popravkama (nudi se kad je redovna već najnovija)."""
         if self._ytdlp_job is not None:
             return
+        self._ytdlp_nightly = nightly
         if not manual:
             last = self._settings.value("last_ytdlp_check", 0.0, type=float)
             if time.time() - last < ytdlp_update.CHECK_INTERVAL_SECONDS:
@@ -1700,7 +1703,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("last_ytdlp_check", time.time())
         if manual:
             self._set_status(tr("ytdlp.checking"))
-        job = YtdlpUpdateJob(manual)
+        job = YtdlpUpdateJob(manual, fetch=ytdlp_update.fetch_nightly if nightly else None)
         job.finished.connect(self._on_ytdlp_updated)
         self._ytdlp_job = job
         job.start()
@@ -1715,9 +1718,15 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, tr("menu.update_ytdlp"), text)
             return
         if version is None:
-            if manual:
-                QMessageBox.information(self, tr("menu.update_ytdlp"),
-                                        tr("ytdlp.latest", version=ytdlp_update.active_version()))
+            if manual and getattr(self, "_ytdlp_nightly", False):
+                QMessageBox.information(self, tr("menu.update_ytdlp"), tr("ytdlp.nightly_none"))
+            elif manual:
+                # Redovna je najnovija, a sajt možda i dalje ne radi: ponudi noćnu verziju (popravka dan-dva ranije).
+                answer = QMessageBox.question(
+                    self, tr("menu.update_ytdlp"),
+                    tr("ytdlp.latest", version=ytdlp_update.active_version()) + "\n\n" + tr("ytdlp.nightly_offer"))
+                if answer == QMessageBox.StandardButton.Yes:
+                    self.update_ytdlp(manual=True, nightly=True)
             return
         text = tr("ytdlp.updated", version=version)
         self._set_status(text)

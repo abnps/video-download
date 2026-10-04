@@ -142,6 +142,36 @@ class YtdlpUpdateTest(unittest.TestCase):
         with mock.patch.object(ytdlp_update, "active_version", return_value="2026.8.19"):
             self.assertIsNone(ytdlp_update.fetch_latest(opener=self.opener(pages)))
 
+    def nightly_json(self, stable="2026.8.19", nightly=("2026.9.16.232951.dev0", "2026.9.27.232945.dev0")):
+        releases = {stable: [{"filename": f"yt_dlp-{stable}-py3-none-any.whl", "url": "https://x/s.whl",
+                              "digests": {"sha256": "a" * 64}, "size": 1}]}
+        for version in nightly:
+            releases[version] = [{"filename": f"yt_dlp-{version}.tar.gz", "url": "https://x/n.tar.gz"},
+                                 {"filename": f"yt_dlp-{version}-py3-none-any.whl", "url": f"https://x/{version}.whl",
+                                  "digests": {"sha256": self.digest}, "size": len(self.wheel)}]
+        return json.dumps({"info": {"version": stable}, "urls": [], "releases": releases}).encode("utf-8")
+
+    def test_nightly_is_the_newest_dev_build_with_its_wheel(self):
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2026.08.19"):
+            release = ytdlp_update.fetch_nightly(opener=self.opener({PYPI: self.nightly_json()}))
+        self.assertEqual(release.version, "2026.9.27.232945.dev0")
+        self.assertEqual(release.url, "https://x/2026.9.27.232945.dev0.whl")
+        self.assertEqual(release.sha256, self.digest)
+
+    def test_no_nightly_when_regular_release_is_newer_or_already_running(self):
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2026.08.19"):
+            newer_stable = self.nightly_json(stable="2026.10.3")
+            self.assertIsNone(ytdlp_update.fetch_nightly(opener=self.opener({PYPI: newer_stable})))
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2026.09.27.232945"):
+            self.assertIsNone(ytdlp_update.fetch_nightly(opener=self.opener({PYPI: self.nightly_json()})))
+
+    def test_nightly_installs_like_a_regular_release(self):
+        pages = {PYPI: self.nightly_json(), "https://x/2026.9.27.232945.dev0.whl": self.wheel}
+        with mock.patch.object(ytdlp_update, "active_version", return_value="2026.08.19"):
+            release = ytdlp_update.fetch_nightly(opener=self.opener(pages))
+            self.assertEqual(ytdlp_update.install(release, opener=self.opener(pages)), "2026.9.27.232945.dev0")
+        self.assertIn("2026.9.27.232945.dev0", ytdlp_update.installed_versions())
+
     def test_insecure_url_is_refused(self):
         with self.assertRaises(ytdlp_update.YtdlpUpdateError):
             ytdlp_update.fetch_latest(url="http://pypi.example/json", opener=self.opener({}))

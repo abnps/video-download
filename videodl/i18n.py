@@ -693,6 +693,26 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
     "ytdlp.latest": ("yt-dlp je najnoviji ({version}).", "yt-dlp is up to date ({version}).",
                      "yt-dlp ist aktuell ({version}).", "yt-dlp está actualizado ({version}).",
                      "yt-dlp est à jour ({version})."),
+    "ytdlp.nightly_offer": (
+        "Ako neki sajt i dalje ne radi, možeš probati noćnu verziju yt-dlp-a: ima najnovije popravke, obično dan-dva "
+        "prije redovne. Kad izađe novija redovna, program se sam vraća na nju. Preuzeti noćnu verziju?",
+        "If a site still doesn't work, you can try the nightly version of yt-dlp: it has the newest fixes, usually a "
+        "day or two before the regular release. When a newer regular version comes out, the app switches back on its "
+        "own. Download the nightly version?",
+        "Wenn eine Seite weiterhin nicht funktioniert, kannst du die Nightly-Version von yt-dlp probieren: Sie hat die "
+        "neuesten Korrekturen, meist ein bis zwei Tage vor der regulären Version. Erscheint eine neuere reguläre "
+        "Version, wechselt die App von selbst zurück. Nightly-Version herunterladen?",
+        "Si algún sitio sigue sin funcionar, puedes probar la versión nightly de yt-dlp: trae los arreglos más "
+        "recientes, normalmente uno o dos días antes de la versión normal. Cuando salga una versión normal más nueva, "
+        "la aplicación vuelve a ella sola. ¿Descargar la versión nightly?",
+        "Si un site ne fonctionne toujours pas, tu peux essayer la version nightly de yt-dlp : elle contient les "
+        "derniers correctifs, en général un ou deux jours avant la version normale. Dès qu'une version normale plus "
+        "récente sort, l'application y revient d'elle-même. Télécharger la version nightly ?"),
+    "ytdlp.nightly_none": ("Nema novije noćne verzije od one koju već imaš.",
+                           "There is no nightly version newer than the one you have.",
+                           "Es gibt keine neuere Nightly-Version als deine.",
+                           "No hay una versión nightly más nueva que la que tienes.",
+                           "Il n'y a pas de version nightly plus récente que la tienne."),
     "ytdlp.updated": ("yt-dlp je ažuriran na {version}; primjenjuje se pri sljedećem pokretanju aplikacije.",
                       "yt-dlp was updated to {version}; it takes effect the next time the app starts.",
                       "yt-dlp wurde auf {version} aktualisiert; wirksam beim nächsten Start der App.",

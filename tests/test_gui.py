@@ -219,6 +219,20 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(window._theme, "dark")
         self.assertEqual(self.settings.value("rate_limit", type=int), 5)  # sačuvano odmah, bez „Sačuvaj"
 
+    def test_latest_regular_ytdlp_offers_the_nightly_version(self):
+        from PySide6.QtWidgets import QMessageBox
+
+        window = self.make_window(self.quick_download)
+        with mock.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.Yes) as ask,                 mock.patch.object(window, "update_ytdlp") as update:
+            window._on_ytdlp_updated(None, None, True)  # ručna provjera: redovna je već najnovija
+        self.assertIn("noćnu", ask.call_args.args[2])
+        update.assert_called_once_with(manual=True, nightly=True)
+        window._ytdlp_nightly = True
+        with mock.patch.object(QMessageBox, "information") as info, mock.patch.object(QMessageBox, "question") as ask:
+            window._on_ytdlp_updated(None, None, True)  # ni noćne nema: samo obavještenje, bez novog pitanja
+        ask.assert_not_called()
+        info.assert_called_once()
+
     def test_play_button_opens_downloaded_file(self):
         target = os.path.join(self.tmp.name, "a.mp4")
 

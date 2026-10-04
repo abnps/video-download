@@ -26,7 +26,8 @@ from urllib.parse import urlsplit
 from .runtime import user_data_base
 
 PYPI_URL = "https://pypi.org/pypi/yt-dlp/json"
-WHEEL_NAME = re.compile(r"^yt_dlp-(\d+(?:\.\d+){1,3})-py3-none-any\.whl$")
+WHEEL_NAME = re.compile(r"^yt_dlp-(\d+(?:\.\d+){1,3}(?:\.dev\d+)?)-py3-none-any\.whl$")
+NIGHTLY = re.compile(r"^\d+(?:\.\d+){2,3}\.dev\d+$")  # noćna verzija na PyPI-ju, npr. 2026.9.27.232945.dev0
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 MAX_WHEEL_BYTES = 64 * 1024 * 1024
 STORE_NAME = "yt-dlp"
@@ -162,6 +163,31 @@ def fetch_latest(url: str | None = None, opener=urllib.request.urlopen, timeout:
         return None  # već preuzeto, primjenjuje se pri sljedećem pokretanju
     if is_marked_bad(version):
         return None  # ova verzija se kod nas već nije mogla pokrenuti; čeka se sljedeća
+    return YtdlpRelease(version, wheel.get("url") or "", str((wheel.get("digests") or {}).get("sha256") or ""),
+                        int(wheel.get("size") or 0))
+
+
+def fetch_nightly(url: str | None = None, opener=urllib.request.urlopen, timeout: float = 30) -> YtdlpRelease | None:
+    """Najnovija noćna verzija sa PyPI-ja (autori yt-dlp-a je preporučuju kad sajt nešto promijeni: popravka stigne
+    dan-dva prije redovnog izdanja). None kad nije novija od redovne i od one koja radi. Preuzima se istim putem
+    (SHA-256 sa PyPI-ja); čim izađe novija redovna verzija, dnevna provjera prelazi na nju sama."""
+    url = url or os.environ.get("VIDEODL_YTDLP_URL") or PYPI_URL
+    with opener(_request(url), timeout=timeout) as response:
+        data = json.loads(response.read(8 * 1024 * 1024).decode("utf-8"))
+    releases = data.get("releases") or {}
+    nightly = [version for version in releases if NIGHTLY.match(str(version))]
+    if not nightly:
+        return None
+    version = max(nightly, key=parse_version)
+    stable = str((data.get("info") or {}).get("version") or "0")
+    if parse_version(version) <= max(parse_version(stable), parse_version(active_version())):
+        return None
+    if version in installed_versions() or is_marked_bad(version):
+        return None
+    wheel = next((item for item in releases.get(version) or []
+                  if isinstance(item, dict) and WHEEL_NAME.match(item.get("filename") or "")), None)
+    if not wheel:
+        return None
     return YtdlpRelease(version, wheel.get("url") or "", str((wheel.get("digests") or {}).get("sha256") or ""),
                         int(wheel.get("size") or 0))
 
