@@ -164,15 +164,24 @@ class ActivationTest(unittest.TestCase):
         return result.stdout.strip()
 
     @staticmethod
-    def make_package(store: Path, version: str, init_extra: str = "") -> Path:
+    def make_package(store: Path, version: str, init_extra: str = "", internal: str | None = None) -> Path:
         package = store / version / "yt_dlp"
         package.mkdir(parents=True)
         (package / "__init__.py").write_text(
             "from .version import __version__\n" + init_extra +
             "class YoutubeDL:\n    def __init__(self, params=None): pass\n    def close(self): pass\n",
             encoding="utf-8")
-        (package / "version.py").write_text(f'__version__ = "{version}"\n', encoding="utf-8")
+        (package / "version.py").write_text(f'__version__ = "{internal or version}"\n', encoding="utf-8")
         return package
+
+    def test_pypi_and_package_spell_the_same_version_differently(self):
+        # PyPI „2099.1.1", paket „2099.01.01" (kao stvarni yt-dlp 2026.8.19 / 2026.08.19): ista verzija, radi.
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Path(tmp) / "yt-dlp"
+            self.make_package(store, "2099.1.1", internal="2099.01.01")
+            self.assertEqual(self.run_child(Path(tmp), "2099.01.01"), "2099.01.01")
+            self.assertTrue((store / "2099.1.1").exists())
+            self.assertFalse((store / "2099.1.1.neispravna").exists())
 
     def test_new_version_that_cannot_work_falls_back_to_last_good(self):
         # Broj verzije je ispravan, ali paket ne radi s našim zavisnostima: radi prethodna ispravna.

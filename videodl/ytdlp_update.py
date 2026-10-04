@@ -86,7 +86,9 @@ def activate() -> str | None:
         try:
             import yt_dlp.version
 
-            if yt_dlp.version.__version__ == version:
+            # PyPI piše „2026.8.19", a paket u sebi „2026.08.19" (noćna: „2026.9.27.232945.dev0" / „2026.09.27.232945"):
+            # porede se brojevi, ne tekst. Tekstualno poređenje je svaku takvu verziju proglašavalo neispravnom (4.10.2026).
+            if parse_version(yt_dlp.version.__version__) == parse_version(version):
                 from yt_dlp import YoutubeDL
 
                 YoutubeDL({"quiet": True, "no_warnings": True}).close()
