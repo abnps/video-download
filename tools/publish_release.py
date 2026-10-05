@@ -192,9 +192,11 @@ def copy_to_installers_repo(tag: str) -> None:
     version = tag.removeprefix("v")
     names = (f"VideoDownload-Setup-{version}.exe", f"VideoDownload-Setup-{version}.exe.sha256")
     with tempfile.TemporaryDirectory(prefix="videodl-winget-") as temp:
-        run("gh", "release", "download", tag, "--repo", REPO, "--dir", temp,
-            *[arg for name in names for arg in ("--pattern", name)])
-        record_own(names)
+        try:
+            run("gh", "release", "download", tag, "--repo", REPO, "--dir", temp,
+                *[arg for name in names for arg in ("--pattern", name)])
+        finally:
+            record_own(names)  # i pukao pokušaj: GitHub je već izbrojao što je stiglo
         files = [str(Path(temp) / name) for name in names]
         try:
             run("gh", "release", "view", tag, "--repo", INSTALLERS_REPO, "--json", "tagName")
@@ -225,14 +227,20 @@ def validate_draft(tag: str, *, publish: bool = False) -> None:
     with tempfile.TemporaryDirectory(prefix="videodl-release-") as temp:
         folder = Path(temp)
         patterns = [arg for name in names for arg in ("--pattern", name)]
-        run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder), *patterns)
-        record_own(names)
+        try:
+            run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder), *patterns)
+        finally:
+            # I kad skidanje pukne na pola (5.10.2026: dvaput), GitHub je izbrojao fajlove koji su stigli; bez
+            # upisa bi naše provjere izgledale kao pravi korisnici (npr. „4 Mac preuzimanja").
+            record_own(names)
         current = validate_assets(folder, version, code, name)
         previous_folder = folder / "previous"
         previous_folder.mkdir()
         # Već postoji javno izdanje. Nedostupnost provjere prekida objavu, ne preskače zaštitu.
-        run("gh", "release", "download", "--repo", REPO, "--pattern", "android.json", "--dir", str(previous_folder))
-        record_own(["android.json"])
+        try:
+            run("gh", "release", "download", "--repo", REPO, "--pattern", "android.json", "--dir", str(previous_folder))
+        finally:
+            record_own(["android.json"])
         previous = json.loads((previous_folder / "android.json").read_text(encoding="utf-8"))
         check_android_upgrade(current, previous)
     after = draft(tag)

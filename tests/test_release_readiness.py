@@ -29,6 +29,19 @@ class ReleaseReadinessTest(unittest.TestCase):
                 publish_release.validate_draft(tag, publish=True)
             run.assert_not_called()
 
+    def test_failed_download_is_still_counted_as_ours(self):
+        # 5.10.2026: skidanje za provjeru puklo na pola, GitHub je izbrojao fajlove, a mi ih nismo upisali.
+        tag = f"v{publish_release.__version__}"
+        names = publish_release.required_assets(publish_release.__version__, "0.2.0")
+        draft = {"id": 1, "tag_name": tag, "draft": True, "assets": [{"name": n, "state": "uploaded"} for n in names]}
+        with patch.object(publish_release, "check_checkout"), patch.object(publish_release, "draft", return_value=draft), \
+             patch.object(publish_release, "android_version", return_value=(1, "0.2.0")), \
+             patch.object(publish_release, "run", side_effect=subprocess.CalledProcessError(1, "gh")), \
+             patch.object(publish_release, "record_own") as own:
+            with self.assertRaises(subprocess.CalledProcessError):
+                publish_release.validate_draft(tag)
+        own.assert_called_once_with(names)
+
     def test_publish_moves_previous_release_to_draft(self):
         # Javno je samo posljednje izdanje: novo postaje latest, prethodno ide u nacrt (ne briše se).
         def fake_run(*args, **kwargs):
