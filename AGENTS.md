@@ -311,6 +311,15 @@ brisanje starih nacrta 0.9.4/0.9.5 (traži potvrdu); čišćenje e-maila u `abnp
 e-maila; prazan stari OneDrive folder (briše Ahmed); Trusted Signing (ponuđeno istraživanje).
 Kasnije: roditeljska zaštita (blokada 18+ + PIN), privatni repo, Video Toolkit.
 
+## Izdanje 0.9.10 / Android 0.2.6 (objavljeno 5.10.2026, Ahmed: „objavi")
+
+- Novo: poglavlja u MP4/MP3 (uključeno), SponsorBlock za YouTube (isključeno; privatnost dopunjena), Android MP3 i
+  bez posebnog zvuka (iz videa), „Dodaj u Obtainium" na sajtu, Pitanja na sajtu osvježena; v0.9.9 vraćena u nacrt.
+- Naučeno: changelog ide i na reklamne stranice — bez imena YouTube/TikTok (`FORBIDDEN` u build_site); prije
+  build_release pokrenuti `python tools/build_site.py`. `gh release download` zna puknuti na velikim fajlovima —
+  samo ponoviti `publish_release.py`. Zaključan `Build\dist` folder: obrisati ga pa ponoviti build.
+- Winget opis za 0.9.10 tek kad Microsoft spoji PR #445943.
+
 ## Izdanje 0.9.8 / Android 0.2.4 (objavljeno 3.10.2026, Ahmed: „kreni")
 
 - Javno: v0.9.8 sa 14 fajlova (Windows, Mac + `release-macos.json`, Android 0.2.4); v0.9.7 vraćena u nacrt;
