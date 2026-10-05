@@ -96,13 +96,15 @@ HOME = {
         "help": ("Help", "Questions?",
                  "If something doesn't work: in the app use Help → Save a problem report, then <a href=\"{issue}\">report the "
                  "problem</a>. Reports are public: don't include passwords or personal data."),
-        "faq": (("A video suddenly won't download.", "Websites change often. Help → Update the site reader (yt-dlp), then try again."),
+        "faq": (("A video suddenly won't download.", "Websites change often. Help → Update the site reader (yt-dlp), then try again. If it still fails, the app offers the "
+                 "nightly yt-dlp with the newest fixes."),
                 ("Why aren't live streams downloaded?", "A live stream has no end, so the download would never finish. Download it "
                  "after it ends and the recording is published."),
                 ("What does the app send to the internet?", "Only what's needed: the link you download goes to that website, and "
-                 "update checks go to GitHub and PyPI. No accounts, statistics or tracking."),
+                 "update checks go to GitHub and PyPI. SponsorBlock is asked only if you turn it on, and then only with 4 "
+                 "characters of an encoded video ID. No accounts, statistics or tracking."),
                 ("Is it safe?", "The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only "
-                 "updates digitally signed by us, on Windows and on Mac.")),
+                 "updates digitally signed by us, on Windows, Mac and Android.")),
         "demo_titles": ("Mountain hike – Prokosko lake (4K)", "My live concert – filmed from the crowd",
                         "Lecture: photography basics", "Podcast #12 – a talk about travel"),
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
@@ -165,13 +167,14 @@ HOME = {
                  "Ako nešto ne radi: u programu Pomoć → Sačuvaj izvještaj o problemu, pa <a href=\"{issue}\">prijavi problem</a>. "
                  "Prijave su javne: ne upisuj lozinke ni lične podatke."),
         "faq": (("Video se odjednom ne preuzima.", "Sajtovi često mijenjaju način rada. Pomoć → Ažuriraj čitač sajtova (yt-dlp), "
-                 "pa pokušaj ponovo."),
+                 "pa pokušaj ponovo. Ako i dalje ne radi, program ponudi noćnu verziju yt-dlp-a s najnovijim popravkama."),
                 ("Zašto se prenos uživo ne preuzima?", "Prenos uživo nema kraja, pa bi preuzimanje trajalo beskonačno. Preuzmi ga "
                  "kad se završi i snimak bude objavljen."),
                 ("Šta program šalje na internet?", "Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera "
-                 "ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja."),
+                 "ažuriranja ide na GitHub i PyPI. SponsorBlock se pita samo ako ga uključiš, i to samo s 4 znaka šifrovanog "
+                 "ID-a videa. Nema naloga, statistike ni praćenja."),
                 ("Da li je siguran?", "Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo "
-                 "ažuriranja koja smo mi digitalno potpisali, na Windowsu i na Macu.")),
+                 "ažuriranja koja smo mi digitalno potpisali, na Windowsu, Macu i Androidu.")),
         "demo_titles": ("Planinarska tura – Prokoško jezero (4K)", "Moj koncert uživo – snimak iz publike",
                         "Predavanje: osnove fotografije", "Podcast #12 – razgovor o putovanjima"),
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
@@ -239,13 +242,15 @@ HOME = {
                  "Wenn etwas nicht klappt: in der App Hilfe → Problembericht speichern, dann <a href=\"{issue}\">das Problem "
                  "melden</a>. Meldungen sind öffentlich: keine Passwörter oder persönlichen Daten angeben."),
         "faq": (("Ein Video lässt sich plötzlich nicht mehr herunterladen.", "Webseiten ändern sich oft. Hilfe → Seiten-Reader "
-                 "aktualisieren (yt-dlp), dann erneut versuchen."),
+                 "aktualisieren (yt-dlp), dann erneut versuchen. Klappt es weiterhin nicht, bietet die App die Nightly-Version "
+                 "von yt-dlp mit den neuesten Korrekturen an."),
                 ("Warum werden Livestreams nicht heruntergeladen?", "Ein Livestream hat kein Ende, der Download würde also nie "
                  "fertig. Lade ihn herunter, wenn er vorbei ist und die Aufzeichnung veröffentlicht wurde."),
                 ("Was sendet die App ins Internet?", "Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und "
-                 "die Update-Prüfung an GitHub und PyPI. Keine Konten, Statistiken oder Tracking."),
+                 "die Update-Prüfung an GitHub und PyPI. SponsorBlock wird nur gefragt, wenn du es einschaltest, und nur mit "
+                 "4 Zeichen einer verschlüsselten Video-ID. Keine Konten, Statistiken oder Tracking."),
                 ("Ist die App sicher?", "Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die "
-                 "App installiert unter Windows und auf dem Mac nur Updates, die wir digital signiert haben.")),
+                 "App installiert unter Windows, auf dem Mac und unter Android nur Updates, die wir digital signiert haben.")),
         "demo_titles": ("Bergwanderung – Prokoško-See (4K)", "Mein Live-Konzert – aus dem Publikum gefilmt",
                         "Vortrag: Grundlagen der Fotografie", "Podcast #12 – ein Gespräch übers Reisen"),
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
@@ -312,13 +317,15 @@ HOME = {
                  "Si algo no funciona: en la aplicación usa Ayuda → Guardar un informe del problema y luego "
                  "<a href=\"{issue}\">informa del problema</a>. Los informes son públicos: no incluyas contraseñas ni datos personales."),
         "faq": (("De repente un vídeo no se descarga.", "Los sitios web cambian a menudo. Ayuda → Actualizar el lector de sitios "
-                 "(yt-dlp) y vuelve a intentarlo."),
+                 "(yt-dlp) y vuelve a intentarlo. Si sigue sin funcionar, la aplicación ofrece la versión nightly de yt-dlp con "
+                 "los arreglos más recientes."),
                 ("¿Por qué no se descargan las emisiones en directo?", "Una emisión en directo no tiene fin, así que la descarga "
                  "nunca terminaría. Descárgala cuando acabe y se publique la grabación."),
                 ("¿Qué envía la aplicación a internet?", "Solo lo necesario: el enlace que descargas va a ese sitio web y la "
-                 "búsqueda de actualizaciones, a GitHub y PyPI. Sin cuentas, estadísticas ni rastreo."),
+                 "búsqueda de actualizaciones, a GitHub y PyPI. A SponsorBlock solo se consulta si lo activas, y solo con 4 "
+                 "caracteres de un ID de vídeo cifrado. Sin cuentas, estadísticas ni rastreo."),
                 ("¿Es segura?", "El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo "
-                 "instala actualizaciones firmadas digitalmente por nosotros, en Windows y en Mac.")),
+                 "instala actualizaciones firmadas digitalmente por nosotros, en Windows, Mac y Android.")),
         "demo_titles": ("Ruta de montaña – lago Prokoško (4K)", "Mi concierto en directo – grabado desde el público",
                         "Clase: fundamentos de fotografía", "Pódcast #12 – una charla sobre viajes"),
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
@@ -387,13 +394,15 @@ HOME = {
                  "<a href=\"{issue}\">signalez le problème</a>. Les signalements sont publics : n'y mettez ni mots de passe ni "
                  "données personnelles."),
         "faq": (("Une vidéo ne se télécharge soudain plus.", "Les sites changent souvent. Aide → Mettre à jour le lecteur de sites "
-                 "(yt-dlp), puis réessayez."),
+                 "(yt-dlp), puis réessayez. Si ça ne marche toujours pas, l'application propose la version nightly de yt-dlp "
+                 "avec les derniers correctifs."),
                 ("Pourquoi les directs ne sont-ils pas téléchargés ?", "Un direct n'a pas de fin, le téléchargement ne se "
                  "terminerait donc jamais. Téléchargez-le une fois terminé, quand l'enregistrement est publié."),
                 ("Qu'envoie l'application sur Internet ?", "Seulement le nécessaire : le lien que vous téléchargez va vers ce "
-                 "site, et la recherche de mises à jour vers GitHub et PyPI. Ni compte, ni statistiques, ni pistage."),
+                 "site, et la recherche de mises à jour vers GitHub et PyPI. SponsorBlock n'est interrogé que si vous "
+                 "l'activez, et seulement avec 4 caractères d'un ID vidéo chiffré. Ni compte, ni statistiques, ni pistage."),
                 ("Est-ce sûr ?", "Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et "
-                 "l'application n'installe que des mises à jour signées par nous, sous Windows et sur Mac.")),
+                 "l'application n'installe que des mises à jour signées par nous, sous Windows, sur Mac et sur Android.")),
         "demo_titles": ("Randonnée en montagne – lac de Prokoško (4K)", "Mon concert en direct – filmé depuis le public",
                         "Cours : les bases de la photographie", "Podcast #12 – une discussion sur le voyage"),
         "demo": ("Téléchargement · {p}% · {v} MB/s · encore {s} s", ","),

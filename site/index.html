@@ -26,7 +26,7 @@
  "inLanguage": "en",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.9",
+ "softwareVersion": "0.9.10",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -103,7 +103,7 @@
           <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>No account</li><li>No daily limit</li><li>Your links never reach us</li></ul>
-        <div class="meta"><!-- version -->Version 0.9.9 · 117 MB<!-- /version --> · Windows 10 and 11 (64-bit) · <a href="#install">installation help</a></div>
+        <div class="meta"><!-- version -->Version 0.9.10 · 117 MB<!-- /version --> · Windows 10 and 11 (64-bit) · <a href="#install">installation help</a></div>
         <p class="note">The app is meant for your own videos, content you have the author's permission for, and content under a free license. By downloading you accept the <a href="terms.html">Terms of use</a>. DRM-protected content is not downloaded.</p>
       </div>
 
@@ -278,25 +278,23 @@
       <h2 data-reveal>Better every week.</h2>
       <p class="sub" data-reveal>The same list as in the app (Help → What's new).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.9 <span>4.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.10 <span>5.10.2026</span></h3><ul>
+          <li>Video chapters (e.g. “0:00 Intro”) now go into MP4 and MP3 files, so players show them on the progress bar; you can turn this off in Settings.</li>
+          <li>New in Settings: cutting out sponsor ads (SponsorBlock) removes sponsor ads, self-promotion and “like and subscribe” from the video. Off until you turn it on.</li>
+          <li>Android: MP3 now works for sites without separate audio, such as Instagram (made from the video); the ♪ button and the Audio tab are no longer greyed out.</li>
+          <li>Android: the website also has an “Add to Obtainium” button to install and update straight from GitHub.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.9 <span>4.10.2026</span></h3><ul>
           <li>New Settings window (gear next to “Download”, or File → Settings, Ctrl+,): all options in one place, in groups.</li>
           <li>Tabs above the list (All, Downloading, Waiting, Finished, Failed) and labels on finished files: format, real resolution and size.</li>
           <li>When a site changes something, Help → Update the site reader also offers the nightly yt-dlp with the newest fixes; automatic yt-dlp updates are fixed too.</li>
           <li>You can now contribute by card, Apple Pay or Google Pay, or via Ko-fi, without a PayPal account.</li>
           <li>The progress bar no longer stays on a row that finished while the window was hidden; the empty screen also mentions the browser extension.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
           <li>Downloads → Parental control, optionally protected by a PIN.</li>
           <li>Help → Report a problem or suggestion: opens an e-mail to the author, with the app version.</li>
           <li>The Mac version now updates itself like Windows: it downloads the new version, checks our digital signature and replaces the app (from the next release on).</li>
           <li>Smaller installer (about 117 MB instead of 130 MB), without parts the app doesn&#x27;t use.</li>
           <li>A clearer message when a site requires you to log in to show a post.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.7 <span>27.9.2026</span></h3><ul>
-          <li>Clear error messages in the app&#x27;s language (e.g. “The video is no longer available”, “Can&#x27;t reach the site”); the technical message stays in the tooltip and in the problem report.</li>
-          <li>Two downloads never write the same file: not the same video through two links, not long titles that start the same, not clips within the same second; an MP3 of the same video no longer deletes the MP4 you already have.</li>
-          <li>The queue saves itself after every change, so a crash or power cut doesn&#x27;t lose links; “Download all” while a link is still being read starts as soon as the link arrives.</li>
-          <li>“Stop” also stops MP3 conversion, while “Remove all from list” and “Clear finished” keep an MP3 that is still being made; closing the app no longer starts new downloads.</li>
-          <li>A retry after a dropped connection really waits 5 seconds; the problem report hides passwords and keys more thoroughly.</li>
-          <li>The browser extension opens a welcome page when installed (checks the connection to the app, shows how to pin the icon); a bigger × button and a nicer picture while the thumbnail loads.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">All versions →</a></p>
     </div>
@@ -345,10 +343,10 @@
         <p class="sub" data-reveal>If something doesn't work: in the app use Help → Save a problem report, then <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report the problem</a>. Reports are public: don't include passwords or personal data.</p>
       </div>
       <div class="faq" data-reveal>
-        <details><summary>A video suddenly won't download.</summary><p>Websites change often. Help → Update the site reader (yt-dlp), then try again.</p></details>
+        <details><summary>A video suddenly won't download.</summary><p>Websites change often. Help → Update the site reader (yt-dlp), then try again. If it still fails, the app offers the nightly yt-dlp with the newest fixes.</p></details>
         <details><summary>Why aren't live streams downloaded?</summary><p>A live stream has no end, so the download would never finish. Download it after it ends and the recording is published.</p></details>
-        <details><summary>What does the app send to the internet?</summary><p>Only what's needed: the link you download goes to that website, and update checks go to GitHub and PyPI. No accounts, statistics or tracking.</p></details>
-        <details><summary>Is it safe?</summary><p>The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only updates digitally signed by us, on Windows and on Mac.</p></details>
+        <details><summary>What does the app send to the internet?</summary><p>Only what's needed: the link you download goes to that website, and update checks go to GitHub and PyPI. SponsorBlock is asked only if you turn it on, and then only with 4 characters of an encoded video ID. No accounts, statistics or tracking.</p></details>
+        <details><summary>Is it safe?</summary><p>The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only updates digitally signed by us, on Windows, Mac and Android.</p></details>
       </div>
       <p class="more" data-reveal><a href="guides.html">Guides: MP3, clips, playlists, subtitles →</a></p>
     </div>

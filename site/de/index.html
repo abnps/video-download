@@ -26,7 +26,7 @@
  "inLanguage": "de",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.9",
+ "softwareVersion": "0.9.10",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -103,7 +103,7 @@
           <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Kein Konto</li><li>Kein Tageslimit</li><li>Deine Links landen nicht bei uns</li></ul>
-        <div class="meta"><!-- version -->Version 0.9.9 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
+        <div class="meta"><!-- version -->Version 0.9.10 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
         <p class="note">Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href="terms.html">Nutzungsbedingungen</a>. DRM-geschützte Inhalte werden nicht heruntergeladen.</p>
       </div>
 
@@ -278,25 +278,23 @@
       <h2 data-reveal>Jede Woche besser.</h2>
       <p class="sub" data-reveal>Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.9 <span>4.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.10 <span>5.10.2026</span></h3><ul>
+          <li>Videokapitel (z. B. „0:00 Intro“) kommen jetzt in MP4- und MP3-Dateien, sodass Player sie auf der Leiste zeigen; abschaltbar in den Einstellungen.</li>
+          <li>Neu in den Einstellungen: Sponsorenwerbung herausschneiden (SponsorBlock) entfernt Sponsorenwerbung, Eigenwerbung und „Liken und abonnieren“ aus dem Video. Aus, bis du es einschaltest.</li>
+          <li>Android: MP3 funktioniert jetzt auch bei Seiten ohne eigene Tonspur, etwa Instagram (aus dem Video erstellt); die ♪-Taste und der Audio-Tab sind nicht mehr ausgegraut.</li>
+          <li>Android: Auf der Website gibt es jetzt auch „Zu Obtainium hinzufügen“, um direkt von GitHub zu installieren und zu aktualisieren.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.9 <span>4.10.2026</span></h3><ul>
           <li>Neues Fenster Einstellungen (Zahnrad neben „Herunterladen“ oder Datei → Einstellungen, Strg+,): alle Optionen an einem Ort, in Gruppen.</li>
           <li>Tabs über der Liste (Alle, Läuft, Wartend, Fertig, Fehlgeschlagen) und Kennzeichen an fertigen Dateien: Format, echte Auflösung und Größe.</li>
           <li>Ändert eine Seite etwas, bietet Hilfe → Seiten-Reader aktualisieren auch die Nightly-Version von yt-dlp mit den neuesten Korrekturen an; die automatische yt-dlp-Aktualisierung ist ebenfalls repariert.</li>
           <li>Beiträge gehen jetzt auch per Karte, Apple Pay oder Google Pay oder über Ko-fi, ohne PayPal-Konto.</li>
           <li>Der Fortschrittsbalken bleibt nicht mehr an einer Zeile, die fertig wurde, während das Fenster verborgen war; der leere Bildschirm erwähnt auch die Browser-Erweiterung.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
           <li>Downloads → Jugendschutz, auf Wunsch mit PIN geschützt.</li>
           <li>Hilfe → Problem oder Vorschlag melden: öffnet eine E-Mail an den Autor, mit der Programmversion.</li>
           <li>Die Mac-Version aktualisiert sich jetzt selbst wie unter Windows: Sie lädt die neue Version, prüft unsere digitale Signatur und ersetzt das Programm (ab der nächsten Version).</li>
           <li>Kleinerer Installer (etwa 117 MB statt 130 MB), ohne Teile, die das Programm nicht nutzt.</li>
           <li>Eine klarere Meldung, wenn eine Seite für einen Beitrag eine Anmeldung verlangt.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.7 <span>27.9.2026</span></h3><ul>
-          <li>Verständliche Fehlermeldungen in der Sprache des Programms (z. B. „Das Video ist nicht mehr verfügbar“, „Keine Verbindung zur Seite“); die technische Meldung bleibt im Tooltip und im Problembericht.</li>
-          <li>Zwei Downloads schreiben nie in dieselbe Datei: weder dasselbe Video über zwei Links noch lange Titel mit gleichem Anfang noch Ausschnitte innerhalb derselben Sekunde; eine MP3 desselben Videos löscht die schon geladene MP4 nicht mehr.</li>
-          <li>Die Liste speichert sich nach jeder Änderung selbst, daher gehen bei einem Absturz oder Stromausfall keine Links verloren; „Alle herunterladen“, während ein Link noch gelesen wird, startet, sobald der Link da ist.</li>
-          <li>„Stoppen“ hält auch die MP3-Umwandlung an, während „Alle aus der Liste entfernen“ und „Fertige entfernen“ eine MP3 behalten, die noch entsteht; das Schließen startet keine neuen Downloads mehr.</li>
-          <li>Ein neuer Versuch nach einem Verbindungsabbruch wartet wirklich 5 Sekunden; der Problembericht verbirgt Passwörter und Schlüssel gründlicher.</li>
-          <li>Die Browser-Erweiterung öffnet bei der Installation eine Willkommensseite (prüft die Verbindung zum Programm, zeigt das Anheften des Symbols); größere ×-Schaltfläche und schöneres Bild, solange das Vorschaubild lädt.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Alle Versionen →</a></p>
     </div>
@@ -345,10 +343,10 @@
         <p class="sub" data-reveal>Wenn etwas nicht klappt: in der App Hilfe → Problembericht speichern, dann <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">das Problem melden</a>. Meldungen sind öffentlich: keine Passwörter oder persönlichen Daten angeben.</p>
       </div>
       <div class="faq" data-reveal>
-        <details><summary>Ein Video lässt sich plötzlich nicht mehr herunterladen.</summary><p>Webseiten ändern sich oft. Hilfe → Seiten-Reader aktualisieren (yt-dlp), dann erneut versuchen.</p></details>
+        <details><summary>Ein Video lässt sich plötzlich nicht mehr herunterladen.</summary><p>Webseiten ändern sich oft. Hilfe → Seiten-Reader aktualisieren (yt-dlp), dann erneut versuchen. Klappt es weiterhin nicht, bietet die App die Nightly-Version von yt-dlp mit den neuesten Korrekturen an.</p></details>
         <details><summary>Warum werden Livestreams nicht heruntergeladen?</summary><p>Ein Livestream hat kein Ende, der Download würde also nie fertig. Lade ihn herunter, wenn er vorbei ist und die Aufzeichnung veröffentlicht wurde.</p></details>
-        <details><summary>Was sendet die App ins Internet?</summary><p>Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und die Update-Prüfung an GitHub und PyPI. Keine Konten, Statistiken oder Tracking.</p></details>
-        <details><summary>Ist die App sicher?</summary><p>Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die App installiert unter Windows und auf dem Mac nur Updates, die wir digital signiert haben.</p></details>
+        <details><summary>Was sendet die App ins Internet?</summary><p>Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und die Update-Prüfung an GitHub und PyPI. SponsorBlock wird nur gefragt, wenn du es einschaltest, und nur mit 4 Zeichen einer verschlüsselten Video-ID. Keine Konten, Statistiken oder Tracking.</p></details>
+        <details><summary>Ist die App sicher?</summary><p>Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die App installiert unter Windows, auf dem Mac und unter Android nur Updates, die wir digital signiert haben.</p></details>
       </div>
       <p class="more" data-reveal><a href="guides.html">Anleitungen: MP3, Ausschnitte, Playlists, Untertitel →</a></p>
     </div>

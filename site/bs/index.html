@@ -26,7 +26,7 @@
  "inLanguage": "bs",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13",
- "softwareVersion": "0.9.9",
+ "softwareVersion": "0.9.10",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -103,7 +103,7 @@
           <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
-        <div class="meta"><!-- version -->Verzija 0.9.9 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
+        <div class="meta"><!-- version -->Verzija 0.9.10 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
         <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
       </div>
 
@@ -278,25 +278,23 @@
       <h2 data-reveal>Svake sedmice bolje.</h2>
       <p class="sub" data-reveal>Ista lista kao u programu (Pomoć → Šta je novo).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>0.9.9 <span>4.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>0.9.10 <span>5.10.2026</span></h3><ul>
+          <li>Poglavlja videa (npr. „0:00 Uvod“) sada ulaze u MP4 i MP3, pa ih plejer prikazuje na traci; isključuje se u Postavkama.</li>
+          <li>Novo u Postavkama: izrezivanje reklama sponzora (SponsorBlock) iz videa uklanja sponzorske reklame, samoreklamu i „lajkuj i pretplati se“. Isključeno dok ga sam ne uključiš.</li>
+          <li>Android: MP3 radi i za sajtove bez posebnog zvuka, npr. Instagram (pravi se iz videa); dugme ♪ i kartica Audio više nisu zamrznuti.</li>
+          <li>Android: na sajtu je i dugme „Dodaj u Obtainium“ za instalaciju i ažuriranje direktno s GitHuba.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.9 <span>4.10.2026</span></h3><ul>
           <li>Novi prozor Postavke (zupčanik desno od „Preuzmi“, ili Fajl → Postavke, Ctrl+,): sve opcije na jednom mjestu, u grupama.</li>
           <li>Kartice iznad liste (Sve, U toku, Na čekanju, Završeno, Neuspjelo) i oznake na gotovom fajlu: format, stvarna rezolucija i veličina.</li>
           <li>Kad sajt promijeni nešto, Pomoć → Ažuriraj čitač sajtova nudi i noćnu verziju yt-dlp-a s najnovijim popravkama; popravljeno je i automatsko ažuriranje yt-dlp-a.</li>
           <li>Prilog sada može i karticom, Apple Payem ili Google Payem, ili preko Ko-fija, bez PayPal naloga.</li>
           <li>Traka napretka više ne ostaje na redu koji je završio dok je prozor bio skriven; prazan ekran pominje i dodatak za browser.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.8 <span>3.10.2026</span></h3><ul>
           <li>Preuzimanja → Roditeljska zaštita, po želji zaštićena PIN-om.</li>
           <li>Pomoć → Prijavi problem ili prijedlog: otvara e-poruku za autora, uz verziju programa.</li>
           <li>Mac se sada ažurira sam, kao Windows: preuzme novu verziju, provjeri naš digitalni potpis i zamijeni program (od sljedećeg izdanja).</li>
           <li>Manji instaler (oko 117 MB umjesto 130 MB), bez dijelova koje program ne koristi.</li>
           <li>Jasnija poruka kad sajt traži prijavu da bi prikazao objavu.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>0.9.7 <span>27.9.2026</span></h3><ul>
-          <li>Razumljive poruke o greškama na jeziku programa (npr. „Video više nije dostupan“, „Nema veze sa sajtom“); tehnička poruka ostaje u oblačiću i u izvještaju o problemu.</li>
-          <li>Dva preuzimanja nikad ne pišu u isti fajl: ni isti video preko dva linka, ni dugi naslovi istog početka, ni isječci unutar iste sekunde; MP3 istog videa više ne briše već preuzeti MP4.</li>
-          <li>Red se sam čuva poslije svake izmjene, pa pad programa ili nestanak struje ne gube linkove; „Preuzmi sve“ dok se link još čita kreće čim link stigne.</li>
-          <li>„Zaustavi“ zaustavlja i pretvaranje u MP3, a „Ukloni sve sa liste“ i „Očisti završene“ ne sklanjaju MP3 koji se još pravi; zatvaranje programa više ne pokreće nova preuzimanja.</li>
-          <li>Novi pokušaj poslije pucanja veze zaista sačeka 5 sekundi; izvještaj o problemu bolje skriva lozinke i ključeve.</li>
-          <li>Dodatak za browser pri instalaciji otvara stranicu dobrodošlice (provjera veze s programom, kačenje ikone); veće dugme × i ljepša sličica dok se učitava.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Sve verzije →</a></p>
     </div>
@@ -345,10 +343,10 @@
         <p class="sub" data-reveal>Ako nešto ne radi: u programu Pomoć → Sačuvaj izvještaj o problemu, pa <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">prijavi problem</a>. Prijave su javne: ne upisuj lozinke ni lične podatke.</p>
       </div>
       <div class="faq" data-reveal>
-        <details><summary>Video se odjednom ne preuzima.</summary><p>Sajtovi često mijenjaju način rada. Pomoć → Ažuriraj čitač sajtova (yt-dlp), pa pokušaj ponovo.</p></details>
+        <details><summary>Video se odjednom ne preuzima.</summary><p>Sajtovi često mijenjaju način rada. Pomoć → Ažuriraj čitač sajtova (yt-dlp), pa pokušaj ponovo. Ako i dalje ne radi, program ponudi noćnu verziju yt-dlp-a s najnovijim popravkama.</p></details>
         <details><summary>Zašto se prenos uživo ne preuzima?</summary><p>Prenos uživo nema kraja, pa bi preuzimanje trajalo beskonačno. Preuzmi ga kad se završi i snimak bude objavljen.</p></details>
-        <details><summary>Šta program šalje na internet?</summary><p>Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera ažuriranja ide na GitHub i PyPI. Nema naloga, statistike ni praćenja.</p></details>
-        <details><summary>Da li je siguran?</summary><p>Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo ažuriranja koja smo mi digitalno potpisali, na Windowsu i na Macu.</p></details>
+        <details><summary>Šta program šalje na internet?</summary><p>Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera ažuriranja ide na GitHub i PyPI. SponsorBlock se pita samo ako ga uključiš, i to samo s 4 znaka šifrovanog ID-a videa. Nema naloga, statistike ni praćenja.</p></details>
+        <details><summary>Da li je siguran?</summary><p>Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo ažuriranja koja smo mi digitalno potpisali, na Windowsu, Macu i Androidu.</p></details>
       </div>
       <p class="more" data-reveal><a href="guides.html">Vodiči: MP3, isječci, plejliste, titlovi →</a></p>
     </div>

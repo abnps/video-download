@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.10", "5.10.2026", {
+        "bs": ["Poglavlja videa (npr. „0:00 Uvod“) sada ulaze u MP4 i MP3, pa ih plejer prikazuje na traci; isključuje se u Postavkama.",
+               "Novo u Postavkama: izrezivanje reklama sponzora (SponsorBlock) iz videa uklanja sponzorske reklame, samoreklamu i „lajkuj i pretplati se“. Isključeno dok ga sam ne uključiš.",
+               "Android: MP3 radi i za sajtove bez posebnog zvuka, npr. Instagram (pravi se iz videa); dugme ♪ i kartica Audio više nisu zamrznuti.",
+               "Android: na sajtu je i dugme „Dodaj u Obtainium“ za instalaciju i ažuriranje direktno s GitHuba."],
+        "en": ["Video chapters (e.g. “0:00 Intro”) now go into MP4 and MP3 files, so players show them on the progress bar; you can turn this off in Settings.",
+               "New in Settings: cutting out sponsor ads (SponsorBlock) removes sponsor ads, self-promotion and “like and subscribe” from the video. Off until you turn it on.",
+               "Android: MP3 now works for sites without separate audio, such as Instagram (made from the video); the ♪ button and the Audio tab are no longer greyed out.",
+               "Android: the website also has an “Add to Obtainium” button to install and update straight from GitHub."],
+        "de": ["Videokapitel (z. B. „0:00 Intro“) kommen jetzt in MP4- und MP3-Dateien, sodass Player sie auf der Leiste zeigen; abschaltbar in den Einstellungen.",
+               "Neu in den Einstellungen: Sponsorenwerbung herausschneiden (SponsorBlock) entfernt Sponsorenwerbung, Eigenwerbung und „Liken und abonnieren“ aus dem Video. Aus, bis du es einschaltest.",
+               "Android: MP3 funktioniert jetzt auch bei Seiten ohne eigene Tonspur, etwa Instagram (aus dem Video erstellt); die ♪-Taste und der Audio-Tab sind nicht mehr ausgegraut.",
+               "Android: Auf der Website gibt es jetzt auch „Zu Obtainium hinzufügen“, um direkt von GitHub zu installieren und zu aktualisieren."],
+        "es": ["Los capítulos del vídeo (p. ej. «0:00 Intro») ahora van en los archivos MP4 y MP3, y el reproductor los muestra en la barra; se puede desactivar en Ajustes.",
+               "Nuevo en Ajustes: recortar anuncios de patrocinadores (SponsorBlock) quita del vídeo los anuncios de patrocinadores, la autopromoción y el «dale like y suscríbete». Desactivado hasta que lo actives.",
+               "Android: el MP3 ahora funciona en sitios sin audio separado, como Instagram (se crea a partir del vídeo); el botón ♪ y la pestaña Audio ya no aparecen desactivados.",
+               "Android: la web tiene también un botón «Añadir a Obtainium» para instalar y actualizar directamente desde GitHub."],
+        "fr": ["Les chapitres de la vidéo (p. ex. « 0:00 Intro ») sont maintenant inclus dans les fichiers MP4 et MP3, et le lecteur les affiche sur la barre ; désactivable dans les Paramètres.",
+               "Nouveau dans les Paramètres : couper les pubs des sponsors (SponsorBlock) retire de la vidéo les pubs des sponsors, l'autopromotion et le « like et abonne-toi ». Désactivé tant que vous ne l'activez pas.",
+               "Android : le MP3 fonctionne maintenant pour les sites sans piste audio séparée, comme Instagram (créé à partir de la vidéo) ; le bouton ♪ et l'onglet Audio ne sont plus grisés.",
+               "Android : le site propose aussi un bouton « Ajouter à Obtainium » pour installer et mettre à jour directement depuis GitHub."],
+    }),
     ("0.9.9", "4.10.2026", {
         "bs": ["Novi prozor Postavke (zupčanik desno od „Preuzmi“, ili Fajl → Postavke, Ctrl+,): sve opcije na jednom mjestu, u grupama.",
                "Kartice iznad liste (Sve, U toku, Na čekanju, Završeno, Neuspjelo) i oznake na gotovom fajlu: format, stvarna rezolucija i veličina.",
