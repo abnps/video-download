@@ -319,6 +319,12 @@ Dopuna (Ahmed 5.10.2026): bez reklama; savjetnik trenutno nije moguć → Toolki
 (ne-trgovac). U Play aplikaciji NEMA PayPal/Ko-fi/Stripe dugmadi (Play traži Googleovo plaćanje i za napojnice);
 dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repoa).
 
+## Put do 1.0.0 (Ahmed 5.10.2026)
+
+- Pretplate na kanale: NE za sada. Do 1.0.0 samo poliranje (greške, tekstovi, izgled, sitnice), bez novih
+  velikih funkcija. Android 0.2.7 (5.10.2026) broji nove instalacije i „Pozovi prijatelja" (izdanje „brojac"
+  u repou za winget; tools/statistika.py).
+
 ## Izdanje 0.9.10 / Android 0.2.6 (objavljeno 5.10.2026, Ahmed: „objavi")
 
 - Novo: poglavlja u MP4/MP3 (uključeno), SponsorBlock za YouTube (isključeno; privatnost dopunjena), Android MP3 i
