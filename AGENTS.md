@@ -276,8 +276,8 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 - Google provjera programera (DE/RS od 2027): $25 pun nalog ili besplatan ograničen (20 uređaja) — odluka
   čeka Ahmeda; vidi `00_plan/android_plan.md`.
   5.10.2026: nalog verifikovan (i broj telefona); paket `io.github.abnps.videodownload` prijavljen s ključem
-  SHA-256 83:C2:…:72:30, dokaz poslan (mali APK s istim ključem i `assets/adi-registration.properties`) — čeka
-  Googleov mejl (do 48 h), pa status „Registered". Fragment ostaje u aplikaciji.
+  SHA-256 83:C2:…:72:30, dokaz poslan (mali APK s istim ključem i `assets/adi-registration.properties`);
+  status „Registrovano" 5.10.2026 — APK se instalira i na certificiranim telefonima kad provjera krene. Fragment ostaje.
 
 ### Stanje 2.10.2026
 
