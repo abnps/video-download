@@ -93,6 +93,21 @@ ANDROID_TEXT = {
             "Si Google Play Protect signale une application inconnue, touchez <b>Plus de détails → Installer quand même</b>.",
             "Les nouvelles versions s'installent depuis l'application : <b>Réglages → Rechercher des mises à jour</b>.")),
 }
+# Obtainium (besplatan, otvoren kod) dodaje aplikaciju direktno s GitHuba i sam je ažurira; zvanična stranica
+# za preusmjeravanje otvara Obtainium na telefonu (Ahmed 5.10.2026, umjesto Google Playa).
+OBTAINIUM_URL = f"https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/{REPO}"
+OBTAINIUM_TEXT = {
+    "en": ("Use <b>Obtainium</b>? It installs the app straight from GitHub and keeps it up to date.",
+           "Add to Obtainium"),
+    "bs": ("Koristiš <b>Obtainium</b>? On instalira aplikaciju direktno s GitHuba i sam je ažurira.",
+           "Dodaj u Obtainium"),
+    "de": ("Nutzt du <b>Obtainium</b>? Es installiert die App direkt von GitHub und hält sie aktuell.",
+           "Zu Obtainium hinzufügen"),
+    "es": ("¿Usas <b>Obtainium</b>? Instala la app directamente desde GitHub y la mantiene actualizada.",
+           "Añadir a Obtainium"),
+    "fr": ("Vous utilisez <b>Obtainium</b> ? Il installe l'application directement depuis GitHub et la tient à jour.",
+           "Ajouter à Obtainium"),
+}
 ISSUE_URL = f"{REPO}/issues/new?template=problem.yml"
 INSTALL_DIR = r"%LOCALAPPDATA%\Programs\Video Download\extension"
 GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
@@ -937,6 +952,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
             android_url=ANDROID_APK_URL, android_text=ANDROID_TEXT[lang],
+            obtainium=(OBTAINIUM_URL, *OBTAINIUM_TEXT[lang]),
             android_guide_label=site_android.TEXT[lang]["dev_guide_title"],
             meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])
             + "\n" + software_jsonld(lang), page_url=page_url(lang), news_more=CHANGELOG_TEXT[lang][2],

@@ -501,7 +501,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
            android_url: str = "", android_text: tuple = ("", "", "", ()), android_guide_label: str = "",
-           page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
+           obtainium: tuple = (), page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="#{anchor}">{label}</a>'
@@ -528,6 +528,9 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
     mac_items = "\n".join(f"          <li>{step}</li>" for step in mac_steps)
     android_lead, android_button, android_note, android_steps = android_text
     android_items = "\n".join(f"          <li>{step}</li>" for step in android_steps)
+    # Obtainium (Ahmed 5.10.2026): prati GitHub izdanja i sam ažurira; obična veza, bez tuđeg koda na sajtu.
+    obtainium_html = (f'        <p>{obtainium[1]} <a href="{esc(obtainium[0])}">{obtainium[2]} →</a></p>\n'
+                      if obtainium else "")
     download_icon = (f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
                      f'stroke-linejoin="round">{ICONS["download"]}</svg>')
     return f"""<!doctype html>
@@ -709,7 +712,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {android_items}
         </ol>
         <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
-        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
+{obtainium_html}        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
       </div>
     </div>
   </section>
