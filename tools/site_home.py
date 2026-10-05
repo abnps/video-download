@@ -103,6 +103,7 @@ HOME = {
                 ("What does the app send to the internet?", "Only what's needed: the link you download goes to that website, and "
                  "update checks go to GitHub and PyPI. SponsorBlock is asked only if you turn it on, and then only with 4 "
                  "characters of an encoded video ID. No accounts, statistics or tracking."),
+                ("How is it different from download websites?", "Download websites run everything on their server: your link and IP address go to them and to ad networks, and they pay for it with pop-ups, fake buttons and often a lower quality. Video Download works on your own computer or phone, without ads or accounts, in full quality, and your links go to no one but the site you download from."),
                 ("Is it safe?", "The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only "
                  "updates digitally signed by us, on Windows, Mac and Android.")),
         "demo_titles": ("Mountain hike – Prokosko lake (4K)", "My live concert – filmed from the crowd",
@@ -173,6 +174,7 @@ HOME = {
                 ("Šta program šalje na internet?", "Samo ono što je potrebno: link koji preuzimaš ide do tog sajta, a provjera "
                  "ažuriranja ide na GitHub i PyPI. SponsorBlock se pita samo ako ga uključiš, i to samo s 4 znaka šifrovanog "
                  "ID-a videa. Nema naloga, statistike ni praćenja."),
+                ("Po čemu se razlikuje od sajtova za preuzimanje?", "Sajtovi za preuzimanje sve rade na svom serveru: tvoj link i IP adresa idu njima i reklamnim mrežama, a to plaćaš iskačućim prozorima, lažnim dugmadima i često slabijim kvalitetom. Video Download radi na tvom računaru ili telefonu, bez reklama i naloga, u punom kvalitetu, a tvoji linkovi ne idu nikome osim sajtu s kog preuzimaš."),
                 ("Da li je siguran?", "Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo "
                  "ažuriranja koja smo mi digitalno potpisali, na Windowsu, Macu i Androidu.")),
         "demo_titles": ("Planinarska tura – Prokoško jezero (4K)", "Moj koncert uživo – snimak iz publike",
@@ -249,6 +251,7 @@ HOME = {
                 ("Was sendet die App ins Internet?", "Nur das Nötige: Der Link, den du herunterlädst, geht an diese Webseite, und "
                  "die Update-Prüfung an GitHub und PyPI. SponsorBlock wird nur gefragt, wenn du es einschaltest, und nur mit "
                  "4 Zeichen einer verschlüsselten Video-ID. Keine Konten, Statistiken oder Tracking."),
+                ("Was ist der Unterschied zu Download-Webseiten?", "Download-Webseiten erledigen alles auf ihrem Server: Dein Link und deine IP-Adresse gehen an sie und an Werbenetzwerke, bezahlt wird mit Pop-ups, falschen Knöpfen und oft schlechterer Qualität. Video Download läuft auf deinem eigenen Computer oder Handy, ohne Werbung und Konto, in voller Qualität, und deine Links gehen nur an die Seite, von der du lädst."),
                 ("Ist die App sicher?", "Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die "
                  "App installiert unter Windows, auf dem Mac und unter Android nur Updates, die wir digital signiert haben.")),
         "demo_titles": ("Bergwanderung – Prokoško-See (4K)", "Mein Live-Konzert – aus dem Publikum gefilmt",
@@ -324,6 +327,7 @@ HOME = {
                 ("¿Qué envía la aplicación a internet?", "Solo lo necesario: el enlace que descargas va a ese sitio web y la "
                  "búsqueda de actualizaciones, a GitHub y PyPI. A SponsorBlock solo se consulta si lo activas, y solo con 4 "
                  "caracteres de un ID de vídeo cifrado. Sin cuentas, estadísticas ni rastreo."),
+                ("¿En qué se diferencia de las webs de descarga?", "Las webs de descarga lo hacen todo en su servidor: tu enlace y tu IP van a ellas y a redes publicitarias, y lo pagas con ventanas emergentes, botones falsos y a menudo menos calidad. Video Download funciona en tu propio ordenador o móvil, sin anuncios ni cuentas, con calidad completa, y tus enlaces solo van al sitio del que descargas."),
                 ("¿Es segura?", "El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo "
                  "instala actualizaciones firmadas digitalmente por nosotros, en Windows, Mac y Android.")),
         "demo_titles": ("Ruta de montaña – lago Prokoško (4K)", "Mi concierto en directo – grabado desde el público",
@@ -401,6 +405,7 @@ HOME = {
                 ("Qu'envoie l'application sur Internet ?", "Seulement le nécessaire : le lien que vous téléchargez va vers ce "
                  "site, et la recherche de mises à jour vers GitHub et PyPI. SponsorBlock n'est interrogé que si vous "
                  "l'activez, et seulement avec 4 caractères d'un ID vidéo chiffré. Ni compte, ni statistiques, ni pistage."),
+                ("Quelle différence avec les sites de téléchargement ?", "Les sites de téléchargement font tout sur leur serveur : votre lien et votre adresse IP vont chez eux et chez des régies publicitaires, et vous le payez en pop-ups, faux boutons et souvent une qualité moindre. Video Download fonctionne sur votre propre ordinateur ou téléphone, sans pub ni compte, en qualité maximale, et vos liens ne vont qu'au site depuis lequel vous téléchargez."),
                 ("Est-ce sûr ?", "Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et "
                  "l'application n'installe que des mises à jour signées par nous, sous Windows, sur Mac et sur Android.")),
         "demo_titles": ("Randonnée en montagne – lac de Prokoško (4K)", "Mon concert en direct – filmé depuis le public",
