@@ -71,6 +71,7 @@ class MainActivity : ComponentActivity() {
         welcome.value = !getSharedPreferences("postavke", MODE_PRIVATE).getBoolean("uslovi_prihvaceni", false)
         // U pozadini, najviše jednom dnevno: nova verzija aplikacije (GitHub) i čitača sajtova (PyPI).
         Thread {
+            Counter.newInstall(this)
             AppUpdater.check(this)
             runCatching { Python.getInstance().getModule("vd_core").callAttr("update_ytdlp") }
         }.start()
@@ -253,6 +254,7 @@ class MainActivity : ComponentActivity() {
             .putExtra(Intent.EXTRA_STREAM, uri).putExtra(Intent.EXTRA_TEXT, getString(R.string.invite_text))
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(send, getString(R.string.invite_title)))
+        Counter.invite()
     }
 
     private fun installUpdate() {

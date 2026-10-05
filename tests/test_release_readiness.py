@@ -144,6 +144,18 @@ class OwnDownloadsTest(unittest.TestCase):
         self.assertEqual(total["downloads"]["windows"], 2)
         self.assertEqual(total["checks"]["windows"], 1)
 
+    def test_own_checks_are_kept_per_day(self):
+        # Dan objave: naše provjere opisa verzija ne smiju izgledati kao skok aktivnih korisnika.
+        import tempfile
+        import vlastita
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "vlastita.json"
+            vlastita.record(["release.json", "android.json", "android.json"], path, today="2026-10-05")
+            vlastita.record(["release.json", "VideoDownload-Setup-1.0.0.exe"], path, today="2026-10-06")
+            self.assertEqual(vlastita.load_days(path), {"2026-10-05": {"windows": 1, "mac": 0, "android": 2},
+                                                        "2026-10-06": {"windows": 1, "mac": 0, "android": 0}})
+            self.assertEqual(vlastita.load(path)["checks"]["android"], 2)
+
     def test_tests_never_write_the_real_file(self):
         import vlastita
 

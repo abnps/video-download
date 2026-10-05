@@ -29,6 +29,13 @@ REPOS = ("abnps/video-download", "abnps/video-download-installers")
 CHECKS = {"android.json": "android", "release.json": "windows", "release-macos.json": "mac"}
 # Nulta tačka: preuzimanja prije nje su skoro sva naša (probe, automatska ažuriranja na Ahmedovom računaru).
 START = "2026-10-04"
+# Android brojači (Ahmed 5.10.2026): stalno izdanje u repou za winget, nikad „latest" glavnog repoa. Aplikacija
+# jednom po novoj instalaciji preuzme COUNTERS["installs"], a pri „Pozovi prijatelja" COUNTERS["invites"]; GitHub
+# broji samo koliko puta, bez ikakvih podataka o korisniku.
+COUNTER_REPO, COUNTER_TAG = "abnps/video-download-installers", "brojac"
+COUNTERS = {"installs": "android-nova-instalacija.txt", "invites": "android-poziv.txt"}
+# Naše probe linkova brojača (5.10.2026: jedna provjera da fajl postoji) se oduzimaju.
+OWN_COUNTERS = {"installs": 0, "invites": 1}
 # Ahmedovi uređaji se javljaju svaki dan kao aktivni: oduzimaju se od dnevnog broja (--devices).
 MY_DEVICES = {"windows": 1, "mac": 0, "android": 1}
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -61,7 +68,20 @@ def snapshot() -> dict:
                     checks[CHECKS[name]] += count
             per_release.append(row)
     return {"time": dt.datetime.now().isoformat(timespec="minutes"), "downloads": downloads, "checks": checks,
-            "releases": per_release}
+            "counters": counters(), "releases": per_release}
+
+
+def counters() -> dict:
+    """Nove Android instalacije i poslani pozivi (brojač preuzimanja dva mala fajla); bez izdanja: nule."""
+    result = dict.fromkeys(COUNTERS, 0)
+    try:
+        raw = subprocess.run(["gh", "api", f"repos/{COUNTER_REPO}/releases/tags/{COUNTER_TAG}"], check=True,
+                             capture_output=True, text=True, encoding="utf-8").stdout
+        by_name = {a.get("name"): int(a.get("download_count") or 0) for a in json.loads(raw).get("assets", [])}
+        result = {key: max(0, by_name.get(name, 0) - OWN_COUNTERS[key]) for key, name in COUNTERS.items()}
+    except (subprocess.CalledProcessError, ValueError, OSError):
+        pass
+    return result
 
 
 def load_history(path: Path) -> list[dict]:
@@ -94,13 +114,17 @@ def net_downloads(history: list[dict], snap: dict, own: dict, since: str = START
 
 
 def render(snap: dict, days: list[tuple[str, dict]], net: dict | None = None, devices: dict | None = None,
-           own: dict | None = None) -> str:
+           own: dict | None = None, own_days: dict | None = None) -> str:
     c = snap["checks"]
     d = net or snap["downloads"]
     devices = devices or dict.fromkeys(d, 0)
     own = own or vlastita.empty()
-    days = [(day, {k: (None if v is None else max(0, v - devices.get(k, 0))) for k, v in vals.items()})
+    own_days = own_days or {}
+    # Stvarna javljanja: bez mojih uređaja i bez naših provjera tog dana (objava izdanja skida opise verzija).
+    days = [(day, {k: (None if v is None else max(0, v - devices.get(k, 0) - own_days.get(day, {}).get(k, 0)))
+                   for k, v in vals.items() if k in ("windows", "mac", "android")})
             for day, vals in days if day >= START]
+    counted = snap.get("counters") or dict.fromkeys(COUNTERS, 0)
     esc = html.escape
     day_rows = "".join(
         f"<tr><td>{esc(day)}</td>" + "".join(f"<td>{'—' if v[k] is None else v[k]}</td>" for k in ("windows", "mac", "android"))
@@ -136,6 +160,8 @@ podaci s GitHub-a, bez praćenja korisnika · <code>python tools/statistika.py</
 <div class="tile"><span class="muted">Windows</span><b>{d['windows']}</b></div>
 <div class="tile"><span class="muted">Mac</span><b>{d['mac']}</b></div>
 <div class="tile"><span class="muted">Android</span><b>{d['android']}</b></div>
+<div class="tile"><span class="muted">Nove Android instalacije (i od prijatelja)</span><b>{counted['installs']}</b></div>
+<div class="tile"><span class="muted">Dodiri na „Pozovi prijatelja“</span><b>{counted['invites']}</b></div>
 </div>
 <section><h2>Aktivne instalacije (javljanja pri dnevnoj provjeri)</h2>
 <p class="muted">Jedna instalacija se javi najviše jednom dnevno, pa je broj za jedan dan ≈ broj aktivnih korisnika tog dana.
@@ -162,17 +188,18 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     snap = snapshot()
     history_path = args.history or OUT / "istorija.json"
-    history = load_history(history_path) + [{k: snap[k] for k in ("time", "downloads", "checks")}]
+    history = load_history(history_path) + [{k: snap[k] for k in ("time", "downloads", "checks", "counters")}]
     history_path.write_text(json.dumps(history[-2000:], indent=1), encoding="utf-8")
     own = vlastita.load()
     d = net_downloads(history, snap, own)
     devices = dict(zip(("windows", "mac", "android"), (int(x) for x in args.devices.split(","))))
     print(f"Preuzimanja od {START} bez naših: {sum(d.values())} "
           f"(Windows {d['windows']}, Mac {d['mac']}, Android {d['android']})")
+    print(f"Nove Android instalacije: {snap['counters']['installs']}, pozivi prijatelju: {snap['counters']['invites']}")
     if args.no_page:
         return 0
     page = OUT / "index.html"
-    page.write_text(render(snap, per_day(history), d, devices, own), encoding="utf-8")
+    page.write_text(render(snap, per_day(history), d, devices, own, vlastita.load_days()), encoding="utf-8")
     print(f"Stranica: {page}")
     if not args.no_open and os.name == "nt":
         os.startfile(page)  # noqa: S606 - lokalni fajl autora

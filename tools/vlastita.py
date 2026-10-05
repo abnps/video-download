@@ -6,6 +6,7 @@ tools/statistika.py oduzme od ukupnog broja.
 Neuspjeh upisa nikad ne smije zaustaviti objavu: samo se ispiše upozorenje.
 """
 
+import datetime as dt
 import json
 import sys
 from pathlib import Path
@@ -46,8 +47,17 @@ def load(path: Path = DEFAULT) -> dict:
     return total
 
 
-def record(names, path: Path | None = None) -> None:
-    """Dodaj preuzete fajlove u zbir u lokalnom fajlu."""
+def load_days(path: Path = DEFAULT) -> dict:
+    """Naše provjere po danu ({"2026-10-05": {"windows": 4, ...}}): dan objave inače izgleda kao skok korisnika."""
+    try:
+        days = json.loads(path.read_text(encoding="utf-8")).get("days", {})
+        return {day: {kind: int(v.get(kind, 0)) for kind in KINDS} for day, v in days.items() if isinstance(v, dict)}
+    except (OSError, ValueError, AttributeError):
+        return {}
+
+
+def record(names, path: Path | None = None, today: str | None = None) -> None:
+    """Dodaj preuzete fajlove u zbir u lokalnom fajlu (i provjere u današnji dan)."""
     if path is None and "unittest" in sys.modules:
         return  # testovi nikad ne pišu pravu statistiku
     path = path or DEFAULT
@@ -59,7 +69,11 @@ def record(names, path: Path | None = None) -> None:
         for part in total:
             for kind in KINDS:
                 total[part][kind] += add[part][kind]
+        days = load_days(path)
+        day = days.setdefault(today or dt.date.today().isoformat(), dict.fromkeys(KINDS, 0))
+        for kind in KINDS:
+            day[kind] += add["checks"][kind]
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(total, indent=1), encoding="utf-8")
+        path.write_text(json.dumps({**total, "days": days}, indent=1), encoding="utf-8")
     except OSError as exc:
         print(f"Upozorenje: vlastita preuzimanja nisu upisana u statistiku ({exc}).")
