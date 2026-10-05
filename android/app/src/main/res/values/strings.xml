@@ -4,9 +4,6 @@
     <string name="app_name" translatable="false">Video Download</string>
     <string name="link_hint">Video link</string>
     <string name="paste">Paste</string>
-    <string name="download_video">Download video (MP4)</string>
-    <string name="download_audio">Audio only (M4A)</string>
-    <string name="no_link">No link yet. Share a video from another app or paste its link.</string>
     <string name="channel_name">Downloads</string>
     <string name="status_reading">Reading the link…</string>
     <string name="status_downloading">Downloading %1$d%%</string>
@@ -32,7 +29,6 @@
     <string name="tab_audio">Audio</string>
     <string name="about_size">about %1$s</string>
     <string name="size_unknown">size unknown</string>
-    <string name="best_audio">Best audio</string>
     <string name="audio_unavailable">This site has no separate audio, so the MP3 is made from the video (the download is larger).</string>
     <string name="error_unsupported">This link is not supported.</string>
     <string name="error_login">This site requires a login or confirmation.</string>
@@ -65,7 +61,6 @@
     <string name="set_terms">Terms of use</string>
     <string name="set_privacy">Privacy</string>
     <string name="set_version">Version</string>
-    <string name="set_reader">Site reader (yt-dlp)</string>
     <string name="test_version">Test version</string>
     <string name="invite_title">Invite a friend</string>
     <string name="invite_sub">Send the app via WhatsApp, Viber or Quick Share</string>
@@ -86,8 +81,6 @@
     <string name="status_cancelled">Stopped</string>
     <string name="cancel">Stop</string>
     <string name="open">Open</string>
-    <string name="saved_where">Videos go to Movies/Video Download, audio to Music/Video Download.</string>
-    <string name="prototype_note">Test version: video up to 1080p (H.264), audio as M4A; MP3 is coming.</string>
     <string name="login_title">Instagram account</string>
     <string name="login_on">Signed in</string>
     <string name="login_off">Sign in for Instagram videos</string>
@@ -177,7 +170,6 @@
     <string name="tile_label">Paste link</string>
     <string name="paste_empty">No link was copied.</string>
     <string name="failed_label">Failed</string>
-    <string name="copy_link">Copy link</string>
     <string name="link_copied">Link copied</string>
     <string name="filter_all">All</string>
     <string name="quick_audio">Download audio now</string>

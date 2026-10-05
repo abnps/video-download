@@ -3,9 +3,6 @@
 <resources>
     <string name="link_hint">Link videa</string>
     <string name="paste">Zalijepi</string>
-    <string name="download_video">Preuzmi video (MP4)</string>
-    <string name="download_audio">Samo zvuk (M4A)</string>
-    <string name="no_link">Još nema linka. Podijeli video iz druge aplikacije ili zalijepi njegov link.</string>
     <string name="channel_name">Preuzimanja</string>
     <string name="status_reading">Čitam link…</string>
     <string name="status_downloading">Preuzimanje %1$d%%</string>
@@ -31,7 +28,6 @@
     <string name="tab_audio">Audio</string>
     <string name="about_size">oko %1$s</string>
     <string name="size_unknown">veličina nepoznata</string>
-    <string name="best_audio">Najbolji zvuk</string>
     <string name="audio_unavailable">Sajt nema poseban zvuk, pa se MP3 pravi iz videa (preuzimanje je veće).</string>
     <string name="error_unsupported">Ovaj link nije podržan.</string>
     <string name="error_login">Ovaj sajt traži prijavu ili potvrdu.</string>
@@ -64,7 +60,6 @@
     <string name="set_terms">Uslovi korištenja</string>
     <string name="set_privacy">Privatnost</string>
     <string name="set_version">Verzija</string>
-    <string name="set_reader">Čitač sajtova (yt-dlp)</string>
     <string name="test_version">Probna verzija</string>
     <string name="invite_title">Pozovi prijatelja</string>
     <string name="invite_sub">Pošalji aplikaciju preko WhatsAppa, Vibera ili Quick Sharea</string>
@@ -85,8 +80,6 @@
     <string name="status_cancelled">Zaustavljeno</string>
     <string name="cancel">Zaustavi</string>
     <string name="open">Otvori</string>
-    <string name="saved_where">Video ide u Movies/Video Download, zvuk u Music/Video Download.</string>
-    <string name="prototype_note">Probna verzija: video do 1080p (H.264), zvuk kao M4A; MP3 dolazi uskoro.</string>
     <string name="login_title">Instagram nalog</string>
     <string name="login_on">Prijavljen</string>
     <string name="login_off">Prijavi se za Instagram video snimke</string>
@@ -179,7 +172,6 @@
     <string name="tile_label">Nalepi link</string>
     <string name="paste_empty">Nema kopiranog linka.</string>
     <string name="failed_label">Nije uspelo</string>
-    <string name="copy_link">Kopiraj link</string>
     <string name="link_copied">Link je kopiran</string>
     <string name="filter_all">Sve</string>
     <string name="quick_audio">Preuzmi zvuk odmah</string>

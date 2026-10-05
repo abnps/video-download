@@ -3,9 +3,6 @@
 <resources>
     <string name="link_hint">Videolink</string>
     <string name="paste">Einfügen</string>
-    <string name="download_video">Video herunterladen (MP4)</string>
-    <string name="download_audio">Nur Ton (M4A)</string>
-    <string name="no_link">Noch kein Link. Teile ein Video aus einer anderen App oder füge den Link ein.</string>
     <string name="channel_name">Downloads</string>
     <string name="status_reading">Link wird gelesen…</string>
     <string name="status_downloading">Wird geladen: %1$d%%</string>
@@ -31,7 +28,6 @@
     <string name="tab_audio">Audio</string>
     <string name="about_size">ca. %1$s</string>
     <string name="size_unknown">Größe unbekannt</string>
-    <string name="best_audio">Bester Ton</string>
     <string name="audio_unavailable">Diese Seite hat keine separate Tonspur, daher wird die MP3 aus dem Video erstellt (der Download ist größer).</string>
     <string name="error_unsupported">Dieser Link wird nicht unterstützt.</string>
     <string name="error_login">Diese Seite verlangt eine Anmeldung oder Bestätigung.</string>
@@ -64,7 +60,6 @@
     <string name="set_terms">Nutzungsbedingungen</string>
     <string name="set_privacy">Datenschutz</string>
     <string name="set_version">Version</string>
-    <string name="set_reader">Seitenleser (yt-dlp)</string>
     <string name="test_version">Testversion</string>
     <string name="invite_title">Freund einladen</string>
     <string name="invite_sub">App per WhatsApp, Viber oder Quick Share senden</string>
@@ -85,8 +80,6 @@
     <string name="status_cancelled">Gestoppt</string>
     <string name="cancel">Stoppen</string>
     <string name="open">Öffnen</string>
-    <string name="saved_where">Videos landen in Movies/Video Download, Ton in Music/Video Download.</string>
-    <string name="prototype_note">Testversion: Video bis 1080p (H.264), Ton als M4A; MP3 kommt bald.</string>
     <string name="login_title">Instagram-Konto</string>
     <string name="login_on">Angemeldet</string>
     <string name="login_off">Für Instagram-Videos anmelden</string>
@@ -176,7 +169,6 @@
     <string name="tile_label">Link einfügen</string>
     <string name="paste_empty">Kein Link kopiert.</string>
     <string name="failed_label">Fehlgeschlagen</string>
-    <string name="copy_link">Link kopieren</string>
     <string name="link_copied">Link kopiert</string>
     <string name="filter_all">Alle</string>
     <string name="quick_audio">Ton jetzt laden</string>

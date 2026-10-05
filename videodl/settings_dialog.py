@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from . import theme
 from .i18n import LANGUAGES, get_language, tr
+from .widgets import ElidedLabel
 
 
 def _plain(key: str) -> str:
@@ -34,8 +35,8 @@ class SettingsDialog(QDialog):
         form = QFormLayout()
         download_box.addLayout(form)
         folder_row = QHBoxLayout()
-        self.folder_label = QLabel()
-        self.folder_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        # Duga putanja se skraćuje po sredini (vide se disk i zadnji folder); cijela je u oblačiću.
+        self.folder_label = ElidedLabel(mode=Qt.TextElideMode.ElideMiddle)
         folder_row.addWidget(self.folder_label, 1)
         change = QPushButton(tr("settings.change"))
         change.clicked.connect(self._choose_folder)
@@ -142,6 +143,7 @@ class SettingsDialog(QDialog):
 
     def _show_folder(self) -> None:
         self.folder_label.setText(self._window.output_dir)
+        self.folder_label.setToolTip(self._window.output_dir)
 
     def _choose_folder(self) -> None:
         self._window._choose_folder()

@@ -738,11 +738,18 @@ class MainWindow(QMainWindow):
         if self._watch_clipboard:
             self._last_clipboard = clipboard.text()
             clipboard.dataChanged.connect(self._on_clipboard_change, Qt.ConnectionType.UniqueConnection)
+            self._clipboard_hooked = True
         else:
-            with contextlib.suppress(RuntimeError):
-                clipboard.dataChanged.disconnect(self._on_clipboard_change)
+            self._unhook_clipboard()
         if save:
             self._save_settings()
+
+    def _unhook_clipboard(self) -> None:
+        """Odvezuje samo ako je vezano: PySide inače ispiše upozorenje (isključeno hvatanje pri pokretanju)."""
+        if getattr(self, "_clipboard_hooked", False):
+            with contextlib.suppress(RuntimeError):
+                QApplication.clipboard().dataChanged.disconnect(self._on_clipboard_change)
+            self._clipboard_hooked = False
 
     def _close_clipboard_notice(self, keep: bool) -> None:
         self._settings.setValue("clipboard_notice_seen", True)
@@ -1860,8 +1867,7 @@ class MainWindow(QMainWindow):
                 QApplication.instance().styleHints().colorSchemeChanged.disconnect(self._on_system_scheme)
             self._follows_system = False
         # Prozor se gasi: signal clipboarda više ne smije stizati.
-        with contextlib.suppress(RuntimeError):
-            QApplication.clipboard().dataChanged.disconnect(self._on_clipboard_change)
+        self._unhook_clipboard()
         event.accept()
 
 

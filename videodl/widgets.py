@@ -265,8 +265,10 @@ class AnimatedProgress(QWidget):
 class ElidedLabel(QLabel):
     """Jednoredni tekst koji se skraćuje sa „…" umjesto da širi prozor."""
 
-    def __init__(self, text: str = "", parent: QWidget | None = None):
+    def __init__(self, text: str = "", parent: QWidget | None = None,
+                 mode: Qt.TextElideMode = Qt.TextElideMode.ElideRight):
         super().__init__(text, parent)
+        self._mode = mode  # putanje: ElideMiddle, da se vide i disk i zadnji folder
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
 
     def minimumSizeHint(self) -> QSize:
@@ -276,7 +278,7 @@ class ElidedLabel(QLabel):
         painter = QPainter(self)
         painter.setPen(self.palette().color(self.foregroundRole()))
         rect = self.contentsRect()
-        text = self.fontMetrics().elidedText(self.text(), Qt.TextElideMode.ElideRight, rect.width())
+        text = self.fontMetrics().elidedText(self.text(), self._mode, rect.width())
         painter.drawText(rect, int(self.alignment() | Qt.AlignmentFlag.AlignVCenter), text)
 
 
@@ -452,8 +454,9 @@ class QueueRow(QFrame):
 
         detail = QHBoxLayout()
         detail.setSpacing(8)
+        # Format prije završetka: ista „pilula" kao kod gotovog fajla (poliranje 5.10.2026), klik mijenja format.
         self.format_link = QLabel()
-        self.format_link.setObjectName("rowLink")
+        self.format_link.setObjectName("pill")
         self.format_link.linkActivated.connect(self._on_format_link)
         detail.addWidget(self.format_link)
         # Oznake gotovog fajla kao „pilule" (stvarna rezolucija i veličina), kao kod sličnih programa.
@@ -536,7 +539,7 @@ class QueueRow(QFrame):
         if active:
             self.format_link.setText(f'<span style="color:{theme.c("muted")}">{preset}</span>')
         else:
-            self.format_link.setText(f'<a href="format" style="color:{theme.c("link")}">{preset}</a>')
+            self.format_link.setText(f'<a href="format" style="color:{theme.c("link")};text-decoration:none">{preset}</a>')
         # Gotov fajl: format kao „pilula" (posebna oznaka; ista oznaka koja mijenja stil dok je red vidljiv
         # zadrži staru veličinu), i dalje klik za promjenu formata.
         self.ext_pill.setText(f'<a href="format" style="color:{theme.c("link")};text-decoration:none">{preset}</a>')
