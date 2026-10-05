@@ -597,6 +597,9 @@ class MainWindow(QMainWindow):
             snooze_until=self._settings.value("support/snooze_until", 0.0, type=float))
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
+        # Poglavlja su uključena odmah (ništa ne šalju); SponsorBlock pita vanjski servis, pa tek na zahtjev.
+        self._chapters = self._settings.value("chapters", True, type=bool)
+        self._sponsorblock = self._settings.value("sponsorblock", False, type=bool)
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
         self._notify_done = self._settings.value("notify_done", True, type=bool)
         name_template = self._settings.value("name_template", DEFAULT_NAME_TEMPLATE, type=str)
@@ -622,6 +625,8 @@ class MainWindow(QMainWindow):
         self._settings.setValue("support/last_dialog", self._support.last_dialog)
         self._settings.setValue("support/snooze_until", self._support.snooze_until)
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
+        self._settings.setValue("chapters", self._chapters)
+        self._settings.setValue("sponsorblock", self._sponsorblock)
         self._settings.setValue("whole_playlist", self._whole_playlist)
         self._settings.setValue("notify_done", self._notify_done)
         self._settings.setValue("name_template", self._name_template)
@@ -773,6 +778,10 @@ class MainWindow(QMainWindow):
             options["subtitle_langs"] = subtitle_languages(get_language())
         if self._thumbnail_cover:
             options["thumbnail"] = True
+        if self._chapters:
+            options["chapters"] = True
+        if self._sponsorblock:
+            options["sponsorblock"] = True
         if item.force_id_name:
             options["name_template"] = DEFAULT_NAME_TEMPLATE  # naslov [id]: ne može se sudariti s drugim videom
         elif self._name_template != DEFAULT_NAME_TEMPLATE:

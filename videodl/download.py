@@ -195,6 +195,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              subtitles: bool = False,
              subtitle_langs: list[str] | None = None,
              thumbnail: bool = False,
+             chapters: bool = False,
+             sponsorblock: bool = False,
              ratelimit: "int | RateBudget | None" = None,
              name_template: str | None = None,
              _isolated: bool = False) -> DownloadResult:
@@ -207,14 +209,15 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         try:
             return download(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
                             filename_title=filename_title, cookies=cookies, section=section, subtitles=subtitles,
-                            subtitle_langs=subtitle_langs, thumbnail=thumbnail, ratelimit=_LiveShare(budget),
-                            name_template=name_template)
+                            subtitle_langs=subtitle_langs, thumbnail=thumbnail, chapters=chapters,
+                            sponsorblock=sponsorblock, ratelimit=_LiveShare(budget), name_template=name_template)
         finally:
             budget.leave()
     if preset.is_audio and not _isolated:
         return _download_audio(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
                                filename_title=filename_title, cookies=cookies, section=section, thumbnail=thumbnail,
-                               ratelimit=ratelimit, name_template=name_template)
+                               chapters=chapters, sponsorblock=sponsorblock, ratelimit=ratelimit,
+                               name_template=name_template)
 
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     no_subtitles = False
@@ -225,7 +228,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
                                      filename_title=filename_title, source_url=url, cookiefile=cookiefile,
                                      section=section, subtitles=subtitles, subtitle_langs=subtitle_langs,
-                                     thumbnail=thumbnail, ratelimit=live.budget.share() if live else ratelimit,
+                                     thumbnail=thumbnail, chapters=chapters, sponsorblock=sponsorblock,
+                                     ratelimit=live.budget.share() if live else ratelimit,
                                      name_template=name_template)
             opts["progress_hooks"] = [attempt.progress_hook]
             if live:
@@ -258,8 +262,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             # yt-dlp zbog neuspjelog titla (npr. HTTP 429) prekida cijelo preuzimanje; video je važniji.
             result = download(url, preset, output_dir, subfolder, on_progress, cancel_event,
                               http_headers=http_headers, filename_title=filename_title, cookies=cookies,
-                              section=section, subtitles=False, thumbnail=thumbnail, ratelimit=ratelimit,
-                              name_template=name_template)
+                              section=section, subtitles=False, thumbnail=thumbnail, chapters=chapters,
+                              sponsorblock=sponsorblock, ratelimit=ratelimit, name_template=name_template)
             if result.status == ItemStatus.DONE:
                 return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed,
                                       result.height)

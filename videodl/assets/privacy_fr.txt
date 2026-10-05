@@ -10,6 +10,7 @@ Le programme n'envoie à l'auteur aucune donnée, aucune statistique d'utilisati
 - À GitHub (api.github.com, github.com) : recherche et téléchargement d'une nouvelle version du programme, au plus une fois par jour et quand tu cliques sur « Rechercher des mises à jour ».
   Lors de cette vérification, le programme télécharge aussi une petite description de la nouvelle version. GitHub compte combien de fois un fichier est téléchargé : l'auteur ne voit que le nombre total de vérifications (à peu près combien d'installations sont utilisées), sans adresse IP et sans rien sur toi.
 - À PyPI (pypi.org, files.pythonhosted.org) : recherche et téléchargement du lecteur de sites yt-dlp, au plus une fois par jour.
+- À SponsorBlock (sponsor.ajay.app), seulement si vous activez « YouTube : couper les pubs des sponsors » dans les Paramètres sur l'ordinateur : pour chaque vidéo YouTube, le programme n'envoie que les 4 premiers caractères de l'ID chiffré (SHA-256) de la vidéo, le service ne sait donc pas quelle vidéo vous téléchargez.
 - À PayPal, Stripe (carte, Apple Pay, Google Pay) ou Ko-fi seulement si tu cliques sur « Soutenir le projet » ou sur l'un de ces liens : la page de contribution s'ouvre dans ton navigateur et le programme n'envoie rien.
 Ces services voient ton adresse IP et la version du programme ; leurs propres politiques de confidentialité s'appliquent.
 

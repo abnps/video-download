@@ -218,6 +218,16 @@ class MainWindowTest(unittest.TestCase):
         dialog.theme.setCurrentIndex(dialog.theme.findData("dark"))
         self.assertEqual(window._theme, "dark")
         self.assertEqual(self.settings.value("rate_limit", type=int), 5)  # sačuvano odmah, bez „Sačuvaj"
+        # Poglavlja uključena odmah, SponsorBlock tek kad ga korisnik uključi (pita vanjski servis).
+        self.assertTrue(dialog.chapters.isChecked())
+        self.assertFalse(dialog.sponsorblock.isChecked())
+        dialog.sponsorblock.setChecked(True)
+        dialog.chapters.setChecked(False)
+        self.assertTrue(self.settings.value("sponsorblock", type=bool))
+        item = window._queue.add("https://www.youtube.com/watch?v=x", "x", "best", self.tmp.name)
+        options = window._download_options(item)
+        self.assertTrue(options["sponsorblock"])
+        self.assertNotIn("chapters", options)
 
     def test_latest_regular_ytdlp_offers_the_nightly_version(self):
         from PySide6.QtWidgets import QMessageBox
@@ -850,7 +860,8 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(pasted.status, ItemStatus.WAITING)
         self.assertEqual(browser_item.title, "Lekcija 3")
         self.assertEqual(self.calls, [("https://cdn.sajt.ba/a/index.m3u8", "720p", self.tmp.name, None)])
-        self.assertEqual(self.extras, [{"http_headers": headers, "filename_title": "Lekcija 3"}])
+        self.assertEqual(self.extras, [{"http_headers": headers, "filename_title": "Lekcija 3",
+                                        "chapters": True}])  # poglavlja su uključena odmah
         self.assertIn("Iz browsera", window.status_label.text())
 
     def test_browser_page_request_is_probed_with_headers_and_started(self):
@@ -866,7 +877,8 @@ class MainWindowTest(unittest.TestCase):
         self.assertTrue(wait_until(lambda: window._queue.items()
                                    and window._queue.items()[0].status == ItemStatus.DONE))
         self.assertEqual(seen, [("https://www.youtube.com/watch?v=x", {"User-Agent": "UA"})])
-        self.assertEqual(self.extras, [{"http_headers": {"User-Agent": "UA"}, "filename_title": None}])
+        self.assertEqual(self.extras, [{"http_headers": {"User-Agent": "UA"}, "filename_title": None,
+                                        "chapters": True}])
 
     def test_browser_cookies_reach_probe_and_download(self):
         seen = []

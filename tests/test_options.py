@@ -70,6 +70,26 @@ class OptionsTest(unittest.TestCase):
         self.assertEqual([pp["key"] for pp in audio["postprocessors"]],
                          ["FFmpegThumbnailsConvertor", "FFmpegExtractAudio", "EmbedThumbnail"])
 
+    def test_chapters_and_sponsorblock_in_ytdlp_order(self):
+        video = build_ydl_options(get_preset("best"), r"C:\v", subtitles=True, thumbnail=True, chapters=True,
+                                  sponsorblock=True)
+        # Kao yt-dlp: SponsorBlock prije preuzimanja, rezanje poslije titla, pa poglavlja, pa omot.
+        self.assertEqual([pp["key"] for pp in video["postprocessors"]],
+                         ["SponsorBlock", "FFmpegThumbnailsConvertor", "FFmpegSubtitlesConvertor",
+                          "FFmpegEmbedSubtitle", "ModifyChapters", "FFmpegMetadata", "EmbedThumbnail"])
+        sponsor = video["postprocessors"][0]
+        self.assertEqual(sponsor["when"], "after_filter")
+        self.assertEqual(sponsor["categories"], {"sponsor", "selfpromo", "interaction"})
+        metadata = next(pp for pp in video["postprocessors"] if pp["key"] == "FFmpegMetadata")
+        self.assertEqual((metadata["add_chapters"], metadata["add_metadata"]), (True, False))
+
+        audio = build_ydl_options(get_preset("mp3"), r"C:\v", chapters=True, sponsorblock=True)
+        self.assertEqual([pp["key"] for pp in audio["postprocessors"]],
+                         ["SponsorBlock", "FFmpegExtractAudio", "ModifyChapters", "FFmpegMetadata"])
+        # Isječak ima svoje vrijeme: bez poglavlja i rezanja cijelog videa.
+        clip = build_ydl_options(get_preset("best"), r"C:\v", section=(10, 20), chapters=True, sponsorblock=True)
+        self.assertNotIn("postprocessors", clip)
+
     def test_rate_limit_and_defaults(self):
         self.assertEqual(build_ydl_options(get_preset("best"), r"C:\v", ratelimit=1_048_576)["ratelimit"], 1_048_576)
         plain = build_ydl_options(get_preset("best"), r"C:\v")

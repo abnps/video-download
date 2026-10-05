@@ -75,6 +75,11 @@ class SettingsDialog(QDialog):
                                      lambda on: window._set_option("_subtitles", on))
         self.thumbnail = self._check(box, "menu.thumbnail", window._thumbnail_cover,
                                      lambda on: window._set_option("_thumbnail_cover", on))
+        self.chapters = self._check(box, "settings.chapters", window._chapters,
+                                    lambda on: window._set_option("_chapters", on))
+        self.sponsorblock = self._check(box, "settings.sponsorblock", window._sponsorblock,
+                                        lambda on: window._set_option("_sponsorblock", on))
+        self.sponsorblock.setToolTip(tr("settings.sponsorblock_tip"))
         self.playlist = self._check(box, "menu.whole_playlist", window._whole_playlist,
                                     lambda on: window._set_option("_whole_playlist", on))
         layout.addWidget(content)

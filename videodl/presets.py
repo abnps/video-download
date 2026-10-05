@@ -138,13 +138,19 @@ def _clock(value: float) -> str:
     return f"{hours}:{minutes:02d}:{seconds:02d}" if hours else f"{minutes}:{seconds:02d}"
 
 
+# Šta SponsorBlock izreže: plaćena reklama, samoreklama autora i „lajkuj i pretplati se". Uvodi, odjavne
+# špice i sl. ostaju (to je dio videa koji neki žele).
+SPONSOR_CATEGORIES = ("sponsor", "selfpromo", "interaction")
+
+
 def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = None,
                       logger=None, *, http_headers: dict[str, str] | None = None,
                       filename_title: str | None = None, source_url: str | None = None,
                       cookiefile: str | None = None, section: tuple[float, float] | None = None,
                       subtitles: bool = False, subtitle_langs: list[str] | None = None,
                       thumbnail: bool = False, ratelimit: int | None = None,
-                      name_template: str | None = None) -> dict:
+                      name_template: str | None = None, chapters: bool = False,
+                      sponsorblock: bool = False) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
@@ -184,6 +190,20 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         opts["subtitlesformat"] = "srt/vtt/best"
         postprocessors.append({"key": "FFmpegSubtitlesConvertor", "format": "srt", "when": "before_dl"})
         postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": True})
+    # Isječak (section) ima svoje vrijeme: poglavlja i SponsorBlock dijelovi cijelog videa ne bi se poklopili.
+    if sponsorblock and not section:
+        # SponsorBlock (Ahmed 5.10.2026, isključeno dok ga korisnik ne uključi): baza zajednice o reklamama
+        # u YouTube videima. yt-dlp pita sponsor.ajay.app samo s prva 4 znaka heša ID-a videa, pa servis ne
+        # zna koji video se preuzima; drugi sajtovi se ne pitaju. Izrezani dijelovi: SPONSOR_CATEGORIES.
+        postprocessors.insert(0, {"key": "SponsorBlock", "categories": set(SPONSOR_CATEGORIES),
+                                  "when": "after_filter"})
+        # Mora prije FFmpegMetadata, da poglavlja u fajlu prate izrezan video (kao u yt-dlp-u).
+        postprocessors.append({"key": "ModifyChapters", "remove_sponsor_segments": set(SPONSOR_CATEGORIES)})
+    if chapters and not section:
+        # Poglavlja (npr. YouTube „0:00 Uvod") ulaze u MP4/MP3; plejer ih prikazuje na traci. Bez poglavlja
+        # yt-dlp ovaj korak preskoči, pa nema dodatnog prolaza kroz ffmpeg.
+        postprocessors.append({"key": "FFmpegMetadata", "add_chapters": True, "add_metadata": False,
+                               "add_infojson": False})
     if thumbnail:
         postprocessors.append({"key": "EmbedThumbnail", "already_have_thumbnail": False})
     if postprocessors:

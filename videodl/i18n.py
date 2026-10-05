@@ -340,6 +340,24 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "Subtítulos con el vídeo", "Sous-titres avec la vidéo"),
     "menu.thumbnail": ("Sličica kao omot fajla", "Thumbnail as file cover", "Vorschaubild als Cover",
                        "Miniatura como portada", "Miniature comme pochette"),
+    "settings.chapters": ("Poglavlja videa u fajlu", "Video chapters in the file", "Videokapitel in der Datei",
+                          "Capítulos del vídeo en el archivo", "Chapitres de la vidéo dans le fichier"),
+    "settings.sponsorblock": ("YouTube: izreži reklame sponzora (SponsorBlock)",
+                              "YouTube: cut out sponsor ads (SponsorBlock)",
+                              "YouTube: Sponsorenwerbung herausschneiden (SponsorBlock)",
+                              "YouTube: recortar anuncios de patrocinadores (SponsorBlock)",
+                              "YouTube : couper les pubs des sponsors (SponsorBlock)"),
+    "settings.sponsorblock_tip": (
+        "Izrezuje dijelove koje su korisnici SponsorBlocka označili: reklame sponzora, samoreklamu i „lajkuj i "
+        "pretplati se“. Program pita sponsor.ajay.app samo s dijelom šifrovanog ID-a videa.",
+        "Cuts the parts marked by SponsorBlock users: sponsor ads, self-promotion and “like and subscribe”. "
+        "The app asks sponsor.ajay.app with only part of an encoded video ID.",
+        "Schneidet die von SponsorBlock-Nutzern markierten Teile heraus: Sponsorenwerbung, Eigenwerbung und "
+        "„Liken und abonnieren“. Das Programm fragt sponsor.ajay.app nur mit einem Teil einer verschlüsselten Video-ID.",
+        "Recorta las partes marcadas por los usuarios de SponsorBlock: anuncios de patrocinadores, autopromoción y "
+        "«dale like y suscríbete». El programa consulta sponsor.ajay.app solo con parte de un ID de vídeo cifrado.",
+        "Coupe les passages signalés par les utilisateurs de SponsorBlock : pubs des sponsors, autopromotion et "
+        "« like et abonne-toi ». Le programme interroge sponsor.ajay.app avec seulement une partie d'un ID vidéo chiffré."),
     "menu.whole_playlist": ("Link videa iz plejliste: preuzmi cijelu plejlistu",
                             "Video link from a playlist: download the whole playlist",
                             "Videolink aus einer Playlist: ganze Playlist laden",

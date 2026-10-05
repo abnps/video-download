@@ -10,6 +10,7 @@ The program does not send the author any data, usage statistics or error reports
 - GitHub (api.github.com, github.com): checking for and downloading a new version of the program, at most once a day and when you click "Check for updates".
   During that check the program also downloads a small description of the new version. GitHub counts how many times a file is downloaded, so the author sees only the total number of checks (roughly how many installations are in use), with no IP address and nothing about you.
 - PyPI (pypi.org, files.pythonhosted.org): checking for and downloading the site reader yt-dlp, at most once a day.
+- SponsorBlock (sponsor.ajay.app), only if you turn on “YouTube: cut out sponsor ads” in Settings on the computer: for each YouTube video the app sends only the first 4 characters of the encoded (SHA-256) video ID, so the service doesn't know which video you download.
 - PayPal, Stripe (card, Apple Pay, Google Pay) or Ko-fi only if you click “Support the project” or one of those links: the contribution page opens in your browser, and the program sends nothing.
 These services can see your IP address and the program version; their own privacy policies apply.
 
