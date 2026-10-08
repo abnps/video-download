@@ -319,6 +319,16 @@ Dopuna (Ahmed 5.10.2026): bez reklama; savjetnik trenutno nije moguć → Toolki
 (ne-trgovac). U Play aplikaciji NEMA PayPal/Ko-fi/Stripe dugmadi (Play traži Googleovo plaćanje i za napojnice);
 dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repoa).
 
+## Izdanje 1.0.0 (objavljeno 8.10.2026, Ahmed: „objavi" → 1.0.0)
+
+- Program, Android i dodatak 1.0.0 istog dana; stranica „Video Download 1.0" (`version-1.html`) uključena sama.
+- Android APK 29 MB (bio 61): R8 (`android/app/proguard-rules.pro` čuva klase koje Python zove po imenu:
+  NativeHttp, NativeResponse, DownloadService$Listener) i samo arm64. Proba na S26 Ultra prije objave: MP3 iz
+  videa radi, bez rušenja. Nova klasa koju Python zove = novo pravilo u proguard-rules.pro.
+- Snimci za kataloge (5 jezika, svijetla/tamna): `Videos\Video Download\snimci-1.0` (van repoa).
+- Sljedeće: prijave u kataloge (00_plan/lansiranje_1_0.md, naloge otvara Ahmed), Firefox ZIP 1.0.0 za AMO,
+  poslije 1.0: manji Windows instaler (ffmpeg shared), brži start (yt-dlp kasnije), Video Toolkit za Play.
+
 ## Put do 1.0.0 (Ahmed 5.10.2026)
 
 - Pretplate na kanale: NE za sada. Do 1.0.0 samo poliranje (greške, tekstovi, izgled, sitnice), bez novih
