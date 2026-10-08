@@ -40,7 +40,9 @@ class ReleaseReadinessTest(unittest.TestCase):
              patch.object(publish_release, "record_own") as own:
             with self.assertRaises(subprocess.CalledProcessError):
                 publish_release.validate_draft(tag)
-        own.assert_called_once_with(names)
+        # Tri pokušaja skidanja, svaki upisan kao naš.
+        self.assertEqual(own.call_count, 3)
+        own.assert_called_with(names)
 
     def test_publish_moves_previous_release_to_draft(self):
         # Javno je samo posljednje izdanje: novo postaje latest, prethodno ide u nacrt (ne briše se).

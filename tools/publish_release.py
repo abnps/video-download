@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -227,12 +228,21 @@ def validate_draft(tag: str, *, publish: bool = False) -> None:
     with tempfile.TemporaryDirectory(prefix="videodl-release-") as temp:
         folder = Path(temp)
         patterns = [arg for name in names for arg in ("--pattern", name)]
-        try:
-            run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder), *patterns)
-        finally:
-            # I kad skidanje pukne na pola (5.10.2026: dvaput), GitHub je izbrojao fajlove koji su stigli; bez
-            # upisa bi naše provjere izgledale kao pravi korisnici (npr. „4 Mac preuzimanja").
-            record_own(names)
+        # Skidanje ~600 MB zna puknuti iz prvog pokušaja (0.9.10 i 0.9.11, svaki put): do tri pokušaja, svaki
+        # u prazan folder (pola skinut fajl ne smije ući u provjeru).
+        for attempt in range(3):
+            shutil.rmtree(folder, ignore_errors=True)
+            folder.mkdir(exist_ok=True)
+            try:
+                run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder), *patterns)
+                break
+            except subprocess.CalledProcessError:
+                if attempt == 2:
+                    raise
+            finally:
+                # I kad skidanje pukne na pola, GitHub je izbrojao fajlove koji su stigli; bez upisa bi naše
+                # provjere izgledale kao pravi korisnici (5.10.2026: „4 Mac preuzimanja").
+                record_own(names)
         current = validate_assets(folder, version, code, name)
         previous_folder = folder / "previous"
         previous_folder.mkdir()
