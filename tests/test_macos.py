@@ -266,6 +266,30 @@ class MacSelfUpdateTest(unittest.TestCase):
         self.assertIn(["hdiutil", "detach"], calls)
         self.assertFalse(self.dmg.exists())
 
+    def test_busy_dmg_is_retried(self):
+        # 5.10.2026: hdiutil attach na Macu jednom odbio otvaranje; drugi pokušaj uspije.
+        run, calls = self.fake_runner()
+        fails = [1]
+
+        def flaky(args, **kwargs):
+            if args[:2] == ["hdiutil", "attach"] and fails:
+                fails.pop()
+                calls.append(args[:2])
+                return mock.Mock(returncode=1, stdout=b"")
+            return run(args, **kwargs)
+
+        pauses = []
+        staged = updater.prepare_mac_app(self.dmg, self.bundle, runner=flaky, sleep=pauses.append)
+        self.assertEqual(staged, self.staged)
+        self.assertEqual(calls.count(["hdiutil", "attach"]), 2)
+        self.assertEqual(pauses, [3])
+
+        always = lambda args, **kwargs: mock.Mock(returncode=1, stdout=b"")  # noqa: E731
+        self.dmg.write_bytes(b"dmg")
+        with self.assertRaises(updater.UpdateError):
+            updater.prepare_mac_app(self.dmg, self.bundle, runner=always, sleep=pauses.append)
+        self.assertEqual(pauses, [3, 3, 3])  # tri pokušaja, dvije pauze
+
     def test_prepare_refuses_wrong_app_version_or_signature(self):
         for name, options in {"version": {"version": "1.0.0"}, "other_app": {"bundle_id": "com.example.other"},
                               "codesign": {"codesign": 1}}.items():

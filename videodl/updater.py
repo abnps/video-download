@@ -265,7 +265,7 @@ def _bundle_info(app: Path) -> dict:
         return plistlib.load(file)
 
 
-def prepare_mac_app(dmg: Path, bundle: Path, runner=subprocess.run) -> Path:
+def prepare_mac_app(dmg: Path, bundle: Path, runner=subprocess.run, sleep=time.sleep) -> Path:
     """Otvori provjeren .dmg (bez prikaza u Finderu), kopiraj aplikaciju pored instalirane i provjeri je:
     ista oznaka paketa, verzija iz imena .dmg-a, ispravan (ad-hoc) potpis. Vraća kopiju; .dmg se briše."""
     version = MAC_INSTALLER_NAME.match(dmg.name)
@@ -273,8 +273,15 @@ def prepare_mac_app(dmg: Path, bundle: Path, runner=subprocess.run) -> Path:
         raise UpdateError(f"Unexpected Mac package name: {dmg.name}")
     staged = _staged_path(bundle)
     shutil.rmtree(staged, ignore_errors=True)
-    attached = runner(["hdiutil", "attach", "-nobrowse", "-readonly", "-noautoopen", "-plist", str(dmg)],
-                      capture_output=True, timeout=120)
+    # hdiutil zna kratko odbiti otvaranje („resource busy", npr. dok macOS još provjerava tek preuzet fajl;
+    # viđeno na GitHub Macu 5.10.2026): do tri pokušaja s pauzom, tek onda greška.
+    for attempt in range(3):
+        attached = runner(["hdiutil", "attach", "-nobrowse", "-readonly", "-noautoopen", "-plist", str(dmg)],
+                          capture_output=True, timeout=120)
+        if attached.returncode == 0:
+            break
+        if attempt < 2:
+            sleep(3)
     if attached.returncode != 0:
         raise UpdateError("Could not open the Mac package (hdiutil attach)")
     mounts = [entity["mount-point"] for entity in plistlib.loads(attached.stdout).get("system-entities", [])
