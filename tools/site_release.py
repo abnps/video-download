@@ -27,8 +27,8 @@ TEXT = {
         "sections": [
             ("Same app everywhere", "Windows, Mac and Android get version 1.0 on the same day: MP4 up to the best "
              "quality or MP3, playlists, clips and subtitles on every device."),
-            ("Safe updates", "The app updates itself and installs only updates digitally signed by us, on Windows "
-             "and on Mac. The part that reads websites is refreshed without reinstalling."),
+            ("Safe updates", "The app updates itself and installs only updates digitally signed by us, on Windows, "
+             "Mac and Android. The part that reads websites is refreshed without reinstalling."),
             ("Checked every day", "An automatic test downloads from the most popular sites every morning, so a "
              "change on a website is noticed and fixed quickly."),
             ("For families", "Parental control with a PIN: content for adults is never downloaded without it."),
@@ -48,7 +48,7 @@ TEXT = {
             ("Isti program svuda", "Windows, Mac i Android dobijaju verziju 1.0 istog dana: MP4 do najboljeg "
              "kvaliteta ili MP3, liste, isječci i titlovi na svakom uređaju."),
             ("Sigurna ažuriranja", "Program se sam ažurira i instalira samo ažuriranja s našim digitalnim potpisom, "
-             "na Windowsu i na Macu. Dio koji čita sajtove osvježava se bez ponovne instalacije."),
+             "na Windowsu, Macu i Androidu. Dio koji čita sajtove osvježava se bez ponovne instalacije."),
             ("Provjereno svaki dan", "Automatski test svako jutro preuzima sa najpopularnijih sajtova, pa se "
              "promjena na nekom sajtu brzo primijeti i popravi."),
             ("Za porodice", "Roditeljska zaštita s PIN-om: sadržaj za odrasle se bez njega nikad ne preuzima."),
@@ -68,7 +68,7 @@ TEXT = {
             ("Überall dieselbe App", "Windows, Mac und Android bekommen Version 1.0 am selben Tag: MP4 bis zur "
              "besten Qualität oder MP3, Playlists, Ausschnitte und Untertitel auf jedem Gerät."),
             ("Sichere Updates", "Die App aktualisiert sich selbst und installiert nur von uns digital signierte "
-             "Updates, unter Windows und auf dem Mac. Der Teil, der Websites liest, wird ohne Neuinstallation "
+             "Updates, unter Windows, auf dem Mac und unter Android. Der Teil, der Websites liest, wird ohne Neuinstallation "
              "erneuert."),
             ("Jeden Tag geprüft", "Ein automatischer Test lädt jeden Morgen von den beliebtesten Seiten, damit "
              "Änderungen an einer Website schnell bemerkt und behoben werden."),
@@ -90,7 +90,7 @@ TEXT = {
             ("La misma app en todas partes", "Windows, Mac y Android reciben la versión 1.0 el mismo día: MP4 hasta "
              "la mejor calidad o MP3, listas, fragmentos y subtítulos en cada dispositivo."),
             ("Actualizaciones seguras", "La app se actualiza sola e instala solo actualizaciones firmadas "
-             "digitalmente por nosotros, en Windows y en Mac. La parte que lee los sitios se renueva sin "
+             "digitalmente por nosotros, en Windows, Mac y Android. La parte que lee los sitios se renueva sin "
              "reinstalar."),
             ("Comprobado cada día", "Una prueba automática descarga cada mañana de los sitios más populares, así "
              "que un cambio en un sitio se detecta y se corrige rápido."),
@@ -112,7 +112,7 @@ TEXT = {
             ("La même application partout", "Windows, Mac et Android reçoivent la version 1.0 le même jour : MP4 "
              "jusqu'à la meilleure qualité ou MP3, listes, extraits et sous-titres sur chaque appareil."),
             ("Mises à jour sûres", "L'application se met à jour seule et n'installe que des mises à jour signées "
-             "numériquement par nous, sous Windows et sur Mac. La partie qui lit les sites se renouvelle sans "
+             "numériquement par nous, sous Windows, sur Mac et sur Android. La partie qui lit les sites se renouvelle sans "
              "réinstallation."),
             ("Vérifiée chaque jour", "Un test automatique télécharge chaque matin depuis les sites les plus "
              "populaires : un changement sur un site est vite repéré et corrigé."),

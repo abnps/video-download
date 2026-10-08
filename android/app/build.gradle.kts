@@ -20,8 +20,8 @@ android {
         versionCode = 12
         versionName = "0.2.8"
         ndk {
-            // Telefoni (arm64) i emulator na računaru (x86_64).
-            abiFilters += listOf("arm64-v8a", "x86_64")
+            // Samo telefoni (arm64). x86_64 (emulator, rijetki Chromebookovi) izbačen 8.10.2026: APK −13 MB.
+            abiFilters += listOf("arm64-v8a")
         }
     }
 
@@ -42,7 +42,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 (8.10.2026): izbacuje neiskorišten Kotlin/Compose kod (APK oko −15 MB). Klase koje Python
+            // poziva preko imena čuva proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
         }
     }
