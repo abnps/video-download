@@ -560,4 +560,44 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/impressum.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/impressum.html"/>
   </url>
+  <url><loc>https://abnps.github.io/video-download/version-1.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/version-1.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/bs/version-1.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/version-1.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/de/version-1.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/version-1.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/es/version-1.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/version-1.html"/>
+  </url>
+  <url><loc>https://abnps.github.io/video-download/fr/version-1.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://abnps.github.io/video-download/de/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://abnps.github.io/video-download/es/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://abnps.github.io/video-download/fr/version-1.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://abnps.github.io/video-download/version-1.html"/>
+  </url>
 </urlset>

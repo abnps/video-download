@@ -8,6 +8,23 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.0", "8.10.2026", {
+        "bs": ["Video Download 1.0: program za računar, Android aplikacija i dodatak za browser dobijaju verziju 1.0 istog dana.",
+               "Android aplikacija je upola manja (29 MB umjesto 61 MB): brže preuzimanje i brže slanje prijatelju.",
+               "Sve iz probnih verzija je tu: MP4 do najboljeg kvaliteta, MP3, plejliste, isječci, titlovi, poglavlja, roditeljska zaštita i samostalna, potpisana ažuriranja."],
+        "en": ["Video Download 1.0: the desktop app, the Android app and the browser extension all reach version 1.0 on the same day.",
+               "The Android app is half the size (29 MB instead of 61 MB): faster to download and faster to send to a friend.",
+               "Everything from the beta versions is here: MP4 up to the best quality, MP3, playlists, clips, subtitles, chapters, parental controls and signed self-updates."],
+        "de": ["Video Download 1.0: Desktop-Programm, Android-App und Browser-Erweiterung erreichen am selben Tag Version 1.0.",
+               "Die Android-App ist nur noch halb so groß (29 MB statt 61 MB): schneller geladen und schneller an Freunde geschickt.",
+               "Alles aus den Testversionen ist dabei: MP4 in bester Qualität, MP3, Playlists, Ausschnitte, Untertitel, Kapitel, Jugendschutz und signierte automatische Updates."],
+        "es": ["Video Download 1.0: el programa de escritorio, la app de Android y la extensión del navegador llegan a la versión 1.0 el mismo día.",
+               "La app de Android ocupa la mitad (29 MB en lugar de 61 MB): se descarga y se envía a un amigo más rápido.",
+               "Todo lo de las versiones de prueba está aquí: MP4 con la mejor calidad, MP3, listas, fragmentos, subtítulos, capítulos, control parental y actualizaciones automáticas firmadas."],
+        "fr": ["Video Download 1.0 : le programme pour ordinateur, l'application Android et l'extension du navigateur passent en version 1.0 le même jour.",
+               "L'application Android est deux fois plus légère (29 Mo au lieu de 61 Mo) : plus rapide à télécharger et à envoyer à un ami.",
+               "Tout ce qui était dans les versions d'essai est là : MP4 en meilleure qualité, MP3, playlists, extraits, sous-titres, chapitres, contrôle parental et mises à jour automatiques signées."],
+    }),
     ("0.9.11", "8.10.2026", {
         "bs": ["Postavke: duga putanja foldera se skraćuje po sredini, a cijela se vidi kad pređeš mišem preko nje.",
                "Format u listi preuzimanja izgleda isto u svakom redu; klik na njega i dalje mijenja format.",

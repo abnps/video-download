@@ -19,6 +19,10 @@ from videodl import __version__, changelog  # noqa: E402
 
 PAGES = ("index.html", "guides.html", "android-guide.html", *(f"{slug}.html" for slug in site_guides.GUIDES), "changelog.html",
          "terms.html", "privacy.html", "licenses.html", "extension.html", "impressum.html")
+# Od 1.0.0 sajt ima i stranicu „Video Download 1.0" (site_release uključuje se sam).
+import site_release  # noqa: E402
+if site_release.enabled():
+    PAGES = (*PAGES, site_release.PAGE)
 
 
 class SiteTest(unittest.TestCase):
