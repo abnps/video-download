@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("0.9.11", "8.10.2026", {
+        "bs": ["Postavke: duga putanja foldera se skraćuje po sredini, a cijela se vidi kad pređeš mišem preko nje.",
+               "Format u listi preuzimanja izgleda isto u svakom redu; klik na njega i dalje mijenja format.",
+               "Mac: samostalno ažuriranje je pouzdanije (ponovni pokušaj kad macOS kratko odbije otvoriti paket).",
+               "Android: aplikacija broji nove instalacije i poziv prijatelju anonimno (samo ukupan broj, vidi Privatnost); sitna čišćenja."],
+        "en": ["Settings: a long folder path is shortened in the middle, and the full path shows when you hover over it.",
+               "The format in the download list looks the same in every row; clicking it still changes the format.",
+               "Mac: self-updating is more reliable (it retries when macOS briefly refuses to open the package).",
+               "Android: the app counts new installations and friend invitations anonymously (only a total, see Privacy); small clean-ups."],
+        "de": ["Einstellungen: Ein langer Ordnerpfad wird in der Mitte gekürzt; der ganze Pfad erscheint, wenn du mit der Maus darauf zeigst.",
+               "Das Format in der Downloadliste sieht in jeder Zeile gleich aus; ein Klick darauf ändert weiterhin das Format.",
+               "Mac: Die automatische Aktualisierung ist zuverlässiger (neuer Versuch, wenn macOS das Paket kurz nicht öffnet).",
+               "Android: Die App zählt neue Installationen und Einladungen an Freunde anonym (nur eine Gesamtzahl, siehe Datenschutz); kleine Aufräumarbeiten."],
+        "es": ["Ajustes: una ruta de carpeta larga se acorta por el medio y la ruta completa aparece al pasar el ratón por encima.",
+               "El formato en la lista de descargas se ve igual en cada fila; hacer clic en él sigue cambiando el formato.",
+               "Mac: la actualización automática es más fiable (reintenta cuando macOS se niega brevemente a abrir el paquete).",
+               "Android: la app cuenta las instalaciones nuevas y las invitaciones a amigos de forma anónima (solo un total, ver Privacidad); pequeñas limpiezas."],
+        "fr": ["Paramètres : un long chemin de dossier est raccourci au milieu, et le chemin complet s'affiche au survol de la souris.",
+               "Le format dans la liste des téléchargements a le même aspect sur chaque ligne ; un clic dessus change toujours le format.",
+               "Mac : la mise à jour automatique est plus fiable (nouvel essai quand macOS refuse brièvement d'ouvrir le paquet).",
+               "Android : l'application compte les nouvelles installations et les invitations d'amis de façon anonyme (seulement un total, voir Confidentialité) ; petits nettoyages."],
+    }),
     ("0.9.10", "5.10.2026", {
         "bs": ["Poglavlja videa (npr. „0:00 Uvod“) sada ulaze u MP4 i MP3, pa ih plejer prikazuje na traci; isključuje se u Postavkama.",
                "Novo u Postavkama: izrezivanje reklama sponzora (SponsorBlock) iz videa uklanja sponzorske reklame, samoreklamu i „lajkuj i pretplati se“. Isključeno dok ga sam ne uključiš.",
