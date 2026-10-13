@@ -31,9 +31,9 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 |---|---|---|
 | winget | da | PR #445943 prošao automatske provjere, čeka moderatora |
 | AlternativeTo | da | besplatan nalog; unos programa + snimci ekrana |
-| Softpedia | da | obrazac „Submit program", besplatno |
+| Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
 | Uptodown (Windows i Android) | da | besplatan nalog programera; APK se šalje ručno |
-| Firefox AMO | da | ZIP 0.5.3 spreman, šalje Ahmed |
+| Firefox AMO | poslano | 1.0.0 javno (listed) poslan na pregled 14.10.2026, adresa `video-download-abnps`; paket `build_firefox.py --listed` |
 | Edge Add-ons | da, uz rizik | besplatno; pravila o preuzimanju videa mogu odbiti dodatak |
 | Chrome Web Store | **ne sada** | jednokratno 5 $ (plaćeno) i pravila zabranjuju preuzimanje s YouTube-a |
 | IzzyOnDroid, F-Droid | **ne** | primaju samo otvoren kod (FOSS licenca) |
