@@ -494,14 +494,14 @@ def meta_tags(lang: str, page: str, title: str, description: str) -> str:
 
 
 def software_jsonld(lang: str) -> str:
-    """Strukturirani podaci za Google: besplatan program za Windows i Mac (može dati bogatiji rezultat pretrage)."""
+    """Strukturirani podaci za Google: besplatan program za Windows, Mac i Android."""
     import json
 
     home = site_home.HOME[lang]
     data = {
         "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Video Download",
         "description": home["description"], "url": page_url(lang), "inLanguage": lang,
-        "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, macOS 13",
+        "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
         "softwareVersion": __version__, "downloadUrl": INSTALLER_URL, "isAccessibleForFree": True,
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
         "image": f"{PUBLIC_URL}assets/icon.png", "screenshot": f"{PUBLIC_URL}assets/screenshot-light-{lang}.png",
