@@ -41,6 +41,14 @@ class FirefoxPackageTest(unittest.TestCase):
         self.assertIn(FIREFOX_EXTENSION_ID, updates["addons"])
         self.assertIn("nativeMessaging", m["permissions"])
 
+    def test_listed_package_has_no_update_url(self):
+        listed = build_firefox.build(Path(self.tmp.name), listed=True)
+        self.assertTrue(listed.name.endswith("-amo.zip"))
+        with zipfile.ZipFile(listed) as archive:
+            gecko = json.loads(archive.read("manifest.json"))["browser_specific_settings"]["gecko"]
+        self.assertNotIn("update_url", gecko)  # AMO katalog odbija update_url
+        self.assertEqual(gecko["id"], FIREFOX_EXTENSION_ID)
+
     def test_signed_xpi_on_the_site_matches_updates_json(self):
         import hashlib
         import build_site

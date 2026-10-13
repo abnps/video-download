@@ -5,6 +5,8 @@ Potpisan .xpi Firefox instalira trajno, bez developer moda. Predaju i potpis rad
 
     python tools/build_firefox.py            → <build folder>\\firefox\\video-download-firefox-<verzija>.zip
                                                (isti build folder kao build_release.py: C:\\Video Downloader\\Build)
+    python tools/build_firefox.py --listed   → ...-<verzija>-amo.zip za javni katalog AMO: bez update_url,
+                                               jer listani dodatak ažurira sama Mozilla
 """
 
 import json
@@ -26,7 +28,7 @@ SKIP = {"manifest.json", "package.json"}  # package.json služi samo za Node tes
 UPDATE_URL = "https://abnps.github.io/video-download/firefox/updates.json"
 
 
-def firefox_manifest(chrome: dict) -> dict:
+def firefox_manifest(chrome: dict, listed: bool = False) -> dict:
     manifest = {key: value for key, value in chrome.items() if key not in ("key", "minimum_chrome_version")}
     background = dict(chrome.get("background") or {})
     background.pop("service_worker", None)
@@ -40,19 +42,23 @@ def firefox_manifest(chrome: dict) -> dict:
         # Dodatak ništa ne šalje autoru: linkovi idu samo programu na istom računaru.
         "data_collection_permissions": {"required": ["none"]},
     }, "gecko_android": {"strict_min_version": FIREFOX_ANDROID_MIN_VERSION}}
+    if listed:
+        # AMO katalog ne prima update_url: nove verzije listanog dodatka dijeli Mozilla.
+        del manifest["browser_specific_settings"]["gecko"]["update_url"]
     return manifest
 
 
-def build(out_dir: Path | None = None) -> Path:
+def build(out_dir: Path | None = None, listed: bool = False) -> Path:
     chrome = json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))
-    manifest = firefox_manifest(chrome)
+    manifest = firefox_manifest(chrome, listed)
     sibling = Path(__file__).resolve().parent.parent.parent / "Build"  # isti izbor foldera kao build_release.py
     root = os.environ.get("VIDEODL_BUILD_DIR") or (
         sibling if sibling.is_dir() else Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "VideoDownload-build")
     base = Path(root) / "firefox"
     out_dir = Path(out_dir or base)
     out_dir.mkdir(parents=True, exist_ok=True)
-    target = out_dir / f"video-download-firefox-{manifest['version']}.zip"
+    suffix = "-amo" if listed else ""
+    target = out_dir / f"video-download-firefox-{manifest['version']}{suffix}.zip"
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
         for path in sorted(EXTENSION.rglob("*")):
@@ -63,4 +69,4 @@ def build(out_dir: Path | None = None) -> Path:
 
 
 if __name__ == "__main__":
-    print(build())
+    print(build(listed="--listed" in sys.argv[1:]))
