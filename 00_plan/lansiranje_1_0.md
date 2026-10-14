@@ -30,9 +30,9 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 | Katalog | Može? | Napomena |
 |---|---|---|
 | winget | da | PR #445943 prošao automatske provjere, čeka moderatora |
-| AlternativeTo | da | besplatan nalog; unos programa + snimci ekrana |
+| AlternativeTo | poslano | 14.10.2026, besplatni red čekanja (može trajati dugo); alternative: yt-dlp, 4K Video Downloader |
 | Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
-| Uptodown (Windows i Android) | da | besplatan nalog programera; APK se šalje ručno |
+| Uptodown (Windows i Android) | nacrti | nalog abnpsdev; za slanje traži ≥3 snimka ekrana (Android snimci s telefona fale) |
 | Firefox AMO | poslano | 1.0.0 javno (listed) poslan na pregled 14.10.2026, adresa `video-download-abnps`; paket `build_firefox.py --listed` |
 | Edge Add-ons | da, uz rizik | besplatno; pravila o preuzimanju videa mogu odbiti dodatak |
 | Chrome Web Store | **ne sada** | jednokratno 5 $ (plaćeno) i pravila zabranjuju preuzimanje s YouTube-a |
