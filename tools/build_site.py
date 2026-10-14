@@ -539,7 +539,7 @@ def footer_html(lang: str) -> str:
     <div class="links">
       <a href="guides.html">{site_guides.HUB[lang][0]}</a><a href="changelog.html">{site_home.HOME[lang]["nav"][3]}</a>
       <a href="terms.html">{terms}</a><a href="privacy.html">{privacy}</a><a href="licenses.html">{licenses}</a>{site_impressum.footer_link(lang)}
-      <a href="{REPO}">GitHub</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>
+      <a href="{REPO}">GitHub</a><a href="{site_home.DISCORD_URL}">Discord</a><a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>
     </div>
   </div>
 </footer>"""

@@ -415,6 +415,17 @@ HOME = {
 }
 
 
+# Discord zajednica (Ahmed 14.10.2026): trajna pozivnica; obična veza i tekstualno dugme, bez tuđeg logotipa i koda.
+DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
+DISCORD_TEXT = {
+    "en": ("Questions in your language? Ask the community on Discord.", "Join our Discord"),
+    "bs": ("Pitanje na svom jeziku? Pitaj zajednicu na Discordu.", "Pridruži se našem Discordu"),
+    "de": ("Fragen in deiner Sprache? Frag die Community auf Discord.", "Tritt unserem Discord bei"),
+    "es": ("¿Preguntas en tu idioma? Pregunta a la comunidad en Discord.", "Únete a nuestro Discord"),
+    "fr": ("Des questions dans votre langue ? Demandez à la communauté sur Discord.", "Rejoignez notre Discord"),
+}
+
+
 def _icon(name: str) -> str:
     return (f'<div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
             f'stroke-linecap="round" stroke-linejoin="round">{ICONS[name]}</svg></div>')
@@ -768,6 +779,8 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         <div class="kicker" data-reveal>{help_kicker}</div>
         <h2 data-reveal>{help_h2}</h2>
         <p class="sub" data-reveal>{help_sub.format(issue=issue_url)}</p>
+        <p class="sub" data-reveal>{DISCORD_TEXT[lang][0]}</p>
+        <p data-reveal><a class="btn" href="{DISCORD_URL}" rel="noopener">{DISCORD_TEXT[lang][1]}</a></p>
       </div>
       <div class="faq" data-reveal>
 {faq}
