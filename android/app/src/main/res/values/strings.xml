@@ -119,6 +119,8 @@
     </plurals>
     <string name="feedback_title">Report a problem or suggestion</string>
     <string name="feedback_sub">E-mail the author; a safe report is attached</string>
+    <string name="discord_title">Discord community</string>
+    <string name="discord_sub">Help and news in 5 languages</string>
     <string name="feedback_subject">Video Download %1$s: problem or suggestion</string>
     <string name="feedback_body">Describe what happened or what you suggest:</string>
     <string name="feedback_no_mail">No e-mail app found. The address %1$s was copied.</string>

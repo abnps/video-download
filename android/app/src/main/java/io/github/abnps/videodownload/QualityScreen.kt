@@ -114,7 +114,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                     adult = info.adult)
                 // Brzo preuzimanje jednim dodirom (kao kod sličnih aplikacija): zvuk kao MP3 ili video u
                 // izabranom kvalitetu, bez traženja dugmeta ispod. Isti posao kao glavno dugme.
-                Row(Modifier.align(Alignment.BottomEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Gore desno, jer je dolje desno trajanje videa (dugmad su ga prekrivala).
+                Row(Modifier.align(Alignment.TopEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio),
                         enabled = !blockedByParental) { start(true, true) }
                     QuickButton(R.drawable.ic_videocam, stringResource(R.string.quick_video),

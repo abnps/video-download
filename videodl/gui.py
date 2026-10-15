@@ -44,7 +44,7 @@ from . import updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
-    AUDIO_EXTENSIONS, BROWSERS, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
+    AUDIO_EXTENSIONS, BROWSERS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
     SupportDialog, WhatsNewDialog, browser_exe, filter_history,
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
@@ -373,6 +373,7 @@ class MainWindow(QMainWindow):
         self.browser_help_action = self.help_menu.addAction("", self._show_browser_help)
         self.report_action = self.help_menu.addAction("", self._save_report)
         self.feedback_action = self.help_menu.addAction("", self._send_feedback)
+        self.discord_action = self.help_menu.addAction("", lambda: QDesktopServices.openUrl(QUrl(DISCORD_URL)))
         self.legal_action = self.help_menu.addAction("", self._show_legal)
         self.support_action = self.help_menu.addAction("", lambda: self.show_support_dialog(automatic=False))
         self.about_action = self.help_menu.addAction("", self._show_about)
@@ -433,6 +434,7 @@ class MainWindow(QMainWindow):
         self.browser_help_action.setText(tr("menu.browser_help"))
         self.report_action.setText(tr("menu.report"))
         self.feedback_action.setText(tr("menu.feedback"))
+        self.discord_action.setText(tr("menu.discord"))
         self.legal_action.setText(tr("menu.legal"))
         self.support_action.setText(tr("menu.support"))
         self.support_link.setText(f'<a href="support" style="color:{theme.c('support_link')};text-decoration:none">{tr("support.link")}</a>')

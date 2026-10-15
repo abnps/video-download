@@ -152,6 +152,9 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             GroupRow(OneUi.Orange, R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
                 onClick = onFeedback)
             GroupDivider()
+            GroupRow(OneUi.Purple, R.drawable.ic_share, stringResource(R.string.discord_title), stringResource(R.string.discord_sub),
+                onClick = { onOpenLink(Links.DISCORD) })
+            GroupDivider()
             GroupRow(OneUi.Green, R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
                 onClick = onInvite)
             GroupDivider()

@@ -207,6 +207,8 @@ def filter_history(entries, text: str = "", kind: str = "all") -> list:
     return result
 
 SITE_URL = "https://abnps.github.io/video-download/"
+# Discord zajednica (trajna pozivnica, ista kao na sajtu); otvara se samo u browseru na klik.
+DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
 
 # Stranica dodataka u browseru; otvara se pokretanjem browsera s tom adresom.
 BROWSERS = (("msedge.exe", "edge://extensions", "help.open_edge"),

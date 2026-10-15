@@ -13,6 +13,7 @@ Program ne šalje autoru nikakve podatke, statistiku korištenja ni izvještaje 
 - Sa PyPI-jem (pypi.org, files.pythonhosted.org): provjera i preuzimanje čitača sajtova yt-dlp, najviše jednom dnevno.
 - Sa SponsorBlockom (sponsor.ajay.app) samo ako na računaru uključiš „YouTube: izreži reklame sponzora“ u Postavkama: za svaki YouTube video program šalje samo prva 4 znaka šifrovanog (SHA-256) ID-a videa, pa servis ne zna koji video preuzimaš.
 - Sa PayPal-om, Stripeom (kartica, Apple Pay, Google Pay) ili Ko-fijem samo ako klikneš „Podrži projekat“ ili neki od tih linkova: stranica za prilog otvara se u tvom browseru, a program pri tome ništa ne šalje.
+- Discord samo ako klikneš Pomoć → Discord zajednica: server se otvara u tvom browseru ili Discord aplikaciji, a program pri tome ništa ne šalje.
 Tim servisima su vidljivi tvoja IP adresa i verzija programa; za njih važe njihove politike privatnosti.
 
 3. Šta se čuva na tvom uređaju

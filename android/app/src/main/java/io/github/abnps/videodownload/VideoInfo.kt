@@ -58,6 +58,7 @@ object Links {
     const val KOFI = "https://ko-fi.com/abnps"
     const val CARD = "https://buy.stripe.com/14A4gA9GnfcSgjVdAV8Vi00" // Stripe: kartica, Apple Pay, Google Pay
     // Javni kontakt projekta (isti kao na sajtu i u programu za računar); lični e-mail nikad.
+    const val DISCORD = "https://discord.gg/xZ7JNKSaKb" // zajednica; ista trajna pozivnica kao na sajtu
     const val CONTACT_EMAIL = "abnpsdev@gmail.com"
     private const val SITE = "https://abnps.github.io/video-download/"
 
