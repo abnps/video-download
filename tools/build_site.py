@@ -49,7 +49,7 @@ ANDROID_TEXT = {
            "The app isn't in Google Play, so the first install takes a few extra taps:",
            ("Open the downloaded file (Downloads or the browser's download list).",
             "If Android asks, allow installing apps from your browser: <b>Settings → Allow from this source</b>.",
-            "On Samsung phones, turn off <b>Auto Blocker</b> for the install (Settings → Security and privacy).",
+            "On Samsung phones, turn off <b>Auto Blocker</b> only for the install (Settings → Security and privacy) and turn it back on afterwards.",
             "If Google Play Protect warns about an unknown app, tap <b>More details → Install anyway</b>.",
             "Later versions install from the app itself: <b>Settings → Check for updates</b>.")),
     "bs": ("<b>Novo: Video Download za Android.</b> Za telefone s Androidom 10 ili novijim. Podijeli video iz bilo koje "
@@ -59,7 +59,7 @@ ANDROID_TEXT = {
            "Aplikacija nije na Google Playu, pa prva instalacija traži par tapova više:",
            ("Otvori preuzeti fajl (Preuzimanja ili lista preuzimanja u pregledniku).",
             "Ako Android pita, dozvoli instalaciju iz preglednika: <b>Podešavanja → Dozvoli iz ovog izvora</b>.",
-            "Na Samsung telefonima za instalaciju isključi <b>Auto Blocker</b> (Podešavanja → Sigurnost i privatnost).",
+            "Na Samsung telefonima <b>Auto Blocker</b> isključi samo za instalaciju (Podešavanja → Sigurnost i privatnost), a poslije ga ponovo uključi.",
             "Ako Google Play Protect upozori na nepoznatu aplikaciju, tapni <b>Više detalja → Ipak instaliraj</b>.",
             "Nove verzije se instaliraju iz same aplikacije: <b>Postavke → Provjeri ažuriranje</b>.")),
     "de": ("<b>Neu: Video Download für Android.</b> Für Handys mit Android 10 oder neuer. Teile ein Video aus einer "
@@ -69,7 +69,7 @@ ANDROID_TEXT = {
            "Die App ist nicht bei Google Play, daher braucht die erste Installation ein paar Fingertipps mehr:",
            ("Öffne die heruntergeladene Datei (Downloads oder Downloadliste des Browsers).",
             "Wenn Android fragt, erlaube Installationen aus deinem Browser: <b>Einstellungen → Von dieser Quelle zulassen</b>.",
-            "Auf Samsung-Handys für die Installation den <b>Auto Blocker</b> ausschalten (Einstellungen → Sicherheit und Datenschutz).",
+            "Auf Samsung-Handys den <b>Auto Blocker</b> nur für die Installation ausschalten (Einstellungen → Sicherheit und Datenschutz) und danach wieder einschalten.",
             "Wenn Google Play Protect vor einer unbekannten App warnt, tippe auf <b>Weitere Details → Trotzdem installieren</b>.",
             "Neue Versionen installierst du direkt in der App: <b>Einstellungen → Nach Updates suchen</b>.")),
     "es": ("<b>Novedad: Video Download para Android.</b> Para móviles con Android 10 o posterior. Comparte un vídeo "
@@ -79,7 +79,7 @@ ANDROID_TEXT = {
            "La app no está en Google Play, así que la primera instalación requiere unos toques más:",
            ("Abre el archivo descargado (Descargas o la lista de descargas del navegador).",
             "Si Android lo pide, permite instalar apps desde tu navegador: <b>Ajustes → Permitir de esta fuente</b>.",
-            "En móviles Samsung, desactiva <b>Auto Blocker</b> para la instalación (Ajustes → Seguridad y privacidad).",
+            "En móviles Samsung, desactiva <b>Auto Blocker</b> solo para la instalación (Ajustes → Seguridad y privacidad) y vuelve a activarlo después.",
             "Si Google Play Protect avisa de una app desconocida, pulsa <b>Más detalles → Instalar de todas formas</b>.",
             "Las nuevas versiones se instalan desde la propia app: <b>Ajustes → Buscar actualizaciones</b>.")),
     "fr": ("<b>Nouveau : Video Download pour Android.</b> Pour les téléphones sous Android 10 ou plus récent. Partagez "
@@ -89,7 +89,7 @@ ANDROID_TEXT = {
            "L'application n'est pas sur Google Play, la première installation demande donc quelques touches de plus :",
            ("Ouvrez le fichier téléchargé (Téléchargements ou la liste des téléchargements du navigateur).",
             "Si Android le demande, autorisez l'installation depuis votre navigateur : <b>Paramètres → Autoriser cette source</b>.",
-            "Sur les téléphones Samsung, désactivez <b>Auto Blocker</b> pour l'installation (Paramètres → Sécurité et confidentialité).",
+            "Sur les téléphones Samsung, désactivez <b>Auto Blocker</b> seulement pour l'installation (Paramètres → Sécurité et confidentialité), puis réactivez-le.",
             "Si Google Play Protect signale une application inconnue, touchez <b>Plus de détails → Installer quand même</b>.",
             "Les nouvelles versions s'installent depuis l'application : <b>Réglages → Rechercher des mises à jour</b>.")),
 }
