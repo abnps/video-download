@@ -319,6 +319,15 @@ Dopuna (Ahmed 5.10.2026): bez reklama; savjetnik trenutno nije moguć → Toolki
 (ne-trgovac). U Play aplikaciji NEMA PayPal/Ko-fi/Stripe dugmadi (Play traži Googleovo plaćanje i za napojnice);
 dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repoa).
 
+## Sakuplja se za 1.0.1 (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
+
+Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a 1.0.1 se objavljuje tek na Ahmedovo „objavi".
+Dosad (sve pushano, nije objavljeno korisnicima):
+- Program: Pomoć → „Discord zajednica" (`DISCORD_URL` u `videodl/dialogs.py`, ista pozivnica kao na sajtu).
+- Android: Postavke → „Discord zajednica"; na ekranu kvaliteta brza dugmad ♪/🎥 gore desno (prekrivala trajanje).
+- Politika privatnosti (program + sajt): rečenica o Discordu (otvara se samo na klik, program ništa ne šalje).
+- Firefox: `tools/build_firefox.py --listed` pravi AMO paket bez `update_url`.
+
 ## Izdanje 1.0.0 (objavljeno 8.10.2026, Ahmed: „objavi" → 1.0.0)
 
 - Program, Android i dodatak 1.0.0 istog dana; stranica „Video Download 1.0" (`version-1.html`) uključena sama.
