@@ -330,6 +330,9 @@ Dosad (sve pushano, nije objavljeno korisnicima):
 - Brže pokretanje: yt-dlp se aktivira i uvozi u pozadini (`ytdlp_update.start_background()` u `launch.py`).
   PRAVILO: nijedan modul ne uvozi yt-dlp na vrhu fajla; ko ga treba, uvozi ga u funkciji POSLIJE
   `ytdlp_update.ensure_ready()` (inače pobjedi aktivaciju preuzete verzije). Test: `tests/test_startup.py`.
+- Manji instaler (provjereno 15.10.2026): „shared" ffmpeg (gyan full_build-shared) NIJE manji — komprimovano
+  65,6 MB naspram 56,7 MB za statički essentials, a instaler već koristi SolidCompression (ffmpeg i ffprobe se
+  sažmu zajedno). Ostaje essentials. Stvarna ušteda tek uz vlastiti uži ffmpeg build — ne isplati se sada.
 
 ## Izdanje 1.0.0 (objavljeno 8.10.2026, Ahmed: „objavi" → 1.0.0)
 
