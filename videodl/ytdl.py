@@ -139,6 +139,9 @@ def is_network_error(message: str) -> bool:
 
 
 def error_message(exc: BaseException) -> str:
+    from .ytdlp_update import ensure_ready
+
+    ensure_ready()
     from yt_dlp.utils import UnsupportedError
 
     from .i18n import MESSAGE_DRM, MESSAGE_LIVE, MESSAGE_NOT_MEDIA

@@ -327,6 +327,9 @@ Dosad (sve pushano, nije objavljeno korisnicima):
 - Android: Postavke → „Discord zajednica"; na ekranu kvaliteta brza dugmad ♪/🎥 gore desno (prekrivala trajanje).
 - Politika privatnosti (program + sajt): rečenica o Discordu (otvara se samo na klik, program ništa ne šalje).
 - Firefox: `tools/build_firefox.py --listed` pravi AMO paket bez `update_url`.
+- Brže pokretanje: yt-dlp se aktivira i uvozi u pozadini (`ytdlp_update.start_background()` u `launch.py`).
+  PRAVILO: nijedan modul ne uvozi yt-dlp na vrhu fajla; ko ga treba, uvozi ga u funkciji POSLIJE
+  `ytdlp_update.ensure_ready()` (inače pobjedi aktivaciju preuzete verzije). Test: `tests/test_startup.py`.
 
 ## Izdanje 1.0.0 (objavljeno 8.10.2026, Ahmed: „objavi" → 1.0.0)
 

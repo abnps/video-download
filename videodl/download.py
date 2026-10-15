@@ -11,27 +11,41 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from yt_dlp import YoutubeDL
-from yt_dlp.postprocessor import FFmpegExtractAudioPP, FFmpegMergerPP, PostProcessor
-from yt_dlp.utils import DownloadCancelled
-
 from .browser import Cookie, cookie_file
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
 from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS
 from .ytdl import YdlLogger, error_message
+from .ytdlp_update import ensure_ready
 
 DOWNLOADING = "downloading"
 SUBTITLE_ERROR = "Unable to download video subtitles"
 PROCESSING = "processing"
 
+# yt-dlp se uvozi tek pri prvom preuzimanju (_load), da pokretanje programa ne čeka njegov uvoz.
+# Testovi mogu YoutubeDL zamijeniti svojom klasom.
+YoutubeDL = DownloadCancelled = PostProcessor = None
+
 # Duži ffmpeg koraci; prije njihovog početka prekid još ne ostavlja polovičan izlaz.
-# Ključ uzimamo iz klase jer yt-dlp skraćuje ime (FFmpegMergerPP -> "Merger").
+# Ključ uzimamo iz klase jer yt-dlp skraćuje ime (FFmpegMergerPP -> "Merger"); puni ga _load.
 # Oznake su ključevi prevoda (i18n); prevode se tek pri prikazu u glavnoj niti.
-_PP_LABELS = {
-    FFmpegMergerPP.pp_key(): "pp.merge",
-    FFmpegExtractAudioPP.pp_key(): "pp.extract_audio",
-}
+_PP_LABELS: dict[str, str] = {}
+
+
+def _load() -> None:
+    global YoutubeDL, DownloadCancelled, PostProcessor
+    if PostProcessor is not None and YoutubeDL is not None:
+        return
+    ensure_ready()
+    from yt_dlp import YoutubeDL as ydl
+    from yt_dlp.postprocessor import FFmpegExtractAudioPP, FFmpegMergerPP, PostProcessor as base
+    from yt_dlp.utils import DownloadCancelled as cancelled
+
+    if YoutubeDL is None:
+        YoutubeDL = ydl
+    DownloadCancelled = cancelled
+    _PP_LABELS.update({FFmpegMergerPP.pp_key(): "pp.merge", FFmpegExtractAudioPP.pp_key(): "pp.extract_audio"})
+    PostProcessor = base
 
 
 @dataclass(frozen=True)
@@ -117,16 +131,35 @@ def _part_label(info: dict) -> str:
     return ""
 
 
-class _PartsRecorderPP(PostProcessor):
-    """Prije preuzimanja javlja koji se dijelovi (formati) preuzimaju."""
+_parts_recorder_class = None
 
-    def __init__(self, on_info: Callable[[dict], None]):
-        super().__init__()
-        self._on_info = on_info
 
-    def run(self, information):
-        self._on_info(information)
-        return [], information
+def _parts_recorder():
+    """Klasa se pravi tek kad je yt-dlp uvezen (nasljeđuje njegov PostProcessor)."""
+    global _parts_recorder_class
+    if _parts_recorder_class is None:
+        _load()
+
+        class _PartsRecorderPP(PostProcessor):
+            """Prije preuzimanja javlja koji se dijelovi (formati) preuzimaju."""
+
+            def __init__(self, on_info: Callable[[dict], None]):
+                super().__init__()
+                self._on_info = on_info
+
+            def run(self, information):
+                self._on_info(information)
+                return [], information
+
+        _parts_recorder_class = _PartsRecorderPP
+    return _parts_recorder_class
+
+
+def __getattr__(name: str):
+    # `from videodl.download import _PartsRecorderPP` (testovi) dobija istu, kasno napravljenu klasu.
+    if name == "_PartsRecorderPP":
+        return _parts_recorder()
+    raise AttributeError(name)
 
 
 class _Attempt:
@@ -158,7 +191,8 @@ class _Attempt:
 
     def postprocessor_hook(self, d: dict) -> None:
         key = d.get("postprocessor")
-        if d.get("status") != "started" or key == _PartsRecorderPP.pp_key():
+        _load()
+        if d.get("status") != "started" or key == _parts_recorder().pp_key():
             return
         if key in _PP_LABELS:
             self._check_cancel()
@@ -175,6 +209,7 @@ class _Attempt:
 
     def _check_cancel(self) -> None:
         if self._cancel.is_set():
+            _load()
             raise DownloadCancelled()
 
     def _emit(self, progress: Progress, force: bool = False) -> None:
@@ -219,6 +254,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                                chapters=chapters, sponsorblock=sponsorblock, ratelimit=ratelimit,
                                name_template=name_template)
 
+    _load()  # prije try: except-grane ispod trebaju yt-dlp-ove klase
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     no_subtitles = False
     try:
@@ -237,7 +273,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                 opts["progress_hooks"].append(lambda _d: opts.__setitem__("ratelimit", live.budget.share()))
             opts["postprocessor_hooks"] = [attempt.postprocessor_hook]
             with YoutubeDL(opts) as ydl:
-                ydl.add_post_processor(_PartsRecorderPP(attempt.record_parts), when="before_dl")
+                ydl.add_post_processor(_parts_recorder()(attempt.record_parts), when="before_dl")
                 if subtitles and not preset.is_audio:
                     # Prvo se pročita koje titlove video ima, pa se uzme najviše jedan po jeziku
                     # (inače bi automatski prevodi dali po titl za svaki traženi jezik).

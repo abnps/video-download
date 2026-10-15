@@ -7,10 +7,18 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
-from yt_dlp.utils import download_range_func, sanitize_filename
-
 from .i18n import tr
 from .ytdl import base_options, reject_live
+from .ytdlp_update import ensure_ready
+
+
+def _ytdlp_utils():
+    """yt-dlp se uvozi tek kad zatreba, da pokretanje programa ne čeka njegov uvoz."""
+    ensure_ready()
+    from yt_dlp import utils
+
+    return utils
+
 
 # .150B ograničava naslov na 150 bajtova da putanja ne pređe Windows limit.
 OUTPUT_NAME = "%(title).150B [%(id)s].%(ext)s"
@@ -73,7 +81,7 @@ def get_preset(key: str) -> Preset:
 
 
 def safe_folder_name(name: str, fallback: str = "Plejlista") -> str:
-    cleaned = sanitize_filename(name or "").strip().rstrip(". ")
+    cleaned = _ytdlp_utils().sanitize_filename(name or "").strip().rstrip(". ")
     return cleaned[:80].rstrip(". ") or fallback
 
 
@@ -210,7 +218,7 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         opts["postprocessors"] = postprocessors
     if section:
         # Samo dio videa; rezovi na tačnom mjestu traže ponovno kodiranje oko ključnih kadrova.
-        opts["download_ranges"] = download_range_func(None, [section])
+        opts["download_ranges"] = _ytdlp_utils().download_range_func(None, [section])
         opts["force_keyframes_at_cuts"] = True
     if ratelimit:
         opts["ratelimit"] = int(ratelimit)
@@ -275,13 +283,13 @@ def title_identity(title: str) -> str:
     """Naslov onako kako završi u imenu fajla (%(title).150B: prvih 150 bajtova, pa čišćenje znakova),
     bez razlike u velikim i malim slovima (Windows ih ne razlikuje). Isti rezultat = isto ime fajla."""
     cut = (title or "").encode("utf-8")[:150].decode("utf-8", errors="ignore")
-    return sanitize_filename(cut).strip().casefold()
+    return _ytdlp_utils().sanitize_filename(cut).strip().casefold()
 
 
 def direct_output_name(filename_title: str, source_url: str | None) -> str:
     """Ime fajla za direktan tok (npr. index.m3u8): nema smislen naslov ni id, pa ime daje naslov
     stranice, a otisak toka razlikuje različite videe istog naslova."""
-    title = sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"
+    title = _ytdlp_utils().sanitize_filename(filename_title).strip()[:120].rstrip(". ") or "Video"
     return f"{_escape(title)} [{stream_fingerprint(source_url)}].%(ext)s"
 
 

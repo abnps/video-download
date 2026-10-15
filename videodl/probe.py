@@ -4,10 +4,23 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-from yt_dlp import YoutubeDL
-
 from .browser import Cookie, cookie_file
 from .ytdl import LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media
+from .ytdlp_update import ensure_ready
+
+# yt-dlp se uvozi tek pri prvom čitanju linka (_ydl), da pokretanje programa ne čeka. Testovi mogu ovo
+# ime zamijeniti svojom klasom; tada se pravi yt-dlp ne uvozi.
+YoutubeDL = None
+
+
+def _ydl():
+    global YoutubeDL
+    if YoutubeDL is None:
+        ensure_ready()
+        from yt_dlp import YoutubeDL as cls
+
+        YoutubeDL = cls
+    return YoutubeDL
 
 # Kanal -> tabovi (Videos, Shorts...) -> videi: dva nivoa ugnježdavanja su dovoljna.
 MAX_NESTING = 2
@@ -142,7 +155,7 @@ def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[
         with cookie_file(cookies) as cookiefile:
             if cookiefile:
                 opts["cookiefile"] = cookiefile
-            with YoutubeDL(opts) as ydl:
+            with _ydl()(opts) as ydl:
                 return ydl.extract_info(url, download=False)
 
     return extract

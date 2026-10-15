@@ -1932,6 +1932,7 @@ def self_test(report_path: str) -> int:
     import importlib.util
     import json
 
+    ytdlp_update.ensure_ready()  # pozadinska aktivacija preuzetog yt-dlp-a mora završiti prije uvoza
     import yt_dlp
 
     checks = {

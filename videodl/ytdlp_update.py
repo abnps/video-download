@@ -69,6 +69,41 @@ def installed_versions() -> list[str]:
     return sorted(found, key=parse_version, reverse=True)
 
 
+_ready = threading.Event()
+_start_lock = threading.Lock()
+_started = False
+
+
+def start_background() -> None:
+    """Aktivira preuzeti yt-dlp i uvozi ga u pozadinskoj niti, da prozor ne čeka (0,5–3 s pri pokretanju).
+
+    Zove se samo pri pravom pokretanju programa, PRIJE nego bilo šta drugo uveze yt-dlp. Ko god ga poslije
+    treba, prvo zove `ensure_ready()`.
+    """
+    global _started
+    with _start_lock:
+        if _started:
+            return
+        _started = True
+    threading.Thread(target=_warm_up, name="yt-dlp-start", daemon=True).start()
+
+
+def _warm_up() -> None:
+    try:
+        activate()
+        import yt_dlp  # noqa: F401 - uvoz unaprijed; prvo preuzimanje ga onda ne čeka
+    except Exception:  # noqa: BLE001 - greška se ponovi i prijavi pri pravoj upotrebi
+        pass
+    finally:
+        _ready.set()
+
+
+def ensure_ready() -> None:
+    """Čeka pozadinsko učitavanje yt-dlp-a ako je pokrenuto (testovi i browser host ga ne pokreću)."""
+    if _started:
+        _ready.wait()
+
+
 def activate() -> str | None:
     """Stavlja preuzeti yt-dlp ispred onog iz paketa. Zove se PRIJE prvog `import yt_dlp`.
 
