@@ -49,6 +49,13 @@
     <string name="done_label">Fertig</string>
     <string name="share">Teilen</string>
     <string name="remove_from_list">Aus der Liste entfernen</string>
+    <string name="delete_from_device">Vom Gerät löschen</string>
+    <string name="delete_title">Vom Gerät löschen?</string>
+    <string name="delete_text">„%1$s“ wird vom Handy gelöscht. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_yes">Löschen</string>
+    <string name="delete_keep">Behalten</string>
+    <string name="deleted">Vom Gerät gelöscht</string>
+    <string name="delete_failed">Datei konnte nicht gelöscht werden</string>
     <string name="today">Heute</string>
     <string name="earlier">Früher</string>
     <string name="no_active">Gerade wird nichts geladen.</string>

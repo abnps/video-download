@@ -325,6 +325,9 @@ Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a 1.0.1 se objavljuje 
 Dosad (sve pushano, nije objavljeno korisnicima):
 - Program: Pomoć → „Discord zajednica" (`DISCORD_URL` u `videodl/dialogs.py`, ista pozivnica kao na sajtu).
 - Android: Postavke → „Discord zajednica"; na ekranu kvaliteta brza dugmad ♪/🎥 gore desno (prekrivala trajanje).
+- Android: meni gotovog preuzimanja (⋮) → „Izbriši s uređaja" (crveno, uz potvrdu): briše fajl preko MediaStore-a i
+  stavku s liste; fajl iz ranije instalacije Android briše tek uz sistemsku potvrdu (`createDeleteRequest`).
+  Kompajlirano i lint OK 17.10.2026; NIJE još probano na telefonu.
 - Politika privatnosti (program + sajt): rečenica o Discordu (otvara se samo na klik, program ništa ne šalje).
 - Firefox: `tools/build_firefox.py --listed` pravi AMO paket bez `update_url`.
 - Brže pokretanje: yt-dlp se aktivira i uvozi u pozadini (`ytdlp_update.start_background()` u `launch.py`).

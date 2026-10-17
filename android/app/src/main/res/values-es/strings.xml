@@ -49,6 +49,13 @@
     <string name="done_label">Terminado</string>
     <string name="share">Compartir</string>
     <string name="remove_from_list">Quitar de la lista</string>
+    <string name="delete_from_device">Eliminar del dispositivo</string>
+    <string name="delete_title">¿Eliminar del dispositivo?</string>
+    <string name="delete_text">«%1$s» se eliminará del teléfono. No se puede deshacer.</string>
+    <string name="delete_yes">Eliminar</string>
+    <string name="delete_keep">Conservar</string>
+    <string name="deleted">Eliminado del dispositivo</string>
+    <string name="delete_failed">No se pudo eliminar el archivo</string>
     <string name="today">Hoy</string>
     <string name="earlier">Antes</string>
     <string name="no_active">No se está descargando nada.</string>

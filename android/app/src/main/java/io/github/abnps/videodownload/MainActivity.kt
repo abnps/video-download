@@ -1,6 +1,7 @@
 package io.github.abnps.videodownload
 
 import android.Manifest
+import android.app.RecoverableSecurityException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -8,11 +9,14 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings as SystemSettings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -223,6 +227,7 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent.createChooser(send, null))
         },
         remove = { item -> History.remove(item.id) }, // uklanja samo s liste; fajl ostaje u folderu
+        delete = { item -> deleteFromDevice(item) },
         retry = { item ->
             // Isti link ponovo kroz Početnu (svjež izbor kvaliteta); stara crvena kartica nestaje.
             History.remove(item.id)
@@ -239,6 +244,48 @@ class MainActivity : ComponentActivity() {
         },
         copyReport = { copyReport() },
     )
+
+    // Fajl koji aplikacija više ne „posjeduje" (npr. poslije ponovne instalacije) Android briše tek uz svoju potvrdu.
+    private var pendingDelete: HistoryItem? = null
+    private val deleteRequest = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        val item = pendingDelete ?: return@registerForActivityResult
+        pendingDelete = null
+        if (result.resultCode == RESULT_OK) deleted(item)
+    }
+
+    /** Briše fajl s uređaja (MediaStore) i stavku s liste. Fajl kojeg više nema samo nestaje s liste. */
+    private fun deleteFromDevice(item: HistoryItem) {
+        val uri = Uri.parse(item.uri)
+        lifecycleScope.launch {
+            val outcome = withContext(Dispatchers.IO) {
+                try {
+                    contentResolver.delete(uri, null, null)
+                    null
+                } catch (error: SecurityException) {
+                    error
+                } catch (_: Exception) {
+                    null // fajl je već obrisan ili nedostupan: dovoljno ga je skloniti s liste
+                }
+            }
+            if (outcome == null) { deleted(item); return@launch }
+            val sender = when {
+                Build.VERSION.SDK_INT >= 30 -> MediaStore.createDeleteRequest(contentResolver, listOf(uri)).intentSender
+                outcome is RecoverableSecurityException -> outcome.userAction.actionIntent.intentSender
+                else -> null
+            }
+            if (sender == null) {
+                Toast.makeText(this@MainActivity, R.string.delete_failed, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            pendingDelete = item
+            deleteRequest.launch(IntentSenderRequest.Builder(sender).build())
+        }
+    }
+
+    private fun deleted(item: HistoryItem) {
+        History.remove(item.id)
+        Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT).show()
+    }
 
     /** „Pozovi prijatelja": šalje samu aplikaciju (kopija instaliranog APK-a) uz kratku poruku, preko menija Podijeli. */
     private suspend fun invite() {

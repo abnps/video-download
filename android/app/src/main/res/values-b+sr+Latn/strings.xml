@@ -49,6 +49,13 @@
     <string name="done_label">Završeno</string>
     <string name="share">Podijeli</string>
     <string name="remove_from_list">Ukloni s liste</string>
+    <string name="delete_from_device">Izbriši sa uređaja</string>
+    <string name="delete_title">Izbrisati sa uređaja?</string>
+    <string name="delete_text">„%1$s“ će biti izbrisan sa telefona. Ovo se ne može poništiti.</string>
+    <string name="delete_yes">Izbriši</string>
+    <string name="delete_keep">Zadrži</string>
+    <string name="deleted">Izbrisano sa uređaja</string>
+    <string name="delete_failed">Fajl nije moguće izbrisati</string>
     <string name="today">Danas</string>
     <string name="earlier">Ranije</string>
     <string name="no_active">Ništa se trenutno ne preuzima.</string>

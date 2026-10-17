@@ -49,6 +49,13 @@
     <string name="done_label">Terminé</string>
     <string name="share">Partager</string>
     <string name="remove_from_list">Retirer de la liste</string>
+    <string name="delete_from_device">Supprimer de l\'appareil</string>
+    <string name="delete_title">Supprimer de l\'appareil ?</string>
+    <string name="delete_text">« %1$s » sera supprimé du téléphone. Cette action est irréversible.</string>
+    <string name="delete_yes">Supprimer</string>
+    <string name="delete_keep">Conserver</string>
+    <string name="deleted">Supprimé de l\'appareil</string>
+    <string name="delete_failed">Impossible de supprimer le fichier</string>
     <string name="today">Aujourd\'hui</string>
     <string name="earlier">Plus tôt</string>
     <string name="no_active">Aucun téléchargement en cours.</string>

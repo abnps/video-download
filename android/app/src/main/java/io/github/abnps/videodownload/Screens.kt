@@ -101,6 +101,7 @@ fun CardBox(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, conten
 @Composable
 internal fun ItemMenu(item: HistoryItem, actions: ItemActions) {
     var open by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) { AppIcon(R.drawable.ic_more) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
@@ -113,13 +114,32 @@ internal fun ItemMenu(item: HistoryItem, actions: ItemActions) {
             }
             DropdownMenuItem(text = { Text(stringResource(R.string.remove_from_list)) },
                 onClick = { open = false; actions.remove(item) })
+            // Ahmed 17.10.2026: i fajl s telefona, ne samo s liste. Crveno i uz potvrdu, jer se ne može vratiti.
+            if (!item.failed) {
+                DropdownMenuItem(text = { Text(stringResource(R.string.delete_from_device), color = MaterialTheme.colorScheme.error) },
+                    onClick = { open = false; confirmDelete = true })
+            }
         }
+    }
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.delete_title)) },
+            text = { Text(stringResource(R.string.delete_text, item.title)) },
+            confirmButton = {
+                TextButton(onClick = { confirmDelete = false; actions.delete(item) }) {
+                    Text(stringResource(R.string.delete_yes), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.delete_keep)) } },
+        )
     }
 }
 
 /** Šta se može uraditi s gotovim fajlom (ekran Početna i Preuzimanja). */
 class ItemActions(
     val open: (HistoryItem) -> Unit, val share: (HistoryItem) -> Unit, val remove: (HistoryItem) -> Unit,
+    val delete: (HistoryItem) -> Unit = {}, // briše fajl s uređaja i stavku s liste
     // Za neuspjela preuzimanja:
     val retry: (HistoryItem) -> Unit = {}, val copyLink: (HistoryItem) -> Unit = {}, val copyReport: () -> Unit = {},
 )

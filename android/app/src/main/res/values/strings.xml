@@ -50,6 +50,13 @@
     <string name="done_label">Finished</string>
     <string name="share">Share</string>
     <string name="remove_from_list">Remove from list</string>
+    <string name="delete_from_device">Delete from device</string>
+    <string name="delete_title">Delete from device?</string>
+    <string name="delete_text">“%1$s” will be deleted from your phone. This cannot be undone.</string>
+    <string name="delete_yes">Delete</string>
+    <string name="delete_keep">Keep</string>
+    <string name="deleted">Deleted from device</string>
+    <string name="delete_failed">Could not delete the file</string>
     <string name="today">Today</string>
     <string name="earlier">Earlier</string>
     <string name="no_active">Nothing is downloading right now.</string>
