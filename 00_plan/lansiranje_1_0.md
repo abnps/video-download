@@ -29,7 +29,7 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 
 | Katalog | Može? | Napomena |
 |---|---|---|
-| winget | da | PR #445943 prošao automatske provjere, čeka moderatora |
+| winget | da | PR #445943 ažuriran 17.10.2026 s 0.9.7 na 1.0.0 (isti ProductCode, `winget validate` OK); čeka ponovnu automatsku provjeru i moderatora |
 | AlternativeTo | poslano | 14.10.2026, besplatni red čekanja (može trajati dugo); alternative: yt-dlp, 4K Video Downloader |
 | Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
 | Uptodown (Windows i Android) | poslano | Windows i Android 1.0.0 na pregledu 14.10.2026 (Android snimci: `Videos/Video Download/snimci-1.0/vd-android-*.png`) |
