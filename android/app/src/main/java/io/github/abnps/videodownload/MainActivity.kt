@@ -268,10 +268,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
             if (outcome == null) { deleted(item); return@launch }
-            val sender = when {
-                Build.VERSION.SDK_INT >= 30 -> MediaStore.createDeleteRequest(contentResolver, listOf(uri)).intentSender
-                outcome is RecoverableSecurityException -> outcome.userAction.actionIntent.intentSender
-                else -> null
+            val sender = try {
+                when {
+                    Build.VERSION.SDK_INT >= 30 -> MediaStore.createDeleteRequest(contentResolver, listOf(uri)).intentSender
+                    outcome is RecoverableSecurityException -> outcome.userAction.actionIntent.intentSender
+                    else -> null
+                }
+            } catch (_: IllegalArgumentException) {
+                // „Invalid Uri": fajla više nema (obrisan u Galeriji i sl.), pa ga samo skloni s liste.
+                // Prije se tu aplikacija rušila (S26 Ultra 17.10.2026).
+                deleted(item)
+                return@launch
             }
             if (sender == null) {
                 Toast.makeText(this@MainActivity, R.string.delete_failed, Toast.LENGTH_SHORT).show()
