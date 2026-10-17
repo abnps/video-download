@@ -728,39 +728,40 @@ def extension_mock(lang: str) -> str:
 </div>"""
 
 
-# Potpisan Firefox dodatak (Mozilla, nelistan) leži na sajtu; site/firefox/updates.json vodi na isti fajl.
+# Stari nelistan dodatak ostaje na sajtu samo zbog postojećih instalacija (site/firefox/updates.json vodi na njega).
 FIREFOX_XPI = "firefox/video-download-0.5.2.xpi"
+# Od 16.10.2026 dodatak je javno na Firefox Add-ons (AMO): dugme vodi tamo, Mozilla isporučuje ažuriranja.
+FIREFOX_AMO = "https://addons.mozilla.org/firefox/addon/video-download-abnps/"
 FIREFOX_TEXT = {
     "en": ("Firefox", "Install in Firefox — no developer mode needed. The extension is signed by Mozilla and "
            "updates itself.", "Add to Firefox",
            ("Install the app first (the extension talks to it).",
-            "Open this page in Firefox 140 or newer and click <b>Add to Firefox</b>.",
-            "Firefox asks to allow the installation from this site: click <b>Continue to installation</b>, then <b>Add</b>.",
+            "In Firefox 140 or newer click <b>Add to Firefox</b> below: the official Firefox Add-ons page opens.",
+            "There click <b>Add to Firefox</b>, then <b>Add</b>.",
             "Pin the Video Download icon (puzzle icon → pin).")),
     "bs": ("Firefox", "Instalacija u Firefoxu — bez developer moda. Dodatak je potpisala Mozilla i sam se ažurira.",
            "Dodaj u Firefox",
            ("Prvo instaliraj program (dodatak radi s njim).",
-            "Otvori ovu stranicu u Firefoxu 140 ili novijem i klikni <b>Dodaj u Firefox</b>.",
-            "Firefox pita da dozvoliš instalaciju s ovog sajta: klikni <b>Continue to installation</b>, pa <b>Add</b>.",
+            "U Firefoxu 140 ili novijem klikni <b>Dodaj u Firefox</b> ispod: otvara se zvanična stranica Firefox Add-ons.",
+            "Tamo klikni <b>Add to Firefox</b> (Dodaj u Firefox), pa <b>Add</b> (Dodaj).",
             "Prikvači ikonu Video Download (ikona slagalice → pribadača).")),
     "de": ("Firefox", "Installation in Firefox – ohne Entwicklermodus. Die Erweiterung ist von Mozilla signiert und "
            "aktualisiert sich selbst.", "Zu Firefox hinzufügen",
            ("Installiere zuerst die App (die Erweiterung arbeitet mit ihr).",
-            "Öffne diese Seite in Firefox 140 oder neuer und klicke auf <b>Zu Firefox hinzufügen</b>.",
-            "Firefox fragt, ob die Installation von dieser Seite erlaubt werden soll: erlaube sie und bestätige mit "
-            "<b>Hinzufügen</b>.",
+            "Klicke in Firefox 140 oder neuer unten auf <b>Zu Firefox hinzufügen</b>: die offizielle Seite von Firefox Add-ons öffnet sich.",
+            "Klicke dort auf <b>Zu Firefox hinzufügen</b> und dann auf <b>Hinzufügen</b>.",
             "Hefte das Symbol von Video Download an (Puzzle-Symbol → Anheften).")),
     "es": ("Firefox", "Instalación en Firefox, sin modo de desarrollador. La extensión está firmada por Mozilla y se "
            "actualiza sola.", "Añadir a Firefox",
            ("Instala primero la aplicación (la extensión trabaja con ella).",
-            "Abre esta página en Firefox 140 o posterior y pulsa <b>Añadir a Firefox</b>.",
-            "Firefox pide permiso para instalar desde este sitio: permítelo y confirma con <b>Añadir</b>.",
+            "En Firefox 140 o posterior pulsa <b>Añadir a Firefox</b> abajo: se abre la página oficial de Firefox Add-ons.",
+            "Allí pulsa <b>Añadir a Firefox</b> y luego <b>Añadir</b>.",
             "Fija el icono de Video Download (icono de pieza de puzle → fijar).")),
     "fr": ("Firefox", "Installation dans Firefox, sans mode développeur. L'extension est signée par Mozilla et se met à "
            "jour toute seule.", "Ajouter à Firefox",
            ("Installez d'abord l'application (l'extension fonctionne avec elle).",
-            "Ouvrez cette page dans Firefox 140 ou plus récent et cliquez sur <b>Ajouter à Firefox</b>.",
-            "Firefox demande d'autoriser l'installation depuis ce site : autorisez-la puis confirmez avec <b>Ajouter</b>.",
+            "Dans Firefox 140 ou plus récent, cliquez sur <b>Ajouter à Firefox</b> ci-dessous : la page officielle de Firefox Add-ons s'ouvre.",
+            "Cliquez-y sur <b>Ajouter à Firefox</b>, puis sur <b>Ajouter</b>.",
             "Épinglez l'icône de Video Download (icône de pièce de puzzle → épingler).")),
 }
 
@@ -771,7 +772,7 @@ def firefox_section(lang: str) -> str:
     return f"""<div class="box">
 <h2 style="margin-top:0">{title}</h2>
 <p>{html.escape(lead)}</p>
-<p><a class="btn" href="{_up(lang)}{FIREFOX_XPI}">{html.escape(button)}</a></p>
+<p><a class="btn" href="{FIREFOX_AMO}" rel="noopener">{html.escape(button)}</a></p>
 <ol>
 {items}
 </ol>
