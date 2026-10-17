@@ -98,15 +98,20 @@ header.past-hero .btn-mini { display: inline-flex; animation: rowin .3s var(--ea
 
 /* ---------- hero s „cvjetom" (pokretni gradijenti) ---------- */
 .hero { position: relative; padding: 72px 0 40px; isolation: isolate; }
-.bloom { position: absolute; inset: -120px 0 -40px; z-index: -1; overflow: hidden; pointer-events: none; }
+.bloom { position: absolute; inset: -120px 0 -40px; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
+/* Meki krugovi su radijalni prelaz, ne filter: blur(): zamućenje velikih površina u pokretu se računalo u svakoj
+   sličici i kočilo skrol na vrhu stranice (Ahmed 17.10.2026). Prelaz se samo pomjera (transform), bez ponovnog crtanja. */
 .bloom span {
-  position: absolute; width: 58vmax; height: 58vmax; border-radius: 50%; filter: blur(70px); opacity: .55;
-  mix-blend-mode: normal; animation: drift 22s ease-in-out infinite alternate;
+  --c: var(--bloom-1);
+  position: absolute; width: 58vmax; height: 58vmax; border-radius: 50%; opacity: .55;
+  background: radial-gradient(closest-side, var(--c) 35%, color-mix(in srgb, var(--c) 70%, transparent) 62%,
+    color-mix(in srgb, var(--c) 25%, transparent) 85%, transparent);
+  will-change: transform; animation: drift 22s ease-in-out infinite alternate;
 }
-.bloom span:nth-child(1) { background: var(--bloom-1); left: -12vmax; top: -18vmax; }
-.bloom span:nth-child(2) { background: var(--bloom-2); right: -14vmax; top: -10vmax; animation-duration: 26s; animation-delay: -6s; }
-.bloom span:nth-child(3) { background: var(--bloom-3); left: 30%; top: 18vmax; width: 40vmax; height: 40vmax; animation-duration: 30s; animation-delay: -12s; opacity: .35; }
-.bloom span:nth-child(4) { background: var(--bloom-4); left: 8%; top: 22vmax; width: 34vmax; height: 34vmax; animation-duration: 24s; animation-delay: -3s; opacity: .35; }
+.bloom span:nth-child(1) { left: -12vmax; top: -18vmax; }
+.bloom span:nth-child(2) { --c: var(--bloom-2); right: -14vmax; top: -10vmax; animation-duration: 26s; animation-delay: -6s; }
+.bloom span:nth-child(3) { --c: var(--bloom-3); left: 30%; top: 18vmax; width: 40vmax; height: 40vmax; animation-duration: 30s; animation-delay: -12s; opacity: .35; }
+.bloom span:nth-child(4) { --c: var(--bloom-4); left: 8%; top: 22vmax; width: 34vmax; height: 34vmax; animation-duration: 24s; animation-delay: -3s; opacity: .35; }
 .bloom::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, var(--bg)); }
 @keyframes drift {
   0% { transform: translate3d(0, 0, 0) scale(1); }
