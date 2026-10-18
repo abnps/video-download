@@ -175,7 +175,12 @@ def apply_theme(app: QApplication) -> None:
                         (QPalette.ColorRole.ButtonText, k("text")), (QPalette.ColorRole.Highlight, "#1e88e5"),
                         (QPalette.ColorRole.HighlightedText, "#ffffff"), (QPalette.ColorRole.ToolTipBase, k("bg")),
                         (QPalette.ColorRole.ToolTipText, k("text")), (QPalette.ColorRole.Link, k("link")),
-                        (QPalette.ColorRole.PlaceholderText, k("hint"))):
+                        (QPalette.ColorRole.PlaceholderText, k("hint")),
+                        # Okviri (kvadratići, radio dugmad): bez ovih Fusion uzima boje Windowsa, pa svijetla tema na
+                        # tamnom Windowsu nije imala vidljive kvadratiće (Ahmed 19.10.2026).
+                        (QPalette.ColorRole.Light, k("light")), (QPalette.ColorRole.Midlight, k("midlight")),
+                        (QPalette.ColorRole.Mid, k("mid")), (QPalette.ColorRole.Dark, k("dark")),
+                        (QPalette.ColorRole.Shadow, k("shadow"))):
         palette.setColor(role, QColor(color))
     for role in (QPalette.ColorRole.Text, QPalette.ColorRole.WindowText, QPalette.ColorRole.ButtonText):
         palette.setColor(QPalette.ColorGroup.Disabled, role, QColor(k("hint")))

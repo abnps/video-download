@@ -15,6 +15,8 @@ LIGHT = {
     "thumb": "#2f3136", "progress_track": "#e3ecf8", "dash": "#9aa0a6", "arrow": "#7d8288",
     "download_disabled": "#a9cdf2", "support_link": "#c2185b", "alt_base": "#f5f5f5", "button": "#f3f3f3",
     "pill_bg": "#eef1f5", "pill_fg": "#3c4043", "tab_active_bg": "#e8f0fe", "tab_active_fg": "#1a73e8",
+    "light": "#ffffff", "midlight": "#ededed", "mid": "#b8b8b8", "dark": "#8f8f8f", "shadow": "#6b6b6b",
+    "check_border": "#8a8f95",
 }
 
 DARK = {
@@ -30,6 +32,8 @@ DARK = {
     "thumb": "#2f3136", "progress_track": "#33404f", "dash": "#6f7478", "arrow": "#8a8f95",
     "download_disabled": "#2c4a6b", "support_link": "#f48fb1", "alt_base": "#292a2d", "button": "#303134",
     "pill_bg": "#33363b", "pill_fg": "#c4c7cc", "tab_active_bg": "#394457", "tab_active_fg": "#8ab4f8",
+    "light": "#4a4d52", "midlight": "#3c4043", "mid": "#5f6368", "dark": "#141517", "shadow": "#000000",
+    "check_border": "#9aa0a6",
 }
 
 THEMES = ("light", "dark", "system")
@@ -57,6 +61,7 @@ def c(key: str) -> str:
 def stylesheet() -> str:
     k = _colors
     chevron = (Path(__file__).parent / "assets" / "chevron-down.svg").as_posix()
+    check = (Path(__file__).parent / "assets" / "check.svg").as_posix()
     return f"""
 QMainWindow, QWidget#central, QScrollArea, QWidget#rows, QWidget#dropZone {{ background: {k['bg']}; }}
 QMenuBar {{ background: {k['bg']}; border-bottom: 1px solid {k['border']}; padding: 2px 4px; }}
@@ -86,6 +91,12 @@ QComboBox#presetCombo::drop-down {{ border: none; width: 28px; }}
 QComboBox#presetCombo::down-arrow {{ image: url("{chevron}"); width: 12px; height: 12px; }}
 QComboBox#presetCombo QAbstractItemView {{ border: 1px solid {k['combo_border']}; background: {k['bg']};
     color: {k['text']}; selection-background-color: {k['selection']}; selection-color: {k['text']}; }}
+QCheckBox::indicator {{ width: 14px; height: 14px; border: 1px solid {k['check_border']}; border-radius: 3px;
+    background: {k['bg']}; }}
+QCheckBox::indicator:hover {{ border-color: {k['combo_hover']}; }}
+QCheckBox::indicator:checked {{ background: #1e88e5; border-color: #1e88e5; image: url("{check}"); }}
+QCheckBox::indicator:disabled {{ background: {k['alt_base']}; border-color: {k['border']}; }}
+QCheckBox::indicator:checked:disabled {{ background: {k['hint']}; border-color: {k['hint']}; }}
 QLabel#warning {{ background: {k['warning_bg']}; color: {k['warning_fg']}; padding: 6px 12px;
     border-bottom: 1px solid {k['warning_border']}; }}
 QFrame#queueRow {{ background: {k['bg']}; border-bottom: 1px solid {k['row_border']}; }}
