@@ -322,9 +322,9 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 ## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
-Za 1.0.2:
-- Program: meni formata se uvijek otvara ispod polja (`combobox-popup: 0` u `theme.py`; Fusion ga je
-  centrirao na izabranu stavku, pa je s novim formatima za auto išao prema gore).
+Za 1.0.2: (još ništa)
+PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
+(nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
 ### Objavljeno u 1.0.1 (18.10.2026; winget PR #445943 prebačen na 1.0.1)
 - Program: Pomoć → „Discord zajednica" (`DISCORD_URL` u `videodl/dialogs.py`, ista pozivnica kao na sajtu).
