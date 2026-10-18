@@ -49,6 +49,7 @@
     <string name="done_label">Terminé</string>
     <string name="share">Partager</string>
     <string name="remove_from_list">Retirer de la liste</string>
+    <string name="press_back_again">Appuyez à nouveau sur Retour pour quitter</string>
     <string name="delete_from_device">Supprimer de l\'appareil</string>
     <string name="delete_title">Supprimer de l\'appareil ?</string>
     <string name="delete_text">« %1$s » sera supprimé du téléphone. Cette action est irréversible.</string>

@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
     private val link = mutableStateOf("")
     private val tab = mutableIntStateOf(TAB_HOME)
     private var tabBeforeSettings = TAB_HOME // Postavke su poseban ekran; „nazad" vraća tamo odakle se došlo
+    private var lastBackAt = 0L // prvi „nazad" na Početnoj; drugi u roku od 2 s zatvara aplikaciju
     private val downloadsTab = mutableIntStateOf(0)
     private val info = mutableStateOf<VideoInfo?>(null)
     private val finding = mutableStateOf(false)
@@ -355,12 +356,18 @@ class MainActivity : ComponentActivity() {
             }
         }
         val shownList = playlist.value
-        BackHandler(enabled = shown != null || shownList != null || tab.intValue != TAB_HOME) {
+        BackHandler {
             when {
                 shown != null -> info.value = null
                 shownList != null -> playlist.value = null
                 tab.intValue == TAB_SETTINGS -> tab.intValue = tabBeforeSettings
-                else -> tab.intValue = TAB_HOME
+                tab.intValue != TAB_HOME -> tab.intValue = TAB_HOME
+                // Početna (Ahmed 18.10.2026): izlaz tek na drugi „nazad" u roku od 2 s, da se aplikacija ne zatvori slučajno.
+                System.currentTimeMillis() - lastBackAt < 2000 -> finish()
+                else -> {
+                    lastBackAt = System.currentTimeMillis()
+                    Toast.makeText(this@MainActivity, R.string.press_back_again, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         val openSettings = { tabBeforeSettings = tab.intValue; tab.intValue = TAB_SETTINGS }
