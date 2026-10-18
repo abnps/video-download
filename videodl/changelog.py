@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.1", "18.10.2026", {
+        "bs": ["Novi formati za auto: „Video – za auto (AVI, 720×480)“ i „MP3 za auto (44,1 kHz)“, za starije auto-sisteme koji ne puštaju obični MP4 ili MP3.",
+               "Program se brže otvara: čitač sajtova se učitava u pozadini, prozor ga ne čeka.",
+               "Pomoć → Discord zajednica: pitanja i pomoć na 5 jezika.",
+               "Android: „Izbriši s uređaja“ u meniju gotovog preuzimanja (uz potvrdu); brza dugmad više ne prekrivaju trajanje videa; Discord u Postavkama."],
+        "en": ["New car formats: “Video – for the car (AVI, 720×480)” and “MP3 for the car (44.1 kHz)”, for older car systems that don't play regular MP4 or MP3.",
+               "The app opens faster: the site reader loads in the background, the window doesn't wait for it.",
+               "Help → Discord community: questions and help in 5 languages.",
+               "Android: “Delete from device” in the menu of a finished download (with confirmation); the quick buttons no longer cover the video length; Discord in Settings."],
+        "de": ["Neue Formate fürs Auto: „Video – fürs Auto (AVI, 720×480)“ und „MP3 fürs Auto (44,1 kHz)“, für ältere Autosysteme, die normales MP4 oder MP3 nicht abspielen.",
+               "Das Programm öffnet schneller: Der Seitenleser lädt im Hintergrund, das Fenster wartet nicht darauf.",
+               "Hilfe → Discord-Community: Fragen und Hilfe in 5 Sprachen.",
+               "Android: „Vom Gerät löschen“ im Menü eines fertigen Downloads (mit Bestätigung); die Schnelltasten verdecken die Videolänge nicht mehr; Discord in den Einstellungen."],
+        "es": ["Nuevos formatos para el coche: «Vídeo – para el coche (AVI, 720×480)» y «MP3 para el coche (44,1 kHz)», para sistemas de coche antiguos que no reproducen MP4 o MP3 normales.",
+               "El programa se abre más rápido: el lector de sitios se carga en segundo plano y la ventana no lo espera.",
+               "Ayuda → Comunidad de Discord: preguntas y ayuda en 5 idiomas.",
+               "Android: «Eliminar del dispositivo» en el menú de una descarga terminada (con confirmación); los botones rápidos ya no tapan la duración del vídeo; Discord en Ajustes."],
+        "fr": ["Nouveaux formats pour la voiture : « Vidéo – pour la voiture (AVI, 720×480) » et « MP3 pour la voiture (44,1 kHz) », pour les anciens systèmes de voiture qui ne lisent pas les MP4 ou MP3 ordinaires.",
+               "Le programme s'ouvre plus vite : le lecteur de sites se charge en arrière-plan, la fenêtre ne l'attend pas.",
+               "Aide → Communauté Discord : questions et aide en 5 langues.",
+               "Android : « Supprimer de l'appareil » dans le menu d'un téléchargement terminé (avec confirmation) ; les boutons rapides ne cachent plus la durée de la vidéo ; Discord dans les Paramètres."],
+    }),
     ("1.0.0", "8.10.2026", {
         "bs": ["Video Download 1.0: program za računar, Android aplikacija i dodatak za browser dobijaju verziju 1.0 istog dana.",
                "Android aplikacija je upola manja (29 MB umjesto 61 MB): brže preuzimanje i brže slanje prijatelju.",

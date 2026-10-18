@@ -24,6 +24,28 @@ class PresetOptionsTest(unittest.TestCase):
             self.assertEqual(opts["final_ext"], codec)
             self.assertNotIn("merge_output_format", opts)
 
+    def test_car_video_converts_to_avi_like_the_working_sample(self):
+        # Prijateljev Audi Q5 (MMI) pušta AVI, MPEG-4 Part 2 (FMP4), 720×480, 25 fps, stereo MP3 44,1 kHz.
+        opts = build_ydl_options(get_preset("car"), r"C:\Preuzimanja", thumbnail=True, subtitles=True, chapters=True)
+        self.assertEqual([pp["key"] for pp in opts["postprocessors"]], ["FFmpegVideoConvertor"])
+        self.assertEqual(opts["postprocessors"][0]["preferedformat"], "avi")
+        self.assertEqual(opts["final_ext"], "avi")
+        args = opts["postprocessor_args"]["videoconvertor"]
+        for pair in (("-c:v", "mpeg4"), ("-vtag", "FMP4"), ("-c:a", "libmp3lame"), ("-ar", "44100"), ("-ac", "2")):
+            self.assertIn(list(pair), [args[i:i + 2] for i in range(len(args) - 1)])
+        self.assertIn("scale=720:480", args[args.index("-vf") + 1])
+        self.assertIn("fps=25", args[args.index("-vf") + 1])
+        self.assertNotIn("writesubtitles", opts)
+        self.assertNotIn("writethumbnail", opts)
+
+    def test_car_mp3_is_44khz_stereo_id3v23_without_cover_and_separate_name(self):
+        opts = build_ydl_options(get_preset("mp3car"), r"C:\Preuzimanja", thumbnail=True, chapters=True)
+        self.assertEqual([pp["key"] for pp in opts["postprocessors"]], ["FFmpegExtractAudio"])
+        self.assertEqual(opts["postprocessor_args"]["extractaudio"], ["-ar", "44100", "-ac", "2", "-id3v2_version", "3"])
+        self.assertEqual(opts["final_ext"], "mp3")
+        self.assertTrue(opts["outtmpl"].endswith(" [car].%(ext)s"))  # ne zamijeni obični MP3 istog videa
+        self.assertTrue(build_ydl_options(get_preset("mp3"), r"C:\P")["outtmpl"].endswith("[%(id)s].%(ext)s"))
+
     def test_output_template_escapes_percent_and_sanitizes_subfolder(self):
         opts = build_ydl_options(get_preset("best"), r"C:\100% video", subfolder="Moja/lista: dio?")
         folder, name = opts["outtmpl"].rsplit(os.sep, 1)

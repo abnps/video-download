@@ -330,6 +330,11 @@ Dosad (sve pushano, nije objavljeno korisnicima):
   Kompajlirano i lint OK 17.10.2026; NIJE još probano na telefonu.
 - Politika privatnosti (program + sajt): rečenica o Discordu (otvara se samo na klik, program ništa ne šalje).
 - Firefox: `tools/build_firefox.py --listed` pravi AMO paket bez `update_url`.
+- Program: formati „Video – za auto (AVI, 720×480)" (`car`) i „Samo zvuk – MP3 za auto (44,1 kHz)" (`mp3car`) za
+  starije auto-sisteme (prijateljev Audi Q5 / MMI). Video = tačno kao uzorak koji tamo radi: AVI, MPEG-4 Part 2
+  (koder `mpeg4`, oznaka FMP4, ne libxvid — ima ga svaki ffmpeg), 720×480 s crnim trakama, 25 fps, MP3 192k
+  44,1 kHz stereo. MP3 za auto: 44,1 kHz stereo, ID3v2.3, bez omota/poglavlja, ime s „[car]". Provjereno ffprobe-om
+  18.10.2026; u autu još NIJE probano. Android ih još nema.
 - Brže pokretanje: yt-dlp se aktivira i uvozi u pozadini (`ytdlp_update.start_background()` u `launch.py`).
   PRAVILO: nijedan modul ne uvozi yt-dlp na vrhu fajla; ko ga treba, uvozi ga u funkciji POSLIJE
   `ytdlp_update.ensure_ready()` (inače pobjedi aktivaciju preuzete verzije). Test: `tests/test_startup.py`.

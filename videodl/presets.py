@@ -47,10 +47,17 @@ class Preset:
     merge_output_format: str | None = None
     audio_codec: str | None = None
     audio_quality: str | None = None
+    convert_to: str | None = None  # video se poslije preuzimanja pretvara u ovaj kontejner (npr. "avi")
+    ffmpeg_args: tuple[str, ...] = ()  # dodatne ffmpeg opcije za pretvaranje (videa ili zvuka)
+    plain: bool = False  # bez omota, titlova i poglavlja (stariji uređaji, npr. auto)
 
     @property
     def is_audio(self) -> bool:
         return self.audio_codec is not None
+
+    @property
+    def is_converted(self) -> bool:
+        return self.convert_to is not None
 
     @property
     def label(self) -> str:
@@ -61,13 +68,30 @@ class Preset:
         return tr(f"preset.{self.key}.short")
 
 
+# Za auto (Ahmed 18.10.2026, prijateljev Audi Q5 / MMI): stariji auto-sistemi puštaju samo stari spoj, pa se
+# pravi tačno kao uzorak koji tamo radi: AVI, MPEG-4 Part 2 (oznaka FMP4), 720×480, 25 fps, stereo MP3 44,1 kHz.
+# Slika se smanji bez izobličenja i dopuni crnim trakama. Koder „mpeg4" ima svaki ffmpeg (i na Macu), za razliku
+# od libxvid koji yt-dlp sam bira za AVI; ove opcije idu poslije njegovih, pa ih zamijene.
+CAR_ARGS = (
+    "-c:v", "mpeg4", "-vtag", "FMP4", "-q:v", "3",
+    "-vf", "scale=720:480:force_original_aspect_ratio=decrease,pad=720:480:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=25",
+    "-c:a", "libmp3lame", "-b:a", "192k", "-ar", "44100", "-ac", "2",
+)
+
+# MP3 za auto: sajtovi uglavnom daju zvuk na 48 kHz, a stariji auto-sistemi traže 44,1 kHz; stare ID3 oznake (v2.3)
+# i bez slike omota, koju neki ne čitaju ili zbog nje preskoče pjesmu.
+CAR_AUDIO_ARGS = ("-ar", "44100", "-ac", "2", "-id3v2_version", "3")
+
 PRESETS: tuple[Preset, ...] = (
     Preset("best", "bv*+ba/b", ("res", *_COMPATIBLE), "mp4"),
     Preset("1080p", "bv*+ba/b", ("res:1080", *_COMPATIBLE), "mp4"),
     Preset("720p", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mp4"),
     Preset("480p", "bv*+ba/b", ("res:480", *_COMPATIBLE), "mp4"),
+    # Preuzima se do 720p (dovoljno za 720×480, a manje za skinuti), pa se pretvara.
+    Preset("car", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mkv", convert_to="avi", ffmpeg_args=CAR_ARGS, plain=True),
     Preset("mp3", "ba/b", audio_codec="mp3", audio_quality="192"),
     Preset("m4a", "ba/b", ("acodec:aac",), audio_codec="m4a"),
+    Preset("mp3car", "ba/b", audio_codec="mp3", audio_quality="192", ffmpeg_args=CAR_AUDIO_ARGS, plain=True),
 )
 
 DEFAULT_PRESET_KEY = "best"
@@ -162,6 +186,9 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
+    if preset.plain:
+        # Za auto: AVI ne nosi titlove, omot ni poglavlja, a stari MP3 plejeri ne vole omot i poglavlja.
+        subtitles = thumbnail = chapters = False
 
     opts = base_options(logger)
     opts["format"] = preset.format
@@ -186,6 +213,8 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         if preset.audio_quality:
             extract["preferredquality"] = preset.audio_quality
         postprocessors.append(extract)
+        if preset.ffmpeg_args:
+            opts["postprocessor_args"] = {"extractaudio": list(preset.ffmpeg_args)}
         # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo.
         opts["final_ext"] = preset.audio_codec
     elif subtitles:
@@ -214,6 +243,11 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
                                "add_infojson": False})
     if thumbnail:
         postprocessors.append({"key": "EmbedThumbnail", "already_have_thumbnail": False})
+    if preset.is_converted:
+        # Zadnji korak, poslije eventualnog rezanja reklama: pretvaranje u traženi spoj.
+        postprocessors.append({"key": "FFmpegVideoConvertor", "preferedformat": preset.convert_to})
+        opts["postprocessor_args"] = {"videoconvertor": list(preset.ffmpeg_args)}
+        opts["final_ext"] = preset.convert_to
     if postprocessors:
         opts["postprocessors"] = postprocessors
     if section:
@@ -232,13 +266,13 @@ def _escape(text: str) -> str:
 
 # Formati s ograničenom rezolucijom dobijaju oznaku u imenu: isti video u 720p i 1080p su dva fajla,
 # a 1080p poslije 720p se ne proglašava „već preuzetim". „Najbolji" i zvuk ostaju bez oznake.
-QUALITY_TAGGED = ("1080p", "720p", "480p")
+QUALITY_TAGGED = {"1080p": "1080p", "720p": "720p", "480p": "480p", "mp3car": "car"}  # MP3 za auto ≠ obični MP3
 
 
 def _with_quality(template: str, preset: Preset) -> str:
     if preset.key not in QUALITY_TAGGED:
         return template
-    return template.replace(".%(ext)s", f" [{preset.key}].%(ext)s")
+    return template.replace(".%(ext)s", f" [{QUALITY_TAGGED[preset.key]}].%(ext)s")
 
 
 def _clock_precise(value: float) -> str:
