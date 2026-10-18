@@ -79,6 +79,7 @@ QPushButton#downloadButton:disabled {{ background: {k['download_disabled']}; }}
 QComboBox#presetCombo {{
     border: 1px solid {k['combo_border']}; border-radius: 3px; padding: 0 10px; min-height: 32px;
     background: {k['bg']}; color: {k['text']}; font-size: 10pt;
+    combobox-popup: 0; /* lista uvijek ispod polja; Fusion je centrira na izabranu stavku, pa je išla prema gore */
 }}
 QComboBox#presetCombo:hover {{ border-color: {k['combo_hover']}; }}
 QComboBox#presetCombo::drop-down {{ border: none; width: 28px; }}
