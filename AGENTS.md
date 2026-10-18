@@ -158,6 +158,12 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   za vezu (`app-status`) i daje uputstvo za kačenje ikone po browseru. E2E (`tools/e2e_browser/run.mjs`) je provjerava.
   Firefox nije instaliran na razvojnom računaru; provjereno 26.9.2026 raspakovanim Firefoxom 156 (Marionette,
   `-remote-allow-system-access`): dodatak aktivan i potpisan, popup preko native messaging-a javlja „aplikacija radi".
+- Microsoft Store (Ahmed 19.10.2026: „uskladiti naša ažuriranja sa MS Store"): aplikacija „Video Download by abnps"
+  (Store ID 9NT46S6L7KGN, Partner Center nalog na abnpsdev@gmail.com; nalog i prijave mijenja Ahmed ili uz njegovu
+  potvrdu). SVAKO izdanje ide i u Store: `tools/build_msix.py` (MSIX, Store potpisuje; isti broj verzije + „.0").
+  Program u paketu sam sebe prepozna (`runtime.is_store_package`) i ne nudi naše ažuriranje. Paket isključuje
+  virtualizaciju registra/fajlova (`unvirtualizedResources`) zbog veze s browserom — mora se obrazložiti pri
+  provjeri. Pravila Storea 7.20: rizik je 10.2.2 (preuzimanje koda = naše ažuriranje yt-dlp-a), objasniti u napomeni.
 - Rjeđa izdanja (Ahmedova odluka 25.9.2026): instaler nije digitalno potpisan, a SmartScreen ugled se
   skuplja po fajlu, pa svako novo izdanje kreće od nule. Izmjene se skupljaju i izdaju otprilike jednom
   sedmično ili kad je nešto važno; hitne popravke odmah. Popravke za sajtove idu preko ažuriranja

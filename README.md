@@ -84,6 +84,12 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    `PackageVersion`, `ReleaseDate`, `InstallerUrl` i `InstallerSha256`, provjeri s `winget validate --manifest <folder>`
    i pošalji pull request u `microsoft/winget-pkgs` (folder `manifests/a/abnps/VideoDownload/<verzija>`).
 
+8. **Microsoft Store** (aplikacija „Video Download by abnps", Store ID `9NT46S6L7KGN`): `python tools/build_msix.py`
+   od istog builda pravi `Build\msix\VideoDownloadbyabnps-<verzija>.0-x64.msix`. U Partner Centeru: nova prijava
+   (Update) → Packages → postavi .msix → pošalji. Microsoft ga potpisuje i provjerava (obično 1–3 dana), pa ga
+   Store sam ažurira kod korisnika. Store verzija ne nudi naše ažuriranje programa (`runtime.is_store_package`);
+   yt-dlp se i dalje osvježava sam (u napomeni za provjeru objašnjeno).
+
 ## Podrži projekat
 
 Video Download je besplatan, bez reklama i bez praćenja. Ako ti koristi, možeš dobrovoljno

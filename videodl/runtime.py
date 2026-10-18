@@ -69,6 +69,27 @@ def extension_dir() -> Path:
     return bundle_dir() / "extension"
 
 
+_store_package: bool | None = None
+
+
+def is_store_package() -> bool:
+    """Program iz Microsoft Store paketa (MSIX): ima identitet paketa, a novu verziju donosi Store, ne mi."""
+    global _store_package
+    if _store_package is None:
+        _store_package = False
+        if IS_WINDOWS:
+            import ctypes
+
+            length = ctypes.c_uint32(0)
+            try:
+                # Bez paketa vraća APPMODEL_ERROR_NO_PACKAGE (15700); u paketu traži veći bafer (122).
+                result = ctypes.windll.kernel32.GetCurrentPackageFullName(ctypes.byref(length), None)
+                _store_package = result != 15700
+            except (AttributeError, OSError):
+                pass
+    return _store_package
+
+
 def bundled_tool(name: str) -> str | None:
     """Alat iz paketa programa (tools/), bez traženja po PATH-u."""
     bundled = tools_dir() / exe(name)

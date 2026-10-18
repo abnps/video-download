@@ -759,6 +759,11 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "PyPI n'a fourni aucun paquet yt-dlp."),
 
     # ažuriranje
+    "update.store": ("Verzija {version} iz Microsoft Storea: nove verzije stižu automatski preko Storea.",
+                     "Version {version} from the Microsoft Store: new versions arrive automatically through the Store.",
+                     "Version {version} aus dem Microsoft Store: Neue Versionen kommen automatisch über den Store.",
+                     "Versión {version} de Microsoft Store: las nuevas versiones llegan automáticamente a través de la Store.",
+                     "Version {version} du Microsoft Store : les nouvelles versions arrivent automatiquement via le Store."),
     "update.latest": ("Imaš najnoviju verziju ({version}).", "You have the latest version ({version}).",
                       "Du hast die neueste Version ({version}).", "Tienes la versión más reciente ({version}).",
                       "Vous avez la dernière version ({version})."),

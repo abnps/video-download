@@ -40,7 +40,7 @@ from .presets import (
     direct_output_name, section_label, subtitle_languages, title_identity,
 )
 from .probe import ProbeResult, probe
-from . import convert, diagnostics, parental, release_signing, scheduler, store, support, theme, winshell
+from . import convert, diagnostics, parental, release_signing, runtime, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
 from .desktop import play_file, reveal
@@ -1759,6 +1759,11 @@ class MainWindow(QMainWindow):
 
     def check_for_updates(self, manual: bool) -> None:
         if self._update_check_job is not None:
+            return
+        if runtime.is_store_package():
+            # Microsoft Store sam ažurira svoj paket; naš instaler tu ne smije (ni ne može) ništa mijenjati.
+            if manual:
+                QMessageBox.information(self, tr("menu.check_updates"), tr("update.store", version=__version__))
             return
         if not manual:
             last = self._settings.value("last_update_check", 0.0, type=float)
