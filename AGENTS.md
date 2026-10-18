@@ -319,10 +319,12 @@ Dopuna (Ahmed 5.10.2026): bez reklama; savjetnik trenutno nije moguć → Toolki
 (ne-trgovac). U Play aplikaciji NEMA PayPal/Ko-fi/Stripe dugmadi (Play traži Googleovo plaćanje i za napojnice);
 dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repoa).
 
-## Sakuplja se za 1.0.1 (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
+## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 
-Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a 1.0.1 se objavljuje tek na Ahmedovo „objavi".
-Dosad (sve pushano, nije objavljeno korisnicima):
+Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
+Za 1.0.2: (još ništa)
+
+### Objavljeno u 1.0.1 (18.10.2026; winget PR #445943 prebačen na 1.0.1)
 - Program: Pomoć → „Discord zajednica" (`DISCORD_URL` u `videodl/dialogs.py`, ista pozivnica kao na sajtu).
 - Android: Postavke → „Discord zajednica"; na ekranu kvaliteta brza dugmad ♪/🎥 gore desno (prekrivala trajanje).
 - Android: meni gotovog preuzimanja (⋮) → „Izbriši s uređaja" (crveno, uz potvrdu): briše fajl preko MediaStore-a i
