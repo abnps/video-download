@@ -4,6 +4,7 @@ import collections
 import contextlib
 import dataclasses
 import datetime
+import functools
 import os
 import queue
 import re
@@ -33,7 +34,7 @@ from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
 from .native_messaging import TemporaryLocationError, install_native_host, uninstall_native_host
-from .runtime import extension_dir, find_tool, mark_running
+from .runtime import bundled_tool, extension_dir, find_tool, mark_running
 from .presets import (
     DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
     direct_output_name, section_label, subtitle_languages, title_identity,
@@ -142,13 +143,16 @@ def extract_urls(text: str) -> list[str]:
     return urls
 
 
-def missing_tools() -> list[str]:
+@functools.cache
+def missing_tools() -> tuple[str, ...]:
+    # Jednom po pokretanju: zove se pri svakom prevođenju prozora, a traženje po PATH-u (npr. „deno", koji paket
+    # nema) je trajalo i pola sekunde pri otvaranju. Node iz paketa se provjeri prije nego išta po PATH-u.
     missing = []
     if not find_tool("ffmpeg"):
         missing.append("missing.ffmpeg")
-    if not any(find_tool(name) for name in JS_RUNTIMES):
+    if not (any(bundled_tool(name) for name in JS_RUNTIMES) or any(find_tool(name) for name in JS_RUNTIMES)):
         missing.append("missing.js")
-    return missing
+    return tuple(missing)
 
 
 def fetch_thumbnail(url: str) -> bytes | None:

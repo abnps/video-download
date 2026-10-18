@@ -69,12 +69,15 @@ def extension_dir() -> Path:
     return bundle_dir() / "extension"
 
 
+def bundled_tool(name: str) -> str | None:
+    """Alat iz paketa programa (tools/), bez traženja po PATH-u."""
+    bundled = tools_dir() / exe(name)
+    return str(bundled) if bundled.is_file() else None
+
+
 def find_tool(name: str) -> str | None:
     """Alat iz paketa ima prednost; u razvoju se traži na PATH-u."""
-    bundled = tools_dir() / exe(name)
-    if bundled.is_file():
-        return str(bundled)
-    return shutil.which(name)
+    return bundled_tool(name) or shutil.which(name)
 
 
 def ffmpeg_location() -> str | None:

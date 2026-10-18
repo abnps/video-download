@@ -9,13 +9,18 @@ Privatni ključ je SAMO kod vlasnika, van repoa i van OneDrive-a (VIDEODL_SIGNIN
 postojeće instalacije prihvataju — zato mora postojati sigurnosna kopija.
 """
 
+from __future__ import annotations
+
 import hashlib
 import json
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from Cryptodome.PublicKey import ECC
-from Cryptodome.Signature import eddsa
+if TYPE_CHECKING:
+    from Cryptodome.PublicKey import ECC
+
+# Cryptodome se uvozi tek u funkcijama: otvaranje programa ga ne treba, a uvoz je trajao oko 0,3 s.
 
 MANIFEST_NAME = "release.json"
 SIGNATURE_NAME = "release.json.sig"
@@ -41,6 +46,8 @@ def generate_key(path: Path | None = None) -> str:
     path = path or key_path()
     if path.exists():
         raise FileExistsError(f"Ključ već postoji: {path}")
+    from Cryptodome.PublicKey import ECC
+
     key = ECC.generate(curve="ed25519")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(key.export_key(format="PEM"), encoding="ascii")
@@ -51,6 +58,8 @@ def load_key(path: Path | None = None) -> ECC.EccKey:
     path = path or key_path()
     if not path.is_file():
         raise SignatureError(f"Privatni ključ za potpis izdanja nije pronađen: {path}")
+    from Cryptodome.PublicKey import ECC
+
     return ECC.import_key(path.read_text(encoding="ascii"))
 
 
@@ -69,6 +78,8 @@ def manifest_bytes(version: str, installer: Path) -> bytes:
 
 
 def sign(data: bytes, key: ECC.EccKey) -> bytes:
+    from Cryptodome.Signature import eddsa
+
     return eddsa.new(key, "rfc8032").sign(data)
 
 
@@ -85,6 +96,8 @@ def write_signed_manifest(version: str, installer: Path, key: ECC.EccKey | None 
 
 def verify_manifest(data: bytes, signature_text: str, public_keys=None) -> dict:
     """Vraća opis izdanja ako ga je potpisao jedan od naših ključeva; inače SignatureError."""
+    from Cryptodome.Signature import eddsa
+
     try:
         signature = bytes.fromhex(signature_text.strip())
     except ValueError as exc:
