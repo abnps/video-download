@@ -73,6 +73,50 @@ class SupportDialog(QDialog):
         self.kofi_link.setOpenExternalLinks(True)
         layout.addWidget(self.kofi_link)
 
+class AchievementDialog(QDialog):
+    """Čestitka na 10, 50, 100… preuzimanja. Ne blokira rad; dugme za prilog samo ako ga korisnik nije ugasio."""
+
+    support_clicked = Signal()
+
+    def __init__(self, count: int, show_support: bool, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr("achievement.title"))
+        self.setFixedWidth(440)  # poruka za prilog se lomi u dva reda umjesto jednog dugog
+        layout = QVBoxLayout(self)
+        self.headline = QLabel(tr("achievement.headline", count=count))
+        font = self.headline.font()
+        font.setPointSizeF(font.pointSizeF() * 1.6)
+        font.setBold(True)
+        self.headline.setFont(font)
+        self.headline.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.headline)
+        key = f"achievement.{count}" if count <= 500 else "achievement.big"
+        self.message = QLabel(f"{tr(key)}\n{tr('achievement.thanks')}")
+        self.message.setWordWrap(True)
+        self.message.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.message)
+        # Poruka za prilog uz čestitku (Ahmed 19.10.2026), ali ne i kad je korisnik kliknuo „Već sam podržao".
+        self.support_note = QLabel(tr("achievement.support"))
+        self.support_note.setWordWrap(True)
+        self.support_note.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.support_note.setObjectName("supportNote")
+        self.support_note.setVisible(show_support)
+        layout.addWidget(self.support_note)
+        buttons = QHBoxLayout()
+        self.support_button = QPushButton(tr("support.link"))
+        self.support_button.setObjectName("supportButton")
+        self.support_button.clicked.connect(self.support_clicked)
+        self.support_button.clicked.connect(self.accept)
+        self.support_button.setVisible(show_support)
+        self.ok_button = QPushButton(tr("achievement.ok"))
+        self.ok_button.setDefault(True)
+        self.ok_button.clicked.connect(self.accept)
+        buttons.addWidget(self.support_button)
+        buttons.addStretch(1)
+        buttons.addWidget(self.ok_button)
+        layout.addLayout(buttons)
+
+
 class LegalDialog(QDialog):
     """Pomoć → Ugovori i licence: isti tekstovi kao u instaleru, na jeziku aplikacije."""
 

@@ -65,6 +65,19 @@ class SupportStateTest(unittest.TestCase):
         self.assertFalse(state.should_show_dialog(1000 + 89 * DAY, busy=False))
         self.assertTrue(state.should_show_dialog(1000 + 91 * DAY, busy=False))
 
+    def test_milestones_wait_until_idle_and_come_once(self):
+        state = support.SupportState(downloads=9)
+        self.assertEqual(state.milestone_due(busy=False), 0)
+        state.count_download()
+        self.assertEqual(state.milestone_due(busy=True), 0)  # lista se ne prekida
+        self.assertEqual(state.milestone_due(busy=False), 10)
+        state.milestone_seen(10)
+        self.assertEqual(state.milestone_due(busy=False), 0)
+        state.downloads = 120  # preskočeno 50 dok je radio: čestita se najveće dostignuto
+        self.assertEqual(state.milestone_due(busy=False), 100)
+        self.assertEqual(support.passed_milestone(37), 10)
+        self.assertEqual(support.passed_milestone(3), 0)
+
     def test_qr_code_points_to_the_same_link(self):
         try:
             import cv2
@@ -159,6 +172,35 @@ class SupportWindowTest(unittest.TestCase):
         dialog.already_button.click()  # bez ikakve provjere uplate
         self.assertTrue(wait_until(lambda: window._support_dialog is None))
         self.assertGreater(self.settings.value("support/snooze_until", type=float), time.time() + 89 * DAY)
+
+    def test_achievement_at_ten_with_support_message(self):
+        window = self.window()
+        window._support.last_dialog = time.time()  # sedmični podsjetnik već prikazan
+        self.download(window, 10)
+        self.assertTrue(wait_until(lambda: window._achievement_dialog is not None))
+        dialog = window._achievement_dialog
+        self.assertEqual(dialog.headline.text(), "🏆 10 preuzimanja!")
+        self.assertIn("Odličan početak", dialog.message.text())
+        self.assertFalse(dialog.support_note.isHidden())
+        self.assertFalse(dialog.support_button.isHidden())
+        self.assertEqual(self.settings.value("support/milestone_shown", type=int), 10)
+        with mock.patch("videodl.gui.QDesktopServices.openUrl") as open_url:
+            dialog.support_button.click()
+        open_url.assert_called_once()
+        self.assertTrue(wait_until(lambda: window._achievement_dialog is None))
+
+    def test_achievement_without_donation_after_already_supported(self):
+        window = self.window()
+        window._support.already_supported(time.time())
+        self.download(window, 10)
+        self.assertTrue(wait_until(lambda: window._achievement_dialog is not None))
+        self.assertTrue(window._achievement_dialog.support_note.isHidden())
+        self.assertTrue(window._achievement_dialog.support_button.isHidden())
+
+    def test_existing_users_are_not_congratulated_for_old_milestones(self):
+        self.settings.setValue("support/downloads", 57)
+        window = self.window()
+        self.assertEqual(window._support.milestone_shown, 50)
 
     def test_existing_files_do_not_count(self):
         window = self.window()

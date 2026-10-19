@@ -46,7 +46,7 @@ from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, fi
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
     AUDIO_EXTENSIONS, BROWSERS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
-    SupportDialog, WhatsNewDialog, browser_exe, filter_history,
+    AchievementDialog, SupportDialog, WhatsNewDialog, browser_exe, filter_history,
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
 
@@ -606,6 +606,10 @@ class MainWindow(QMainWindow):
             banner_next=self._settings.value("support/banner_next", support.BANNER_EVERY, type=int),
             last_dialog=self._settings.value("support/last_dialog", 0.0, type=float),
             snooze_until=self._settings.value("support/snooze_until", 0.0, type=float))
+        # Ko je preuzimao i prije dostignuća, ne dobija naknadnu čestitku za broj koji je već prešao.
+        self._support.milestone_shown = self._settings.value(
+            "support/milestone_shown", support.passed_milestone(self._support.downloads), type=int)
+        self._achievement_dialog = None
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
         # Poglavlja su uključena odmah (ništa ne šalju); SponsorBlock pita vanjski servis, pa tek na zahtjev.
@@ -635,6 +639,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("support/banner_next", self._support.banner_next)
         self._settings.setValue("support/last_dialog", self._support.last_dialog)
         self._settings.setValue("support/snooze_until", self._support.snooze_until)
+        self._settings.setValue("support/milestone_shown", self._support.milestone_shown)
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
         self._settings.setValue("chapters", self._chapters)
         self._settings.setValue("sponsorblock", self._sponsorblock)
@@ -688,9 +693,22 @@ class MainWindow(QMainWindow):
         if self._support.should_show_banner(now):
             self.support_banner.show()
         busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
-        if self._support.should_show_dialog(now, busy) and self._support_dialog is None:
+        milestone = self._support.milestone_due(busy)
+        if milestone and self._achievement_dialog is None and self._support_dialog is None:
+            # Čestitka ima prednost; podsjetnik za prilog čeka sljedeću priliku (ne dva prozora odjednom).
+            self._support.milestone_seen(milestone)
+            self.show_achievement(milestone, now)
+        elif (self._support.should_show_dialog(now, busy) and self._support_dialog is None
+              and self._achievement_dialog is None):
             self.show_support_dialog(automatic=True)
         self._save_settings()
+
+    def show_achievement(self, milestone: int, now: float) -> None:
+        dialog = AchievementDialog(milestone, show_support=not self._support.snoozed(now), parent=self)
+        dialog.support_clicked.connect(self._open_support)
+        dialog.finished.connect(lambda _result: setattr(self, "_achievement_dialog", None))
+        self._achievement_dialog = dialog
+        dialog.open()
 
     @Slot()
     def _open_support(self) -> None:

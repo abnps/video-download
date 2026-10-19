@@ -16,6 +16,13 @@ STRIPE_URL = "https://buy.stripe.com/14A4gA9GnfcSgjVdAV8Vi00"
 BANNER_EVERY = 10  # traka iznad liste poslije svakih N novih preuzimanja
 DIALOG_INTERVAL = 7 * 24 * 60 * 60  # prozor najviše jednom sedmično
 SNOOZE = 90 * 24 * 60 * 60  # „Već sam podržao" gasi podsjetnik na 90 dana
+# Dostignuća (Ahmed 19.10.2026): čestitka na 10, 50, 100… novih preuzimanja; podsjetnik za prilog ostaje kakav je.
+MILESTONES = (10, 50, 100, 250, 500, 1000, 2500, 5000, 10000)
+
+
+def passed_milestone(downloads: int) -> int:
+    """Najveće dostignuće do kojeg je broj već stigao (0 ako nijedno)."""
+    return max((m for m in MILESTONES if m <= downloads), default=0)
 
 
 @dataclass
@@ -24,6 +31,7 @@ class SupportState:
     banner_next: int = BANNER_EVERY
     last_dialog: float = 0.0
     snooze_until: float = 0.0
+    milestone_shown: int = 0  # zadnje čestitano dostignuće
 
     def snoozed(self, now: float) -> bool:
         return now < self.snooze_until
@@ -53,3 +61,11 @@ class SupportState:
     def already_supported(self, now: float) -> None:
         self.snooze_until = now + SNOOZE
         self.banner_next = self.downloads + BANNER_EVERY
+
+    def milestone_due(self, busy: bool) -> int:
+        """Dostignuće za čestitku, tek kad ništa ne radi (lista se ne prekida usred preuzimanja); 0 ako nema."""
+        reached = passed_milestone(self.downloads)
+        return reached if not busy and reached > self.milestone_shown else 0
+
+    def milestone_seen(self, milestone: int) -> None:
+        self.milestone_shown = max(self.milestone_shown, milestone)
