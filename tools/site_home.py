@@ -416,6 +416,29 @@ HOME = {
 
 
 # Discord zajednica (Ahmed 14.10.2026): trajna pozivnica; obična veza i tekstualno dugme, bez tuđeg logotipa i koda.
+# Microsoft Store (Ahmed 19.10.2026: sajt nudi i Store i običnu verziju za računar). Samo tekstualno dugme,
+# bez Microsoftovog logoa. Skriveno dok je aplikacija u Storeu privatna (link bi drugima javljao da je nema):
+# kad 1.0.2 izađe javno u Storeu → STORE_LIVE = True, `python tools/build_site.py`, commit.
+STORE_LIVE = False
+STORE_URL = "https://apps.microsoft.com/detail/9NT46S6L7KGN"
+STORE_TEXT = {
+    "en": "Or install it from the Microsoft Store: checked and signed by Microsoft, no SmartScreen warning, "
+          "updates come through the Store.",
+    "bs": "Ili ga instaliraj iz Microsoft Storea: Microsoft ga je provjerio i potpisao, nema upozorenja SmartScreena, "
+          "a ažuriranja stižu kroz Store.",
+    "de": "Oder aus dem Microsoft Store installieren: von Microsoft geprüft und signiert, ohne SmartScreen-Warnung, "
+          "Updates kommen über den Store.",
+    "es": "O instálalo desde Microsoft Store: revisado y firmado por Microsoft, sin aviso de SmartScreen y con "
+          "actualizaciones a través de la Store.",
+    "fr": "Ou installez-le depuis le Microsoft Store : vérifié et signé par Microsoft, sans avertissement SmartScreen, "
+          "mises à jour via le Store.",
+}
+
+
+def store_button(cls: str = "btn ghost") -> str:
+    return f'<a class="{cls}" href="{STORE_URL}" rel="noopener">Microsoft Store</a>' if STORE_LIVE else ""
+
+
 DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
 DISCORD_TEXT = {
     "en": ("Questions in your language? Ask the community on Discord.", "Join our Discord"),
@@ -546,6 +569,9 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
                            for i, (title, text) in enumerate(steps, 1))
     in_kicker, in_h2, in_sub, in_label, in_win = h["install"]
     d_title, d_body, d_more, d_dont, d_app, d_run = h["dialog"]
+    store_hero = "\n          " + store_button() if STORE_LIVE else ""
+    store_panel = (f'        <p style="margin-top:22px">{esc(STORE_TEXT[lang])}</p>\n'
+                   f'        <p>{store_button()}</p>\n') if STORE_LIVE else ""
     news_kicker, news_h2, news_sub = h["news"]
     s_kicker, s_h2, s_text, s_btn, s_qr, s_scan = h["support"]
     help_kicker, help_h2, help_sub = h["help"]
@@ -604,7 +630,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <a class="btn" href="{installer_url}">
             {download_icon}
             {h["win_btn"]}
-          </a>
+          </a>{store_hero}
           <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">{badge}</span></a>
           <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">{badge}</span></a>
         </div>
@@ -721,7 +747,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <div class="dlg"><div class="h">{d_title}</div><div>{d_app}</div><div class="btns"><span class="hl">{d_run}</span><span>{d_dont}</span></div></div>
         </div>
         <p style="margin-top:22px"><a class="btn" href="{installer_url}">{h["win_btn"]}</a></p>
-      </div>
+{store_panel}      </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">{badge}</span> {mac_lead.format(issue=issue_url)}</p>
         <p>{mac_note}</p>

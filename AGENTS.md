@@ -339,6 +339,8 @@ Za 1.0.2:
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
   Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
   Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).
+- Sajt: dugme „Microsoft Store" uz Windows dugme i rečenica u Windows uputstvu (5 jezika) su spremni u
+  `tools/site_home.py`; kad Store verzija postane javna: `STORE_LIVE = True`, `python tools/build_site.py`, commit.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
