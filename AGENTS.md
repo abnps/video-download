@@ -374,7 +374,7 @@ PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`
   starije auto-sisteme (prijateljev Audi Q5 / MMI). Video = tačno kao uzorak koji tamo radi: AVI, MPEG-4 Part 2
   (koder `mpeg4`, oznaka FMP4, ne libxvid — ima ga svaki ffmpeg), 720×480 s crnim trakama, 25 fps, MP3 192k
   44,1 kHz stereo. MP3 za auto: 44,1 kHz stereo, ID3v2.3, bez omota/poglavlja, ime s „[car]". Provjereno ffprobe-om
-  18.10.2026; u autu još NIJE probano. Android ih još nema.
+  18.10.2026; u autu RADI (prijatelj, oba formata, 19.10.2026). Android ih još nema.
 - Brže pokretanje: yt-dlp se aktivira i uvozi u pozadini (`ytdlp_update.start_background()` u `launch.py`).
   PRAVILO: nijedan modul ne uvozi yt-dlp na vrhu fajla; ko ga treba, uvozi ga u funkciji POSLIJE
   `ytdlp_update.ensure_ready()` (inače pobjedi aktivaciju preuzete verzije). Test: `tests/test_startup.py`.
