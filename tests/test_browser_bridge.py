@@ -373,5 +373,7 @@ class UninstallRegistryTest(unittest.TestCase):
         # Svaki browser za koji program registruje host mora se i ukloniti pri deinstalaciji
         # (inače ostaje zapis koji pokazuje na obrisan fajl).
         iss = (PROJECT_ROOT / "installer" / "VideoDownload.iss").read_text(encoding="utf-8-sig")
-        removed = set(re.findall(r'Root: HKCU; Subkey: "([^"]+)"; Flags: uninsdeletekey', iss))
+        removed = set(re.findall(r"RegDeleteKeyIncludingSubkeys\(HKCU, '([^']+)'\)", iss))
+        # ... ali samo ako registracija nije Store verzije (manifest u ...\WindowsApps\).
+        self.assertIn("if (CurUninstallStep = usUninstall) and not StoreOwnsBrowserLink then", iss)
         self.assertEqual(set(REGISTRY_PATHS) | set(FIREFOX_REGISTRY_PATHS), removed)

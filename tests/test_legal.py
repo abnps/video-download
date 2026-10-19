@@ -70,8 +70,8 @@ class InstallerTest(unittest.TestCase):
                 self.assertRegex(SCRIPT, rf'Name: "{inno_name}";.*InfoBeforeFile: "\{{#SourceDir\}}\\legal\\privacy_{language}\.txt"')
 
     def test_uninstall_removes_downloaded_yt_dlp_but_not_user_data(self):
-        section = SCRIPT[SCRIPT.index("[UninstallDelete]"):SCRIPT.index("[Run]")]
-        self.assertIn(r"{localappdata}\VideoDownload\yt-dlp", section)
+        section = SCRIPT[SCRIPT.index("procedure CurUninstallStepChanged"):]
+        self.assertIn(r"DelTree(ExpandConstant('{localappdata}\VideoDownload\yt-dlp')", section)
         self.assertNotIn("history.json", section)
         self.assertNotIn("queue.json", section)
 

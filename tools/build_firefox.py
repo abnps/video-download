@@ -23,7 +23,6 @@ from videodl.native_messaging import FIREFOX_EXTENSION_ID  # noqa: E402
 EXTENSION = ROOT / "extension"
 # world: "MAIN" postoji od Firefoxa 128, a data_collection_permissions od 140 (Android 142); 140 je i ESR.
 FIREFOX_MIN_VERSION = "140.0"
-FIREFOX_ANDROID_MIN_VERSION = "142.0"
 SKIP = {"manifest.json", "package.json"}  # package.json služi samo za Node testove
 UPDATE_URL = "https://abnps.github.io/video-download/firefox/updates.json"
 
@@ -41,7 +40,9 @@ def firefox_manifest(chrome: dict, listed: bool = False) -> dict:
         "update_url": UPDATE_URL,
         # Dodatak ništa ne šalje autoru: linkovi idu samo programu na istom računaru.
         "data_collection_permissions": {"required": ["none"]},
-    }, "gecko_android": {"strict_min_version": FIREFOX_ANDROID_MIN_VERSION}}
+    }}
+    # Bez „gecko_android": Firefox za Android nema native messaging (sendNativeMessage), pa dodatak tamo ne
+    # može ništa (Codex pregled 20.10.2026). Pri predaji na AMO označiti samo Firefox za računar.
     if listed:
         # AMO katalog ne prima update_url: nove verzije listanog dodatka dijeli Mozilla.
         del manifest["browser_specific_settings"]["gecko"]["update_url"]

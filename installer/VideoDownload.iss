@@ -75,16 +75,8 @@ Name: "{autodesktop}\Video Download"; Filename: "{app}\VideoDownload.exe"; Tasks
 [Registry]
 ; Jezik izabran u instaleru postaje jezik aplikacije (isti ključ koristi QSettings).
 Root: HKCU; Subkey: "Software\VideoDownload\VideoDownload"; ValueType: string; ValueName: "language"; ValueData: "{code:AppLanguage}"; Flags: uninsdeletekeyifempty
-; Registraciju za Chrome/Edge upisuje aplikacija pri pokretanju; deinstalacija je briše.
-Root: HKCU; Subkey: "Software\Google\Chrome\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
-Root: HKCU; Subkey: "Software\Microsoft\Edge\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
-Root: HKCU; Subkey: "Software\Mozilla\NativeMessagingHosts\com.videodl.bridge"; Flags: uninsdeletekey dontcreatekey
-
-[UninstallDelete]
-Type: filesandordirs; Name: "{localappdata}\VideoDownload\native-host"
-Type: files; Name: "{localappdata}\VideoDownload\bridge.json"
-; Preuzeti yt-dlp je dio programa, ne korisnikovi podaci (red i istorija ostaju).
-Type: filesandordirs; Name: "{localappdata}\VideoDownload\yt-dlp"
+; Registraciju za browsere upisuje aplikacija pri pokretanju; deinstalacija je briše u [Code]
+; (CurUninstallStepChanged), i to samo ako ne pripada Microsoft Store verziji.
 
 [Run]
 Filename: "{app}\VideoDownload.exe"; Description: "{cm:LaunchProgram,Video Download}"; Flags: nowait postinstall skipifsilent
@@ -123,6 +115,31 @@ begin
       Sleep(250);
       Tries := Tries + 1;
     end;
+  end;
+end;
+
+// Store verzija (MSIX) koristi istu registraciju za browsere i iste fajlove u %LOCALAPPDATA%\VideoDownload.
+// Njen manifest pokazuje na ...\WindowsApps\...: tada ih deinstalacija ove verzije ne dira (Codex pregled 20.10.2026).
+function StoreOwnsBrowserLink: Boolean;
+var
+  Manifest: AnsiString;
+begin
+  Result := False;
+  if LoadStringFromFile(ExpandConstant('{localappdata}\VideoDownload\native-host\com.videodl.bridge.json'), Manifest) then
+    Result := Pos('windowsapps', Lowercase(String(Manifest))) > 0;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if (CurUninstallStep = usUninstall) and not StoreOwnsBrowserLink then
+  begin
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Google\Chrome\NativeMessagingHosts\com.videodl.bridge');
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Microsoft\Edge\NativeMessagingHosts\com.videodl.bridge');
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Mozilla\NativeMessagingHosts\com.videodl.bridge');
+    DelTree(ExpandConstant('{localappdata}\VideoDownload\native-host'), True, True, True);
+    DeleteFile(ExpandConstant('{localappdata}\VideoDownload\bridge.json'));
+    // Preuzeti yt-dlp je dio programa, ne korisnikovi podaci (red i istorija ostaju).
+    DelTree(ExpandConstant('{localappdata}\VideoDownload\yt-dlp'), True, True, True);
   end;
 end;
 

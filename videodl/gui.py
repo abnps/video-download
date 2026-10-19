@@ -706,7 +706,9 @@ class MainWindow(QMainWindow):
             if milestone:
                 self._support.milestone_seen(milestone)
             self.show_achievement(milestone, badges, now)
-        elif free and self._support.should_show_dialog(now, busy):
+        elif (free and self._support.should_show_dialog(now, busy)
+              and now - self._achievements.last_support_note >= achievements.SUPPORT_NOTE_EVERY):
+            # Isti dan kad je čestitka već pozvala na prilog nema i sedmičnog prozora (jedan poziv dnevno).
             self.show_support_dialog(automatic=True)
         self._save_settings()
 
@@ -721,7 +723,9 @@ class MainWindow(QMainWindow):
             headline = tr("achievement.new_many")
             lines = ([f"🏆 {tr('achievements.count_name', count=milestone)}"] if milestone else []) + \
                 [f"{icon} {name}: {desc}" for icon, name, desc in names]
-        show_support = not self._support.snoozed(now) and self._achievements.support_note_allowed(now)
+        show_support = (not self._support.snoozed(now)
+                        and now - self._support.last_dialog >= achievements.SUPPORT_NOTE_EVERY
+                        and self._achievements.support_note_allowed(now))
         dialog = AchievementDialog(headline, lines, show_support=show_support, parent=self)
         dialog.support_clicked.connect(self._open_support)
         dialog.finished.connect(lambda _result: setattr(self, "_achievement_dialog", None))
@@ -1235,12 +1239,15 @@ class MainWindow(QMainWindow):
         done = [item for item in items if item is not None and item.status == ItemStatus.DONE]
         failed = sum(1 for item in items if item is not None and item.status == ItemStatus.FAILED)
         stopped = self._batch_stopped
-        per_playlist = {}
-        for item in done:
-            if item.subfolder:  # stavke iste liste dijele podfolder s njenim imenom
-                per_playlist[item.subfolder] = per_playlist.get(item.subfolder, 0) + 1
-        if not stopped and per_playlist:
-            self._achievements.record_playlist(max(per_playlist.values()))
+        playlists = {}  # podfolder liste -> [uspjelo, ukupno]; stavke iste liste dijele podfolder s njenim imenom
+        for item in items:
+            if item is not None and item.subfolder:
+                counts = playlists.setdefault(item.subfolder, [0, 0])
+                counts[0] += item.status == ItemStatus.DONE
+                counts[1] += 1
+        if not stopped:
+            for ok, total in playlists.values():
+                self._achievements.record_playlist(ok, total)
         self._batch.clear()
         self._taskbar.clear()
         if stopped or not self._notify_done or not (done or failed):

@@ -92,6 +92,26 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(loaded.take_pending(), ["audio"])
         self.assertEqual(loaded.pending, [])
 
+    def test_broken_saved_value_does_not_stop_the_program(self):
+        for broken in ("[]", "5", '{"earned": [1], "streak": "x", "first_day": "nije datum", "pending": ["nema"]}'):
+            with self.subTest(broken):
+                state = AchievementState.from_json(broken)
+                self.assertEqual(state.earned, {})
+                self.assertEqual(state.pending, [])
+                state.record(Download(url="https://a.ba/1", when=NOON))  # i dalje radi
+
+    def test_country_second_level_domains_are_separate_sites(self):
+        self.assertEqual(achievements.site_of("https://news.bbc.co.uk/v"), "bbc.co.uk")
+        self.assertEqual(achievements.site_of("https://www.itv.co.uk/v"), "itv.co.uk")
+        self.assertEqual(achievements.site_of("https://m.klix.ba/v"), "klix.ba")
+
+    def test_playlist_with_a_failed_item_is_not_whole(self):
+        state = AchievementState()
+        state.record_playlist(10, total=11)
+        self.assertNotIn("playlist", state.earned)
+        state.record_playlist(10, total=10)
+        self.assertIn("playlist", state.earned)
+
     def test_support_note_at_most_once_a_day(self):
         state = AchievementState()
         start = 1_800_000_000.0
@@ -126,7 +146,7 @@ class WindowTest(unittest.TestCase):
 
     def test_badge_dialog_and_list(self):
         window = self.window()
-        window._support.last_dialog = time.time()
+        window._support.last_dialog = time.time() - 2 * 24 * 3600  # sedmični prozor prije 2 dana
         window._achievements.record(Download(url="https://a.ba/1", audio=True, when=NOON))
         window._maybe_remind_support()
         dialog = window._achievement_dialog
@@ -146,7 +166,7 @@ class WindowTest(unittest.TestCase):
 
     def test_several_at_once_in_one_dialog_without_second_support_note(self):
         window = self.window()
-        window._support.last_dialog = time.time()
+        window._support.last_dialog = time.time() - 2 * 24 * 3600  # sedmični prozor prije 2 dana
         window._achievements.record(Download(url="https://a.ba/1", audio=True, clip=True, when=NOON))
         window._maybe_remind_support()
         dialog = window._achievement_dialog
@@ -157,6 +177,19 @@ class WindowTest(unittest.TestCase):
         window._achievements.record(Download(url="https://a.ba/2", car=True, when=NOON))
         window._maybe_remind_support()
         self.assertTrue(window._achievement_dialog.support_note.isHidden())  # isti dan: bez druge poruke
+
+
+class OneInvitationADayTest(WindowTest):
+    def test_weekly_dialog_waits_after_achievement_with_support_note(self):
+        window = self.window()
+        window._support.downloads = 7
+        window._support.last_dialog = time.time() - 8 * 24 * 3600  # sedmični prozor bi sada smio
+        window._achievements.record(Download(url="https://a.ba/1", audio=True, when=NOON))
+        window._maybe_remind_support()
+        self.assertFalse(window._achievement_dialog.support_note.isHidden())
+        window._achievement_dialog.accept()
+        window._maybe_remind_support()
+        self.assertIsNone(window._support_dialog)  # isti dan: bez drugog poziva na prilog
 
 
 if __name__ == "__main__":

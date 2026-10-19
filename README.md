@@ -91,7 +91,8 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    yt-dlp se i dalje osvježava sam (u napomeni za provjeru objašnjeno).
 
 9. **Dodatak u prodavnicama** (samo kad se dodatak mijenjao; `version` u `extension/manifest.json` mora biti veći):
-   Firefox: `python tools/build_firefox.py --listed` → addons.mozilla.org → nova verzija. Edge: `python tools/build_edge.py`
+   Firefox: `python tools/build_firefox.py --listed` → addons.mozilla.org → nova verzija, samo za Firefox na računaru
+   (Firefox za Android nema vezu s programom). Edge: `python tools/build_edge.py`
    → Partner Center → Edge → Video Download → Packages → Replace → Publish. Edge dodatak ima svoj ID
    (`EDGE_STORE_EXTENSION_ID` u `videodl/native_messaging.py`), pa se objavljuje tek kad je program s tim ID-em izašao.
 

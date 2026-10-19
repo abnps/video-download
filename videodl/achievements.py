@@ -44,9 +44,15 @@ class Download:
     when: datetime = field(default_factory=datetime.now)
 
 
+# Česti drugi nivoi ispod države (bbc.co.uk, abc.com.au): sajt su tada zadnja tri dijela adrese.
+SECOND_LEVEL = {"co", "com", "org", "net", "gov", "edu", "ac", "or", "ne", "go", "gob", "nic"}
+
+
 def site_of(url: str) -> str:
     host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
     parts = host.split(".")
+    if len(parts) >= 3 and len(parts[-1]) == 2 and parts[-2] in SECOND_LEVEL:
+        return ".".join(parts[-3:])
     return ".".join(parts[-2:]) if len(parts) >= 2 else host
 
 
@@ -73,8 +79,25 @@ class AchievementState:
             data = json.loads(text or "{}")
         except ValueError:
             data = {}
-        known = {key: value for key, value in data.items() if key in cls.__dataclass_fields__}
-        return cls(**known)
+        if not isinstance(data, dict):
+            data = {}
+        # Pokvarena ili tuđa vrijednost u podešavanjima ne smije spriječiti pokretanje: loše polje = početno.
+        state = cls()
+        for key, value in data.items():
+            default = getattr(state, key, None)
+            if key in cls.__dataclass_fields__ and type(value) is type(default):
+                setattr(state, key, value)
+            elif key in cls.__dataclass_fields__ and isinstance(default, float) and isinstance(value, int):
+                setattr(state, key, float(value))
+        state.earned = {k: v for k, v in state.earned.items() if isinstance(v, (int, float))}
+        state.pending = [k for k in state.pending if k in ICONS]
+        state.sites = [s for s in state.sites if isinstance(s, str)]
+        try:
+            date.fromisoformat(state.first_day or "2000-01-01")
+            date.fromisoformat(state.last_day or "2000-01-01")
+        except ValueError:
+            state.first_day = state.last_day = ""
+        return state
 
     # ---------- osvajanje ----------
 
@@ -132,8 +155,9 @@ class AchievementState:
         if (today - date.fromisoformat(self.first_day)).days >= 365:
             earn("anniversary")
 
-    def record_playlist(self, done_in_playlist: int, now: float | None = None) -> None:
-        if done_in_playlist >= PLAYLIST_MIN:
+    def record_playlist(self, done_in_playlist: int, total: int | None = None, now: float | None = None) -> None:
+        """Cijela lista: sve njene stavke uspjele (lista s neuspjelom stavkom se ne računa)."""
+        if done_in_playlist >= PLAYLIST_MIN and (total is None or done_in_playlist >= total):
             self._earn("playlist", time.time() if now is None else now)
 
     # ---------- čestitka ----------

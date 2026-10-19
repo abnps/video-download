@@ -179,7 +179,7 @@ class SupportWindowTest(unittest.TestCase):
 
     def test_achievement_at_ten_with_support_message(self):
         window = self.window()
-        window._support.last_dialog = time.time()  # sedmični podsjetnik već prikazan
+        window._support.last_dialog = time.time() - 2 * DAY  # sedmični podsjetnik prikazan prije 2 dana
         self.download(window, 10)
         self.assertTrue(wait_until(lambda: window._achievement_dialog is not None))
         dialog = window._achievement_dialog
