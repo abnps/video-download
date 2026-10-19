@@ -15,6 +15,10 @@ from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_data_base
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
 EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
+# Edge Add-ons daje dodatku svoj ID (paket ide bez polja "key"); upisuje se ovdje kad ga prodavnica dodijeli,
+# da program prihvati i dodatak iz prodavnice i onaj učitan iz foldera programa.
+EDGE_STORE_EXTENSION_ID: str | None = None
+CHROMIUM_EXTENSION_IDS = tuple(i for i in (EXTENSION_ID, EDGE_STORE_EXTENSION_ID) if i)
 REGISTRY_PATHS = (
     rf"Software\Google\Chrome\NativeMessagingHosts\{native_host.HOST_NAME}",
     rf"Software\Microsoft\Edge\NativeMessagingHosts\{native_host.HOST_NAME}",
@@ -82,7 +86,7 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
 
     common = {"name": native_host.HOST_NAME, "description": "Video Download", "path": str(script), "type": "stdio"}
     manifest = install_dir / f"{native_host.HOST_NAME}.json"
-    manifest.write_text(json.dumps({**common, "allowed_origins": [f"chrome-extension://{EXTENSION_ID}/"]},
+    manifest.write_text(json.dumps({**common, "allowed_origins": [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS]},
                                    indent=2), encoding="utf-8")
     firefox = install_dir / f"{native_host.HOST_NAME}.firefox.json"
     firefox.write_text(json.dumps({**common, "allowed_extensions": [FIREFOX_EXTENSION_ID]}, indent=2),
