@@ -265,6 +265,33 @@ class NativeHostTest(unittest.TestCase):
         self.assertEqual(reply["code"], "app-timeout")
         self.assertFalse(unknown["ok"])
 
+    def test_store_version_opens_app_through_start_menu(self):
+        store = Path(r"C:\Program Files\WindowsApps\abnps.VideoDownloadbyabnps_1.0.2.0_x64__rtqmsrm0jkev2")
+        self.assertEqual(native_host.store_launch_command(store / "videodl-host.exe"),
+                         ["explorer.exe", r"shell:AppsFolder\abnps.VideoDownloadbyabnps_rtqmsrm0jkev2!VideoDownload"])
+        # Obična instalacija i neobičan folder ostaju na direktnom pokretanju.
+        self.assertIsNone(native_host.store_launch_command(
+            Path(r"C:\Users\a\AppData\Local\Programs\VideoDownload\videodl-host.exe")))
+        self.assertIsNone(native_host.store_launch_command(Path(r"C:\WindowsApps\nesto\videodl-host.exe")))
+
+    def test_store_package_manifest_matches_host(self):
+        import sys
+        sys.path.insert(0, str(PROJECT_ROOT / "tools"))
+        try:
+            import build_msix
+        finally:
+            sys.path.remove(str(PROJECT_ROOT / "tools"))
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(build_msix.manifest("1.0.2.0"))
+        ns = {"m": "http://schemas.microsoft.com/appx/manifest/foundation/windows10",
+              "v": "http://schemas.microsoft.com/appx/manifest/virtualization/windows10"}
+        self.assertEqual(root.find("m:Applications/m:Application", ns).get("Id"), native_host.STORE_APP_ID)
+        keys = [k.text for k in root.iterfind(".//v:ExcludedKey", ns)]
+        self.assertEqual(keys, [f"HKEY_CURRENT_USER\\{p}" for p in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS])
+        self.assertEqual([d.text for d in root.iterfind(".//v:ExcludedDirectory", ns)],
+                         [r"$(KnownFolder:LocalAppData)\VideoDownload"])
+
 
 class NativeMessagingInstallTest(unittest.TestCase):
     def test_extension_id_matches_manifest_key(self):

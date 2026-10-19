@@ -210,6 +210,22 @@ def is_browser_launch(argv: list[str]) -> bool:
     return any(arg.startswith("chrome-extension://") or arg == "video-download@abnps.github.io" for arg in argv[1:])
 
 
+STORE_APP_ID = "VideoDownload"  # Application Id iz AppxManifest.xml (tools/build_msix.py)
+
+
+def store_launch_command(executable: Path) -> list[str] | None:
+    """Store (MSIX) verzija: host je u ...\\WindowsApps\\<ime>_<verzija>_<arh>_<resurs>_<izdavač>\\. Browser ga
+    pokreće direktno, bez identiteta paketa; i VideoDownload.exe pokrenut po putanji ne bi ga imao (pa bi nudio
+    naše ažuriranje), zato se program otvara preko Starta: shell:AppsFolder\\<ime>_<izdavač>!VideoDownload."""
+    folder = executable.parent
+    if "windowsapps" not in (part.lower() for part in folder.parts[:-1]):
+        return None
+    parts = folder.name.split("_")
+    if len(parts) != 5 or not parts[0] or not parts[4]:
+        return None
+    return ["explorer.exe", f"shell:AppsFolder\\{parts[0]}_{parts[4]}!{STORE_APP_ID}"]
+
+
 def current_config() -> dict:
     if getattr(sys, "frozen", False):
         executable = Path(sys.executable).resolve()
@@ -219,7 +235,7 @@ def current_config() -> dict:
             bundle = next((parent for parent in executable.parents if parent.suffix == ".app"), executable)
             return {"launch": ["open", str(bundle)]}
         # Windows: videodl-host.exe stoji pored VideoDownload.exe.
-        return {"launch": [str(executable.with_name("VideoDownload.exe"))]}
+        return {"launch": store_launch_command(executable) or [str(executable.with_name("VideoDownload.exe"))]}
     return load_config(Path(__file__).resolve().parent)
 
 

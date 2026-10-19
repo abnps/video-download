@@ -336,6 +336,12 @@ Za 1.0.2:
   build_msix.py virtualization:ExcludedKeys za tri NativeMessagingHosts putanje (ili upis preko procesa izvan
   paketa); i native_host.launch_app za Store verziju pokretati preko shell:AppsFolder\<PFN>!VideoDownload (direktan
   VideoDownload.exe radi bez identiteta paketa pa bi nudio naše ažuriranje). Prije slanja probati lokalno.
+  URAĐENO u kodu 19.10.2026 (makeappx prihvata manifest, testovi): build_msix.py dodaje virtualization:
+  ExcludedKeys (3 ključa) + ExcludedDirectory $(KnownFolder:LocalAppData)\VideoDownload; native_host.
+  store_launch_command (host iz ...\WindowsApps\<ime>_..._<izdavač>\ → explorer.exe shell:AppsFolder\...).
+  JOŠ NIJE PROBANO na pravom Store paketu: provjera tek s 1.0.2 u privatnoj grupi „Proba" (ključevi vidljivi
+  u regedit van paketa, dodatak „aplikacija radi", klik iz browsera otvara Store verziju bez ponude ažuriranja).
+  Ako ključevi i dalje ostanu u mjehuru: upis registra iz procesa koji izlazi iz paketa (breakaway).
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
   Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
   Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).

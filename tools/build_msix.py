@@ -19,6 +19,7 @@ PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT))
 
 from videodl import __version__  # noqa: E402
+from videodl.native_messaging import FIREFOX_REGISTRY_PATHS, REGISTRY_PATHS  # noqa: E402
 
 BUILD = PROJECT.parent / "Build"
 IDENTITY_NAME = "abnps.VideoDownloadbyabnps"
@@ -33,7 +34,8 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
-         IgnorableNamespaces="uap rescap desktop6">
+         xmlns:virtualization="http://schemas.microsoft.com/appx/manifest/virtualization/windows10"
+         IgnorableNamespaces="uap rescap desktop6 virtualization">
   <Identity Name="{name}" Publisher="{publisher}" Version="{version}" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>{display}</DisplayName>
@@ -41,6 +43,7 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
     <Logo>Assets\\StoreLogo.png</Logo>
     <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
     <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
+{excluded}
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
@@ -61,6 +64,30 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
   </Capabilities>
 </Package>
 """
+
+
+def excluded_locations() -> str:
+    """Windows 11 (i 10 od 2004) ne poštuje uvijek desktop6 „disabled" za HKCU (19.10.2026: ključevi za browser
+    ostali u mjehuru paketa), pa se mjesta koja browser mora vidjeti navode i pojedinačno; novi zapis tada
+    ima prednost, a stariji Windows koristi desktop6."""
+    keys = "".join(f"\n        <virtualization:ExcludedKey>HKEY_CURRENT_USER\\{path}</virtualization:ExcludedKey>"
+                   for path in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS)
+    return ("    <virtualization:FileSystemWriteVirtualization>\n"
+            "      <virtualization:ExcludedDirectories>\n"
+            # manifest za browser (native-host), bridge.json i postavke programa
+            "        <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\\VideoDownload"
+            "</virtualization:ExcludedDirectory>\n"
+            "      </virtualization:ExcludedDirectories>\n"
+            "    </virtualization:FileSystemWriteVirtualization>\n"
+            "    <virtualization:RegistryWriteVirtualization>\n"
+            f"      <virtualization:ExcludedKeys>{keys}\n"
+            "      </virtualization:ExcludedKeys>\n"
+            "    </virtualization:RegistryWriteVirtualization>")
+
+
+def manifest(version: str) -> str:
+    return MANIFEST.format(name=IDENTITY_NAME, publisher=PUBLISHER, version=version, display=DISPLAY_NAME,
+                           publisher_display=PUBLISHER_DISPLAY, excluded=excluded_locations())
 
 
 def store_version(version: str) -> str:
@@ -97,9 +124,7 @@ def main() -> int:
     for name, size in LOGOS.items():
         icon.resize((size, size), Image.LANCZOS).save(assets / name)
     version = store_version(__version__)
-    (layout / "AppxManifest.xml").write_text(MANIFEST.format(
-        name=IDENTITY_NAME, publisher=PUBLISHER, version=version, display=DISPLAY_NAME,
-        publisher_display=PUBLISHER_DISPLAY), encoding="utf-8")
+    (layout / "AppxManifest.xml").write_text(manifest(version), encoding="utf-8")
     package = args.out / f"VideoDownloadbyabnps-{version}-x64.msix"
     subprocess.run([str(find_makeappx()), "pack", "/d", str(layout), "/p", str(package), "/o"], check=True,
                    stdout=subprocess.DEVNULL)
