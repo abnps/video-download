@@ -328,7 +328,14 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 ## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
-Za 1.0.2: (još ništa)
+Za 1.0.2:
+- Microsoft Store verzija (obavezno prije javne objave u Storeu): veza s browserom. Provjereno 19.10.2026 na Store
+  1.0.1.0: fajl manifesta ide na pravo mjesto, ali ključevi HKCU\...\NativeMessagingHosts\com.videodl.bridge ostaju
+  u mjehuru paketa uprkos desktop6:RegistryWriteVirtualization=disabled (vide se samo unutar paketa). Uz ručno
+  upisane ključeve dodatak javlja „aplikacija radi" (videodl-host.exe iz WindowsApps radi). Popravka: u
+  build_msix.py virtualization:ExcludedKeys za tri NativeMessagingHosts putanje (ili upis preko procesa izvan
+  paketa); i native_host.launch_app za Store verziju pokretati preko shell:AppsFolder\<PFN>!VideoDownload (direktan
+  VideoDownload.exe radi bez identiteta paketa pa bi nudio naše ažuriranje). Prije slanja probati lokalno.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
