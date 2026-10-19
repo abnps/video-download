@@ -15,9 +15,9 @@ from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_data_base
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
 EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
-# Edge Add-ons daje dodatku svoj ID (paket ide bez polja "key"); upisuje se ovdje kad ga prodavnica dodijeli,
-# da program prihvati i dodatak iz prodavnice i onaj učitan iz foldera programa.
-EDGE_STORE_EXTENSION_ID: str | None = None
+# Edge Add-ons daje dodatku svoj ID (paket ide bez polja "key", Partner Center → CRX ID, 19.10.2026);
+# program prihvata i dodatak iz prodavnice i onaj učitan iz foldera programa.
+EDGE_STORE_EXTENSION_ID = "glikmhiifcloegaachgkhinigmnhnjpo"
 CHROMIUM_EXTENSION_IDS = tuple(i for i in (EXTENSION_ID, EDGE_STORE_EXTENSION_ID) if i)
 REGISTRY_PATHS = (
     rf"Software\Google\Chrome\NativeMessagingHosts\{native_host.HOST_NAME}",

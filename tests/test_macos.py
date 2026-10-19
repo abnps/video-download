@@ -19,7 +19,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from videodl import desktop, dialogs, native_host, runtime, updater  # noqa: E402
 from videodl.gui import default_output_dir  # noqa: E402
 from videodl.native_messaging import (  # noqa: E402
-    EXTENSION_ID, FIREFOX_EXTENSION_ID, MAC_CHROMIUM_DIRS, install_native_host, mac_manifest_targets,
+    CHROMIUM_EXTENSION_IDS, EXTENSION_ID, FIREFOX_EXTENSION_ID, MAC_CHROMIUM_DIRS, install_native_host, mac_manifest_targets,
     uninstall_native_host,
 )
 
@@ -50,7 +50,8 @@ class MacNativeMessagingTest(unittest.TestCase):
 
             chrome = support / "Google" / "Chrome" / "NativeMessagingHosts" / f"{native_host.HOST_NAME}.json"
             firefox = support / "Mozilla" / "NativeMessagingHosts" / f"{native_host.HOST_NAME}.json"
-            self.assertEqual(json.loads(chrome.read_text())["allowed_origins"], [f"chrome-extension://{EXTENSION_ID}/"])
+            self.assertEqual(json.loads(chrome.read_text())["allowed_origins"],
+                         [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS])
             self.assertEqual(json.loads(firefox.read_text())["allowed_extensions"], [FIREFOX_EXTENSION_ID])
             self.assertFalse((support / "Microsoft Edge").exists())  # ne pravi foldere za browser koji nema
 

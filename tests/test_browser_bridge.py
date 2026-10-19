@@ -16,7 +16,7 @@ from videodl import native_host
 from videodl.bridge import BridgeServer
 from videodl.browser import cookie_file, parse_browser_request
 from videodl.native_messaging import (
-    EXTENSION_ID, FIREFOX_EXTENSION_ID, FIREFOX_REGISTRY_PATHS, PROJECT_ROOT, REGISTRY_PATHS, install_native_host,
+    CHROMIUM_EXTENSION_IDS, EXTENSION_ID, FIREFOX_EXTENSION_ID, FIREFOX_REGISTRY_PATHS, PROJECT_ROOT, REGISTRY_PATHS, install_native_host,
 )
 
 
@@ -288,7 +288,8 @@ class NativeMessagingInstallTest(unittest.TestCase):
             host_copied = (folder / "host.py").read_text(encoding="utf-8") == \
                 Path(native_host.__file__).read_text(encoding="utf-8")
 
-        self.assertEqual(manifest["allowed_origins"], [f"chrome-extension://{EXTENSION_ID}/"])
+        self.assertEqual(manifest["allowed_origins"],
+                         [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS])
         self.assertEqual(manifest["name"], native_host.HOST_NAME)
         self.assertTrue(manifest["path"].endswith("host.bat"))
         self.assertTrue(script.isascii())
