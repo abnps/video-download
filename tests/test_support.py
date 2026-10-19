@@ -116,6 +116,10 @@ class SupportWindowTest(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.settings = QSettings(os.path.join(self.tmp.name, "s.ini"), QSettings.Format.IniFormat)
         self.settings.setValue("language", "bs")
+        # Ostala dostignuća (npr. „Noćna ptica" kad testovi rade noću) ovdje ne smiju zamijeniti podsjetnik.
+        patcher = mock.patch("videodl.achievements.AchievementState.take_pending", return_value=[])
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def window(self):
         counter = iter(range(1000))

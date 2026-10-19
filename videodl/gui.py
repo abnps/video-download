@@ -40,13 +40,13 @@ from .presets import (
     direct_output_name, section_label, subtitle_languages, title_identity,
 )
 from .probe import ProbeResult, probe
-from . import convert, diagnostics, parental, release_signing, runtime, scheduler, store, support, theme, winshell
+from . import achievements, convert, diagnostics, parental, release_signing, runtime, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
     AUDIO_EXTENSIONS, BROWSERS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
-    AchievementDialog, SupportDialog, WhatsNewDialog, browser_exe, filter_history,
+    AchievementDialog, AchievementsListDialog, SupportDialog, WhatsNewDialog, milestone_line, browser_exe, filter_history,
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
 
@@ -385,6 +385,7 @@ class MainWindow(QMainWindow):
         self.discord_action = self.help_menu.addAction("", lambda: QDesktopServices.openUrl(QUrl(DISCORD_URL)))
         self.legal_action = self.help_menu.addAction("", self._show_legal)
         self.support_action = self.help_menu.addAction("", lambda: self.show_support_dialog(automatic=False))
+        self.achievements_action = self.help_menu.addAction("", self.show_achievements_list)
         self.about_action = self.help_menu.addAction("", self._show_about)
 
         # Referenca se čuva: PySide ne preuzima vlasništvo, pa bi Python obrisao label.
@@ -446,6 +447,7 @@ class MainWindow(QMainWindow):
         self.discord_action.setText(tr("menu.discord"))
         self.legal_action.setText(tr("menu.legal"))
         self.support_action.setText(tr("menu.support"))
+        self.achievements_action.setText(tr("menu.achievements"))
         self.support_link.setText(f'<a href="support" style="color:{theme.c('support_link')};text-decoration:none">{tr("support.link")}</a>')
         self.support_banner_label.setText(tr("support.banner"))
         self.support_banner_button.setText(tr("support.button"))
@@ -610,6 +612,8 @@ class MainWindow(QMainWindow):
         self._support.milestone_shown = self._settings.value(
             "support/milestone_shown", support.passed_milestone(self._support.downloads), type=int)
         self._achievement_dialog = None
+        self._achievements = achievements.AchievementState.from_json(
+            self._settings.value("achievements/state", "", type=str))
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
         # Poglavlja su uključena odmah (ništa ne šalju); SponsorBlock pita vanjski servis, pa tek na zahtjev.
@@ -640,6 +644,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("support/last_dialog", self._support.last_dialog)
         self._settings.setValue("support/snooze_until", self._support.snooze_until)
         self._settings.setValue("support/milestone_shown", self._support.milestone_shown)
+        self._settings.setValue("achievements/state", self._achievements.to_json())
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
         self._settings.setValue("chapters", self._chapters)
         self._settings.setValue("sponsorblock", self._sponsorblock)
@@ -693,22 +698,48 @@ class MainWindow(QMainWindow):
         if self._support.should_show_banner(now):
             self.support_banner.show()
         busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
+        free = self._achievement_dialog is None and self._support_dialog is None
         milestone = self._support.milestone_due(busy)
-        if milestone and self._achievement_dialog is None and self._support_dialog is None:
+        badges = self._achievements.take_pending() if free and not busy else []
+        if free and (milestone or badges):
             # Čestitka ima prednost; podsjetnik za prilog čeka sljedeću priliku (ne dva prozora odjednom).
-            self._support.milestone_seen(milestone)
-            self.show_achievement(milestone, now)
-        elif (self._support.should_show_dialog(now, busy) and self._support_dialog is None
-              and self._achievement_dialog is None):
+            if milestone:
+                self._support.milestone_seen(milestone)
+            self.show_achievement(milestone, badges, now)
+        elif free and self._support.should_show_dialog(now, busy):
             self.show_support_dialog(automatic=True)
         self._save_settings()
 
-    def show_achievement(self, milestone: int, now: float) -> None:
-        dialog = AchievementDialog(milestone, show_support=not self._support.snoozed(now), parent=self)
+    def show_achievement(self, milestone: int, badges: list, now: float) -> None:
+        names = [(achievements.ICONS[key], tr(f"badge.{key}"), tr(f"badge.{key}.desc")) for key in badges]
+        if milestone and not names:
+            headline, lines = tr("achievement.headline", count=milestone), [milestone_line(milestone)]
+        elif len(names) == 1 and not milestone:
+            icon, name, desc = names[0]
+            headline, lines = f"{icon} {name}", [desc]
+        else:
+            headline = tr("achievement.new_many")
+            lines = ([f"🏆 {tr('achievements.count_name', count=milestone)}"] if milestone else []) + \
+                [f"{icon} {name}: {desc}" for icon, name, desc in names]
+        show_support = not self._support.snoozed(now) and self._achievements.support_note_allowed(now)
+        dialog = AchievementDialog(headline, lines, show_support=show_support, parent=self)
         dialog.support_clicked.connect(self._open_support)
         dialog.finished.connect(lambda _result: setattr(self, "_achievement_dialog", None))
         self._achievement_dialog = dialog
         dialog.open()
+
+    def _record_achievements(self, item, result: DownloadResult) -> None:
+        preset = get_preset(item.preset_key)
+        self._achievements.record(achievements.Download(
+            url=item.url, audio=preset.is_audio, car=item.preset_key in ("car", "mp3car"),
+            clip=item.section is not None, height=result.height, size=self._sizes.get(item.id, 0),
+            from_browser=item.from_browser, subtitles=self._subtitles, duration=item.duration,
+            retried=item.auto_retries > 0, running_together=len(self._download_jobs) + 1))
+
+    @Slot()
+    def show_achievements_list(self) -> None:
+        AchievementsListDialog(self._achievements, self._support.downloads, self._support.milestone_shown,
+                               self).open()
 
     @Slot()
     def _open_support(self) -> None:
@@ -1008,6 +1039,7 @@ class MainWindow(QMainWindow):
                                request.preset or self.preset_combo.currentData(),
                                self._output_dir, filename_title=request.page_title, **access)
         item.custom_format = bool(request.preset)  # izbor iz dodatka ne mijenja glavni format
+        item.from_browser = True
         self._append_row(item)
         self._set_status(tr("status.from_browser", title=request.page_title))
         self._manual.append(item.id)
@@ -1035,6 +1067,7 @@ class MainWindow(QMainWindow):
                                    thumbnail=entry.thumbnail, duration=entry.duration, adult=entry.adult,
                                    video_id=entry.video_id, **access)
             item.custom_format = bool(preset)  # format tražen iz dodatka ostaje na toj stavci
+            item.from_browser = auto_start  # auto_start dolazi samo iz dodatka za browser
             self._append_row(item)
             added.append(item)
         if auto_start and self._confirm_adult(added):  # iz browsera: kreće odmah, 18+ tek uz potvrdu
@@ -1168,6 +1201,7 @@ class MainWindow(QMainWindow):
                                                        self._sizes.get(item_id)))
                 if not result.already_existed:
                     self._support.count_download()
+                    self._record_achievements(item, result)
             if item_id in self._remove_when_done:
                 self._remove_when_done.discard(item_id)
                 self._remove_item(item_id)
@@ -1201,6 +1235,12 @@ class MainWindow(QMainWindow):
         done = [item for item in items if item is not None and item.status == ItemStatus.DONE]
         failed = sum(1 for item in items if item is not None and item.status == ItemStatus.FAILED)
         stopped = self._batch_stopped
+        per_playlist = {}
+        for item in done:
+            if item.subfolder:  # stavke iste liste dijele podfolder s njenim imenom
+                per_playlist[item.subfolder] = per_playlist.get(item.subfolder, 0) + 1
+        if not stopped and per_playlist:
+            self._achievements.record_playlist(max(per_playlist.values()))
         self._batch.clear()
         self._taskbar.clear()
         if stopped or not self._notify_done or not (done or failed):

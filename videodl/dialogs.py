@@ -74,24 +74,25 @@ class SupportDialog(QDialog):
         layout.addWidget(self.kofi_link)
 
 class AchievementDialog(QDialog):
-    """Čestitka na 10, 50, 100… preuzimanja. Ne blokira rad; dugme za prilog samo ako ga korisnik nije ugasio."""
+    """Čestitka za dostignuće (ili više njih odjednom). Ne blokira rad; poruka i dugme za prilog samo kad je
+    dozvoljeno (nije „Već sam podržao", najviše jednom dnevno)."""
 
     support_clicked = Signal()
 
-    def __init__(self, count: int, show_support: bool, parent=None):
+    def __init__(self, headline: str, lines: list[str], show_support: bool, parent=None):
         super().__init__(parent)
         self.setWindowTitle(tr("achievement.title"))
         self.setFixedWidth(440)  # poruka za prilog se lomi u dva reda umjesto jednog dugog
         layout = QVBoxLayout(self)
-        self.headline = QLabel(tr("achievement.headline", count=count))
+        self.headline = QLabel(headline)
         font = self.headline.font()
         font.setPointSizeF(font.pointSizeF() * 1.6)
         font.setBold(True)
         self.headline.setFont(font)
         self.headline.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.headline.setWordWrap(True)
         layout.addWidget(self.headline)
-        key = f"achievement.{count}" if count <= 500 else "achievement.big"
-        self.message = QLabel(f"{tr(key)}\n{tr('achievement.thanks')}")
+        self.message = QLabel("\n".join([*lines, tr("achievement.thanks")]))
         self.message.setWordWrap(True)
         self.message.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.message)
@@ -114,6 +115,61 @@ class AchievementDialog(QDialog):
         buttons.addWidget(self.support_button)
         buttons.addStretch(1)
         buttons.addWidget(self.ok_button)
+        layout.addLayout(buttons)
+
+
+def milestone_line(count: int) -> str:
+    return tr(f"achievement.{count}" if count <= 500 else "achievement.big")
+
+
+class AchievementsListDialog(QDialog):
+    """Pomoć → Moja dostignuća: osvojena i neosvojena, ukupan broj preuzimanja."""
+
+    def __init__(self, state, downloads: int, milestone_shown: int, parent=None):
+        super().__init__(parent)
+        from . import achievements, support  # bez kružnog uvoza pri učitavanju
+
+        self.setWindowTitle(tr("menu.achievements").rstrip("…"))
+        self.resize(520, 600)
+        layout = QVBoxLayout(self)
+        earned = [m for m in support.MILESTONES if m <= milestone_shown]
+        total = len(support.MILESTONES) + len(achievements.BADGES)
+        self.summary = QLabel(tr("achievements.summary", earned=len(earned) + len(state.earned), total=total,
+                                 downloads=downloads, size=format_size(state.total_bytes)))
+        self.summary.setWordWrap(True)
+        layout.addWidget(self.summary)
+        self.list = QListWidget()
+        self.list.setSelectionMode(QListWidget.SelectionMode.NoSelection)  # samo za čitanje
+        self.list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        rows = []
+        for count in support.MILESTONES:
+            rows.append(("🏆", tr("achievements.count_name", count=count), tr("achievements.count_desc", count=count),
+                         count <= milestone_shown, None))
+        for key, icon in achievements.BADGES:
+            rows.append((icon, tr(f"badge.{key}"), tr(f"badge.{key}.desc"), key in state.earned,
+                         state.earned.get(key)))
+        rows.sort(key=lambda row: not row[3])  # osvojena prva, inače istim redom
+        for icon, name, desc, done, when in rows:
+            if done:
+                status = (tr("achievements.earned_on",
+                             date=datetime.date.fromtimestamp(when).strftime("%d.%m.%Y")) if when else "")
+                text = f"{icon}  {name}\n      {desc}" + (f"  ·  {status}" if status else "")
+            else:
+                text = f"🔒  {name}\n      {desc}  ·  {tr('achievements.locked')}"
+            item = QListWidgetItem(text)
+            if not done:
+                item.setForeground(self.palette().placeholderText())
+            self.list.addItem(item)
+        layout.addWidget(self.list, 1)
+        note = QLabel(tr("achievements.local"))
+        note.setWordWrap(True)
+        note.setObjectName("supportNote")
+        layout.addWidget(note)
+        buttons = QHBoxLayout()
+        buttons.addStretch(1)
+        self.close_button = QPushButton(tr("achievements.close"))
+        self.close_button.clicked.connect(self.accept)
+        buttons.addWidget(self.close_button)
         layout.addLayout(buttons)
 
 

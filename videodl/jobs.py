@@ -44,6 +44,7 @@ class QueueItem:
     cookies: tuple = field(default=(), repr=False)
     # Sadržaj 18+: svako preuzimanje traži potvrdu; adult_ok važi samo za to jedno preuzimanje.
     adult: bool = False
+    from_browser: bool = False  # poslato iz dodatka za browser (dostignuće „Iz browsera")
     adult_ok: bool = False
     # ID videa na sajtu (iz čitanja linka): dva linka istog videa pišu isti fajl „naslov [id]".
     video_id: str | None = None
