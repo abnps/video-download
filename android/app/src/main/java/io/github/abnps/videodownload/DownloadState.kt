@@ -24,6 +24,9 @@ data class Job(
     val subtitles: Boolean = false, // .srt/.vtt pored videa (jezik aplikacije + engleski), kao na računaru
     val clipStart: Int = -1, // isječak u sekundama; -1 = cijeli video
     val clipEnd: Int = -1,
+    // Stavka cijele liste (dostignuće „Kolekcionar"): ključ te liste i koliko je stavki krenulo zajedno.
+    val playlistKey: String = "",
+    val playlistSize: Int = 0,
 ) {
     val hasClip get() = clipStart >= 0 && clipEnd > clipStart
 
@@ -32,6 +35,7 @@ data class Job(
         putInt("duration", duration); putBoolean("audio", isAudio); putInt("height", height); putString("label", label)
         putBoolean("adult", adult); putBoolean("adult_ok", adultOk)
         putBoolean("subtitles", subtitles); putInt("clip_start", clipStart); putInt("clip_end", clipEnd)
+        putString("playlist_key", playlistKey); putInt("playlist_size", playlistSize)
     }
 
     companion object {
@@ -40,7 +44,7 @@ data class Job(
             bundle.getString("thumbnail").orEmpty(), bundle.getInt("duration"), bundle.getBoolean("audio"),
             bundle.getInt("height"), bundle.getString("label").orEmpty(), bundle.getBoolean("adult"),
             bundle.getBoolean("adult_ok"), bundle.getBoolean("subtitles"), bundle.getInt("clip_start", -1),
-            bundle.getInt("clip_end", -1),
+            bundle.getInt("clip_end", -1), bundle.getString("playlist_key").orEmpty(), bundle.getInt("playlist_size"),
         )
     }
 }

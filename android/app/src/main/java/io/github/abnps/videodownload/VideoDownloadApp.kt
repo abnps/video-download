@@ -12,6 +12,7 @@ class VideoDownloadApp : Application() {
         super.onCreate()
         if (!Python.isStarted()) Python.start(AndroidPlatform(this))
         History.load(this)
+        Achievements.load(this) // poslije istorije: prvi put broji dosadašnja preuzimanja
         ThemeState.load(this)
         Downloads.load(this)
         runCatching { Python.getInstance().getModule("vd_core").callAttr("clean_diagnostics", cacheDir.absolutePath) }

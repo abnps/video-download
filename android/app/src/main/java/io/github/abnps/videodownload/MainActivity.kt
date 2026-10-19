@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
     private val loggedIn = mutableStateOf(emptySet<LoginSite>()) // na koje sajtove je korisnik prijavljen
     private val playlist = mutableStateOf<PlaylistInfo?>(null)
     private val askAdultFor = mutableStateOf<List<Job>>(emptyList()) // 18+ koji čekaju potvrdu (jedan prozor)
+    private val showAchievements = mutableStateOf(false) // Postavke → Moja dostignuća
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +113,7 @@ class MainActivity : ComponentActivity() {
     private fun handle(intent: Intent?) {
         if (intent?.getBooleanExtra(EXTRA_PASTE, false) == true) {
             // Widget ili pločica: međuspremnik se smije čitati tek kad prozor dobije fokus (onWindowFocusChanged).
+            intent.getStringExtra(EXTRA_SOURCE)?.takeIf { it == "widget" || it == "tile" }?.let { Achievements.recordSource(it) }
             pasteOnFocus = true
             tab.intValue = TAB_HOME
             info.value = null
@@ -129,6 +131,7 @@ class MainActivity : ComponentActivity() {
             info.value = null
             fromShare = true
             autoFind = true
+            Achievements.recordSource("share")
         }
     }
 
@@ -310,6 +313,7 @@ class MainActivity : ComponentActivity() {
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(send, getString(R.string.invite_title)))
         Counter.invite()
+        Achievements.recordSource("invite")
     }
 
     private fun installUpdate() {
@@ -358,6 +362,7 @@ class MainActivity : ComponentActivity() {
         val shownList = playlist.value
         BackHandler {
             when {
+                showAchievements.value -> showAchievements.value = false
                 shown != null -> info.value = null
                 shownList != null -> playlist.value = null
                 tab.intValue == TAB_SETTINGS -> tab.intValue = tabBeforeSettings
@@ -371,6 +376,12 @@ class MainActivity : ComponentActivity() {
             }
         }
         val openSettings = { tabBeforeSettings = tab.intValue; tab.intValue = TAB_SETTINGS }
+        // Čestitka za dostignuća tek kad ništa ne preuzima (ne usred liste) i kad nije otvoren drugi prozor.
+        val badges by Achievements.pending.collectAsState()
+        val working = active.any { it.phase !in setOf(Phase.DONE, Phase.INTERRUPTED, Phase.NEEDS_ADULT) }
+        if (badges.isNotEmpty() && !working && !welcome.value && askAdultFor.value.isEmpty()) {
+            AchievementDialog(badges, onSupport = { openLink(Links.SUPPORT) }) { Achievements.shown() }
+        }
         if (askAdultFor.value.isNotEmpty()) {
             AdultDialog(askAdultFor.value.size, onCancel = { askAdultFor.value = emptyList() }) {
                 askAdultFor.value.forEach { DownloadService.start(this@MainActivity, it.copy(adultOk = true)) }
@@ -409,7 +420,11 @@ class MainActivity : ComponentActivity() {
                     )
                     tab.intValue == TAB_HOME && shownList != null -> PlaylistScreen(
                         playlist = shownList, defaultHeight = quality.intValue, onBack = { playlist.value = null },
-                        onDownload = { jobs ->
+                        onDownload = { picked ->
+                            // Cijela lista (sve stavke) dobija zajednički ključ za dostignuće „Kolekcionar".
+                            val whole = picked.size == shownList.entries.size
+                            val key = "${shownList.url}#${System.currentTimeMillis()}"
+                            val jobs = if (whole) picked.map { it.copy(playlistKey = key, playlistSize = picked.size) } else picked
                             jobs.forEach { DownloadService.start(this@MainActivity, it) }
                             playlist.value = null
                             link.value = ""
@@ -446,6 +461,7 @@ class MainActivity : ComponentActivity() {
                             }, actions = actions,
                             onSettings = openSettings, lastError = error, onCopyReport = { copyReport() })
                     }
+                    showAchievements.value -> AchievementsScreen(onBack = { showAchievements.value = false })
                     else -> SettingsScreen(
                         quality = quality.intValue,
                         onQuality = { quality.intValue = it; Settings.setQuality(this@MainActivity, it) },
@@ -462,6 +478,7 @@ class MainActivity : ComponentActivity() {
                             Python.getInstance().getModule("vd_core").callAttr("version").toString()
                         }.getOrDefault("?"),
                         onBack = { tab.intValue = tabBeforeSettings },
+                        onAchievements = { showAchievements.value = true },
                     )
                 }
             }
@@ -471,6 +488,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_OPEN_DOWNLOADS = "otvori_preuzimanja"
         const val EXTRA_PASTE = "zalijepi_i_preuzmi"
+        const val EXTRA_SOURCE = "izvor" // widget ili pločica (dostignuća)
         private const val TAB_HOME = 0
         private const val TAB_DOWNLOADS = 1
         private const val TAB_SETTINGS = 2

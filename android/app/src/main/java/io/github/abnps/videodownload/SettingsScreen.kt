@@ -79,7 +79,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                    onLanguage: () -> Unit, onOpenLink: (String) -> Unit, onInvite: () -> Unit, onFeedback: () -> Unit,
                    loggedIn: Set<LoginSite>, onLogin: (LoginSite) -> Unit, onLogout: (LoginSite) -> Unit, appVersion: String,
                    readerVersion: String, update: UpdateState, onCheckUpdate: () -> Unit, onInstallUpdate: () -> Unit,
-                   onBack: () -> Unit) {
+                   onBack: () -> Unit, onAchievements: () -> Unit = {}) {
     var pickQuality by remember { mutableStateOf(false) }
     var pickLocation by remember { mutableStateOf(false) }
     var askLogout by remember { mutableStateOf<LoginSite?>(null) }
@@ -149,6 +149,9 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 "$appVersion · ${stringResource(R.string.test_version)} · yt-dlp $readerVersion", onClick = null)
         }
         SettingsGroup(stringResource(R.string.settings_support)) {
+            GroupRow(OneUi.Orange, R.drawable.ic_check_circle, stringResource(R.string.badge_title),
+                stringResource(R.string.badge_settings_sub, Achievements.downloadCount), onClick = onAchievements)
+            GroupDivider()
             GroupRow(OneUi.Orange, R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
                 onClick = onFeedback)
             GroupDivider()

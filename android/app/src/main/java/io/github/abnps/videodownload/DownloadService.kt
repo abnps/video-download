@@ -108,6 +108,7 @@ class DownloadService : Service() {
             }
             if (job.id in cancelled) throw CancelledHere()
             val size = file.length()
+            val height = if (job.isAudio) 0 else videoHeight(file) // stvarna visina (za dostignuće „4K")
             // Titlovi su tekst: MediaStore ih prima samo u Download/, pa tada i video ide tamo (plejer ih nađe zajedno).
             val subtitleFiles = result.getOrNull(4)?.toString().orEmpty().split("|").filter { it.isNotEmpty() }.map(::File)
                 .filter { it.isFile }
@@ -122,9 +123,13 @@ class DownloadService : Service() {
                 contentResolver.delete(uri, null, null)
                 throw CancelledHere()
             }
+            // Isti link je ranije pao, a sada je uspio (dostignuće „Ne odustaje se").
+            val retried = History.items.value.any { it.failed && it.url == job.url }
             History.add(HistoryItem(job.id, job.title.ifBlank { result[0].toString() }, uri.toString(), job.isAudio,
                 formatLabel(job, file.extension), size, job.duration, job.thumbnail, System.currentTimeMillis(),
                 adult = job.adult))
+            Achievements.recordDownload(FinishedDownload(job.url, job.isAudio, job.hasClip, height, size,
+                job.subtitles && subtitleFiles.isNotEmpty(), job.duration, retried, job.playlistKey, job.playlistSize))
             notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio), shareIntent(uri, job.isAudio))
             // Kao na računaru: traka zazeleni, kratko pulsira, pa kartica nestane.
             Downloads.update(job.id) { it.copy(phase = Phase.DONE, fraction = 1f) }
@@ -260,6 +265,18 @@ class DownloadService : Service() {
         worker.shutdownNow()
         super.onDestroy()
     }
+
+    private fun videoHeight(file: File): Int = runCatching {
+        val retriever = android.media.MediaMetadataRetriever()
+        try {
+            retriever.setDataSource(file.absolutePath)
+            val height = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toInt() ?: 0
+            val width = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+            minOf(height, width).takeIf { it > 0 } ?: height // uspravan video: kraća strana je „p"
+        } finally {
+            retriever.release()
+        }
+    }.getOrDefault(0)
 
     companion object {
         /** Oznaka posla „zvuk kao MP3" (ekran kvaliteta); bez nje zvuk ostaje M4A. */

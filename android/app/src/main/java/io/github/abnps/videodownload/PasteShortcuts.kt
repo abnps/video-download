@@ -15,18 +15,20 @@ import android.widget.RemoteViews
  * MainActivity s EXTRA_PASTE; ona zalijepi i pročita link čim dobije fokus.
  */
 object PasteShortcut {
-    fun intent(context: Context): Intent = Intent(context, MainActivity::class.java)
+    fun intent(context: Context, source: String): Intent = Intent(context, MainActivity::class.java)
         .putExtra(MainActivity.EXTRA_PASTE, true)
+        .putExtra(MainActivity.EXTRA_SOURCE, source) // „widget" ili „tile" (dostignuća)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
-    fun pending(context: Context): PendingIntent = PendingIntent.getActivity(context, 7, intent(context),
+    fun pending(context: Context, source: String): PendingIntent = PendingIntent.getActivity(context,
+        if (source == "tile") 8 else 7, intent(context, source),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 }
 
 class PasteWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         val views = RemoteViews(context.packageName, R.layout.widget_paste).apply {
-            setOnClickPendingIntent(R.id.widget_root, PasteShortcut.pending(context))
+            setOnClickPendingIntent(R.id.widget_root, PasteShortcut.pending(context, "widget"))
         }
         ids.forEach { manager.updateAppWidget(it, views) }
     }
@@ -36,10 +38,10 @@ class PasteTile : TileService() {
     override fun onClick() {
         super.onClick()
         if (Build.VERSION.SDK_INT >= 34) {
-            startActivityAndCollapse(PasteShortcut.pending(this))
+            startActivityAndCollapse(PasteShortcut.pending(this, "tile"))
         } else {
             @Suppress("DEPRECATION", "StartActivityAndCollapseDeprecated")
-            startActivityAndCollapse(PasteShortcut.intent(this))
+            startActivityAndCollapse(PasteShortcut.intent(this, "tile"))
         }
     }
 }
