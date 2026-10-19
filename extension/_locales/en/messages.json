@@ -1,0 +1,8 @@
+{
+  "extName": {
+    "message": "Video Download"
+  },
+  "extDescription": {
+    "message": "Sends the video playing on the page to the Video Download desktop app (personal use)."
+  }
+}

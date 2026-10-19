@@ -349,6 +349,8 @@ Za 1.0.2:
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
   Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
   Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).
+  Opis u prodavnici: EN, DE, ES, FR (jezike prodavnica čita iz extension/_locales; bosanski Chrome/Edge ne
+  podržava kao jezik dodatka). Ime i kratki opis dodatka sada su __MSG_extName__/__MSG_extDescription__.
 - Sajt: dugme „Microsoft Store" uz Windows dugme i rečenica u Windows uputstvu (5 jezika) su spremni u
   `tools/site_home.py`; kad Store verzija postane javna: `STORE_LIVE = True`, `python tools/build_site.py`, commit.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
