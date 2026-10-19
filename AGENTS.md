@@ -359,6 +359,12 @@ Za 1.0.2:
   podržava kao jezik dodatka). Ime i kratki opis dodatka sada su __MSG_extName__/__MSG_extDescription__.
 - Sajt: dugme „Microsoft Store" uz Windows dugme i rečenica u Windows uputstvu (5 jezika) su spremni u
   `tools/site_home.py`; kad Store verzija postane javna: `STORE_LIVE = True`, `python tools/build_site.py`, commit.
+- Program: dostignuća (Ahmed 19.10.2026). Čestitka na 10, 50, 100… novih preuzimanja (`support.MILESTONES`) i 18
+  dostignuća u `videodl/achievements.py` (zvuk, cijela lista 10+, isječak, 4K, iz browsera, format za auto, titlovi,
+  video 2 h+, 4 istovremeno, uspjeh poslije ponovnog pokušaja, noću 0–4 h, 5/25 sajtova, 1/10/100 GB, 7 dana zaredom,
+  godinu dana). Čestitka tek kad ništa ne radi, više njih u jednom prozoru; poruka i dugme za prilog najviše jednom
+  dnevno i ne poslije „Već sam podržao". Pomoć → Moja dostignuća (spisak, ukupno preuzimanja i GB). Sve samo lokalno
+  (`achievements/state` u podešavanjima). Ahmed: bez prekidača za isključivanje čestitki.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
