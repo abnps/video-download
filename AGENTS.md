@@ -336,6 +336,9 @@ Za 1.0.2:
   build_msix.py virtualization:ExcludedKeys za tri NativeMessagingHosts putanje (ili upis preko procesa izvan
   paketa); i native_host.launch_app za Store verziju pokretati preko shell:AppsFolder\<PFN>!VideoDownload (direktan
   VideoDownload.exe radi bez identiteta paketa pa bi nudio naše ažuriranje). Prije slanja probati lokalno.
+- Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
+  Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
+  Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

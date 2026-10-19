@@ -35,7 +35,7 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 | Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
 | Uptodown (Windows i Android) | poslano | Windows i Android 1.0.0 na pregledu 14.10.2026 (Android snimci: `Videos/Video Download/snimci-1.0/vd-android-*.png`) |
 | Firefox AMO | objavljeno | 1.0.0 odobren 16.10.2026 (automatski pregled; ljudski pregled moguć kasnije): https://addons.mozilla.org/addon/video-download-abnps/ ; paket `build_firefox.py --listed` |
-| Edge Add-ons | da, uz rizik | besplatno; pravila o preuzimanju videa mogu odbiti dodatak |
+| Edge Add-ons | nacrt | 19.10.2026 nacrt u Partner Centeru (abnpsdev): paket 1.0.1 (`tools/build_edge.py`, bez "key"), javno, Productivity, privatnost i opis EN popunjeni; Store ID 0RDCKB9580VF, CRX ID glikmhiifcloegaachgkhinigmnhnjpo (upisan u `native_messaging.py`). Šalje se tek s izdanjem 1.0.2 (novi paket preko „Replace“), jer stariji program ne prihvata taj ID; pravila o preuzimanju videa mogu odbiti dodatak |
 | Chrome Web Store | **ne sada** | jednokratno 5 $ (plaćeno) i pravila zabranjuju preuzimanje s YouTube-a |
 | IzzyOnDroid, F-Droid | **ne** | primaju samo otvoren kod (FOSS licenca) |
 | Google Play | **ne** | pravila o preuzimanju videa; pun nalog postoji samo radi provjere programera |
