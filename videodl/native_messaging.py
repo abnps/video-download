@@ -6,11 +6,13 @@ Uklanjanje: python -m videodl.native_messaging --uninstall
 """
 
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
 
 from . import native_host
+from . import runtime
 from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_data_base
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
@@ -44,6 +46,17 @@ def mac_location_is_temporary(path: Path | str) -> bool:
     return "/AppTranslocation/" in text or text.startswith("/Volumes/")
 
 
+# Store (MSIX) verzija: folder programa nosi broj verzije i mijenja se pri svakom Store ažuriranju, pa bi
+# registracija pokazivala na obrisan folder dok korisnik sam ne pokrene program. Zato browser dobija stalnu
+# putanju: App Execution Alias hosta iz paketa (tools/build_msix.py), koji Windows drži u ...\Microsoft\WindowsApps.
+STORE_HOST_ALIAS = "abnps-videodl-host.exe"
+
+
+def store_host_alias(environ=os.environ) -> Path:
+    local = environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+    return Path(local) / "Microsoft" / "WindowsApps" / STORE_HOST_ALIAS
+
+
 def default_install_dir(platform: str = sys.platform) -> Path:
     # Namjerno ne prati VIDEODL_DATA_DIR: registracija je jedna za korisnika.
     return user_data_base(platform) / "VideoDownload" / "native-host"
@@ -58,6 +71,8 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
     if frozen_app_dir is None and host_executable is None and is_frozen():
         if platform == "darwin":
             host_executable = Path(sys.executable).resolve()  # Mac: host je sama aplikacija
+        elif platform == "win32" and runtime.is_store_package() and store_host_alias().exists():
+            host_executable = store_host_alias()
         else:
             frozen_app_dir = app_dir()
 

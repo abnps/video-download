@@ -331,6 +331,22 @@ class NativeMessagingInstallTest(unittest.TestCase):
         self.assertEqual(firefox["path"], manifest["path"])
         self.assertNotIn("allowed_origins", firefox)
 
+    def test_store_version_registers_stable_alias(self):
+        from videodl import native_messaging
+
+        with tempfile.TemporaryDirectory() as tmp:
+            alias = Path(tmp) / "Microsoft" / "WindowsApps" / native_messaging.STORE_HOST_ALIAS
+            alias.parent.mkdir(parents=True)
+            alias.write_bytes(b"")
+            with mock.patch.dict(os.environ, {"LOCALAPPDATA": tmp}), \
+                    mock.patch.object(native_messaging, "is_frozen", return_value=True), \
+                    mock.patch.object(native_messaging.runtime, "is_store_package", return_value=True):
+                manifest_path = install_native_host(Path(tmp) / "native-host", set_registry=lambda keys, value: None,
+                                                    platform="win32")
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        # Putanja ne smije sadržavati verziju paketa (mijenja se sa svakim Store ažuriranjem).
+        self.assertEqual(manifest["path"], str(alias))
+
 
 
 class PresetFromExtensionTest(unittest.TestCase):

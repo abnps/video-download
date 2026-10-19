@@ -342,6 +342,10 @@ Za 1.0.2:
   JOŠ NIJE PROBANO na pravom Store paketu: provjera tek s 1.0.2 u privatnoj grupi „Proba" (ključevi vidljivi
   u regedit van paketa, dodatak „aplikacija radi", klik iz browsera otvara Store verziju bez ponude ažuriranja).
   Ako ključevi i dalje ostanu u mjehuru: upis registra iz procesa koji izlazi iz paketa (breakaway).
+  Dodano: paket ima drugu (skrivenu) aplikaciju BrowserHost s App Execution Alias „abnps-videodl-host.exe";
+  Store verzija u registraciju upisuje %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe (stalna
+  putanja; folder paketa nosi verziju i mijenja se pri Store ažuriranju). Pri probi provjeriti i da browser
+  pokreće host preko aliasa (stdin/stdout).
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
   Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
   Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).

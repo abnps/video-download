@@ -19,7 +19,8 @@ PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT))
 
 from videodl import __version__  # noqa: E402
-from videodl.native_messaging import FIREFOX_REGISTRY_PATHS, REGISTRY_PATHS  # noqa: E402
+from videodl.native_messaging import FIREFOX_REGISTRY_PATHS, REGISTRY_PATHS, STORE_HOST_ALIAS  # noqa: E402
+from videodl.runtime import HOST_EXE  # noqa: E402
 
 BUILD = PROJECT.parent / "Build"
 IDENTITY_NAME = "abnps.VideoDownloadbyabnps"
@@ -32,10 +33,12 @@ LOGOS = {"Square44x44Logo.png": 44, "Square150x150Logo.png": 150, "StoreLogo.png
 MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+         xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
          xmlns:virtualization="http://schemas.microsoft.com/appx/manifest/virtualization/windows10"
-         IgnorableNamespaces="uap rescap desktop6 virtualization">
+         IgnorableNamespaces="uap uap3 desktop rescap desktop6 virtualization">
   <Identity Name="{name}" Publisher="{publisher}" Version="{version}" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>{display}</DisplayName>
@@ -56,6 +59,19 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
       <uap:VisualElements DisplayName="Video Download" Description="MP4 and MP3 downloader"
                           BackgroundColor="transparent" Square150x150Logo="Assets\\Square150x150Logo.png"
                           Square44x44Logo="Assets\\Square44x44Logo.png" />
+    </Application>
+    <Application Id="BrowserHost" Executable="{host_exe}" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Video Download (browser)" Description="Connects the browser extension to the app"
+                          BackgroundColor="transparent" Square150x150Logo="Assets\\Square150x150Logo.png"
+                          Square44x44Logo="Assets\\Square44x44Logo.png" AppListEntry="none" />
+      <Extensions>
+        <uap3:Extension Category="windows.appExecutionAlias" Executable="{host_exe}"
+                        EntryPoint="Windows.FullTrustApplication">
+          <uap3:AppExecutionAlias>
+            <desktop:ExecutionAlias Alias="{host_alias}" />
+          </uap3:AppExecutionAlias>
+        </uap3:Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
@@ -87,7 +103,8 @@ def excluded_locations() -> str:
 
 def manifest(version: str) -> str:
     return MANIFEST.format(name=IDENTITY_NAME, publisher=PUBLISHER, version=version, display=DISPLAY_NAME,
-                           publisher_display=PUBLISHER_DISPLAY, excluded=excluded_locations())
+                           publisher_display=PUBLISHER_DISPLAY, excluded=excluded_locations(),
+                           host_exe=HOST_EXE, host_alias=STORE_HOST_ALIAS)
 
 
 def store_version(version: str) -> str:
