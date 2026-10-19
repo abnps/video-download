@@ -346,6 +346,12 @@ Za 1.0.2:
   Store verzija u registraciju upisuje %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe (stalna
   putanja; folder paketa nosi verziju i mijenja se pri Store ažuriranju). Pri probi provjeriti i da browser
   pokreće host preko aliasa (stdin/stdout).
+  Napomena za provjeru (Notes for certification) uz 1.0.2: unvirtualizedResources sada samo za 3 ključa
+  HKCU\Software\{Google\Chrome,Microsoft\Edge,Mozilla}\NativeMessagingHosts\com.videodl.bridge i
+  %LOCALAPPDATA%\VideoDownload; druga aplikacija „BrowserHost" (AppListEntry=none) je native messaging host za
+  dodatak, alias abnps-videodl-host.exe daje browseru stalnu putanju.
+  Poznato: Store ne briše te ključeve pri deinstalaciji (dodatak tada javlja da program nije povezan); ako su
+  instalirane obje verzije (instaler i Store), browser koristi onu koja je zadnja pokrenuta.
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u
   Partner Centeru (Edge → Video Download) je popunjen; pri izdanju: `python tools/build_edge.py`, Packages →
   Replace, pa Publish (tek kad je 1.0.2 objavljen, inače stari program odbija dodatak iz prodavnice).

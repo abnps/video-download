@@ -286,7 +286,9 @@ function sendNative(message) {
       const failure = chrome.runtime.lastError;
       if (failure) {
         const detail = failure.message || "";
-        resolve(/not found|forbidden/i.test(detail) ? { ok: false, code: "not-connected" } : { ok: false, code: "connection", detail });
+        // „forbidden": program postoji, ali ne poznaje ovaj dodatak (npr. dodatak iz Edge prodavnice uz stariji program).
+        const code = /forbidden/i.test(detail) ? "app-outdated" : /not found/i.test(detail) ? "not-connected" : "connection";
+        resolve(code === "connection" ? { ok: false, code, detail } : { ok: false, code });
         return;
       }
       resolve(reply || { ok: false, code: "no-reply" });
