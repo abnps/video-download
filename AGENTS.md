@@ -346,6 +346,9 @@ Za 1.0.2:
   Store verzija u registraciju upisuje %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe (stalna
   putanja; folder paketa nosi verziju i mijenja se pri Store ažuriranju). Pri probi provjeriti i da browser
   pokreće host preko aliasa (stdin/stdout).
+  Windows 10 (Codex pregled 20.10.2026): ExcludedKeys/ExcludedDirectory važe tek od Windowsa 11; na Win10 važi
+  desktop6 „disabled" (nije provjereno da li tamo pušta HKCU). Proba na Win10 nije moguća bez takvog računara;
+  ako prijave stignu s Win10, rješenje je upis registra iz procesa izvan paketa.
   Napomena za provjeru (Notes for certification) uz 1.0.2: unvirtualizedResources sada samo za 3 ključa
   HKCU\Software\{Google\Chrome,Microsoft\Edge,Mozilla}\NativeMessagingHosts\com.videodl.bridge i
   %LOCALAPPDATA%\VideoDownload; druga aplikacija „BrowserHost" (AppListEntry=none) je native messaging host za
