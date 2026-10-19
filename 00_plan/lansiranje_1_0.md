@@ -30,7 +30,7 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 | Katalog | Može? | Napomena |
 |---|---|---|
 | winget | da | PR #445943 ažuriran 17.10.2026 na 1.0.0, a 18.10.2026 na 1.0.1 (isti ProductCode, `winget validate` OK); čeka ponovnu automatsku provjeru i moderatora |
-| Microsoft Store | poslano | „Video Download by abnps" (Store ID 9NT46S6L7KGN), MSIX 1.0.1.0 poslan na provjeru 19.10.2026; privatno (grupa „Proba" = abnpsdev), objava tek na „Publish now"; posebne dozvole runFullTrust + unvirtualizedResources obrazložene |
+| Microsoft Store | odobreno | „Video Download by abnps" (Store ID 9NT46S6L7KGN), MSIX 1.0.1.0 prošao provjeru (i runFullTrust + unvirtualizedResources) i objavljen 19.10.2026 PRIVATNO (grupa „Proba" = abnpsdev); slijedi proba dodatka za browser, pa javno + sajt |
 | AlternativeTo | poslano | 14.10.2026, besplatni red čekanja (može trajati dugo); alternative: yt-dlp, 4K Video Downloader |
 | Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
 | Uptodown (Windows i Android) | poslano | Windows i Android 1.0.0 na pregledu 14.10.2026 (Android snimci: `Videos/Video Download/snimci-1.0/vd-android-*.png`) |
