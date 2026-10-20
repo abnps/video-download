@@ -62,9 +62,27 @@ Novo ime nije registrovano na ovom računaru, pa je ta proba provjerila povratak
 na staro ime i browser → Store alias → host, ne buduću Store verziju s novim imenom.
 Privremeni browser procesi su završeni; profili su ostali samo u `Build` folderu.
 
-Puni svjež build GUI aplikacije, ažuriranje postojećeg Store paketa i Windows 10
-još nisu provjereni. Produkcijsko novo ime i dalje nema HKCU ključ; ne koristiti
-ga u probnom paketu koji se poslije briše.
+## Svjež lokalni paket iz ove grane
+
+Iz commita `f532330` napravljen je novi PyInstaller build pune GUI aplikacije i
+hosta u `C:\Video Downloader\Build\store-fresh-clean-20261020\`. Bez instalacije
+i bez izmjene verzije, `VideoDownload.exe --self-test` vratio je `ok=true` za
+verziju 1.0.2. Lokalni MSIX od tog builda je
+`msix\VideoDownloadbyabnps-1.0.2.0-x64.msix` (161,9 MB; SHA-256 počinje sa
+`38657b5c563e025c8c685e71`). U paketu su oba izvršna fajla, neizmijenjen
+trenutni dodatak i svih šest `ExcludedKey` putanja. To je **samo lokalni probni
+artefakt**, nije potpisan, instaliran ni poslan u Partner Center.
+
+Prvi pokušaj builda pokupio je `icuuc.dll` i `ucrtbase.dll` iz Codexovog
+`PATH`-a (`poppler`/`libheif`), pa je QtCore pao pri uvozu. Čisti build je
+izostavio Codexove runtime putanje iz `PATH`-a i eksplicitno koristio već
+pripremljeni `ffmpeg` iz susjednog `Build\ffmpeg` foldera; tada je self-test
+prošao. Ne koristiti neuspjeli `Build\store-fresh-package-20261020` kao izvor
+paketa. Izvorni kod nije mijenjan zbog ove lokalne build konfiguracije.
+
+Ažuriranje postojećeg Store paketa s novim imenom i Windows 10 još nisu
+provjereni. Produkcijsko novo ime i dalje nema HKCU ključ; ne koristiti ga u
+probnom paketu koji se poslije briše.
 
 ## Ako treba ponoviti osnovni mehanizam
 

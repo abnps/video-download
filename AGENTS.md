@@ -351,13 +351,16 @@ Za 1.0.3:
   Program registruje i staro ime radi starih dodataka; novi dodatak pokušava staro samo kad novi host
   nije pronađen. Tri ExcludedKey su za novo, tri za staro ime. Alias ostaje na glavnoj aplikaciji jer
   je Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute i sirovi rezultati su u
-  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok se svjež build pune aplikacije,
-  stvarni dodatak i Store ažuriranje ne potvrde. Windows 10 treba zasebnu probu.
+  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok se novo ime ne potvrdi
+  u stvarnom dodatku poslije Store ažuriranja. Windows 10 treba zasebnu probu.
   Dodatna provjera 20.10: zatečene vrijednosti `probe` u starim Chrome/Firefox HKCU ključevima
   zamijenjene su putanjama postojećih ispravnih manifesta (rezervne `.reg` kopije u
   `Build\store-legacy-key-repair-20261020`); Edge nije mijenjan. Izolovani Edge s trenutnim
   dodatkom preko starog imena dobio je od instalirane Store 1.0.2 odgovor `ok=true`.
   Ovo potvrđuje kompatibilni put, ne registraciju završnog novog imena poslije ažuriranja.
+  Svjež lokalni build pune aplikacije i MSIX iz grane prošao je `--self-test` (verzija nije
+  mijenjana); nije instaliran niti poslan. Pri buildu iz Codexa ukloniti njegove `poppler/libheif`
+  putanje iz `PATH`-a, inače PyInstaller pokupi tuđe DLL-ove i QtCore ne može da se učita.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
