@@ -373,6 +373,14 @@ Za 1.0.3:
   preko aliasa je `ok=true`. Detalji su u `00_plan/store_browser_link_probe.md`.
   To nije proba Store-potpisanog ažuriranja niti certifikacija; prije javne objave
   još treba privatno Store ažuriranje i stvarni test dodatka u browseru.
+  Dodatna proba u čistom Sandboxu: Edge s trenutnim raspakovanim dodatkom je,
+  bez starih HKCU ključeva, preko novog hosta preuzeo lokalni sintetički MP4.
+  Isto je uspjelo kad je program bio zatvoren (alias ga je pokrenuo) i nakon
+  lokalne nadogradnje probnog paketa 1.0.2.0 → 1.0.2.1; SHA-256 sva tri
+  preuzeta fajla odgovara izvoru. Detalji u `00_plan/store_browser_link_probe.md`.
+  To još nije stvarno Store-potpisano ažuriranje. Ahmed je 20.10.2026 uslovio
+  1.0.3 time da sve radi; kandidat ostaje na radnoj grani i ide prvo u privatnu
+  Store probu, bez javne objave dok se isti tok tamo ne potvrdi.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

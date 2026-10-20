@@ -139,6 +139,35 @@ preskočena. Node testovi dodatka: 24/24. GUI testovi s lažnim `probe_fn` koji
 vraća `None` ispisuju Qt traceback tokom testa, ali ne ruše suite; stvarni
 `probe_fn` vraća `ProbeResult` ili izuzetak.
 
+## Dodatna Edge proba i lokalna nadogradnja (20.10.2026)
+
+U drugom čistom Windows Sandboxu (Windows 11, build 26100) ista posebna
+nepotpisana kopija punog paketa sama je registrovala novo i staro ime. Trenutni
+dodatak iz `extension/` učitan je u Edge s privremenim profilom. Poslije brisanja
+**samo starih HKCU ključeva u Sandboxu**, dodatak je preko novog imena dobio
+`app-status: {"ok":true,"running":true,"language":"bs"}`. Iz browsera je zatim
+poslan sintetički MP4 s lokalnog `127.0.0.1` servera: `add` je vratio `ok=true`,
+a gotovi fajl je imao isti SHA-256 kao izvor.
+
+Zatvorena je samo probna aplikacija u Sandboxu. Ponovni zahtjev iz Edgea dobio je
+prvo `running=false`, zatim `add: {"ok":true,"launched":true}`; drugi preuzeti MP4
+je takođe imao isti SHA-256 kao izvor. Time je potvrđen tok dodatak → novo ime
+hosta → App Execution Alias → pokretanje pakovane aplikacije → preuzimanje.
+
+Za probu ažuriranja napravljena je **samo u Build folderu** druga kopija probnog
+paketa s privremenom verzijom `1.0.2.1` i istim testnim Publisher OID-om. Nakon
+nadogradnje u Sandboxu, alias i sva tri nova HKCU ključa/manifesta su ostali
+ispravni. Staro ime je opet uklonjeno samo u Sandboxu; Edge je preko novog imena
+preuzeo treći MP4, ponovo uz jednak SHA-256. Rezultati su u
+`Build\store-sandbox-probe-20261020\results\` (`browser-status.json`,
+`browser-add.json`, `browser-launch.json`, `update.json`, `browser-update.json`
+i `*-download-verified.json`). Sandbox je zaustavljen.
+
+Ovo je jak lokalni dokaz funkcionalnosti, ali testni Publisher i verzija nisu
+identitet stvarnog Store paketa. Store-potpisani 1.0.3.0 i dodatak iz prodavnice
+moraju proći zasebnu privatnu provjeru prije javne objave. Na Ahmedovom Windowsu
+novo ime HKCU hosta nije dirano. Windows 10 nije testiran.
+
 ## Provjera poslije privatnog Store ažuriranja
 
 `tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,

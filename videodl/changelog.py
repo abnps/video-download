@@ -8,6 +8,13 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.3", "20.10.2026", {
+        "bs": ["Microsoft Store verzija na Windowsu 11 sama povezuje dodatak za browser s programom; postojeći dodaci i dalje rade."],
+        "en": ["On Windows 11, the Microsoft Store version now connects the browser extension to the app automatically; existing extensions continue to work."],
+        "de": ["Unter Windows 11 verbindet die Microsoft-Store-Version die Browser-Erweiterung jetzt automatisch mit dem Programm; vorhandene Erweiterungen funktionieren weiter."],
+        "es": ["En Windows 11, la versión de Microsoft Store conecta automáticamente la extensión del navegador con la aplicación; las extensiones existentes siguen funcionando."],
+        "fr": ["Sur Windows 11, la version Microsoft Store relie désormais automatiquement l’extension du navigateur à l’application ; les extensions existantes continuent de fonctionner."],
+    }),
     ("1.0.2", "20.10.2026", {
         "bs": ["Dostignuća: čestitka na 10, 50, 100… preuzimanja i 18 dostignuća za način korištenja (samo zvuk, cijela lista, isječak, 4K, noćna ptica…). Pomoć → Moja dostignuća pokazuje osvojena i ukupno preuzeto. Sve se računa samo na tvom računaru.",
                "Android: dostignuća i na telefonu (uz Podijeli, widget, pločicu i Pozovi prijatelja), u Postavkama → Moja dostignuća; aplikacija se zatvara tek na drugo „nazad“.",
