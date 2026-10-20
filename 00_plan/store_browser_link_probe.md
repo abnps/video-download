@@ -4,7 +4,7 @@ Na Ahmedovom Windowsu 11 (build 26300) Developer Mode je uključen. Sve probe su
 registrovane kao **odvojeni razvojni MSIX paketi** pomoću `Add-AppxPackage -Register`.
 Nijedna nije mijenjala instaliranu Store aplikaciju. Nakon svake probe uklonjeni su
 probni paket i samo HKCU ključevi koje je proba stvorila. Stari ključevi `com.videodl.bridge`
-ostali su prisutni i netaknuti. Microsoftov [postupak za lokalnu registraciju](https://learn.microsoft.com/en-us/windows/apps/develop/testing/loose-file-registration)
+tokom tih proba ostali su prisutni i netaknuti. Microsoftov [postupak za lokalnu registraciju](https://learn.microsoft.com/en-us/windows/apps/develop/testing/loose-file-registration)
 zahtijeva Developer Mode.
 
 ## Izmjerena razlika pri ponovnoj upotrebi imena
@@ -41,6 +41,30 @@ ono nije korišteno ni brisano u probi (`Test-Path=False` za sva tri browsera).
 Ne koristiti ga za probne pakete koji se zatim uklanjaju. Potrebna je zasebna
 provjera pune aplikacije i dodatka nakon Store ažuriranja; do tada Store ostaje
 privatan. Windows 10 nije ispitan.
+
+## Provjera instalirane Store aplikacije i postojećeg dodatka
+
+Kasnija provjera istog dana našla je vrijednost `probe` u stvarnim HKCU ključevima
+za stari host u Chromeu i Firefoxu; Edge je već pokazivao na ispravan manifest.
+Oba JSON manifesta za Chrome/Firefox i App Execution Alias su postojali. Sva tri
+stara ključa izvezena su u `C:\Video Downloader\Build\store-legacy-key-repair-20261020\`
+prije promjene. Samo Chrome i Firefox `(Default)` vrijednosti vraćene su na
+odgovarajuće postojeće JSON manifeste; Edge nije promijenjen. To popravlja
+zatečene ručne probne vrijednosti, ali nije dokaz da Store 1.0.2 sam piše te
+ključeve.
+
+Instalirani alias `abnps-videodl-host.exe` primio je uokvirenu native-messaging
+poruku `{"action":"status"}` i odgovorio sa `{"ok":true,"running":false,"language":"bs"}`
+bez stderr-a. U odvojenom privremenom Edge profilu učitan je trenutni dodatak iz
+`extension/` (ID `jfgcekfmjipklibljeacchccmebppklp`). Poziv njegovog stvarnog
+`sendNative({action:"status"})` sa stranice dodatka vratio je isti uspješan odgovor.
+Novo ime nije registrovano na ovom računaru, pa je ta proba provjerila povratak
+na staro ime i browser → Store alias → host, ne buduću Store verziju s novim imenom.
+Privremeni browser procesi su završeni; profili su ostali samo u `Build` folderu.
+
+Puni svjež build GUI aplikacije, ažuriranje postojećeg Store paketa i Windows 10
+još nisu provjereni. Produkcijsko novo ime i dalje nema HKCU ključ; ne koristiti
+ga u probnom paketu koji se poslije briše.
 
 ## Ako treba ponoviti osnovni mehanizam
 
