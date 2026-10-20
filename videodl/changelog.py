@@ -8,6 +8,23 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.2", "20.10.2026", {
+        "bs": ["Dostignuća: čestitka na 10, 50, 100… preuzimanja i 18 dostignuća za način korištenja (samo zvuk, cijela lista, isječak, 4K, noćna ptica…). Pomoć → Moja dostignuća pokazuje osvojena i ukupno preuzeto. Sve se računa samo na tvom računaru.",
+               "Android: dostignuća i na telefonu (uz Podijeli, widget, pločicu i Pozovi prijatelja), u Postavkama → Moja dostignuća; aplikacija se zatvara tek na drugo „nazad“.",
+               "Dodatak za browser: jasna poruka kad je program prestar za dodatak, uz savjet da instaliraš najnoviju verziju."],
+        "en": ["Achievements: a congratulation at 10, 50, 100… downloads and 18 achievements for how you use the app (audio only, a whole playlist, a clip, 4K, night owl…). Help → My achievements shows what you've earned and how much you've downloaded. Everything is counted only on your computer.",
+               "Android: achievements on the phone too (plus Share, widget, quick tile and Invite a friend), in Settings → My achievements; the app now closes only on the second “back”.",
+               "Browser extension: a clear message when the app is too old for the extension, with advice to install the latest version."],
+        "de": ["Erfolge: ein Glückwunsch bei 10, 50, 100… Downloads und 18 Erfolge für die Art der Nutzung (nur Ton, ganze Playlist, Clip, 4K, Nachteule…). Hilfe → Meine Erfolge zeigt Erreichtes und die Gesamtmenge. Alles wird nur auf deinem Computer gezählt.",
+               "Android: Erfolge auch auf dem Handy (dazu Teilen, Widget, Schnellkachel und Freunde einladen), unter Einstellungen → Meine Erfolge; die App schließt erst beim zweiten „Zurück“.",
+               "Browser-Erweiterung: eine klare Meldung, wenn die App für die Erweiterung zu alt ist, mit dem Hinweis, die neueste Version zu installieren."],
+        "es": ["Logros: una felicitación a las 10, 50, 100… descargas y 18 logros según cómo usas la app (solo audio, una lista entera, un clip, 4K, ave nocturna…). Ayuda → Mis logros muestra los conseguidos y el total descargado. Todo se cuenta solo en tu ordenador.",
+               "Android: logros también en el teléfono (además de Compartir, widget, mosaico rápido e Invitar a un amigo), en Ajustes → Mis logros; la app se cierra solo con el segundo «atrás».",
+               "Extensión del navegador: un mensaje claro cuando la app es demasiado antigua para la extensión, con el consejo de instalar la última versión."],
+        "fr": ["Succès : des félicitations à 10, 50, 100… téléchargements et 18 succès selon ton utilisation (son seul, playlist entière, extrait, 4K, oiseau de nuit…). Aide → Mes succès affiche ceux obtenus et le total téléchargé. Tout est compté uniquement sur ton ordinateur.",
+               "Android : les succès aussi sur le téléphone (plus Partager, widget, vignette rapide et Inviter un ami), dans Réglages → Mes succès ; l'appli se ferme seulement au deuxième « retour ».",
+               "Extension du navigateur : un message clair quand l'application est trop ancienne pour l'extension, avec le conseil d'installer la dernière version."],
+    }),
     ("1.0.1", "18.10.2026", {
         "bs": ["Novi formati za auto: „Video – za auto (AVI, 720×480)“ i „MP3 za auto (44,1 kHz)“, za starije auto-sisteme koji ne puštaju obični MP4 ili MP3.",
                "Program se brže otvara: čitač sajtova se učitava u pozadini, prozor ga ne čeka.",
