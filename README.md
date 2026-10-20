@@ -156,6 +156,13 @@ stalni App Execution Alias `abnps-videodl-host.exe`; prije javne objave Store ve
 potvrditi da su nova tri HKCU ključa vidljiva browseru van paketa. Lokalni postupak probe
 je u `00_plan/store_browser_link_probe.md`.
 
+Poslije **privatnog Store ažuriranja na 1.0.3.0 ili novije**, pokreni aplikaciju jednom,
+pa iz običnog PowerShella pokreni `python tools/check_store_browser_link.py`. Sve stavke
+(Store verzija, Chrome, Edge, Firefox i alias) moraju biti `OK`. Zatim učitaj trenutni
+`extension/` u Edge/Chrome i provjeri stvarni status u dodatku. Na sadašnjoj Store 1.0.2.0
+verziji možeš provjeriti samo kompatibilni stari host naredbom
+`python tools/check_store_browser_link.py --legacy`; to nije zamjena za novu provjeru.
+
 1. Pokreni aplikaciju jednom. Ona registruje vezu sa browserom samo za tvog
    Windows korisnika (HKCU, Chrome, Edge i Firefox).
 2. Edge: otvori `edge://extensions`, uključi „Developer mode", klikni

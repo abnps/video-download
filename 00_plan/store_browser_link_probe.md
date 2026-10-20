@@ -102,6 +102,27 @@ lokalni `127.0.0.1` socket. Paket zadržava verziju 1.0.2.0 i **nije instaliran,
 potpisan niti poslan u Partner Center**. Stvarno Store ažuriranje će tražiti višu
 verziju i zasebnu potvrdu prije javne objave.
 
+## Provjera poslije privatnog Store ažuriranja
+
+`tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,
+izvan paketa, prvo pokrenuti Store aplikaciju jednom, pa:
+
+```powershell
+Set-Location 'C:\Video Downloader\Projekat'
+python tools/check_store_browser_link.py
+```
+
+Prolaz znači: instalirana Store verzija najmanje 1.0.3.0, za Chrome/Edge/Firefox
+stvarni HKCU ključevi novog imena pokazuju na očekivane JSON manifeste, njihovi
+ID-jevi dodatka su tačni, a App Execution Alias odgovara na uokvireni `status`
+upit. Nakon toga učitati trenutni `extension/` u Edge/Chrome i potvrditi status
+iz samog dodatka. Provjeriti i da Store ažuriranje poslije ponovnog pokretanja
+ostavlja istu vezu. Tek tada razmatrati javnu objavu.
+
+Na trenutno instaliranoj Store 1.0.2.0 `--legacy` prolazi sve stavke. Osnovni
+poziv očekivano vraća `NIJE SPREMNO`: verzija je 1.0.2.0 i tri HKCU ključa novog
+imena ne postoje. Provjera je rađena 20.10.2026; finalno ime je i dalje netaknuto.
+
 ## Ako treba ponoviti osnovni mehanizam
 
 `tools/prepare_store_registry_probe.py` sada namjerno koristi samo **jednokratno

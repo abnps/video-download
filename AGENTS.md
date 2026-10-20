@@ -363,6 +363,10 @@ Za 1.0.3:
   Svjež lokalni build pune aplikacije i MSIX iz grane prošao je `--self-test` (verzija nije
   mijenjana); nije instaliran niti poslan. Pri buildu iz Codexa ukloniti njegove `poppler/libheif`
   putanje iz `PATH`-a, inače PyInstaller pokupi tuđe DLL-ove i QtCore ne može da se učita.
+  `tools/check_store_browser_link.py` je read-only provjera za period poslije privatnog
+  Store ažuriranja: traži najmanje 1.0.3.0, sva tri stvarna HKCU ključa novog imena,
+  ispravne JSON manifeste i status odgovor aliasa. `--legacy` prolazi na 1.0.2.0;
+  osnovni poziv sada očekivano ne prolazi. Stvarni dodatak u browseru još se mora provjeriti.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
