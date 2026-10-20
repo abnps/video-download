@@ -58,6 +58,10 @@ object Achievements {
     private val mutablePending = MutableStateFlow<List<Badge>>(emptyList())
     val pending: StateFlow<List<Badge>> = mutablePending
 
+    /** Broj novih uspjelih preuzimanja, za ekran (traka i prozor „Podrži projekat"). */
+    private val mutableDownloads = MutableStateFlow(0)
+    val downloadsFlow: StateFlow<Int> = mutableDownloads
+
     private var app: Context? = null
     private var earned = JSONObject() // ključ -> vrijeme osvajanja (ms)
     private var downloads = 0
@@ -88,15 +92,18 @@ object Achievements {
         lastSupportNote = json.optLong("support_note")
         val waiting = json.optJSONArray("pending")?.let { array -> (0 until array.length()).mapNotNull { byKey[array.optString(it)] } }
         mutablePending.value = waiting.orEmpty()
+        mutableDownloads.value = downloads.coerceAtLeast(0)
         if (downloads < 0) {
             // Prvo pokretanje s dostignućima: dosadašnja uspjela preuzimanja se broje, ali bez naknadnih čestitki.
             downloads = History.items.value.count { !it.failed }
             MILESTONES.filter { it <= downloads }.forEach { earned.put("count$it", 0L) }
+            mutableDownloads.value = downloads
             save()
         }
     }
 
     val downloadCount: Int @Synchronized get() = downloads
+    val lastSupportNoteAt: Long @Synchronized get() = lastSupportNote
     val bytes: Long @Synchronized get() = totalBytes
     @Synchronized fun earnedAt(key: String): Long? = if (earned.has(key)) earned.optLong(key) else null
 
@@ -111,6 +118,7 @@ object Achievements {
     fun recordDownload(done: FinishedDownload) {
         val now = System.currentTimeMillis()
         downloads++
+        mutableDownloads.value = downloads
         MILESTONES.filter { it <= downloads }.forEach { earn("count$it", now) }
         if (done.audio) earn("audio", now)
         if (done.clip) earn("clip", now)
@@ -167,7 +175,7 @@ object Achievements {
     @Synchronized
     fun supportNoteAllowed(): Boolean {
         val now = System.currentTimeMillis()
-        if (now - lastSupportNote < SUPPORT_NOTE_EVERY) return false
+        if (now - lastSupportNote < SUPPORT_NOTE_EVERY || !Support.noteAllowedInAchievement(now)) return false
         lastSupportNote = now
         save()
         return true

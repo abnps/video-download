@@ -90,6 +90,7 @@ fun HomeScreen(
     update: UpdateState,
     onInstallUpdate: () -> Unit,
     onSettings: () -> Unit,
+    supportBanner: @Composable () -> Unit = {},
 ) {
     var help by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp)) {
@@ -107,6 +108,7 @@ fun HomeScreen(
         Text(stringResource(R.string.home_sub), style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
         UpdateBanner(update, onInstallUpdate)
+        supportBanner()
         Spacer(Modifier.height(20.dp))
         CardBox(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
