@@ -266,13 +266,15 @@ class NativeHostTest(unittest.TestCase):
         self.assertFalse(unknown["ok"])
 
     def test_store_version_opens_app_through_start_menu(self):
-        store = Path(r"C:\Program Files\WindowsApps\abnps.VideoDownloadbyabnps_1.0.2.0_x64__rtqmsrm0jkev2")
+        from pathlib import PureWindowsPath as WinPath  # Windows putanje i kad testovi rade na Macu
+
+        store = WinPath(r"C:\Program Files\WindowsApps\abnps.VideoDownloadbyabnps_1.0.2.0_x64__rtqmsrm0jkev2")
         self.assertEqual(native_host.store_launch_command(store / "videodl-host.exe"),
                          ["explorer.exe", r"shell:AppsFolder\abnps.VideoDownloadbyabnps_rtqmsrm0jkev2!VideoDownload"])
         # Obična instalacija i neobičan folder ostaju na direktnom pokretanju.
         self.assertIsNone(native_host.store_launch_command(
-            Path(r"C:\Users\a\AppData\Local\Programs\VideoDownload\videodl-host.exe")))
-        self.assertIsNone(native_host.store_launch_command(Path(r"C:\WindowsApps\nesto\videodl-host.exe")))
+            WinPath(r"C:\Users\a\AppData\Local\Programs\VideoDownload\videodl-host.exe")))
+        self.assertIsNone(native_host.store_launch_command(WinPath(r"C:\WindowsApps\nesto\videodl-host.exe")))
 
     def test_store_package_manifest_matches_host(self):
         import sys

@@ -135,6 +135,7 @@ class WindowTest(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.settings = QSettings(os.path.join(self.tmp.name, "s.ini"), QSettings.Format.IniFormat)
+        self.settings.setValue("language", "bs")  # inače jezik sistema (na GitHubu engleski)
 
     def window(self):
         from videodl.gui import MainWindow
