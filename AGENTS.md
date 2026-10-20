@@ -332,6 +332,10 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
 Za 1.0.3:
+- Android: podsjetnik za prilog kao na računaru (Support.kt, SupportUi.kt): traka na Početnoj svakih 10 preuzimanja,
+  prozor jednom sedmično (prvi put poslije 5), „Već sam podržao" 90 dana, najviše jedan poziv dnevno zajedno s
+  čestitkom. Postavke → Verzija otvara „Šta je novo" (posljednje 3 verzije) iz assets/changelog.json; poslije
+  izmjene videodl/changelog.py pokrenuti `python tools/android_changelog.py` (test pada ako nije osvježeno).
 - Store verzija, veza s browserom (provjereno 20.10.2026 na Store 1.0.2.0, Windows 11 26300): alias i manifest rade
   (manifest pokazuje na %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe, oba ID-a dodatka), ALI upis
   HKCU\...\NativeMessagingHosts\com.videodl.bridge i dalje ostaje u mjehuru paketa (ni virtualization:ExcludedKeys ni
