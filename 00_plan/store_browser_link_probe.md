@@ -170,6 +170,20 @@ novo ime HKCU hosta nije dirano. Windows 10 nije testiran.
 
 ## Provjera poslije privatnog Store ažuriranja
 
+Privatni kandidat 1.0.3 je 20.10.2026 lokalno izgrađen u
+`Build\store-1.0.3-private-20261020`. `build_release.py` je prošao 438 Python
+testova (2 preskočena), 24 Node testa i self-test spakovanog programa. MSIX
+`VideoDownloadbyabnps-1.0.3.0-x64.msix` (SHA-256
+`5425618E65F43835C33709440343E37CE6E0A652C09F0C7F1A374CD84123064D`)
+Partner Center je označio kao „Validated”. U Submission 3 (ID
+`1152921505702184165`) zadržana je privatna publika „Proba”, bez datuma
+javnog otvaranja, a opcija objave je „Don't publish this submission until I
+select Publish now”. Obrazloženje `unvirtualizedResources` ispravljeno je
+sa tri na šest HKCU izuzetaka. Prijava je poslana na certifikaciju; posljednji
+viđeni status: „Update in certification / Pre-processing”. Paket 1.0.2.0
+ostaje u prijavi kao podrška za Windows 10, a 1.0.3.0 traži Windows 11.
+**Certifikacija nije privatna objava niti potvrda stvarnog ažuriranja.**
+
 `tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,
 izvan paketa, prvo pokrenuti Store aplikaciju jednom, pa:
 

@@ -381,6 +381,13 @@ Za 1.0.3:
   To još nije stvarno Store-potpisano ažuriranje. Ahmed je 20.10.2026 uslovio
   1.0.3 time da sve radi; kandidat ostaje na radnoj grani i ide prvo u privatnu
   Store probu, bez javne objave dok se isti tok tamo ne potvrdi.
+  Lokalni build kandidata 1.0.3 je 20.10.2026 prošao 438 Python testova
+  (2 preskočena), 24 Node testa i self-test spakovane aplikacije. MSIX
+  1.0.3.0 je u Partner Centeru validiran i poslan kao Submission 3 na
+  certifikaciju, uz publiku samo u grupi „Proba” i ručno zadržavanje objave
+  („Don't publish this submission until I select Publish now”). Certifikacija
+  i proba stvarnog Store ažuriranja još čekaju. Poslije prolaza certifikacije
+  pustiti samo grupi „Proba” radi provjere; javno tek kad i ta proba prođe.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
