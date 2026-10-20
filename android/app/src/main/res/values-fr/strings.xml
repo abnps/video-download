@@ -192,6 +192,7 @@
     <string name="badge_title">Mes succès</string>
     <string name="badge_settings_sub">%1$d téléchargements jusqu\'ici</string>
     <string name="badge_summary">%1$d sur %2$d obtenus · %3$d téléchargements · %4$s au total</string>
+    <string name="badge_unlocked">Nouveau succès</string>
     <string name="badge_new_many">🏆 Nouveaux succès !</string>
     <string name="badge_thanks">Merci d\'utiliser Video Download.</string>
     <string name="badge_support">Si Video Download te fait gagner du temps, une petite contribution l\'aide à rester gratuit et à fonctionner quand les sites changent.</string>

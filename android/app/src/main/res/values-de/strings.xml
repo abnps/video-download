@@ -189,6 +189,7 @@
     <string name="badge_title">Meine Erfolge</string>
     <string name="badge_settings_sub">Bisher %1$d Downloads</string>
     <string name="badge_summary">%1$d von %2$d erreicht · %3$d Downloads · %4$s insgesamt</string>
+    <string name="badge_unlocked">Neuer Erfolg</string>
     <string name="badge_new_many">🏆 Neue Erfolge!</string>
     <string name="badge_thanks">Danke, dass du Video Download nutzt.</string>
     <string name="badge_support">Wenn dir Video Download Zeit spart, hilft ein kleiner Beitrag, dass es kostenlos bleibt und auch nach Änderungen der Seiten funktioniert.</string>

@@ -192,6 +192,7 @@
     <string name="badge_title">Moja dostignuća</string>
     <string name="badge_settings_sub">Do sada %1$d preuzimanja</string>
     <string name="badge_summary">Osvojeno %1$d od %2$d · %3$d preuzimanja · %4$s ukupno</string>
+    <string name="badge_unlocked">Novo dostignuće</string>
     <string name="badge_new_many">🏆 Nova dostignuća!</string>
     <string name="badge_thanks">Hvala što koristiš Video Download.</string>
     <string name="badge_support">Ako ti Video Download štedi vreme, mali prilog pomaže da ostane besplatan i da radi i kad sajtovi nešto promene.</string>

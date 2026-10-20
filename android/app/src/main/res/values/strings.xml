@@ -190,6 +190,7 @@
     <string name="badge_title">My achievements</string>
     <string name="badge_settings_sub">%1$d downloads so far</string>
     <string name="badge_summary">Earned %1$d of %2$d · %3$d downloads · %4$s in total</string>
+    <string name="badge_unlocked">New achievement</string>
     <string name="badge_new_many">🏆 New achievements!</string>
     <string name="badge_thanks">Thanks for using Video Download.</string>
     <string name="badge_support">If Video Download saves you time, a small contribution helps keep it free and working when sites change.</string>

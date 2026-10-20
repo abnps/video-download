@@ -1,6 +1,14 @@
 package io.github.abnps.videodownload
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,15 +23,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,41 +54,74 @@ fun badgeDesc(badge: Badge): String =
     if (badge.count > 0) stringResource(badge.desc, badge.count) else stringResource(badge.desc)
 
 /**
- * Čestitka za jedno ili više dostignuća. Poruka i dugme za prilog najviše jednom dnevno (odluka se pamti dok je
- * prozor otvoren); „Super!" samo zatvara. Ništa ne blokira i ništa ne otključava.
+ * Čestitka za jedno ili više dostignuća (Ahmed 20.10.2026: „neka bude ljepši"): kartica s velikom ikonom u krugu,
+ * svako dostignuće u svom redu, velika dugmad. Poruka i dugme za prilog najviše jednom dnevno (odluka se pamti dok
+ * je prozor otvoren); „Super!" samo zatvara. Ništa ne blokira i ništa ne otključava.
  */
 @Composable
 fun AchievementDialog(badges: List<Badge>, onSupport: () -> Unit, onClose: () -> Unit) {
     val showSupport = remember(badges) { Achievements.supportNoteAllowed() }
     val single = badges.singleOrNull()
-    AlertDialog(onDismissRequest = onClose,
-        title = {
-            Text(if (single != null) "${single.icon} ${badgeName(single)}" else stringResource(R.string.badge_new_many),
-                fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    val accent = MaterialTheme.colorScheme.primary
+    Dialog(onDismissRequest = onClose) {
+        Card(shape = RoundedCornerShape(32.dp), modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+            Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("🎉", fontSize = 18.sp, modifier = Modifier.padding(bottom = 6.dp))
+                Box(Modifier.size(96.dp).clip(CircleShape)
+                    .background(Brush.linearGradient(listOf(accent.copy(alpha = 0.35f), Pink.copy(alpha = 0.30f)))),
+                    contentAlignment = Alignment.Center) {
+                    Text(single?.icon ?: "🏆", fontSize = 48.sp)
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(stringResource(R.string.badge_unlocked).uppercase(), style = MaterialTheme.typography.labelMedium,
+                    color = accent, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                Spacer(Modifier.height(4.dp))
+                Text(if (single != null) badgeName(single) else stringResource(R.string.badge_new_many).removePrefix("🏆 "),
+                    fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(14.dp))
                 if (single != null) {
-                    Text(badgeDesc(single), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Text(badgeDesc(single), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
-                    badges.forEach { Text("${it.icon} ${badgeName(it)}: ${badgeDesc(it)}") }
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        badges.forEach { badge ->
+                            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainerHighest).padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Text(badge.icon, fontSize = 26.sp)
+                                Spacer(Modifier.width(12.dp))
+                                Column {
+                                    Text(badgeName(badge), fontWeight = FontWeight.SemiBold)
+                                    Text(badgeDesc(badge), style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
                 }
-                Text(stringResource(R.string.badge_thanks), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(14.dp))
+                Text(stringResource(R.string.badge_thanks), textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
                 if (showSupport) {
+                    Spacer(Modifier.height(8.dp))
                     Text(stringResource(R.string.badge_support), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth())
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                }
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = onClose, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(25.dp)) {
+                    Text(stringResource(R.string.badge_ok), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                }
+                if (showSupport) {
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(onClick = { onSupport(); onClose() }, modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = RoundedCornerShape(25.dp), border = BorderStroke(1.5.dp, Pink)) {
+                        Text(stringResource(R.string.badge_support_button), color = Pink, fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp)
+                    }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.badge_ok)) } },
-        dismissButton = if (showSupport) {
-            {
-                Button(onClick = { onSupport(); onClose() }, colors = ButtonDefaults.buttonColors(containerColor = Pink)) {
-                    Text(stringResource(R.string.badge_support_button), color = Color.White)
-                }
-            }
-        } else null)
+        }
+    }
 }
 
 /** Postavke → Moja dostignuća: osvojena (s datumom) pa zaključana, i ukupno preuzimanja. */
