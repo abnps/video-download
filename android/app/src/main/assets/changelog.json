@@ -1,0 +1,172 @@
+[
+ {
+  "version": "1.0.2",
+  "date": "20.10.2026",
+  "notes": {
+   "bs": [
+    "Dostignuća: čestitka na 10, 50, 100… preuzimanja i 18 dostignuća za način korištenja (samo zvuk, cijela lista, isječak, 4K, noćna ptica…). Pomoć → Moja dostignuća pokazuje osvojena i ukupno preuzeto. Sve se računa samo na tvom računaru.",
+    "Android: dostignuća i na telefonu (uz Podijeli, widget, pločicu i Pozovi prijatelja), u Postavkama → Moja dostignuća; aplikacija se zatvara tek na drugo „nazad“.",
+    "Dodatak za browser: jasna poruka kad je program prestar za dodatak, uz savjet da instaliraš najnoviju verziju."
+   ],
+   "en": [
+    "Achievements: a congratulation at 10, 50, 100… downloads and 18 achievements for how you use the app (audio only, a whole playlist, a clip, 4K, night owl…). Help → My achievements shows what you've earned and how much you've downloaded. Everything is counted only on your computer.",
+    "Android: achievements on the phone too (plus Share, widget, quick tile and Invite a friend), in Settings → My achievements; the app now closes only on the second “back”.",
+    "Browser extension: a clear message when the app is too old for the extension, with advice to install the latest version."
+   ],
+   "de": [
+    "Erfolge: ein Glückwunsch bei 10, 50, 100… Downloads und 18 Erfolge für die Art der Nutzung (nur Ton, ganze Playlist, Clip, 4K, Nachteule…). Hilfe → Meine Erfolge zeigt Erreichtes und die Gesamtmenge. Alles wird nur auf deinem Computer gezählt.",
+    "Android: Erfolge auch auf dem Handy (dazu Teilen, Widget, Schnellkachel und Freunde einladen), unter Einstellungen → Meine Erfolge; die App schließt erst beim zweiten „Zurück“.",
+    "Browser-Erweiterung: eine klare Meldung, wenn die App für die Erweiterung zu alt ist, mit dem Hinweis, die neueste Version zu installieren."
+   ],
+   "es": [
+    "Logros: una felicitación a las 10, 50, 100… descargas y 18 logros según cómo usas la app (solo audio, una lista entera, un clip, 4K, ave nocturna…). Ayuda → Mis logros muestra los conseguidos y el total descargado. Todo se cuenta solo en tu ordenador.",
+    "Android: logros también en el teléfono (además de Compartir, widget, mosaico rápido e Invitar a un amigo), en Ajustes → Mis logros; la app se cierra solo con el segundo «atrás».",
+    "Extensión del navegador: un mensaje claro cuando la app es demasiado antigua para la extensión, con el consejo de instalar la última versión."
+   ],
+   "fr": [
+    "Succès : des félicitations à 10, 50, 100… téléchargements et 18 succès selon ton utilisation (son seul, playlist entière, extrait, 4K, oiseau de nuit…). Aide → Mes succès affiche ceux obtenus et le total téléchargé. Tout est compté uniquement sur ton ordinateur.",
+    "Android : les succès aussi sur le téléphone (plus Partager, widget, vignette rapide et Inviter un ami), dans Réglages → Mes succès ; l'appli se ferme seulement au deuxième « retour ».",
+    "Extension du navigateur : un message clair quand l'application est trop ancienne pour l'extension, avec le conseil d'installer la dernière version."
+   ]
+  }
+ },
+ {
+  "version": "1.0.1",
+  "date": "18.10.2026",
+  "notes": {
+   "bs": [
+    "Novi formati za auto: „Video – za auto (AVI, 720×480)“ i „MP3 za auto (44,1 kHz)“, za starije auto-sisteme koji ne puštaju obični MP4 ili MP3.",
+    "Program se brže otvara: čitač sajtova se učitava u pozadini, prozor ga ne čeka.",
+    "Pomoć → Discord zajednica: pitanja i pomoć na 5 jezika.",
+    "Android: „Izbriši s uređaja“ u meniju gotovog preuzimanja (uz potvrdu); brza dugmad više ne prekrivaju trajanje videa; Discord u Postavkama."
+   ],
+   "en": [
+    "New car formats: “Video – for the car (AVI, 720×480)” and “MP3 for the car (44.1 kHz)”, for older car systems that don't play regular MP4 or MP3.",
+    "The app opens faster: the site reader loads in the background, the window doesn't wait for it.",
+    "Help → Discord community: questions and help in 5 languages.",
+    "Android: “Delete from device” in the menu of a finished download (with confirmation); the quick buttons no longer cover the video length; Discord in Settings."
+   ],
+   "de": [
+    "Neue Formate fürs Auto: „Video – fürs Auto (AVI, 720×480)“ und „MP3 fürs Auto (44,1 kHz)“, für ältere Autosysteme, die normales MP4 oder MP3 nicht abspielen.",
+    "Das Programm öffnet schneller: Der Seitenleser lädt im Hintergrund, das Fenster wartet nicht darauf.",
+    "Hilfe → Discord-Community: Fragen und Hilfe in 5 Sprachen.",
+    "Android: „Vom Gerät löschen“ im Menü eines fertigen Downloads (mit Bestätigung); die Schnelltasten verdecken die Videolänge nicht mehr; Discord in den Einstellungen."
+   ],
+   "es": [
+    "Nuevos formatos para el coche: «Vídeo – para el coche (AVI, 720×480)» y «MP3 para el coche (44,1 kHz)», para sistemas de coche antiguos que no reproducen MP4 o MP3 normales.",
+    "El programa se abre más rápido: el lector de sitios se carga en segundo plano y la ventana no lo espera.",
+    "Ayuda → Comunidad de Discord: preguntas y ayuda en 5 idiomas.",
+    "Android: «Eliminar del dispositivo» en el menú de una descarga terminada (con confirmación); los botones rápidos ya no tapan la duración del vídeo; Discord en Ajustes."
+   ],
+   "fr": [
+    "Nouveaux formats pour la voiture : « Vidéo – pour la voiture (AVI, 720×480) » et « MP3 pour la voiture (44,1 kHz) », pour les anciens systèmes de voiture qui ne lisent pas les MP4 ou MP3 ordinaires.",
+    "Le programme s'ouvre plus vite : le lecteur de sites se charge en arrière-plan, la fenêtre ne l'attend pas.",
+    "Aide → Communauté Discord : questions et aide en 5 langues.",
+    "Android : « Supprimer de l'appareil » dans le menu d'un téléchargement terminé (avec confirmation) ; les boutons rapides ne cachent plus la durée de la vidéo ; Discord dans les Paramètres."
+   ]
+  }
+ },
+ {
+  "version": "1.0.0",
+  "date": "8.10.2026",
+  "notes": {
+   "bs": [
+    "Video Download 1.0: program za računar, Android aplikacija i dodatak za browser dobijaju verziju 1.0 istog dana.",
+    "Android aplikacija je upola manja (29 MB umjesto 61 MB): brže preuzimanje i brže slanje prijatelju.",
+    "Sve iz probnih verzija je tu: MP4 do najboljeg kvaliteta, MP3, plejliste, isječci, titlovi, poglavlja, roditeljska zaštita i samostalna, potpisana ažuriranja."
+   ],
+   "en": [
+    "Video Download 1.0: the desktop app, the Android app and the browser extension all reach version 1.0 on the same day.",
+    "The Android app is half the size (29 MB instead of 61 MB): faster to download and faster to send to a friend.",
+    "Everything from the beta versions is here: MP4 up to the best quality, MP3, playlists, clips, subtitles, chapters, parental controls and signed self-updates."
+   ],
+   "de": [
+    "Video Download 1.0: Desktop-Programm, Android-App und Browser-Erweiterung erreichen am selben Tag Version 1.0.",
+    "Die Android-App ist nur noch halb so groß (29 MB statt 61 MB): schneller geladen und schneller an Freunde geschickt.",
+    "Alles aus den Testversionen ist dabei: MP4 in bester Qualität, MP3, Playlists, Ausschnitte, Untertitel, Kapitel, Jugendschutz und signierte automatische Updates."
+   ],
+   "es": [
+    "Video Download 1.0: el programa de escritorio, la app de Android y la extensión del navegador llegan a la versión 1.0 el mismo día.",
+    "La app de Android ocupa la mitad (29 MB en lugar de 61 MB): se descarga y se envía a un amigo más rápido.",
+    "Todo lo de las versiones de prueba está aquí: MP4 con la mejor calidad, MP3, listas, fragmentos, subtítulos, capítulos, control parental y actualizaciones automáticas firmadas."
+   ],
+   "fr": [
+    "Video Download 1.0 : le programme pour ordinateur, l'application Android et l'extension du navigateur passent en version 1.0 le même jour.",
+    "L'application Android est deux fois plus légère (29 Mo au lieu de 61 Mo) : plus rapide à télécharger et à envoyer à un ami.",
+    "Tout ce qui était dans les versions d'essai est là : MP4 en meilleure qualité, MP3, playlists, extraits, sous-titres, chapitres, contrôle parental et mises à jour automatiques signées."
+   ]
+  }
+ },
+ {
+  "version": "0.9.11",
+  "date": "8.10.2026",
+  "notes": {
+   "bs": [
+    "Postavke: duga putanja foldera se skraćuje po sredini, a cijela se vidi kad pređeš mišem preko nje.",
+    "Format u listi preuzimanja izgleda isto u svakom redu; klik na njega i dalje mijenja format.",
+    "Mac: samostalno ažuriranje je pouzdanije (ponovni pokušaj kad macOS kratko odbije otvoriti paket).",
+    "Android: aplikacija broji nove instalacije i poziv prijatelju anonimno (samo ukupan broj, vidi Privatnost); sitna čišćenja."
+   ],
+   "en": [
+    "Settings: a long folder path is shortened in the middle, and the full path shows when you hover over it.",
+    "The format in the download list looks the same in every row; clicking it still changes the format.",
+    "Mac: self-updating is more reliable (it retries when macOS briefly refuses to open the package).",
+    "Android: the app counts new installations and friend invitations anonymously (only a total, see Privacy); small clean-ups."
+   ],
+   "de": [
+    "Einstellungen: Ein langer Ordnerpfad wird in der Mitte gekürzt; der ganze Pfad erscheint, wenn du mit der Maus darauf zeigst.",
+    "Das Format in der Downloadliste sieht in jeder Zeile gleich aus; ein Klick darauf ändert weiterhin das Format.",
+    "Mac: Die automatische Aktualisierung ist zuverlässiger (neuer Versuch, wenn macOS das Paket kurz nicht öffnet).",
+    "Android: Die App zählt neue Installationen und Einladungen an Freunde anonym (nur eine Gesamtzahl, siehe Datenschutz); kleine Aufräumarbeiten."
+   ],
+   "es": [
+    "Ajustes: una ruta de carpeta larga se acorta por el medio y la ruta completa aparece al pasar el ratón por encima.",
+    "El formato en la lista de descargas se ve igual en cada fila; hacer clic en él sigue cambiando el formato.",
+    "Mac: la actualización automática es más fiable (reintenta cuando macOS se niega brevemente a abrir el paquete).",
+    "Android: la app cuenta las instalaciones nuevas y las invitaciones a amigos de forma anónima (solo un total, ver Privacidad); pequeñas limpiezas."
+   ],
+   "fr": [
+    "Paramètres : un long chemin de dossier est raccourci au milieu, et le chemin complet s'affiche au survol de la souris.",
+    "Le format dans la liste des téléchargements a le même aspect sur chaque ligne ; un clic dessus change toujours le format.",
+    "Mac : la mise à jour automatique est plus fiable (nouvel essai quand macOS refuse brièvement d'ouvrir le paquet).",
+    "Android : l'application compte les nouvelles installations et les invitations d'amis de façon anonyme (seulement un total, voir Confidentialité) ; petits nettoyages."
+   ]
+  }
+ },
+ {
+  "version": "0.9.10",
+  "date": "5.10.2026",
+  "notes": {
+   "bs": [
+    "Poglavlja videa (npr. „0:00 Uvod“) sada ulaze u MP4 i MP3, pa ih plejer prikazuje na traci; isključuje se u Postavkama.",
+    "Novo u Postavkama: izrezivanje reklama sponzora (SponsorBlock) iz videa uklanja sponzorske reklame, samoreklamu i „lajkuj i pretplati se“. Isključeno dok ga sam ne uključiš.",
+    "Android: MP3 radi i za sajtove bez posebnog zvuka, npr. Instagram (pravi se iz videa); dugme ♪ i kartica Audio više nisu zamrznuti.",
+    "Android: na sajtu je i dugme „Dodaj u Obtainium“ za instalaciju i ažuriranje direktno s GitHuba."
+   ],
+   "en": [
+    "Video chapters (e.g. “0:00 Intro”) now go into MP4 and MP3 files, so players show them on the progress bar; you can turn this off in Settings.",
+    "New in Settings: cutting out sponsor ads (SponsorBlock) removes sponsor ads, self-promotion and “like and subscribe” from the video. Off until you turn it on.",
+    "Android: MP3 now works for sites without separate audio, such as Instagram (made from the video); the ♪ button and the Audio tab are no longer greyed out.",
+    "Android: the website also has an “Add to Obtainium” button to install and update straight from GitHub."
+   ],
+   "de": [
+    "Videokapitel (z. B. „0:00 Intro“) kommen jetzt in MP4- und MP3-Dateien, sodass Player sie auf der Leiste zeigen; abschaltbar in den Einstellungen.",
+    "Neu in den Einstellungen: Sponsorenwerbung herausschneiden (SponsorBlock) entfernt Sponsorenwerbung, Eigenwerbung und „Liken und abonnieren“ aus dem Video. Aus, bis du es einschaltest.",
+    "Android: MP3 funktioniert jetzt auch bei Seiten ohne eigene Tonspur, etwa Instagram (aus dem Video erstellt); die ♪-Taste und der Audio-Tab sind nicht mehr ausgegraut.",
+    "Android: Auf der Website gibt es jetzt auch „Zu Obtainium hinzufügen“, um direkt von GitHub zu installieren und zu aktualisieren."
+   ],
+   "es": [
+    "Los capítulos del vídeo (p. ej. «0:00 Intro») ahora van en los archivos MP4 y MP3, y el reproductor los muestra en la barra; se puede desactivar en Ajustes.",
+    "Nuevo en Ajustes: recortar anuncios de patrocinadores (SponsorBlock) quita del vídeo los anuncios de patrocinadores, la autopromoción y el «dale like y suscríbete». Desactivado hasta que lo actives.",
+    "Android: el MP3 ahora funciona en sitios sin audio separado, como Instagram (se crea a partir del vídeo); el botón ♪ y la pestaña Audio ya no aparecen desactivados.",
+    "Android: la web tiene también un botón «Añadir a Obtainium» para instalar y actualizar directamente desde GitHub."
+   ],
+   "fr": [
+    "Les chapitres de la vidéo (p. ex. « 0:00 Intro ») sont maintenant inclus dans les fichiers MP4 et MP3, et le lecteur les affiche sur la barre ; désactivable dans les Paramètres.",
+    "Nouveau dans les Paramètres : couper les pubs des sponsors (SponsorBlock) retire de la vidéo les pubs des sponsors, l'autopromotion et le « like et abonne-toi ». Désactivé tant que vous ne l'activez pas.",
+    "Android : le MP3 fonctionne maintenant pour les sites sans piste audio séparée, comme Instagram (créé à partir de la vidéo) ; le bouton ♪ et l'onglet Audio ne sont plus grisés.",
+    "Android : le site propose aussi un bouton « Ajouter à Obtainium » pour installer et mettre à jour directement depuis GitHub."
+   ]
+  }
+ }
+]

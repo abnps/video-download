@@ -250,4 +250,7 @@
     <string name="support_paypal">♥ Podrži (PayPal)</string>
     <string name="support_later">Kasnije</string>
     <string name="support_already">Već sam podržao</string>
+    <string name="whats_new_title">Što je novo</string>
+    <string name="whats_new_close">Zatvori</string>
+    <string name="whats_new_sub">Pogledaj što je novo</string>
 </resources>

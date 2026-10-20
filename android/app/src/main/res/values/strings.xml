@@ -248,4 +248,7 @@
     <string name="support_paypal">♥ Support (PayPal)</string>
     <string name="support_later">Later</string>
     <string name="support_already">I already supported it</string>
+    <string name="whats_new_title">What\'s new</string>
+    <string name="whats_new_close">Close</string>
+    <string name="whats_new_sub">See what\'s new</string>
 </resources>

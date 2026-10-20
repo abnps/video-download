@@ -84,6 +84,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     var pickLocation by remember { mutableStateOf(false) }
     var askLogout by remember { mutableStateOf<LoginSite?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
+    var showWhatsNew by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var parentalOn by remember { mutableStateOf(Parental.enabled(context)) }
     var askPin by remember { mutableStateOf(false) }
@@ -146,7 +147,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
             GroupDivider()
             GroupRow(OneUi.Gray, R.drawable.ic_settings, stringResource(R.string.set_version),
-                "$appVersion · ${stringResource(R.string.test_version)} · yt-dlp $readerVersion", onClick = null)
+                "$appVersion · ${stringResource(R.string.test_version)} · yt-dlp $readerVersion\n" +
+                    stringResource(R.string.whats_new_sub), onClick = { showWhatsNew = true })
         }
         SettingsGroup(stringResource(R.string.settings_support)) {
             GroupRow(OneUi.Orange, R.drawable.ic_check_circle, stringResource(R.string.badge_title),
@@ -181,6 +183,7 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     }
     }
     if (showLicenses) LicensesDialog { showLicenses = false }
+    if (showWhatsNew) WhatsNewDialog { showWhatsNew = false }
     if (askPin) PinDialog(onCancel = { askPin = false }) { pin ->
         if (Parental.checkPin(context, pin)) { askPin = false; editParental = true } else false.also {
             android.widget.Toast.makeText(context, R.string.parental_pin_wrong, android.widget.Toast.LENGTH_SHORT).show()
