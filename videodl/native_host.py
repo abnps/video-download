@@ -16,7 +16,7 @@ import sys
 import time
 from pathlib import Path
 
-HOST_NAME = "io.github.abnps.videodownload"
+HOST_NAME = "io.github.abnps.videodownload.bridge"
 LEGACY_HOST_NAME = "com.videodl.bridge"
 HOST_NAMES = (HOST_NAME, LEGACY_HOST_NAME)
 TOKEN_HEADER = "X-VideoDL-Token"

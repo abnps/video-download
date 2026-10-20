@@ -1,72 +1,80 @@
-# Lokalna proba novog imena native messaging hosta
+# Lokalna proba Store veze s browserom — 20.10.2026
 
-Razvojni paket `abnps.VideoDownloadNewHostProbe` ima odvojeni identitet od Store programa.
-Tri vidljive probne aplikacije koriste `reg.exe` i upisuju vrijednost `ABNPSProbe=visible`
-u tri HKCU ključa `NativeMessagingHosts\io.github.abnps.videodownload`. Paket ne piše
-manifest za browser i ne mijenja objavljeni program. Registracija i provjera rade se iz
-običnog PowerShella, **van paketa**. Ako bilo koji od tri ključa već postoji, stati: mogao
-ga je upisati stvarni program ili korisnik i proba ga ne smije pregaziti.
+Na Ahmedovom Windowsu 11 (build 26300) Developer Mode je uključen. Sve probe su
+registrovane kao **odvojeni razvojni MSIX paketi** pomoću `Add-AppxPackage -Register`.
+Nijedna nije mijenjala instaliranu Store aplikaciju. Nakon svake probe uklonjeni su
+probni paket i samo HKCU ključevi koje je proba stvorila. Stari ključevi `com.videodl.bridge`
+ostali su prisutni i netaknuti. Microsoftov [postupak za lokalnu registraciju](https://learn.microsoft.com/en-us/windows/apps/develop/testing/loose-file-registration)
+zahtijeva Developer Mode.
 
-1. Uključiti Windows Developer Mode. [Microsoftov postupak za loose-file registraciju](https://learn.microsoft.com/en-us/windows/apps/develop/testing/loose-file-registration)
-   zahtijeva Developer Mode. Iz foldera projekta pripremiti paket i provjeriti da ključeva nema:
+## Izmjerena razlika pri ponovnoj upotrebi imena
 
-   ```powershell
-   Set-Location 'C:\Video Downloader\Projekat'
-   $hostName = 'io.github.abnps.videodownload'
-   $browsers = @('Google\Chrome', 'Microsoft\Edge', 'Mozilla')
-   $keys = $browsers | ForEach-Object { "HKCU:\Software\$_\NativeMessagingHosts\$hostName" }
-   $keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" }
-   python tools/prepare_store_registry_probe.py
-   ```
+| Ime i postupak | Chrome van paketa | Edge van paketa | Mozilla van paketa |
+| --- | --- | --- | --- |
+| `io.github.abnps.videodownload`, prvi `reg.exe` paket, tri izuzetka | `True` | `True` | `True` |
+| Isto ime poslije uklanjanja paketa i ključeva, isti manifest | `True` | `False` | `False` |
+| Svježe `io.github.abnps.videodownload3`, tri izuzetka | `True` | `True` | `True` |
+| Svježe `io.github.abnps.videodownload4`, **šest** izuzetaka (tri nova + tri stara) | `True` | `True` | `True` |
+| Isto ime `...videodownload4` poslije uklanjanja i ponovne registracije | `True` | `False` | `False` |
+| Svježe `io.github.abnps.videodownload5`, PyInstaller kod aplikacije, šest izuzetaka | `True` | `True` | `True` |
 
-   Sva tri rezultata `Test-Path` moraju biti `False`. Skripta piše samo u
-   `C:\Video Downloader\Build\store-registry-probe\NewHost`.
+U jednoj probi Edge upis je bio vidljiv unutar paketa (`reg query` putem
+`Invoke-CommandInDesktopPackage`), ali nije bio vidljiv iz običnog PowerShella.
+Svako `True` je potvrđeno i probnom vrijednošću ili `(Default)` putanjom manifesta.
+Kombinacija šest izuzetaka **nije** sama uzrok: svježe ime `...4` s njima radi.
+Ponovna upotreba iste obrisane putanje na ovom računaru reproducibilno nije radila
+za Edge i Firefox. Unutrašnji Windows uzrok nije utvrđen; ne čistiti
+AppModel/StateRepository/Helium ručno. Microsoftova [dokumentacija za izuzetke](https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization)
+potvrđuje da su stvarni HKCU ključevi vidljivi van paketa i da mogu ostati nakon
+deinstalacije, ali ne objašnjava ovaj slučaj ponovnog upisa.
 
-2. Registrovati probni paket, pokrenuti svaku od tri aplikacije i provjeriti iz istog
-   običnog PowerShella:
+U probi `...videodownload5` pokrenut je stvarni `videodl.native_messaging.install_native_host`
+iz **PyInstaller** izvršnog fajla u posebnom paketu, uz samo probno ime i probni
+folder. Izvještaj je pokazao `frozen=true`, `store_package=true`, `alias_exists=true`.
+Tri `(Default)` vrijednosti pokazivale su na odgovarajuće Chromium/Firefox JSON
+manifeste; u JSON-u je `path` bio probni App Execution Alias. Binary status upit
+kroz alias vratio je `{"ok":true,"running":false,"language":"bs"}` bez stderr-a.
+Probni paket i ključevi su uklonjeni (`Test-Path=False` za sva tri).
 
-   ```powershell
-   $probeManifest = 'C:\Video Downloader\Build\store-registry-probe\NewHost\AppxManifest.xml'
-   Add-AppxPackage -Register $probeManifest
-   $probe = Get-AppxPackage -Name 'abnps.VideoDownloadNewHostProbe'
-   $probe | Select-Object Name, PackageFamilyName, PackageFullName
-   foreach ($browser in @('Chrome', 'Edge', 'Firefox')) {
-     Start-Process "$env:WINDIR\explorer.exe" -ArgumentList "shell:AppsFolder\$($probe.PackageFamilyName)!$browser"
-   }
-   Start-Sleep -Seconds 3
-   $keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" }
-   $keys | ForEach-Object { Get-ItemProperty -LiteralPath $_ -Name ABNPSProbe -ErrorAction SilentlyContinue }
-   ```
+**Završno ime u kodu je `io.github.abnps.videodownload.bridge`.** Na ovom računaru
+ono nije korišteno ni brisano u probi (`Test-Path=False` za sva tri browsera).
+Ne koristiti ga za probne pakete koji se zatim uklanjaju. Potrebna je zasebna
+provjera pune aplikacije i dodatka nakon Store ažuriranja; do tada Store ostaje
+privatan. Windows 10 nije ispitan.
 
-   Očekivano: **tri `True`** i u svakom ključu `ABNPSProbe : visible`. Ako
-   `Add-AppxPackage` prijavi grešku, zabilježiti kod i `Get-AppxLog`; tada nema potvrde.
-   Ako aktivacija zakaže, `Test-Path=False` ne dokazuje kvar virtualizacije.
+## Ako treba ponoviti osnovni mehanizam
 
-3. Očistiti samo probni paket i probne ključeve, nakon što je potvrđeno da ih je ova
-   proba napravila:
+`tools/prepare_store_registry_probe.py` sada namjerno koristi samo **jednokratno
+probno ime** `io.github.abnps.registryprobe`, nikad produkcijsko ime. I tu probu
+treba tumačiti kao prvi pokušaj; poslije brisanja ključeva istu putanju ne koristiti
+za zaključak o čistoj instalaciji.
 
-   ```powershell
-   if ($probe) { Remove-AppxPackage -Package $probe.PackageFullName }
-   $keys | ForEach-Object { Remove-Item -LiteralPath $_ -Recurse -Force -ErrorAction SilentlyContinue }
-   $keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" }
-   ```
+```powershell
+Set-Location 'C:\Video Downloader\Projekat'
+$name = 'io.github.abnps.registryprobe'
+$keys = @('Google\Chrome','Microsoft\Edge','Mozilla') |
+  ForEach-Object { "HKCU:\Software\$_\NativeMessagingHosts\$name" }
+$keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" } # tri False
+python tools/prepare_store_registry_probe.py
+Add-AppxPackage -Register 'C:\Video Downloader\Build\store-registry-probe\DisposableHost\AppxManifest.xml'
+$probe = Get-AppxPackage -Name 'abnps.VideoDownloadDisposableHostProbe'
+foreach ($app in @('Chrome','Edge','Firefox')) {
+  Start-Process "$env:WINDIR\explorer.exe" -ArgumentList "shell:AppsFolder\$($probe.PackageFamilyName)!$app"
+}
+Start-Sleep -Seconds 4
+$keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" } # očekivano tri True
+$keys | ForEach-Object { Get-ItemProperty -LiteralPath $_ -Name ABNPSProbe }
+```
 
-   Završni rezultat treba biti tri `False`. Ne uklanjati ključeve ako su postojali
-   prije probe. Ova proba potvrđuje mehanizam `ExcludedKey` na ovom računaru; ne
-   potvrđuje Store certifikaciju, pravi PyInstaller program ni rad poslije Store
-   ažuriranja.
+Po završetku ukloniti samo paket `abnps.VideoDownloadDisposableHostProbe` i
+ključeve koji prije probe nisu postojali i imaju `ABNPSProbe=visible`:
 
-Na ovoj mašini je 20.10.2026 `AllowDevelopmentWithoutDevLicense=0`; pokušaj
-`Add-AppxPackage -Register` vratio je `0x80073CFF`. Probe nije ostavila paket ni
-ključeve: sva tri `Test-Path` nakon pokušaja bila su `False`. Izgrađeni probni
-MSIX je prošao `makeappx pack`, ali nema rezultata rada paketa dok Ahmed ne uključi
-Developer Mode kroz Windows Settings. Skripta ne mijenja sistemsku postavku.
-
-Za zasebnu probu stvarne aplikacije napraviti svjež build iz ove grane, pa kopirati
-MSIX layout pod **drugim paketnim identitetom i drugim aliasom**. Za taj probni
-build treba uskladiti i `STORE_HOST_ALIAS` u kodu s probnim aliasom. Ne registrovati
-nepotpisani paket pod identitetom već instalirane Store aplikacije. Pokrenuti program
-jednom, pa izvan paketa provjeriti da sva tri nova ključa imaju `(Default)` REG_SZ
-putanju do odgovarajućeg `.json` manifesta i da manifestov `path` pokazuje na
-`%LOCALAPPDATA%\Microsoft\WindowsApps\<probni-alias>`. Zatim provjeriti odgovor
-dodatka iz browsera i očistiti samo razvojni paket. Bez ove probe Store ostaje privatan.
+```powershell
+Remove-AppxPackage -Package $probe.PackageFullName
+$keys | ForEach-Object {
+  if ((Get-ItemProperty -LiteralPath $_ -Name ABNPSProbe).ABNPSProbe -eq 'visible') {
+    Remove-Item -LiteralPath $_ -Force
+  }
+}
+$keys | ForEach-Object { "$_ = $(Test-Path -LiteralPath $_)" } # tri False
+```

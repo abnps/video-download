@@ -306,6 +306,20 @@ class NativeHostTest(unittest.TestCase):
 
 
 class NativeMessagingInstallTest(unittest.TestCase):
+    def test_extension_and_disposable_probe_use_expected_names(self):
+        extension = (PROJECT_ROOT / "extension" / "native.js").read_text(encoding="utf-8")
+        self.assertIn(f'export const NATIVE_HOST = "{native_host.HOST_NAME}"', extension)
+        self.assertIn(f'export const LEGACY_NATIVE_HOST = "{native_host.LEGACY_HOST_NAME}"', extension)
+
+        import sys
+        sys.path.insert(0, str(PROJECT_ROOT / "tools"))
+        try:
+            import prepare_store_registry_probe
+        finally:
+            sys.path.remove(str(PROJECT_ROOT / "tools"))
+        self.assertNotEqual(prepare_store_registry_probe.PROBE_HOST_NAME, native_host.HOST_NAME)
+        self.assertNotIn(native_host.HOST_NAME, prepare_store_registry_probe.manifest())
+
     def test_extension_id_matches_manifest_key(self):
         manifest = json.loads((PROJECT_ROOT / "extension" / "manifest.json").read_text(encoding="utf-8"))
         digest = hashlib.sha256(base64.b64decode(manifest["key"])).hexdigest()[:32]

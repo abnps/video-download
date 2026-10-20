@@ -35,7 +35,7 @@ test("staro ime se koristi samo kada novo nije pronađeno", async () => {
 
 test("Firefoxova poruka o nepostojećoj aplikaciji pokreće povratak na staro ime", async () => {
   const { runtime, calls } = runtimeWith({
-    [NATIVE_HOST]: { error: "No such native application io.github.abnps.videodownload" },
+    [NATIVE_HOST]: { error: `No such native application ${NATIVE_HOST}` },
     [LEGACY_NATIVE_HOST]: { reply: { ok: true } },
   });
   assert.deepEqual(await sendNative({ action: "status" }, runtime), { ok: true });

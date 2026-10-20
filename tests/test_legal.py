@@ -77,7 +77,7 @@ class InstallerTest(unittest.TestCase):
 
     def test_uninstall_keeps_store_registration_for_both_host_names(self):
         guard = SCRIPT[SCRIPT.index("function StoreOwnsBrowserLink"):SCRIPT.index("procedure CurUninstallStepChanged")]
-        for name in ("io.github.abnps.videodownload", "com.videodl.bridge"):
+        for name in ("io.github.abnps.videodownload.bridge", "com.videodl.bridge"):
             self.assertIn(f"native-host\\{name}.json", guard)
 
 

@@ -1,4 +1,4 @@
-export const NATIVE_HOST = "io.github.abnps.videodownload";
+export const NATIVE_HOST = "io.github.abnps.videodownload.bridge";
 export const LEGACY_NATIVE_HOST = "com.videodl.bridge";
 
 function hostNotFound(message) {

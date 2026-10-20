@@ -1,4 +1,4 @@
-"""Pripremi razvojni MSIX za probu novog imena hosta u tri HKCU ključa.
+"""Pripremi razvojni MSIX za jednokratnu probu posebnog imena hosta u tri HKCU ključa.
 
     python tools/prepare_store_registry_probe.py [--out <folder van projekta>]
 
@@ -8,22 +8,21 @@ opisani u 00_plan/store_browser_link_probe.md.
 
 import argparse
 import shutil
-import sys
 from pathlib import Path
 
 from PIL import Image
 
 PROJECT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT))
-from videodl.native_host import HOST_NAME  # noqa: E402
-
-DEFAULT_OUT = PROJECT.parent / "Build" / "store-registry-probe" / "NewHost"
+DEFAULT_OUT = PROJECT.parent / "Build" / "store-registry-probe" / "DisposableHost"
 PUBLISHER = "CN=71819F50-D4A6-44BF-A0BC-D68768718275"
-PACKAGE_NAME = "abnps.VideoDownloadNewHostProbe"
+PACKAGE_NAME = "abnps.VideoDownloadDisposableHostProbe"
+# Namjerno različito od imena u izdanju: brisanje probnog ključa može promijeniti
+# ponašanje MSIX virtualizacije pri ponovnom upisu iste putanje.
+PROBE_HOST_NAME = "io.github.abnps.registryprobe"
 REGISTRY_PATHS = {
-    "Chrome": rf"Software\Google\Chrome\NativeMessagingHosts\{HOST_NAME}",
-    "Edge": rf"Software\Microsoft\Edge\NativeMessagingHosts\{HOST_NAME}",
-    "Firefox": rf"Software\Mozilla\NativeMessagingHosts\{HOST_NAME}",
+    "Chrome": rf"Software\Google\Chrome\NativeMessagingHosts\{PROBE_HOST_NAME}",
+    "Edge": rf"Software\Microsoft\Edge\NativeMessagingHosts\{PROBE_HOST_NAME}",
+    "Firefox": rf"Software\Mozilla\NativeMessagingHosts\{PROBE_HOST_NAME}",
 }
 
 

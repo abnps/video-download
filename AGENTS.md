@@ -339,13 +339,20 @@ Za 1.0.3:
   `EntryPoint="Windows.FullTrustApplication"` upisuje ključeve u stvarni HKCU za probna imena
   `abnps.registry.probe` i `com.videodl.bridge2`, s tri ključa, aliasom i ExcludedDirectory.
   Za tačno `com.videodl.bridge` upis ipak ostaje u privatnom registru čak i pod novim probnim identitetom paketa.
-  Uzrok nije utvrđen; ne čistiti AppModel/StateRepository/Helium ručno. `win32App` nije potreban i eksperiment
-  se uklanja. Novo ime hosta `io.github.abnps.videodownload` ima Chrome/Edge/Firefox manifest i HKCU ključ,
-  a staro ime ostaje registrovano radi starih dodataka. Novi dodatak pokušava staro ime samo ako novi host
-  ne postoji. Tri `ExcludedKey` su za novo ime, tri za staro. Alias ostaje na glavnoj aplikaciji jer je
-  Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute za ponovljivu probu su u
-  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok proba van paketa ne pokaže sva tri
-  nova HKCU ključa i dok pravi dodatak ne uspostavi vezu poslije ažuriranja. Windows 10 treba zasebnu probu.
+  Dodatne probe 20.10.2026 nakon uključivanja Developer Modea: prethodno nekorišteno ime
+  `io.github.abnps.videodownload4` sa šest ExcludedKey unosa prvi put je dalo tri `Test-Path=True` van paketa.
+  Nakon uklanjanja paketa i brisanja ta tri ključa, ponavljanje s ISTIM imenom dalo je Chrome=True,
+  Edge=False, Mozilla=False. Svježe ime `...videodownload5` u odvojenom PyInstaller paketu pokrenulo je
+  stvarni `install_native_host`: `is_store_package=True`, alias postoji, sva tri HKCU ključa su vidljiva
+  van paketa i status kroz alias je vratio `ok=true`. I taj paket/ključevi su uklonjeni. Nalaz snažno
+  povezuje neuspjeh s ponovnom upotrebom obrisane putanje; unutrašnji Windows uzrok nije dokazan i
+  AppModel/StateRepository/Helium se ne smiju ručno čistiti. `win32App` nije potreban.
+  Završno ime hosta `io.github.abnps.videodownload.bridge` nije korišteno ni brisano u probi.
+  Program registruje i staro ime radi starih dodataka; novi dodatak pokušava staro samo kad novi host
+  nije pronađen. Tri ExcludedKey su za novo, tri za staro ime. Alias ostaje na glavnoj aplikaciji jer
+  je Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute i sirovi rezultati su u
+  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok se svjež build pune aplikacije,
+  stvarni dodatak i Store ažuriranje ne potvrde. Windows 10 treba zasebnu probu.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

@@ -148,7 +148,7 @@ Druga instanca se ne otvara: samo se podigne prozor već pokrenute.
 
 ## Preuzimanje iz browsera
 
-Program registruje native messaging host pod imenima `io.github.abnps.videodownload` i
+Program registruje native messaging host pod imenima `io.github.abnps.videodownload.bridge` i
 `com.videodl.bridge` (kompatibilnost sa starim dodacima). Novi dodatak koristi novo ime,
 a staro pokušava samo kada browser javi da novi host nije pronađen. Store paket koristi
 stalni App Execution Alias `abnps-videodl-host.exe`; prije javne objave Store verzije treba
