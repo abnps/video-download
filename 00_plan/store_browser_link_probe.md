@@ -134,6 +134,10 @@ Windowsu nisu dirani. Ovaj test potvrđuje tok pune aplikacije na čistom Window
 11, ali **ne zamjenjuje** privatno ažuriranje stvarnog Store-potpisanog paketa s
 originalnim Publisher identitetom, provjeru dodatka u stvarnom browseru ni Store
 certifikaciju. Testni paket s drugim Publisher identitetom nikad ne slati u Store.
+Poslije dokumentovanja probe puni Python suite je prošao: 438 testova, 2
+preskočena. Node testovi dodatka: 24/24. GUI testovi s lažnim `probe_fn` koji
+vraća `None` ispisuju Qt traceback tokom testa, ali ne ruše suite; stvarni
+`probe_fn` vraća `ProbeResult` ili izuzetak.
 
 ## Provjera poslije privatnog Store ažuriranja
 
