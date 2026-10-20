@@ -102,6 +102,39 @@ lokalni `127.0.0.1` socket. Paket zadržava verziju 1.0.2.0 i **nije instaliran,
 potpisan niti poslan u Partner Center**. Stvarno Store ažuriranje će tražiti višu
 verziju i zasebnu potvrdu prije javne objave.
 
+## Izolovana proba pune aplikacije u Windows Sandboxu (20.10.2026)
+
+Na Windows Sandboxu 11, build 26100, originalni raspakovani MSIX nije mogao biti
+registrovan bez Developer Modea (`0x80073CFF`). Originalni nepotpisani MSIX sa
+`-AllowUnsigned` nije mogao biti instaliran jer Store identitet nema posebni OID za
+nepotpisane pakete (`0x80073D2C`). To su očekivana pravila Windowsa, a sistemska
+politika nije mijenjana.
+
+Zato je samo u `Build\store-sandbox-probe-20261020` napravljena zasebna kopija
+istih binarnih fajlova i manifesta, uz Microsoftov OID za nepotpisane testne
+pakete u polju Publisher. Verzija i kod aplikacije nisu promijenjeni. Ta kopija
+je pokrenuta u Sandboxu bez mreže, s izvornim paketom mapiranim samo za čitanje.
+Rezultati su u `Build\store-sandbox-probe-20261020\results\`:
+
+- `special-unsigned.json`: aplikacija se registrovala i pokrenula; novo ime
+  hosta vidljivo je u sva tri stvarna HKCU ključa izvan paketa.
+- `verified.json`: Chrome, Edge i Firefox imaju ispravne podrazumijevane
+  vrijednosti, postojeće JSON manifeste i putanju na isti App Execution Alias.
+- `node-status.json`: uokvireni native-messaging upit kroz alias vratio je
+  `{"ok":true,"running":true,"language":"bs"}`.
+
+Prvobitni PowerShell izvještaj `special-unsigned.json` pogrešno je očitao
+podrazumijevane vrijednosti kao `null`; zasebna provjera preko .NET Registry API-ja
+u `registry.json` i `verified.json` potvrdila je njihove tačne putanje. PowerShell
+varijanta slanja binarnog zahtjeva dala je loš okvir; Node je poslao ispravan
+uokvireni zahtjev i dobio odgovor.
+
+Sandbox je zaustavljen nakon probe. Produkcijski HKCU ključevi na Ahmedovom
+Windowsu nisu dirani. Ovaj test potvrđuje tok pune aplikacije na čistom Windowsu
+11, ali **ne zamjenjuje** privatno ažuriranje stvarnog Store-potpisanog paketa s
+originalnim Publisher identitetom, provjeru dodatka u stvarnom browseru ni Store
+certifikaciju. Testni paket s drugim Publisher identitetom nikad ne slati u Store.
+
 ## Provjera poslije privatnog Store ažuriranja
 
 `tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,

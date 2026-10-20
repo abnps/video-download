@@ -367,6 +367,12 @@ Za 1.0.3:
   Store ažuriranja: traži najmanje 1.0.3.0, sva tri stvarna HKCU ključa novog imena,
   ispravne JSON manifeste i status odgovor aliasa. `--legacy` prolazi na 1.0.2.0;
   osnovni poziv sada očekivano ne prolazi. Stvarni dodatak u browseru još se mora provjeriti.
+  Izolovana proba 20.10.2026: posebna nepotpisana kopija punog paketa (s testnim
+  Publisher OID-om) u Windows Sandboxu 11/b26100 upisala je novo ime u stvarni
+  HKCU za Chrome, Edge i Firefox; sva tri manifesta i alias su ispravni, status
+  preko aliasa je `ok=true`. Detalji su u `00_plan/store_browser_link_probe.md`.
+  To nije proba Store-potpisanog ažuriranja niti certifikacija; prije javne objave
+  još treba privatno Store ažuriranje i stvarni test dodatka u browseru.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
