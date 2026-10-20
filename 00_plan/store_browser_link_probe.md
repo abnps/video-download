@@ -179,10 +179,14 @@ Partner Center je označio kao „Validated”. U Submission 3 (ID
 `1152921505702184165`) zadržana je privatna publika „Proba”, bez datuma
 javnog otvaranja, a opcija objave je „Don't publish this submission until I
 select Publish now”. Obrazloženje `unvirtualizedResources` ispravljeno je
-sa tri na šest HKCU izuzetaka. Prijava je poslana na certifikaciju; posljednji
-viđeni status: „Update in certification / Pre-processing”. Paket 1.0.2.0
-ostaje u prijavi kao podrška za Windows 10, a 1.0.3.0 traži Windows 11.
-**Certifikacija nije privatna objava niti potvrda stvarnog ažuriranja.**
+sa tri na šest HKCU izuzetaka. Prijava je prošla certifikaciju 20.10.2026.
+Poslije Ahmedovog „kreni” pokrenuta je ručna objava; Partner Center je
+prikazao „Your product is now updated” i Submission 3 kao aktivnu. Privatna
+publika ostaje samo „Proba”, bez datuma javnog otvaranja; grupa ima jedan
+testni Microsoft nalog `abnpsdev@gmail.com`, prijavljen i u Store aplikaciji.
+Paket 1.0.2.0 ostaje u prijavi za Windows 10, a 1.0.3.0 traži Windows 11.
+Store klijent i `Get-AppxPackage` još su pokazali 1.0.2.0, a `winget upgrade`
+nije našao novu verziju. Stvarno Store ažuriranje i browser E2E još čekaju.
 
 `tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,
 izvan paketa, prvo pokrenuti Store aplikaciju jednom, pa:
