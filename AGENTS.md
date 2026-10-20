@@ -368,6 +368,9 @@ Za 1.0.2:
   godinu dana). Čestitka tek kad ništa ne radi, više njih u jednom prozoru; poruka i dugme za prilog najviše jednom
   dnevno i ne poslije „Već sam podržao". Pomoć → Moja dostignuća (spisak, ukupno preuzimanja i GB). Sve samo lokalno
   (`achievements/state` u podešavanjima). Ahmed: bez prekidača za isključivanje čestitki.
+- Android: dostignuća (20.10.2026, `Achievements.kt`, `AchievementsScreen.kt`): isti broj preuzimanja i ista pravila
+  kao računar, bez „auto" i „4 istovremeno"; dodatno Podijeljeno, widget, pločica, Pozovi prijatelja. Čestitka
+  (kartica s ikonom u krugu) kad ništa ne preuzima; Postavke → Podrška → Moja dostignuća. Provjereno na S26 Ultra.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
