@@ -30,12 +30,12 @@ Zato otpadaju katalozi koji primaju samo otvoren kod:
 | Katalog | Može? | Napomena |
 |---|---|---|
 | winget | da | PR #445943 (1.0.0 → 1.0.1) zatvoren greškom 20.10.2026; nova prijava #456435 za 1.0.2 (`winget validate` OK), čeka automatsku provjeru i moderatora |
-| Microsoft Store | odobreno | „Video Download by abnps" (Store ID 9NT46S6L7KGN), MSIX 1.0.1.0 prošao provjeru (i runFullTrust + unvirtualizedResources) i objavljen 19.10.2026 PRIVATNO (grupa „Proba" = abnpsdev); slijedi proba dodatka za browser, pa javno + sajt |
+| Microsoft Store | odobreno | „Video Download by abnps“ (Store ID 9NT46S6L7KGN), 1.0.1.0 objavljen PRIVATNO 19.10.2026 (grupa „Proba“). 20.10.2026: prijava 2 s MSIX 1.0.2.0 na provjeri (prvi paket odbijen: skrivena aplikacija traži HeadlessAppBypass), objava tek na „Publish now“; zatim proba veze s browserom, pa javno + sajt |
 | AlternativeTo | poslano | 14.10.2026, besplatni red čekanja (može trajati dugo); alternative: yt-dlp, 4K Video Downloader |
 | Softpedia | **ne** | obrazac traži potvrdu da kod nije pisala umjetna inteligencija (14.10.2026) |
 | Uptodown (Windows i Android) | poslano | Windows i Android 1.0.0 na pregledu 14.10.2026 (Android snimci: `Videos/Video Download/snimci-1.0/vd-android-*.png`) |
-| Firefox AMO | objavljeno | 1.0.0 odobren 16.10.2026 (automatski pregled; ljudski pregled moguć kasnije): https://addons.mozilla.org/addon/video-download-abnps/ ; paket `build_firefox.py --listed` |
-| Edge Add-ons | nacrt | 19.10.2026 nacrt u Partner Centeru (abnpsdev): paket 1.0.1 (`tools/build_edge.py`, bez "key"), javno, Productivity, privatnost i opis EN popunjeni; Store ID 0RDCKB9580VF, CRX ID glikmhiifcloegaachgkhinigmnhnjpo (upisan u `native_messaging.py`). Šalje se tek s izdanjem 1.0.2 (novi paket preko „Replace“), jer stariji program ne prihvata taj ID; pravila o preuzimanju videa mogu odbiti dodatak |
+| Firefox AMO | objavljeno | 1.0.0 odobren 16.10.2026; 1.0.2 predat 20.10.2026 (samo Firefox za računar, bez Androida): https://addons.mozilla.org/addon/video-download-abnps/ ; paket `build_firefox.py --listed` |
+| Edge Add-ons | na provjeri | 1.0.2 poslan 20.10.2026 (Store ID 0RDCKB9580VF, CRX ID glikmhiifcloegaachgkhinigmnhnjpo), opis EN/DE/ES/FR; odgovor do 7 radnih dana; pravila o preuzimanju videa mogu odbiti dodatak |
 | Chrome Web Store | **ne sada** | jednokratno 5 $ (plaćeno) i pravila zabranjuju preuzimanje s YouTube-a |
 | IzzyOnDroid, F-Droid | **ne** | primaju samo otvoren kod (FOSS licenca) |
 | Google Play | **ne** | pravila o preuzimanju videa; pun nalog postoji samo radi provjere programera |
