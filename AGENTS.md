@@ -350,7 +350,8 @@ PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`
   JOŠ NIJE PROBANO na pravom Store paketu: provjera tek s 1.0.2 u privatnoj grupi „Proba" (ključevi vidljivi
   u regedit van paketa, dodatak „aplikacija radi", klik iz browsera otvara Store verziju bez ponude ažuriranja).
   Ako ključevi i dalje ostanu u mjehuru: upis registra iz procesa koji izlazi iz paketa (breakaway).
-  Dodano: paket ima drugu (skrivenu) aplikaciju BrowserHost s App Execution Alias „abnps-videodl-host.exe";
+  Dodano: App Execution Alias „abnps-videodl-host.exe" (pokreće videodl-host.exe) na GLAVNOJ aplikaciji; posebna
+  skrivena aplikacija BrowserHost (AppListEntry=none) je 20.10.2026 odbijena pri postavljanju (traži „HeadlessAppBypass");
   Store verzija u registraciju upisuje %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe (stalna
   putanja; folder paketa nosi verziju i mijenja se pri Store ažuriranju). Pri probi provjeriti i da browser
   pokreće host preko aliasa (stdin/stdout).
@@ -359,8 +360,8 @@ PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`
   ako prijave stignu s Win10, rješenje je upis registra iz procesa izvan paketa.
   Napomena za provjeru (Notes for certification) uz 1.0.2: unvirtualizedResources sada samo za 3 ključa
   HKCU\Software\{Google\Chrome,Microsoft\Edge,Mozilla}\NativeMessagingHosts\com.videodl.bridge i
-  %LOCALAPPDATA%\VideoDownload; druga aplikacija „BrowserHost" (AppListEntry=none) je native messaging host za
-  dodatak, alias abnps-videodl-host.exe daje browseru stalnu putanju.
+  %LOCALAPPDATA%\VideoDownload; alias abnps-videodl-host.exe na glavnoj aplikaciji (pokreće videodl-host.exe) daje
+  browseru stalnu putanju.
   Poznato: Store ne briše te ključeve pri deinstalaciji (dodatak tada javlja da program nije povezan); ako su
   instalirane obje verzije (instaler i Store), browser koristi onu koja je zadnja pokrenuta.
 - Edge Add-ons: program prihvata i ID dodatka iz Edge prodavnice (glikmhiifcloegaachgkhinigmnhnjpo). Nacrt u

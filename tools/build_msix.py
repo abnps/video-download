@@ -30,6 +30,8 @@ DISPLAY_NAME = "Video Download by abnps"
 LOGOS = {"Square44x44Logo.png": 44, "Square150x150Logo.png": 150, "StoreLogo.png": 50,
          "Square44x44Logo.targetsize-256_altform-unplated.png": 256}
 
+# Stalna putanja hosta za browser: alias „abnps-videodl-host.exe" je na glavnoj aplikaciji, a pokreće videodl-host.exe.
+# Posebna skrivena aplikacija (bez ikone u Startu) traži Microsoftovo odobrenje „HeadlessAppBypass" (odbijeno 20.10.2026).
 MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
          xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -59,11 +61,6 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
       <uap:VisualElements DisplayName="Video Download" Description="MP4 and MP3 downloader"
                           BackgroundColor="transparent" Square150x150Logo="Assets\\Square150x150Logo.png"
                           Square44x44Logo="Assets\\Square44x44Logo.png" />
-    </Application>
-    <Application Id="BrowserHost" Executable="{host_exe}" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="Video Download (browser)" Description="Connects the browser extension to the app"
-                          BackgroundColor="transparent" Square150x150Logo="Assets\\Square150x150Logo.png"
-                          Square44x44Logo="Assets\\Square44x44Logo.png" AppListEntry="none" />
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias" Executable="{host_exe}"
                         EntryPoint="Windows.FullTrustApplication">

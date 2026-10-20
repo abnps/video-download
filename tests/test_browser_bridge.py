@@ -288,7 +288,13 @@ class NativeHostTest(unittest.TestCase):
         root = ET.fromstring(build_msix.manifest("1.0.2.0"))
         ns = {"m": "http://schemas.microsoft.com/appx/manifest/foundation/windows10",
               "v": "http://schemas.microsoft.com/appx/manifest/virtualization/windows10"}
-        self.assertEqual(root.find("m:Applications/m:Application", ns).get("Id"), native_host.STORE_APP_ID)
+        apps = root.findall("m:Applications/m:Application", ns)
+        # Samo jedna, vidljiva aplikacija: skrivena (AppListEntry="none") traži posebno Microsoftovo odobrenje.
+        self.assertEqual([app.get("Id") for app in apps], [native_host.STORE_APP_ID])
+        self.assertNotIn("AppListEntry", build_msix.manifest("1.0.2.0"))
+        alias = apps[0].find(".//{http://schemas.microsoft.com/appx/manifest/uap/windows10/3}Extension")
+        self.assertEqual(alias.get("Executable"), "videodl-host.exe")
+        self.assertIn('Alias="abnps-videodl-host.exe"', build_msix.manifest("1.0.2.0"))
         keys = [k.text for k in root.iterfind(".//v:ExcludedKey", ns)]
         self.assertEqual(keys, [f"HKEY_CURRENT_USER\\{p}" for p in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS])
         self.assertEqual([d.text for d in root.iterfind(".//v:ExcludedDirectory", ns)],
