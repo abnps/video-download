@@ -74,6 +74,7 @@ class FirefoxPackageTest(unittest.TestCase):
         imports = re.findall(r'from\s+"\./([^"]+)"', (ROOT / "extension" / "background.js").read_text(encoding="utf-8"))
         self.assertTrue(imports)
         self.assertLessEqual(set(imports), self.names)
+        self.assertIn("native.js", imports)  # novo ime i povratak na staro moraju biti u Firefox paketu
 
     def test_no_chromium_only_webrequest_option_without_guard(self):
         background = (ROOT / "extension" / "background.js").read_text(encoding="utf-8")

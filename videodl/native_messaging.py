@@ -21,13 +21,25 @@ EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
 # program prihvata i dodatak iz prodavnice i onaj učitan iz foldera programa.
 EDGE_STORE_EXTENSION_ID = "glikmhiifcloegaachgkhinigmnhnjpo"
 CHROMIUM_EXTENSION_IDS = tuple(i for i in (EXTENSION_ID, EDGE_STORE_EXTENSION_ID) if i)
-REGISTRY_PATHS = (
-    rf"Software\Google\Chrome\NativeMessagingHosts\{native_host.HOST_NAME}",
-    rf"Software\Microsoft\Edge\NativeMessagingHosts\{native_host.HOST_NAME}",
-)
+
+
+def _chromium_registry_paths(host_name: str) -> tuple[str, str]:
+    return (
+        rf"Software\Google\Chrome\NativeMessagingHosts\{host_name}",
+        rf"Software\Microsoft\Edge\NativeMessagingHosts\{host_name}",
+    )
+
+
+REGISTRY_PATHS = tuple(path for name in native_host.HOST_NAMES for path in _chromium_registry_paths(name))
 # Firefox: isti host, ali svoj manifest (allowed_extensions umjesto allowed_origins) i svoj ključ.
 FIREFOX_EXTENSION_ID = "video-download@abnps.github.io"
-FIREFOX_REGISTRY_PATHS = (rf"Software\Mozilla\NativeMessagingHosts\{native_host.HOST_NAME}",)
+
+
+def _firefox_registry_paths(host_name: str) -> tuple[str]:
+    return (rf"Software\Mozilla\NativeMessagingHosts\{host_name}",)
+
+
+FIREFOX_REGISTRY_PATHS = tuple(path for name in native_host.HOST_NAMES for path in _firefox_registry_paths(name))
 
 # Mac: folderi browsera u ~/Library/Application Support. Upisuje se samo za browser koji postoji
 # (folder postoji); aplikacija registraciju ponavlja pri svakom pokretanju, pa kasnije instaliran browser
@@ -99,33 +111,43 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
             script.write_text(f'#!/bin/sh\nexec "{python_exe}" "$(dirname "$0")/host.py" "$@"\n', encoding="utf-8")
             script.chmod(0o755)
 
-    common = {"name": native_host.HOST_NAME, "description": "Video Download", "path": str(script), "type": "stdio"}
-    manifest = install_dir / f"{native_host.HOST_NAME}.json"
-    manifest.write_text(json.dumps({**common, "allowed_origins": [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS]},
-                                   indent=2), encoding="utf-8")
-    firefox = install_dir / f"{native_host.HOST_NAME}.firefox.json"
-    firefox.write_text(json.dumps({**common, "allowed_extensions": [FIREFOX_EXTENSION_ID]}, indent=2),
-                       encoding="utf-8")
+    manifests = {}
+    firefox_manifests = {}
+    for host_name in native_host.HOST_NAMES:
+        common = {"name": host_name, "description": "Video Download", "path": str(script), "type": "stdio"}
+        manifest = install_dir / f"{host_name}.json"
+        manifest.write_text(json.dumps({**common, "allowed_origins": [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS]},
+                                       indent=2), encoding="utf-8")
+        firefox = install_dir / f"{host_name}.firefox.json"
+        firefox.write_text(json.dumps({**common, "allowed_extensions": [FIREFOX_EXTENSION_ID]}, indent=2),
+                           encoding="utf-8")
+        manifests[host_name] = manifest
+        firefox_manifests[host_name] = firefox
 
     if platform == "win32":
         register = set_registry or _set_registry_default
-        register(REGISTRY_PATHS, str(manifest))
-        register(FIREFOX_REGISTRY_PATHS, str(firefox))
+        for host_name in native_host.HOST_NAMES:
+            register(_chromium_registry_paths(host_name), str(manifests[host_name]))
+            register(_firefox_registry_paths(host_name), str(firefox_manifests[host_name]))
     elif platform == "darwin":
-        for target, source in mac_manifest_targets(mac_support_dir, manifest, firefox):
+        for target, source in mac_manifest_targets(mac_support_dir, manifests, firefox_manifests):
             if target.parent.parent.is_dir():  # browser postoji
                 target.parent.mkdir(exist_ok=True)
                 shutil.copyfile(source, target)
-    return manifest
+    return manifests[native_host.HOST_NAME]
 
 
-def mac_manifest_targets(support_dir: Path | None, chrome_manifest: Path | None = None,
-                         firefox_manifest: Path | None = None) -> list[tuple[Path, Path | None]]:
+def mac_manifest_targets(support_dir: Path | None, chrome_manifests: dict[str, Path] | None = None,
+                         firefox_manifests: dict[str, Path] | None = None) -> list[tuple[Path, Path | None]]:
     """(gdje browser traži manifest, koji naš manifest ide tamo) za svaki podržani Mac browser."""
     support = Path(support_dir) if support_dir is not None else user_data_base("darwin")
-    name = f"{native_host.HOST_NAME}.json"
-    targets = [(support / folder / "NativeMessagingHosts" / name, chrome_manifest) for folder in MAC_CHROMIUM_DIRS]
-    targets.append((support / MAC_FIREFOX_DIR / "NativeMessagingHosts" / name, firefox_manifest))
+    targets = []
+    for host_name in native_host.HOST_NAMES:
+        name = f"{host_name}.json"
+        targets.extend((support / folder / "NativeMessagingHosts" / name,
+                        (chrome_manifests or {}).get(host_name)) for folder in MAC_CHROMIUM_DIRS)
+        targets.append((support / MAC_FIREFOX_DIR / "NativeMessagingHosts" / name,
+                        (firefox_manifests or {}).get(host_name)))
     return targets
 
 

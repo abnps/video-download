@@ -20,8 +20,10 @@ test("svaki tekst popupa postoji na svih 5 jezika sa istim mjestima za vrijednos
 test("svaki data-i18n ključ iz popup.html i svaka šifra greške iz pozadine ima prevod", () => {
   const html = readFileSync(new URL("../../extension/popup.html", import.meta.url), "utf8");
   for (const [, key] of html.matchAll(/data-i18n="([^"]+)"/g)) assert.ok(TEXT_KEYS.includes(key), key);
-  const background = readFileSync(new URL("../../extension/background.js", import.meta.url), "utf8");
-  for (const [, code] of background.matchAll(/code: "([\w-]+)"/g)) assert.ok(TEXT_KEYS.includes(`error.${code}`), code);
+  for (const file of ["background.js", "native.js"]) {
+    const source = readFileSync(new URL(`../../extension/${file}`, import.meta.url), "utf8");
+    for (const [, code] of source.matchAll(/code: "([\w-]+)"/g)) assert.ok(TEXT_KEYS.includes(`error.${code}`), code);
+  }
 });
 
 test("jezik i prevod", () => {

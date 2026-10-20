@@ -79,9 +79,11 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 
 
 def excluded_locations() -> str:
-    """Windows 11 (i 10 od 2004) ne poštuje uvijek desktop6 „disabled" za HKCU (19.10.2026: ključevi za browser
-    ostali u mjehuru paketa), pa se mjesta koja browser mora vidjeti navode i pojedinačno; novi zapis tada
-    ima prednost, a stariji Windows koristi desktop6."""
+    """Svako ime hosta i svaki browser dobijaju vlastiti izuzetak za upis u stvarni HKCU.
+
+    Lokalna proba je potvrdila izuzetke za druga imena; za staro ime com.videodl.bridge
+    upis ostaje virtualizovan iz zasad nepoznatog razloga.
+    """
     keys = "".join(f"\n        <virtualization:ExcludedKey>HKEY_CURRENT_USER\\{path}</virtualization:ExcludedKey>"
                    for path in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS)
     return ("    <virtualization:FileSystemWriteVirtualization>\n"

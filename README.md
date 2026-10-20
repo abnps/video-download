@@ -148,8 +148,15 @@ Druga instanca se ne otvara: samo se podigne prozor već pokrenute.
 
 ## Preuzimanje iz browsera
 
+Program registruje native messaging host pod imenima `io.github.abnps.videodownload` i
+`com.videodl.bridge` (kompatibilnost sa starim dodacima). Novi dodatak koristi novo ime,
+a staro pokušava samo kada browser javi da novi host nije pronađen. Store paket koristi
+stalni App Execution Alias `abnps-videodl-host.exe`; prije javne objave Store verzije treba
+potvrditi da su nova tri HKCU ključa vidljiva browseru van paketa. Lokalni postupak probe
+je u `00_plan/store_browser_link_probe.md`.
+
 1. Pokreni aplikaciju jednom. Ona registruje vezu sa browserom samo za tvog
-   Windows korisnika (HKCU, Chrome i Edge).
+   Windows korisnika (HKCU, Chrome, Edge i Firefox).
 2. Edge: otvori `edge://extensions`, uključi „Developer mode", klikni
    „Load unpacked" i izaberi folder `extension` iz ovog projekta.
    Chrome: isto preko `chrome://extensions`.

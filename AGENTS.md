@@ -332,14 +332,20 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
 Za 1.0.3:
-- Store verzija, veza s browserom (provjereno 20.10.2026 na Store 1.0.2.0, Windows 11 26300): alias i manifest rade
-  (manifest pokazuje na %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe, oba ID-a dodatka), ALI upis
-  HKCU\...\NativeMessagingHosts\com.videodl.bridge i dalje ostaje u mjehuru paketa (ni virtualization:ExcludedKeys ni
-  desktop6 ne djeluju; provjereno brisanjem ključa i ponovnim pokretanjem: `reg query` unutar paketa ga vidi, van ne).
-  Ahmedu su ključevi upisani ručno. Proba „breakaway" (reg.exe van paketa preko PROC_THREAD_ATTRIBUTE_DESKTOP_APP_POLICY)
-  nije izvedena: Claude Code zaštita je blokira, a Ahmedovo ručno pokretanje preko Invoke-CommandInDesktopPackage nije
-  ništa pokrenulo. Store zato OSTAJE PRIVATAN (grupa „Proba"); javno samo obični instaler. Mogućnosti: Store javno uz
-  napomenu da dodatak traži obični instaler, ili drugo rješenje registracije (npr. jednokratna naredba za korisnika).
+- Store verzija, veza s browserom (Claudeova lokalna proba 20.10.2026, Windows 11 26300):
+  Store 1.0.2.0 već ima ispravan stalni alias i JSON manifest, ali stari HKCU ključ
+  `com.videodl.bridge` ostaje u privatnom registru paketa.
+  `virtualization:ExcludedKeys` + `unvirtualizedResources` s glavnom aplikacijom
+  `EntryPoint="Windows.FullTrustApplication"` upisuje ključeve u stvarni HKCU za probna imena
+  `abnps.registry.probe` i `com.videodl.bridge2`, s tri ključa, aliasom i ExcludedDirectory.
+  Za tačno `com.videodl.bridge` upis ipak ostaje u privatnom registru čak i pod novim probnim identitetom paketa.
+  Uzrok nije utvrđen; ne čistiti AppModel/StateRepository/Helium ručno. `win32App` nije potreban i eksperiment
+  se uklanja. Novo ime hosta `io.github.abnps.videodownload` ima Chrome/Edge/Firefox manifest i HKCU ključ,
+  a staro ime ostaje registrovano radi starih dodataka. Novi dodatak pokušava staro ime samo ako novi host
+  ne postoji. Tri `ExcludedKey` su za novo ime, tri za staro. Alias ostaje na glavnoj aplikaciji jer je
+  Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute za ponovljivu probu su u
+  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok proba van paketa ne pokaže sva tri
+  nova HKCU ključa i dok pravi dodatak ne uspostavi vezu poslije ažuriranja. Windows 10 treba zasebnu probu.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

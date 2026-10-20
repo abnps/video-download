@@ -125,7 +125,9 @@ var
   Manifest: AnsiString;
 begin
   Result := False;
-  if LoadStringFromFile(ExpandConstant('{localappdata}\VideoDownload\native-host\com.videodl.bridge.json'), Manifest) then
+  if LoadStringFromFile(ExpandConstant('{localappdata}\VideoDownload\native-host\io.github.abnps.videodownload.json'), Manifest) then
+    Result := Pos('windowsapps', Lowercase(String(Manifest))) > 0;
+  if not Result and LoadStringFromFile(ExpandConstant('{localappdata}\VideoDownload\native-host\com.videodl.bridge.json'), Manifest) then
     Result := Pos('windowsapps', Lowercase(String(Manifest))) > 0;
 end;
 
@@ -133,6 +135,9 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if (CurUninstallStep = usUninstall) and not StoreOwnsBrowserLink then
   begin
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Google\Chrome\NativeMessagingHosts\io.github.abnps.videodownload');
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Microsoft\Edge\NativeMessagingHosts\io.github.abnps.videodownload');
+    RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Mozilla\NativeMessagingHosts\io.github.abnps.videodownload');
     RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Google\Chrome\NativeMessagingHosts\com.videodl.bridge');
     RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Microsoft\Edge\NativeMessagingHosts\com.videodl.bridge');
     RegDeleteKeyIncludingSubkeys(HKCU, 'Software\Mozilla\NativeMessagingHosts\com.videodl.bridge');

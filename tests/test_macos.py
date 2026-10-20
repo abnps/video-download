@@ -53,6 +53,9 @@ class MacNativeMessagingTest(unittest.TestCase):
             self.assertEqual(json.loads(chrome.read_text())["allowed_origins"],
                          [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS])
             self.assertEqual(json.loads(firefox.read_text())["allowed_extensions"], [FIREFOX_EXTENSION_ID])
+            for host_name in native_host.HOST_NAMES:
+                self.assertTrue((support / "Google" / "Chrome" / "NativeMessagingHosts" / f"{host_name}.json").exists())
+                self.assertTrue((support / "Mozilla" / "NativeMessagingHosts" / f"{host_name}.json").exists())
             self.assertFalse((support / "Microsoft Edge").exists())  # ne pravi foldere za browser koji nema
 
             script = Path(json.loads(chrome.read_text())["path"])
@@ -62,8 +65,9 @@ class MacNativeMessagingTest(unittest.TestCase):
                 self.assertTrue(os.access(script, os.X_OK))
 
             uninstall_native_host(Path(tmp) / "native-host", platform="darwin", mac_support_dir=support)
-            self.assertFalse(chrome.exists())
-            self.assertFalse(firefox.exists())
+            for host_name in native_host.HOST_NAMES:
+                self.assertFalse((chrome.parent / f"{host_name}.json").exists())
+                self.assertFalse((firefox.parent / f"{host_name}.json").exists())
             self.assertFalse((Path(tmp) / "native-host").exists())
 
     def test_installed_app_is_its_own_host(self):
@@ -92,8 +96,8 @@ class MacNativeMessagingTest(unittest.TestCase):
 
     def test_every_supported_browser_has_a_target(self):
         targets = [target for target, _ in mac_manifest_targets(Path("/S"))]
-        self.assertEqual(len(targets), len(MAC_CHROMIUM_DIRS) + 1)
-        self.assertTrue(all(t.name == f"{native_host.HOST_NAME}.json" for t in targets))
+        self.assertEqual(len(targets), len(native_host.HOST_NAMES) * (len(MAC_CHROMIUM_DIRS) + 1))
+        self.assertEqual({t.name for t in targets}, {f"{name}.json" for name in native_host.HOST_NAMES})
 
 
 class MacHostTest(unittest.TestCase):

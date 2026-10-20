@@ -292,10 +292,14 @@ class NativeHostTest(unittest.TestCase):
         # Samo jedna, vidljiva aplikacija: skrivena (AppListEntry="none") traži posebno Microsoftovo odobrenje.
         self.assertEqual([app.get("Id") for app in apps], [native_host.STORE_APP_ID])
         self.assertNotIn("AppListEntry", build_msix.manifest("1.0.2.0"))
+        self.assertEqual(apps[0].get("EntryPoint"), "Windows.FullTrustApplication")
         alias = apps[0].find(".//{http://schemas.microsoft.com/appx/manifest/uap/windows10/3}Extension")
         self.assertEqual(alias.get("Executable"), "videodl-host.exe")
+        # makeappx za alias s posebnim .exe-om traži EntryPoint; host ne piše HKCU registraciju.
+        self.assertEqual(alias.get("EntryPoint"), "Windows.FullTrustApplication")
         self.assertIn('Alias="abnps-videodl-host.exe"', build_msix.manifest("1.0.2.0"))
         keys = [k.text for k in root.iterfind(".//v:ExcludedKey", ns)]
+        self.assertEqual(len(keys), 6)
         self.assertEqual(keys, [f"HKEY_CURRENT_USER\\{p}" for p in REGISTRY_PATHS + FIREFOX_REGISTRY_PATHS])
         self.assertEqual([d.text for d in root.iterfind(".//v:ExcludedDirectory", ns)],
                          [r"$(KnownFolder:LocalAppData)\VideoDownload"])
@@ -322,6 +326,8 @@ class NativeMessagingInstallTest(unittest.TestCase):
             config = json.loads((folder / "host-config.json").read_text(encoding="utf-8"))
             host_copied = (folder / "host.py").read_text(encoding="utf-8") == \
                 Path(native_host.__file__).read_text(encoding="utf-8")
+            registered_manifests = {key: json.loads(Path(path).read_text(encoding="utf-8"))
+                                    for key, path in written.items()}
 
         self.assertEqual(manifest["allowed_origins"],
                          [f"chrome-extension://{i}/" for i in CHROMIUM_EXTENSION_IDS])
@@ -332,7 +338,17 @@ class NativeMessagingInstallTest(unittest.TestCase):
         self.assertEqual(config["launch"][1], r"C:\Прилози\pokreni.pyw")
         self.assertTrue(host_copied)
         self.assertEqual(set(written), set(REGISTRY_PATHS) | set(FIREFOX_REGISTRY_PATHS))
-        self.assertTrue(all(written[key] == str(manifest_path) for key in REGISTRY_PATHS))
+        for host_name in native_host.HOST_NAMES:
+            for key in REGISTRY_PATHS:
+                if key.endswith(host_name):
+                    host_manifest = registered_manifests[key]
+                    self.assertEqual(host_manifest["name"], host_name)
+                    self.assertEqual(host_manifest["allowed_origins"], manifest["allowed_origins"])
+            for key in FIREFOX_REGISTRY_PATHS:
+                if key.endswith(host_name):
+                    firefox_manifest = registered_manifests[key]
+                    self.assertEqual(firefox_manifest["name"], host_name)
+                    self.assertEqual(firefox_manifest["allowed_extensions"], [FIREFOX_EXTENSION_ID])
         # Firefox ima svoj manifest: isti host, ali dozvoljava samo naš Firefox dodatak.
         self.assertTrue(written[FIREFOX_REGISTRY_PATHS[0]].endswith(".firefox.json"))
         self.assertEqual(firefox["allowed_extensions"], [FIREFOX_EXTENSION_ID])
@@ -352,8 +368,10 @@ class NativeMessagingInstallTest(unittest.TestCase):
                 manifest_path = install_native_host(Path(tmp) / "native-host", set_registry=lambda keys, value: None,
                                                     platform="win32")
                 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                legacy = json.loads((Path(tmp) / "native-host" / f"{native_host.LEGACY_HOST_NAME}.json").read_text(encoding="utf-8"))
         # Putanja ne smije sadržavati verziju paketa (mijenja se sa svakim Store ažuriranjem).
         self.assertEqual(manifest["path"], str(alias))
+        self.assertEqual(legacy["path"], str(alias))
 
 
 

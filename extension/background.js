@@ -3,8 +3,8 @@ import { pickLanguage, translate } from "./i18n.js";
 import { shouldWelcome } from "./install.js";
 import { MENU_ITEMS, menuTarget } from "./menus.js";
 import { findPlayingVideo } from "./playing.js";
+import { sendNative } from "./native.js";
 
-const NATIVE_HOST = "com.videodl.bridge";
 const WATCHED_TYPES = ["main_frame", "sub_frame", "media", "xmlhttprequest", "object", "other"];
 const MAX_TRACKED_REFERERS = 500;
 
@@ -278,22 +278,6 @@ async function sendToApp(tabId, mediaUrl, preset) {
   const reply = error || (await sendNative({ action: "add", request }));
   await flashBadge(tabId, reply.ok);
   return reply;
-}
-
-function sendNative(message) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendNativeMessage(NATIVE_HOST, message, (reply) => {
-      const failure = chrome.runtime.lastError;
-      if (failure) {
-        const detail = failure.message || "";
-        // „forbidden": program postoji, ali ne poznaje ovaj dodatak (npr. dodatak iz Edge prodavnice uz stariji program).
-        const code = /forbidden/i.test(detail) ? "app-outdated" : /not found/i.test(detail) ? "not-connected" : "connection";
-        resolve(code === "connection" ? { ok: false, code, detail } : { ok: false, code });
-        return;
-      }
-      resolve(reply || { ok: false, code: "no-reply" });
-    });
-  });
 }
 
 async function flashBadge(tabId, ok) {

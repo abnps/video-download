@@ -75,6 +75,11 @@ class InstallerTest(unittest.TestCase):
         self.assertNotIn("history.json", section)
         self.assertNotIn("queue.json", section)
 
+    def test_uninstall_keeps_store_registration_for_both_host_names(self):
+        guard = SCRIPT[SCRIPT.index("function StoreOwnsBrowserLink"):SCRIPT.index("procedure CurUninstallStepChanged")]
+        for name in ("io.github.abnps.videodownload", "com.videodl.bridge"):
+            self.assertIn(f"native-host\\{name}.json", guard)
+
 
 class ComponentsTest(unittest.TestCase):
     def test_static_license_texts_are_in_the_repo(self):
