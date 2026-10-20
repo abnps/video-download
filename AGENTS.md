@@ -296,7 +296,10 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
   (nikad u pending_jobs/istoriju); bez potvrde `ADULT_CONFIRM` → posao čeka (Phase.NEEDS_ADULT), ostali idu.
 - winget (Ahmed 3.10.2026: „Da, uradi oboje"): paket `abnps.VideoDownload`, instaleri trajno u javnom repou
   `abnps/video-download-installers` (glavni repo javno drži samo posljednje izdanje, a winget traži stalni link).
-  Prva prijava: microsoft/winget-pkgs#445943 (s naloga npgamy). Postupak za nove verzije: README korak 7.
+  Prva prijava: microsoft/winget-pkgs#445943 (s naloga npgamy), zatvorena 20.10.2026 greškom (grana poslana bez
+  prethodnika iz plitkog klona; ne može se ponovo otvoriti) → nova prijava #456435 za 1.0.2, ista grana
+  `npgamy:abnps.VideoDownload-0.9.7`. Postupak za nove verzije: README korak 7. PAŽNJA: winget-pkgs klonirati bar s
+  --depth 2 i commit praviti s roditeljem prethodnog commita grane (ne `--amend` na plitkom klonu).
 - Instalacija s računara: `adb install --user 0 -r …` — bez `--user 0` APK ode i u Samsungov Dual Messenger
   profil (druga ikona sa značkom).
 
@@ -328,7 +331,12 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 ## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
-Za 1.0.2:
+Za 1.0.3:
+(još ništa)
+PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
+(nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
+
+### Objavljeno u 1.0.2 (20.10.2026; winget PR #456435; Store i Edge prijave poslije objave)
 - Microsoft Store verzija (obavezno prije javne objave u Storeu): veza s browserom. Provjereno 19.10.2026 na Store
   1.0.1.0: fajl manifesta ide na pravo mjesto, ali ključevi HKCU\...\NativeMessagingHosts\com.videodl.bridge ostaju
   u mjehuru paketa uprkos desktop6:RegistryWriteVirtualization=disabled (vide se samo unutar paketa). Uz ručno
@@ -371,8 +379,6 @@ Za 1.0.2:
 - Android: dostignuća (20.10.2026, `Achievements.kt`, `AchievementsScreen.kt`): isti broj preuzimanja i ista pravila
   kao računar, bez „auto" i „4 istovremeno"; dodatno Podijeljeno, widget, pločica, Pozovi prijatelja. Čestitka
   (kartica s ikonom u krugu) kad ništa ne preuzima; Postavke → Podrška → Moja dostignuća. Provjereno na S26 Ultra.
-PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
-(nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
 ### Objavljeno u 1.0.1 (18.10.2026; winget PR #445943 prebačen na 1.0.1)
 - Program: Pomoć → „Discord zajednica" (`DISCORD_URL` u `videodl/dialogs.py`, ista pozivnica kao na sajtu).
@@ -428,5 +434,5 @@ PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`
   agentu je force push zabranjen). Kopija za winget se ponavlja s `--installers-only`.
 - Prvo samostalno ažuriranje na Macu: 0.9.8 → sljedeće izdanje (pratiti izvještaje).
 - Winget vodič na sajtu (`tools/site_winget.py`, `winget.html`, 5 jezika) je spreman ali SKRIVEN (`LIVE = False`).
-  Kad Microsoft spoji PR #445943: `LIVE = True`, `python tools/build_site.py`, commit (Ahmed 3.10.2026).
+  Kad Microsoft spoji PR #456435: `LIVE = True`, `python tools/build_site.py`, commit (Ahmed 3.10.2026).
 

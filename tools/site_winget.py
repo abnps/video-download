@@ -1,6 +1,6 @@
 """Vodič „Instalacija jednom komandom (winget)" na sajtu, 5 jezika (Ahmed 3.10.2026).
 
-Skriven dok Microsoft ne prihvati paket (PR microsoft/winget-pkgs #445943): komanda prije toga javlja
+Skriven dok Microsoft ne prihvati paket (PR microsoft/winget-pkgs #456435): komanda prije toga javlja
 „paket nije pronađen". Kad PR bude spojen: LIVE = True, `python tools/build_site.py`, commit.
 Tada je stranica u vodičima (kartica na vrhu), u sitemapu i sama u sebi; bez LIVE sajt ostaje isti.
 """
