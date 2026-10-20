@@ -20,7 +20,6 @@ sys.path.insert(0, str(PROJECT))
 
 from videodl import __version__  # noqa: E402
 from videodl.native_messaging import FIREFOX_REGISTRY_PATHS, REGISTRY_PATHS, STORE_HOST_ALIAS  # noqa: E402
-from videodl.runtime import HOST_EXE  # noqa: E402
 
 BUILD = PROJECT.parent / "Build"
 IDENTITY_NAME = "abnps.VideoDownloadbyabnps"
@@ -101,7 +100,7 @@ def excluded_locations() -> str:
 def manifest(version: str) -> str:
     return MANIFEST.format(name=IDENTITY_NAME, publisher=PUBLISHER, version=version, display=DISPLAY_NAME,
                            publisher_display=PUBLISHER_DISPLAY, excluded=excluded_locations(),
-                           host_exe=HOST_EXE, host_alias=STORE_HOST_ALIAS)
+                           host_exe="videodl-host.exe", host_alias=STORE_HOST_ALIAS)  # paket je samo za Windows
 
 
 def store_version(version: str) -> str:
