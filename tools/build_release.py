@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -272,6 +273,22 @@ def verify_package() -> None:
         raise SystemExit("Paket je oštećen (razlika ili same nule): " + ", ".join(sorted(set(problems))))
 
 
+def clean_output(path: Path) -> None:
+    """Ukloni stari izlaz i kad kopirane ikone imaju Windows atribut samo za čitanje."""
+    if BUILD.resolve() not in path.resolve().parents:
+        raise SystemExit(f"Izlaz za brisanje nije unutar build foldera: {path}")
+    if not path.exists():
+        return
+
+    def retry_readonly(func, failed_path, error):
+        if not isinstance(error, PermissionError):
+            raise error
+        os.chmod(failed_path, stat.S_IWRITE)
+        func(failed_path)
+
+    shutil.rmtree(path, onexc=retry_readonly)
+
+
 def main() -> int:
     if not ISCC.is_file():
         raise SystemExit(f"Inno Setup nije pronađen: {ISCC}")
@@ -285,8 +302,8 @@ def main() -> int:
     if problems:
         raise SystemExit("Okruženje se ne slaže s tools/build-lock.json:\n  " + "\n  ".join(problems))
     run_checks()
-    shutil.rmtree(DIST, ignore_errors=True)
-    shutil.rmtree(INSTALLER_OUT, ignore_errors=True)
+    clean_output(DIST)
+    clean_output(INSTALLER_OUT)
     icon = BUILD / "icon.ico"
     make_icon(icon)
 

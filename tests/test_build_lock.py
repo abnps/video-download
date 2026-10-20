@@ -1,8 +1,11 @@
 """Zaključane verzije za izdanje: lock fajlovi se slažu, a pravne napomene navode tačan ffmpeg."""
 
 import json
+import os
 import re
+import stat
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -64,6 +67,21 @@ class BuildLockTest(unittest.TestCase):
         problems = build_release.verify_environment(broken)
         self.assertTrue(any(p.startswith("node: SHA-256") for p in problems))
         self.assertTrue(any(p.startswith("yt-dlp ") for p in problems))
+
+    def test_cleanup_removes_readonly_output_without_leaving_old_files(self):
+        build_release.BUILD.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=build_release.BUILD) as temp:
+            output = Path(temp) / "dist"
+            output.mkdir()
+            icon = output / "icon.png"
+            icon.write_bytes(b"test")
+            os.chmod(icon, stat.S_IREAD)
+            try:
+                build_release.clean_output(output)
+                self.assertFalse(output.exists())
+            finally:
+                if icon.exists():
+                    os.chmod(icon, stat.S_IWRITE)
 
 
 if __name__ == "__main__":

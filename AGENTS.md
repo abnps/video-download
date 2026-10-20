@@ -382,10 +382,9 @@ Za 1.0.3:
   lokalne nadogradnje probnog paketa 1.0.2.0 → 1.0.2.1; SHA-256 sva tri
   preuzeta fajla odgovara izvoru. Detalji u `00_plan/store_browser_link_probe.md`.
   To tada još nije bilo stvarno Store-potpisano ažuriranje. Ahmed je 20.10.2026 uslovio
-  1.0.3 time da sve radi; kandidat ostaje na radnoj grani, a privatna Store
-  proba je sada prošla. Nije izdata dozvola za javnu objavu.
-  Lokalni build kandidata 1.0.3 je 20.10.2026 prošao 438 Python testova
-  (2 preskočena), 24 Node testa i self-test spakovane aplikacije. MSIX
+  1.0.3 time da sve radi; privatna Store proba je potom prošla. Završni Windows build
+  prošao je 440 Python testova (2 preskočena), 24 Node testa i self-test spakovane
+  aplikacije. MSIX
   1.0.3.0 je u Partner Centeru validiran i poslan kao Submission 3, uz publiku
   samo u grupi „Proba” i bez datuma automatskog javnog otvaranja. Certifikacija
   je prošla 20.10.2026; poslije Ahmedovog „kreni” pokrenuta je ručna privatna
@@ -402,9 +401,13 @@ Za 1.0.3:
   Detalji su u `00_plan/store_browser_link_probe.md`. Windows 10 i instalirani
   dodatak iz Edge prodavnice nisu direktno testirani na ovom računaru; novi Store
   MSIX i dalje traži Windows 11. Ahmed je potom odobrio javnu dostupnost i puno
-  izdanje 1.0.3 za postojeće kanale. Store Submission 4 je pripremljen s javnom
-  publikom, samo provjerenim paketom 1.0.3.0 i ručnom objavom poslije certifikacije;
-  dok se ne pošalje i objavi, Store ostaje privatan za grupu Proba.
+  izdanje 1.0.3 za postojeće kanale. GitHub 1.0.3 je javno objavljen 21.10.2026
+  s Windows, Mac i Android paketima; Firefox dodatak 1.0.3 je odobren na AMO,
+  a winget PR #456435 je ažuriran na 1.0.3. Store Submission 4 poslan je s javnom
+  publikom, samo provjerenim paketom 1.0.3.0 i ručnom objavom poslije certifikacije.
+  Dok certifikacija ne završi i ne klikne se Publish now, Store ostaje privatan za
+  grupu Proba; `STORE_LIVE` na sajtu ostaje False. Edge dodatak 1.0.3 je pripremljen
+  u Partner Centeru, ali slanje čeka završetak otkazivanja prethodne 1.0.2 prijave.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
