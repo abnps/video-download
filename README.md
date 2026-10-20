@@ -88,7 +88,8 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    od istog builda pravi `Build\msix\VideoDownloadbyabnps-<verzija>.0-x64.msix`. U Partner Centeru: nova prijava
    (Update) → Packages → postavi .msix → pošalji. Microsoft ga potpisuje i provjerava (obično 1–3 dana), pa ga
    Store sam ažurira kod korisnika. Store verzija ne nudi naše ažuriranje programa (`runtime.is_store_package`);
-   yt-dlp se i dalje osvježava sam (u napomeni za provjeru objašnjeno).
+   yt-dlp se i dalje osvježava sam (u napomeni za provjeru objašnjeno). Store paket za sada traži Windows 11
+   (build 22000 ili noviji), jer registracija hosta iz MSIX-a nije provjerena na Windowsu 10.
 
 9. **Dodatak u prodavnicama** (samo kad se dodatak mijenjao; `version` u `extension/manifest.json` mora biti veći):
    Firefox: `python tools/build_firefox.py --listed` → addons.mozilla.org → nova verzija, samo za Firefox na računaru

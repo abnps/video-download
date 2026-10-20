@@ -84,6 +84,24 @@ Ažuriranje postojećeg Store paketa s novim imenom i Windows 10 još nisu
 provjereni. Produkcijsko novo ime i dalje nema HKCU ključ; ne koristiti ga u
 probnom paketu koji se poslije briše.
 
+## Granica podrške za Store
+
+Ahmed nema Windows 10 za probu. Store MSIX od ove grane zato koristi
+`TargetDeviceFamily MinVersion="10.0.22000.0"` (Windows 11), dok se registracija
+hosta na Windowsu 10 zasebno ne potvrdi. Ovo mijenja samo Store paket; obični
+Windows instaler nije mijenjan. Lokalni MSIX opisan iznad napravljen je **prije**
+ove promjene minimalne verzije i nije kandidat za objavu.
+
+Novi lokalni paket je `C:\Video Downloader\Build\store-win11-candidate-20261020\`
+`VideoDownloadbyabnps-1.0.2.0-x64.msix` (SHA-256
+`af2ba0d773bf2beeeb1e0bff8a1591caf6324195796b708eaee33a126a2f7892`).
+`makeappx` ga je prihvatio; provjereni manifest sadrži `MinVersion=10.0.22000.0`,
+šest HKCU izuzetaka i oba izvršna fajla. Ciljani `tests.test_browser_bridge`
+prošao je svih 27 testova izvan mrežno ograničenog sandboxa, jer testovi koriste
+lokalni `127.0.0.1` socket. Paket zadržava verziju 1.0.2.0 i **nije instaliran,
+potpisan niti poslan u Partner Center**. Stvarno Store ažuriranje će tražiti višu
+verziju i zasebnu potvrdu prije javne objave.
+
 ## Ako treba ponoviti osnovni mehanizam
 
 `tools/prepare_store_registry_probe.py` sada namjerno koristi samo **jednokratno

@@ -2,7 +2,8 @@
 
     python tools/build_msix.py [--dist <folder VideoDownload>] [--out <folder>]
 
-Isti program kao instaler; razlika je samo u paketu: Store ga potpisuje, instalira i ažurira, a program to sam
+Isti program kao instaler; Store paket za sada traži Windows 11 jer veza s browserom na Windowsu 10 nije provjerena.
+Store ga potpisuje, instalira i ažurira, a program to sam
 prepozna (`runtime.is_store_package`) i ne nudi naše ažuriranje (yt-dlp se i dalje osvježava sam).
 Identitet je iz Partner Centera (Product identity, aplikacija „Video Download by abnps", Store ID 9NT46S6L7KGN).
 Veza s browserom upisuje se u HKCU i %LOCALAPPDATA%, pa paket isključuje virtualizaciju registra i fajlova
@@ -50,7 +51,7 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 {excluded}
   </Properties>
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
   <Resources>
     <Resource Language="en-us" /><Resource Language="bs" /><Resource Language="de" /><Resource Language="es" /><Resource Language="fr" />

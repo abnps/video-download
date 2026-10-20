@@ -352,7 +352,9 @@ Za 1.0.3:
   nije pronađen. Tri ExcludedKey su za novo, tri za staro ime. Alias ostaje na glavnoj aplikaciji jer
   je Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute i sirovi rezultati su u
   `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok se novo ime ne potvrdi
-  u stvarnom dodatku poslije Store ažuriranja. Windows 10 treba zasebnu probu.
+  u stvarnom dodatku poslije Store ažuriranja. Ahmed nema Windows 10 za probu, pa novi Store MSIX
+  za sada traži Windows 11 (`TargetDeviceFamily MinVersion=10.0.22000.0`). Ako se Windows 10
+  kasnije želi vratiti u Store, prije toga treba zasebno potvrditi registraciju hosta na njemu.
   Dodatna provjera 20.10: zatečene vrijednosti `probe` u starim Chrome/Firefox HKCU ključevima
   zamijenjene su putanjama postojećih ispravnih manifesta (rezervne `.reg` kopije u
   `Build\store-legacy-key-repair-20261020`); Edge nije mijenjan. Izolovani Edge s trenutnim

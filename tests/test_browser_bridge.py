@@ -288,6 +288,9 @@ class NativeHostTest(unittest.TestCase):
         root = ET.fromstring(build_msix.manifest("1.0.2.0"))
         ns = {"m": "http://schemas.microsoft.com/appx/manifest/foundation/windows10",
               "v": "http://schemas.microsoft.com/appx/manifest/virtualization/windows10"}
+        # Store ne smije nuditi paket Windowsu 10 dok tamo nije provjerena registracija hosta.
+        target = root.find("m:Dependencies/m:TargetDeviceFamily", ns)
+        self.assertEqual(target.get("MinVersion"), "10.0.22000.0")
         apps = root.findall("m:Applications/m:Application", ns)
         # Samo jedna, vidljiva aplikacija: skrivena (AppListEntry="none") traži posebno Microsoftovo odobrenje.
         self.assertEqual([app.get("Id") for app in apps], [native_host.STORE_APP_ID])
