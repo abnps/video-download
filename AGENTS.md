@@ -351,8 +351,8 @@ Za 1.0.3:
   Program registruje i staro ime radi starih dodataka; novi dodatak pokušava staro samo kad novi host
   nije pronađen. Tri ExcludedKey su za novo, tri za staro ime. Alias ostaje na glavnoj aplikaciji jer
   je Microsoft odbio skrivenu drugu aplikaciju bez `HeadlessAppBypass`. Upute i sirovi rezultati su u
-  `00_plan/store_browser_link_probe.md`. **Store ostaje privatan** dok se novo ime ne potvrdi
-  u stvarnom dodatku poslije Store ažuriranja. Ahmed nema Windows 10 za probu, pa novi Store MSIX
+  `00_plan/store_browser_link_probe.md`. Store ostaje privatan do Ahmedove zasebne
+  odluke o javnoj objavi. Ahmed nema Windows 10 za probu, pa novi Store MSIX
   za sada traži Windows 11 (`TargetDeviceFamily MinVersion=10.0.22000.0`). Ako se Windows 10
   kasnije želi vratiti u Store, prije toga treba zasebno potvrditi registraciju hosta na njemu.
   Dodatna provjera 20.10: zatečene vrijednosti `probe` u starim Chrome/Firefox HKCU ključevima
@@ -366,30 +366,39 @@ Za 1.0.3:
   `tools/check_store_browser_link.py` je read-only provjera za period poslije privatnog
   Store ažuriranja: traži najmanje 1.0.3.0, sva tri stvarna HKCU ključa novog imena,
   ispravne JSON manifeste i status odgovor aliasa. `--legacy` prolazi na 1.0.2.0;
-  osnovni poziv sada očekivano ne prolazi. Stvarni dodatak u browseru još se mora provjeriti.
+  osnovni poziv nije prolazio na 1.0.2.0. Završni rezultat za 1.0.3.0 je zapisan ispod.
   Izolovana proba 20.10.2026: posebna nepotpisana kopija punog paketa (s testnim
   Publisher OID-om) u Windows Sandboxu 11/b26100 upisala je novo ime u stvarni
   HKCU za Chrome, Edge i Firefox; sva tri manifesta i alias su ispravni, status
   preko aliasa je `ok=true`. Detalji su u `00_plan/store_browser_link_probe.md`.
-  To nije proba Store-potpisanog ažuriranja niti certifikacija; prije javne objave
-  još treba privatno Store ažuriranje i stvarni test dodatka u browseru.
+  Ovo je bio test prije Store-potpisanog ažuriranja; zasebna privatna proba je sada obavljena.
   Dodatna proba u čistom Sandboxu: Edge s trenutnim raspakovanim dodatkom je,
   bez starih HKCU ključeva, preko novog hosta preuzeo lokalni sintetički MP4.
   Isto je uspjelo kad je program bio zatvoren (alias ga je pokrenuo) i nakon
   lokalne nadogradnje probnog paketa 1.0.2.0 → 1.0.2.1; SHA-256 sva tri
   preuzeta fajla odgovara izvoru. Detalji u `00_plan/store_browser_link_probe.md`.
-  To još nije stvarno Store-potpisano ažuriranje. Ahmed je 20.10.2026 uslovio
-  1.0.3 time da sve radi; kandidat ostaje na radnoj grani i ide prvo u privatnu
-  Store probu, bez javne objave dok se isti tok tamo ne potvrdi.
+  To tada još nije bilo stvarno Store-potpisano ažuriranje. Ahmed je 20.10.2026 uslovio
+  1.0.3 time da sve radi; kandidat ostaje na radnoj grani, a privatna Store
+  proba je sada prošla. Nije izdata dozvola za javnu objavu.
   Lokalni build kandidata 1.0.3 je 20.10.2026 prošao 438 Python testova
   (2 preskočena), 24 Node testa i self-test spakovane aplikacije. MSIX
   1.0.3.0 je u Partner Centeru validiran i poslan kao Submission 3, uz publiku
   samo u grupi „Proba” i bez datuma automatskog javnog otvaranja. Certifikacija
   je prošla 20.10.2026; poslije Ahmedovog „kreni” pokrenuta je ručna privatna
   objava. Partner Center zatim je prikazao „Your product is now updated” i
-  Submission 3 kao aktivnu. Na Ahmedovom računaru Store je još imao 1.0.2.0,
-  a `winget upgrade` nije našao 1.0.3; proba stvarnog Store ažuriranja čeka
-  propagaciju. Javno tek kad i ta proba prođe.
+  Submission 3 kao aktivnu. Store je zatim na Ahmedovom računaru preuzeo privatno
+  ažuriranje: `Get-AppxPackage` pokazuje 1.0.3.0, Status=Ok. Prvo pokretanje
+  programa samo je registrovalo novo ime `io.github.abnps.videodownload.bridge`
+  u stvarni HKCU za Chrome, Edge i Firefox. `tools/check_store_browser_link.py`
+  prošao je prije i poslije ponovnog pokretanja programa. Privremeni Edge profil
+  s trenutnim dodatkom dobio je `ok=true` preko novog imena; kad je program bio
+  zatvoren, zahtjev ga je ponovo pokrenuo (`launched=true`). Edge je zatim
+  prepoznao lokalni sintetički MP4, poslao ga Store aplikaciji i gotov fajl je
+  imao isti SHA-256 kao izvor. Dva probna reda i fajla uklonjena su nakon provjere.
+  Detalji su u `00_plan/store_browser_link_probe.md`. **Store je i dalje privatan
+  za grupu Proba.** Windows 10 i instalirani dodatak iz Edge prodavnice nisu
+  direktno testirani na ovom računaru; novi Store MSIX i dalje traži Windows 11.
+  Javnu objavu ne pokretati bez Ahmedove zasebne odluke.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

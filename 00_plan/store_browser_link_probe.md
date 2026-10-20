@@ -185,8 +185,54 @@ prikazao „Your product is now updated” i Submission 3 kao aktivnu. Privatna
 publika ostaje samo „Proba”, bez datuma javnog otvaranja; grupa ima jedan
 testni Microsoft nalog `abnpsdev@gmail.com`, prijavljen i u Store aplikaciji.
 Paket 1.0.2.0 ostaje u prijavi za Windows 10, a 1.0.3.0 traži Windows 11.
-Store klijent i `Get-AppxPackage` još su pokazali 1.0.2.0, a `winget upgrade`
-nije našao novu verziju. Stvarno Store ažuriranje i browser E2E još čekaju.
+Store klijent i `Get-AppxPackage` prvo su pokazali 1.0.2.0, a `winget upgrade`
+nije našao novu verziju. Poslije propagacije Store je sam preuzeo 1.0.3.0.
+
+## Rezultat stvarnog privatnog Store ažuriranja (20.10.2026)
+
+`Get-AppxPackage -Name 'abnps.VideoDownloadbyabnps'` izvan paketa pokazao je
+`Version=1.0.3.0`, `Status=Ok` i Store identitet
+`abnps.VideoDownloadbyabnps_1.0.3.0_x64__rtqmsrm0jkev2`. Prije prvog
+pokretanja `python tools/check_store_browser_link.py` nije našao tri nova HKCU
+ključa, što je očekivano jer se registracija radi pri pokretanju. Nakon
+otvaranja instalirane aplikacije preko `shell:AppsFolder` isti read-only alat
+je ispisao:
+
+```text
+Store verzija: 1.0.3.0 (OK)
+Chrome: OK
+Edge: OK
+Firefox: OK
+Store alias: OK (status=True)
+OSNOVNE PROVJERE PROŠLE za io.github.abnps.videodownload.bridge
+```
+
+Jednokratna skripta `Build\store-1.0.3-private-20261020\verify-edge-store.mjs`
+pokrenula je Edge s privremenim profilom i trenutnim raspakovanim dodatkom iz
+`extension/` (ID `jfgcekfmjipklibljeacchccmebppklp`). Nije pisala registar.
+Direktan poziv novog hosta i `app-status` kroz service worker dodatka vratili su
+`{"ok":true,"running":true,"language":"bs"}`. Nakon zatvaranja samo probne
+instance aplikacije oba su vratila `running=false`; zahtjev `add` s neispravnim
+linkom vratio je `launched=true` i očekivanu grešku validacije, a naredni status
+opet `running=true`. Time je potvrđeno ponovno pokretanje bez stvarnog dodavanja
+u red.
+
+Za puni tok napravljen je sintetički MP4 od 1.071.812 bajtova, serviran samo na
+`127.0.0.1`. Edge dodatak ga je prepoznao kao `kind=file` i poslao Store
+aplikaciji (`{"ok":true,"launched":false}`). Gotov MP4 imao je isti SHA-256
+kao izvor:
+`b02e8ed222c67baed7dc20bc817df18f1b3831b8db9268e297118b9cbd570822`.
+Oba probna reda, uključujući onaj iz prekinute probne skripte, uklonjena su iz
+aplikacije; oba isključivo probna MP4 fajla uklonjena su nakon poređenja hashova.
+Ponovljeni `check_store_browser_link.py` nakon ponovnog pokretanja opet je prošao.
+Nakon uklanjanja probnih redova i fajlova aplikacija je zatvorena; provjera je
+i tada prošla, pa registracija ne zavisi od otvorenog prozora.
+
+Ovo potvrđuje Windows 11, stvarno Store-potpisano ažuriranje i trenutni
+raspakovani Edge dodatak. Instalirani dodatak iz Edge prodavnice i Windows 10
+nisu direktno testirani. Windows 10 nije ponuđen za 1.0.3 MSIX (minimum 22000);
+1.0.2.0 je i dalje fallback paket u prijavi. **Store ostaje privatan za grupu
+Proba; nema Ahmedove odluke za javnu objavu.**
 
 `tools/check_store_browser_link.py` ništa ne upisuje. Iz običnog PowerShella,
 izvan paketa, prvo pokrenuti Store aplikaciju jednom, pa:
@@ -203,9 +249,10 @@ upit. Nakon toga učitati trenutni `extension/` u Edge/Chrome i potvrditi status
 iz samog dodatka. Provjeriti i da Store ažuriranje poslije ponovnog pokretanja
 ostavlja istu vezu. Tek tada razmatrati javnu objavu.
 
-Na trenutno instaliranoj Store 1.0.2.0 `--legacy` prolazi sve stavke. Osnovni
-poziv očekivano vraća `NIJE SPREMNO`: verzija je 1.0.2.0 i tri HKCU ključa novog
-imena ne postoje. Provjera je rađena 20.10.2026; finalno ime je i dalje netaknuto.
+Prije privatnog ažuriranja, na Store 1.0.2.0 `--legacy` je prolazio sve stavke,
+a osnovni poziv je očekivano vraćao `NIJE SPREMNO` jer tri nova HKCU ključa nisu
+postojala. Nakon prvog pokretanja Store 1.0.3.0 osnovni poziv prolazi; rezultati
+su iznad.
 
 ## Ako treba ponoviti osnovni mehanizam
 
