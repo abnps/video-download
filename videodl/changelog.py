@@ -9,11 +9,16 @@ from html import escape
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
     ("1.0.3", "20.10.2026", {
-        "bs": ["Microsoft Store verzija na Windowsu 11 sama povezuje dodatak za browser s programom; postojeći dodaci i dalje rade."],
-        "en": ["On Windows 11, the Microsoft Store version now connects the browser extension to the app automatically; existing extensions continue to work."],
-        "de": ["Unter Windows 11 verbindet die Microsoft-Store-Version die Browser-Erweiterung jetzt automatisch mit dem Programm; vorhandene Erweiterungen funktionieren weiter."],
-        "es": ["En Windows 11, la versión de Microsoft Store conecta automáticamente la extensión del navegador con la aplicación; las extensiones existentes siguen funcionando."],
-        "fr": ["Sur Windows 11, la version Microsoft Store relie désormais automatiquement l’extension du navigateur à l’application ; les extensions existantes continuent de fonctionner."],
+        "bs": ["Microsoft Store verzija na Windowsu 11 sama povezuje dodatak za browser s programom; postojeći dodaci i dalje rade.",
+               "Android: Postavke prikazuju šta je novo; podsjetnik za dobrovoljnu podršku može se odgoditi ili utišati i ništa ne otključava."],
+        "en": ["On Windows 11, the Microsoft Store version now connects the browser extension to the app automatically; existing extensions continue to work.",
+               "Android: Settings now shows what's new; the optional support reminder can be postponed or muted and unlocks nothing."],
+        "de": ["Unter Windows 11 verbindet die Microsoft-Store-Version die Browser-Erweiterung jetzt automatisch mit dem Programm; vorhandene Erweiterungen funktionieren weiter.",
+               "Android: In den Einstellungen gibt es jetzt „Neuigkeiten“; die freiwillige Erinnerung an Unterstützung lässt sich verschieben oder stummschalten und schaltet keine Funktion frei."],
+        "es": ["En Windows 11, la versión de Microsoft Store conecta automáticamente la extensión del navegador con la aplicación; las extensiones existentes siguen funcionando.",
+               "Android: Ajustes ahora muestra las novedades; el recordatorio de apoyo voluntario se puede posponer o silenciar y no desbloquea ninguna función."],
+        "fr": ["Sur Windows 11, la version Microsoft Store relie désormais automatiquement l’extension du navigateur à l’application ; les extensions existantes continuent de fonctionner.",
+               "Android : les réglages affichent désormais les nouveautés ; le rappel de soutien facultatif peut être reporté ou désactivé et ne débloque aucune fonction."],
     }),
     ("1.0.2", "20.10.2026", {
         "bs": ["Dostignuća: čestitka na 10, 50, 100… preuzimanja i 18 dostignuća za način korištenja (samo zvuk, cijela lista, isječak, 4K, noćna ptica…). Pomoć → Moja dostignuća pokazuje osvojena i ukupno preuzeto. Sve se računa samo na tvom računaru.",

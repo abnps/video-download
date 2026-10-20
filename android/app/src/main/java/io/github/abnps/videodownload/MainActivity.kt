@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -379,8 +380,19 @@ class MainActivity : ComponentActivity() {
         // Čestitka za dostignuća tek kad ništa ne preuzima (ne usred liste) i kad nije otvoren drugi prozor.
         val badges by Achievements.pending.collectAsState()
         val working = active.any { it.phase !in setOf(Phase.DONE, Phase.INTERRUPTED, Phase.NEEDS_ADULT) }
+        val downloadsDone by Achievements.downloadsFlow.collectAsState()
+        val support by Support.state.collectAsState()
+        var supportOpen by remember { mutableStateOf(false) }
         if (badges.isNotEmpty() && !working && !welcome.value && askAdultFor.value.isEmpty()) {
             AchievementDialog(badges, onSupport = { openLink(Links.SUPPORT) }) { Achievements.shown() }
+        } else if (!supportOpen && !welcome.value && askAdultFor.value.isEmpty() &&
+            Support.shouldShowDialog(downloadsDone, working)) {
+            // Sedmični podsjetnik kao na računaru: tek kad ništa ne preuzima i nema čestitke.
+            LaunchedEffect(Unit) { Support.dialogShown(); supportOpen = true }
+        }
+        if (supportOpen) {
+            SupportDialog(downloadsDone, onPayPal = { openLink(Links.SUPPORT) }, onCard = { openLink(Links.CARD) },
+                onAlready = { Support.alreadySupported(downloadsDone) }) { supportOpen = false }
         }
         if (askAdultFor.value.isNotEmpty()) {
             AdultDialog(askAdultFor.value.size, onCancel = { askAdultFor.value = emptyList() }) {
@@ -441,6 +453,12 @@ class MainActivity : ComponentActivity() {
                         onLogin = { openLogin(it) },
                         onShowAll = { downloadsTab.intValue = 1; tab.intValue = TAB_DOWNLOADS }, actions = actions,
                         update = update, onInstallUpdate = { installUpdate() }, onSettings = openSettings,
+                        supportBanner = {
+                            if (support.bannerNext >= 0 && Support.showBanner(downloadsDone)) {
+                                SupportBanner(onSupport = { openLink(Links.SUPPORT) },
+                                    onLater = { Support.bannerLater(downloadsDone) })
+                            }
+                        },
                     )
                     tab.intValue == TAB_DOWNLOADS -> {
                         val error by Downloads.lastError.collectAsState()

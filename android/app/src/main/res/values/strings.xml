@@ -240,4 +240,15 @@
     <string name="badge_streak7_desc">Download on 7 days in a row.</string>
     <string name="badge_anniversary">One year</string>
     <string name="badge_anniversary_desc">Use Video Download for a year.</string>
+    <!-- Podsjetnik za prilog (Support.kt, SupportUi.kt) -->
+    <string name="support_banner">♥ Video Download is free and ad-free. If it helps you, support its development.</string>
+    <string name="support_title">Support Video Download</string>
+    <string name="support_dialog_count">You have already downloaded %1$d videos with Video Download. The app is free and stays free; if it saves you time, a contribution of a few euros helps keep it working when sites change.</string>
+    <string name="support_voluntary">The contribution is voluntary and unlocks nothing: the app is the same for everyone.</string>
+    <string name="support_paypal">♥ Support (PayPal)</string>
+    <string name="support_later">Later</string>
+    <string name="support_already">I already supported it</string>
+    <string name="whats_new_title">What\'s new</string>
+    <string name="whats_new_close">Close</string>
+    <string name="whats_new_sub">See what\'s new</string>
 </resources>

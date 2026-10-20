@@ -242,4 +242,15 @@
     <string name="badge_streak7_desc">Preuzimaj 7 dana zaredom.</string>
     <string name="badge_anniversary">Godinu dana</string>
     <string name="badge_anniversary_desc">Koristi Video Download godinu dana.</string>
+    <!-- Podsjetnik za prilog (Support.kt, SupportUi.kt) -->
+    <string name="support_banner">♥ Video Download je besplatan i bez reklama. Ako ti koristi, podrži razvoj.</string>
+    <string name="support_title">Podrži Video Download</string>
+    <string name="support_dialog_count">Preuzeo si već %1$d videa s Video Downloadom. Aplikacija je besplatna i ostaje besplatna; ako ti štedi vrijeme, prilog od par eura pomaže da radi i kad stranice nešto promijene.</string>
+    <string name="support_voluntary">Prilog je dobrovoljan i ništa ne otključava: aplikacija je ista za sve.</string>
+    <string name="support_paypal">♥ Podrži (PayPal)</string>
+    <string name="support_later">Kasnije</string>
+    <string name="support_already">Već sam podržao</string>
+    <string name="whats_new_title">Što je novo</string>
+    <string name="whats_new_close">Zatvori</string>
+    <string name="whats_new_sub">Pogledaj što je novo</string>
 </resources>

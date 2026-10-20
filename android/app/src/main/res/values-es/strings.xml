@@ -242,4 +242,15 @@
     <string name="badge_streak7_desc">Descarga 7 días seguidos.</string>
     <string name="badge_anniversary">Un año</string>
     <string name="badge_anniversary_desc">Usa Video Download durante un año.</string>
+    <!-- Podsjetnik za prilog (Support.kt, SupportUi.kt) -->
+    <string name="support_banner">♥ Video Download es gratis y sin anuncios. Si te sirve, apoya su desarrollo.</string>
+    <string name="support_title">Apoya Video Download</string>
+    <string name="support_dialog_count">Ya has descargado %1$d vídeos con Video Download. La app es gratis y seguirá siéndolo; si te ahorra tiempo, una aportación de unos euros ayuda a que siga funcionando cuando los sitios cambian.</string>
+    <string name="support_voluntary">La aportación es voluntaria y no desbloquea nada: la app es igual para todos.</string>
+    <string name="support_paypal">♥ Apoyar (PayPal)</string>
+    <string name="support_later">Más tarde</string>
+    <string name="support_already">Ya lo he apoyado</string>
+    <string name="whats_new_title">Novedades</string>
+    <string name="whats_new_close">Cerrar</string>
+    <string name="whats_new_sub">Ver las novedades</string>
 </resources>

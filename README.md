@@ -39,6 +39,8 @@ izdanjima repoa `abnps/video-download` (GitHub → Releases).
 Zvanični sajt: https://abnps.github.io/video-download/ (folder `site/`, objavljuje ga GitHub Actions
 pri svakoj izmjeni). Poslije izmjene changeloga ili pravnih tekstova: `python tools/build_site.py`.
 Glavni jezik je engleski; bosanski, njemački, španski i francuski su u `site/bs/`, `site/de/`, `site/es/`, `site/fr/`. Lokalni pregled: `python -m http.server 8765 --directory site`.
+Snimci dostignuća za svih 5 jezika nastaju komandom `python tools/site_achievement_screenshots.py`
+iz stvarnih dijaloga s izmišljenim napretkom; ništa se ne preuzima.
 
 ## Izdavanje nove verzije
 
@@ -152,14 +154,15 @@ Druga instanca se ne otvara: samo se podigne prozor već pokrenute.
 Program registruje native messaging host pod imenima `io.github.abnps.videodownload.bridge` i
 `com.videodl.bridge` (kompatibilnost sa starim dodacima). Novi dodatak koristi novo ime,
 a staro pokušava samo kada browser javi da novi host nije pronađen. Store paket koristi
-stalni App Execution Alias `abnps-videodl-host.exe`; prije javne objave Store verzije treba
-potvrditi da su nova tri HKCU ključa vidljiva browseru van paketa. Lokalni postupak probe
-je u `00_plan/store_browser_link_probe.md`.
+stalni App Execution Alias `abnps-videodl-host.exe`. Privatni Store paket 1.0.3.0
+provjeren je na Windowsu 11: nova tri HKCU ključa vidljiva su browserima van paketa,
+a Edge dodatak je preuzeo probni lokalni video i kada je program bio zatvoren.
+Postupak i granice te probe su u `00_plan/store_browser_link_probe.md`.
 
 Poslije **privatnog Store ažuriranja na 1.0.3.0 ili novije**, pokreni aplikaciju jednom,
 pa iz običnog PowerShella pokreni `python tools/check_store_browser_link.py`. Sve stavke
 (Store verzija, Chrome, Edge, Firefox i alias) moraju biti `OK`. Zatim učitaj trenutni
-`extension/` u Edge/Chrome i provjeri stvarni status u dodatku. Na sadašnjoj Store 1.0.2.0
+`extension/` u Edge/Chrome i provjeri stvarni status u dodatku. Na starijoj Store 1.0.2.0
 verziji možeš provjeriti samo kompatibilni stari host naredbom
 `python tools/check_store_browser_link.py --legacy`; to nije zamjena za novu provjeru.
 

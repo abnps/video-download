@@ -332,6 +332,10 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
 Za 1.0.3:
+- Android: podsjetnik za prilog kao na računaru (Support.kt, SupportUi.kt): traka na Početnoj svakih 10 preuzimanja,
+  prozor jednom sedmično (prvi put poslije 5), „Već sam podržao" 90 dana, najviše jedan poziv dnevno zajedno s
+  čestitkom. Postavke → Verzija otvara „Šta je novo" (posljednje 3 verzije) iz assets/changelog.json; poslije
+  izmjene videodl/changelog.py pokrenuti `python tools/android_changelog.py` (test pada ako nije osvježeno).
 - Store verzija, veza s browserom (Claudeova lokalna proba 20.10.2026, Windows 11 26300):
   Store 1.0.2.0 već ima ispravan stalni alias i JSON manifest, ali stari HKCU ključ
   `com.videodl.bridge` ostaje u privatnom registru paketa.
@@ -395,10 +399,12 @@ Za 1.0.3:
   zatvoren, zahtjev ga je ponovo pokrenuo (`launched=true`). Edge je zatim
   prepoznao lokalni sintetički MP4, poslao ga Store aplikaciji i gotov fajl je
   imao isti SHA-256 kao izvor. Dva probna reda i fajla uklonjena su nakon provjere.
-  Detalji su u `00_plan/store_browser_link_probe.md`. **Store je i dalje privatan
-  za grupu Proba.** Windows 10 i instalirani dodatak iz Edge prodavnice nisu
-  direktno testirani na ovom računaru; novi Store MSIX i dalje traži Windows 11.
-  Javnu objavu ne pokretati bez Ahmedove zasebne odluke.
+  Detalji su u `00_plan/store_browser_link_probe.md`. Windows 10 i instalirani
+  dodatak iz Edge prodavnice nisu direktno testirani na ovom računaru; novi Store
+  MSIX i dalje traži Windows 11. Ahmed je potom odobrio javnu dostupnost i puno
+  izdanje 1.0.3 za postojeće kanale. Store Submission 4 je pripremljen s javnom
+  publikom, samo provjerenim paketom 1.0.3.0 i ručnom objavom poslije certifikacije;
+  dok se ne pošalje i objavi, Store ostaje privatan za grupu Proba.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 

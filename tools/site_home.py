@@ -418,25 +418,48 @@ HOME = {
 # Discord zajednica (Ahmed 14.10.2026): trajna pozivnica; obična veza i tekstualno dugme, bez tuđeg logotipa i koda.
 # Microsoft Store (Ahmed 19.10.2026: sajt nudi i Store i običnu verziju za računar). Samo tekstualno dugme,
 # bez Microsoftovog logoa. Skriveno dok je aplikacija u Storeu privatna (link bi drugima javljao da je nema):
-# kad 1.0.2 izađe javno u Storeu → STORE_LIVE = True, `python tools/build_site.py`, commit.
+# Uključiti tek kad je javna prijava 1.0.3 dostupna svima.
 STORE_LIVE = False
 STORE_URL = "https://apps.microsoft.com/detail/9NT46S6L7KGN"
 STORE_TEXT = {
-    "en": "Or install it from the Microsoft Store: checked and signed by Microsoft, no SmartScreen warning, "
-          "updates come through the Store.",
-    "bs": "Ili ga instaliraj iz Microsoft Storea: Microsoft ga je provjerio i potpisao, nema upozorenja SmartScreena, "
-          "a ažuriranja stižu kroz Store.",
-    "de": "Oder aus dem Microsoft Store installieren: von Microsoft geprüft und signiert, ohne SmartScreen-Warnung, "
-          "Updates kommen über den Store.",
-    "es": "O instálalo desde Microsoft Store: revisado y firmado por Microsoft, sin aviso de SmartScreen y con "
-          "actualizaciones a través de la Store.",
-    "fr": "Ou installez-le depuis le Microsoft Store : vérifié et signé par Microsoft, sans avertissement SmartScreen, "
-          "mises à jour via le Store.",
+    "en": "Or get the Windows 11 version from Microsoft Store. Microsoft signs the package and delivers its updates.",
+    "bs": "Ili preuzmi verziju za Windows 11 iz Microsoft Storea. Microsoft potpisuje paket i isporučuje ažuriranja.",
+    "de": "Oder lade die Windows-11-Version aus dem Microsoft Store herunter. Microsoft signiert das Paket und liefert Updates.",
+    "es": "O descarga la versión para Windows 11 desde Microsoft Store. Microsoft firma el paquete y entrega las actualizaciones.",
+    "fr": "Ou téléchargez la version pour Windows 11 depuis le Microsoft Store. Microsoft signe le paquet et fournit les mises à jour.",
+}
+
+ACHIEVEMENT_TEXT = {
+    "en": ("Achievements", "Small wins along the way.",
+           "Celebrate download milestones and the ways you use the app. Your progress stays on your device.",
+           "Your collection", "See earned and upcoming achievements, download count and total size.",
+           "A moment to celebrate", "A short congratulations appears after an achievement. It never locks a feature.",
+           "Screenshots use example progress."),
+    "bs": ("Dostignuća", "Mali uspjesi usput.",
+           "Obilježi broj preuzimanja i različite načine korištenja programa. Napredak ostaje na tvom uređaju.",
+           "Tvoja zbirka", "Vidi osvojena i naredna dostignuća, broj preuzimanja i ukupnu veličinu.",
+           "Trenutak za čestitku", "Kratka čestitka se pojavi nakon dostignuća. Nijedna funkcija nije zaključana.",
+           "Snimci prikazuju primjer napretka."),
+    "de": ("Erfolge", "Kleine Erfolge zwischendurch.",
+           "Feiere Download-Meilensteine und wie du die App nutzt. Dein Fortschritt bleibt auf deinem Gerät.",
+           "Deine Sammlung", "Sieh erreichte und kommende Erfolge, Download-Anzahl und Gesamtgröße.",
+           "Ein Moment zum Feiern", "Nach einem Erfolg erscheint eine kurze Gratulation. Keine Funktion wird gesperrt.",
+           "Die Bildschirmfotos zeigen Beispielfortschritt."),
+    "es": ("Logros", "Pequeños logros en el camino.",
+           "Celebra hitos de descarga y distintas formas de usar la aplicación. Tu progreso queda en tu dispositivo.",
+           "Tu colección", "Consulta logros obtenidos y pendientes, descargas y tamaño total.",
+           "Un momento para celebrar", "Aparece una breve felicitación al conseguir un logro. Ninguna función se bloquea.",
+           "Las capturas muestran un progreso de ejemplo."),
+    "fr": ("Succès", "De petites réussites en chemin.",
+           "Célébrez les téléchargements et les façons d'utiliser l'application. Votre progression reste sur votre appareil.",
+           "Votre collection", "Consultez les succès obtenus et à venir, le nombre de téléchargements et la taille totale.",
+           "Un moment à célébrer", "Une courte félicitation apparaît après un succès. Aucune fonction n'est bloquée.",
+           "Les captures montrent un exemple de progression."),
 }
 
 
 def store_button(cls: str = "btn ghost") -> str:
-    return f'<a class="{cls}" href="{STORE_URL}" rel="noopener">Microsoft Store</a>' if STORE_LIVE else ""
+    return f'<a class="{cls}" href="{STORE_URL}" rel="noopener">Microsoft Store · Windows 11</a>' if STORE_LIVE else ""
 
 
 DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
@@ -572,6 +595,8 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
     store_hero = "\n          " + store_button() if STORE_LIVE else ""
     store_panel = (f'        <p style="margin-top:22px">{esc(STORE_TEXT[lang])}</p>\n'
                    f'        <p>{store_button()}</p>\n') if STORE_LIVE else ""
+    (ach_kicker, ach_heading, ach_lead, ach_list_title, ach_list_body,
+     ach_toast_title, ach_toast_body, ach_example) = ACHIEVEMENT_TEXT[lang]
     news_kicker, news_h2, news_sub = h["news"]
     s_kicker, s_h2, s_text, s_btn, s_qr, s_scan = h["support"]
     help_kicker, help_h2, help_sub = h["help"]
@@ -688,6 +713,24 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <p>{tiles["safe"][1]}</p>
           <div class="chips">{chips}</div>
         </div>
+      </div>
+      <div class="achievement-feature">
+        <div class="kicker" data-reveal>{esc(ach_kicker)}</div>
+        <h2 data-reveal>{esc(ach_heading)}</h2>
+        <p class="sub" data-reveal>{esc(ach_lead)}</p>
+        <div class="achievement-grid">
+          <article class="achievement-card" data-reveal>
+            <h3>{esc(ach_list_title)}</h3>
+            <p>{esc(ach_list_body)}</p>
+            <img src="{up}assets/achievement-list-{lang}.png" alt="{esc(ach_list_title)}" width="520" height="470" loading="lazy">
+          </article>
+          <article class="achievement-card" data-reveal style="--d:.1s">
+            <h3>{esc(ach_toast_title)}</h3>
+            <p>{esc(ach_toast_body)}</p>
+            <img src="{up}assets/achievement-toast-{lang}.png" alt="{esc(ach_toast_title)}" width="440" height="140" loading="lazy">
+          </article>
+        </div>
+        <p class="achievement-example">{esc(ach_example)}</p>
       </div>
     </div>
   </section>

@@ -237,6 +237,21 @@ section h2 { font-size: clamp(30px, 3.6vw, 48px); line-height: 1.08; letter-spac
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .chips span { font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); }
 
+/* ---------- stvarni prikazi dostignuća ---------- */
+.achievement-feature { margin-top: 88px; }
+.achievement-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+.achievement-card {
+  display: flex; flex-direction: column; min-width: 0; padding: 26px; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-1);
+}
+.achievement-card h3 { font-size: 21px; margin: 0 0 6px; }
+.achievement-card p { color: var(--muted); margin: 0 0 24px; }
+.achievement-card img {
+  display: block; max-width: 100%; height: auto; align-self: center; margin: auto 0;
+  border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow-2);
+}
+.achievement-example { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+
 /* ---------- koraci ---------- */
 .steps { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
 .steps::before {  /* linija koja se „nacrta" pri skrolu */
@@ -407,6 +422,7 @@ nav.mobile-nav { display: none; }
   .tile.tall { grid-row: auto; }
   .news { grid-template-columns: 1fr; }
   .support-card { grid-template-columns: 1fr; padding: 32px; }
+  .achievement-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
   nav { display: none; }
