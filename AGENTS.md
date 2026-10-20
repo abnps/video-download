@@ -332,7 +332,14 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
 
 Ne praviti izdanje za svaku sitnicu; izmjene idu na main, a izdanje se objavljuje tek na Ahmedovo „objavi".
 Za 1.0.3:
-(još ništa)
+- Store verzija, veza s browserom (provjereno 20.10.2026 na Store 1.0.2.0, Windows 11 26300): alias i manifest rade
+  (manifest pokazuje na %LOCALAPPDATA%\Microsoft\WindowsApps\abnps-videodl-host.exe, oba ID-a dodatka), ALI upis
+  HKCU\...\NativeMessagingHosts\com.videodl.bridge i dalje ostaje u mjehuru paketa (ni virtualization:ExcludedKeys ni
+  desktop6 ne djeluju; provjereno brisanjem ključa i ponovnim pokretanjem: `reg query` unutar paketa ga vidi, van ne).
+  Ahmedu su ključevi upisani ručno. Proba „breakaway" (reg.exe van paketa preko PROC_THREAD_ATTRIBUTE_DESKTOP_APP_POLICY)
+  nije izvedena: Claude Code zaštita je blokira, a Ahmedovo ručno pokretanje preko Invoke-CommandInDesktopPackage nije
+  ništa pokrenulo. Store zato OSTAJE PRIVATAN (grupa „Proba"); javno samo obični instaler. Mogućnosti: Store javno uz
+  napomenu da dodatak traži obični instaler, ili drugo rješenje registracije (npr. jednokratna naredba za korisnika).
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
