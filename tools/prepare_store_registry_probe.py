@@ -10,8 +10,6 @@ import argparse
 import shutil
 from pathlib import Path
 
-from PIL import Image
-
 PROJECT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = PROJECT.parent / "Build" / "store-registry-probe" / "DisposableHost"
 PUBLISHER = "CN=71819F50-D4A6-44BF-A0BC-D68768718275"
@@ -69,6 +67,8 @@ def manifest() -> str:
 
 
 def prepare(out: Path) -> None:
+    from PIL import Image
+
     reg = Path(r"C:\Windows\System32\reg.exe")
     if not reg.is_file():
         raise SystemExit("reg.exe nije pronađen; ova proba se pokreće samo na Windowsu.")
