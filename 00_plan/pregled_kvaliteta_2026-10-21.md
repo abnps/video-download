@@ -26,12 +26,41 @@ Izmjene su pripremljene u grani `quality-review-20261021`; broj verzije i postoj
 - Izolovano okruženje blokiralo je privremene fajlove i lokalne HTTP probe, pa je završni discover pokrenut izvan njega, s privremenim folderom u `Build/quality-review-tests`. Te blokade nisu pripisane aplikaciji.
 - Telefon i macOS nisu ručno testirani. Postojeći Store paket nije mijenjan niti je napravljen novi javni paket.
 
+## Nastavak pregleda — stanje ekrana i izbor platforme
+
+- Android: `MainState.kt` zadržava navigaciju, uneseni link, rezultat i čitanje kroz rotaciju/promjenu jezika,
+  bez reference na staru aktivnost. Novi link poništava stari zahtjev i njegov zakasnjeli rezultat. Događaj za brzo
+  preuzimanje troši se jednom; `MainActivity` ne obrađuje stari Share intent pri obnovi, a novi prima preko `onNewIntent`.
+- Poslije sistemskog gašenja procesa Android obnavlja mali Bundle (link, glavni ekran, kartica istorije, dostignuća),
+  a rezultat ponovo čita s mreže ako je bio otvoren. Tada nema automatskog brzog preuzimanja. Bundle ne sadrži
+  video-listu, kolačiće ni potvrdu 18+; pretjeran unos preko 8192 znaka se ne čuva. Potpuno zatvaranje/force-stop
+  nije trajno čuvanje sesije. Pristup prati [Androidove preporuke](https://developer.android.com/topic/libraries/architecture/saving-states).
+- Ekrani kvaliteta i plejliste koriste saveable primitive za izbor formata/isječka i indekse odabranih stavki.
+  Dijalog i potvrda za sadržaj 18+ ostaju samo u memoriji trenutnog ekrana; rotacija traži novi klik/potvrdu.
+  Ako se pri ponovnom čitanju promijene stavke ili njihov redoslijed, otisak liste poništava stari izbor;
+  stari indeks ne smije označiti neki drugi video. Korisnik tada bira stavke ponovo.
+- Sajt: izbor Windows/macOS/Android u uvodu prati sistem posjetioca uz ručni izbor. Glavno dugme i dugme u
+  zaglavlju vode na odgovarajući EXE/DMG/APK; zahtjevi i instalacijske kartice prate isti izbor. Postojeća animacija
+  desktop aplikacije je sačuvana. Svih pet jezika ima nove tekstove; veličina Windows instalera prikazuje se samo za Windows.
+- Bez JavaScripta sva tri paketa i pune upute ostaju dostupni. Microsoft Store dugme ostaje uslovljeno `STORE_LIVE`,
+  a nakon uključenja vidljivo je samo uz Windows izbor. U privatnosti na svih pet jezika opisano je lokalno čuvanje Android ekrana.
+- Ručna Android proba još je potrebna prije izdavanja: rotirati tokom čitanja i na izboru formata, promijeniti jezik,
+  vratiti aplikaciju nakon sistemskog gašenja procesa i provjeriti da isti Share poziv ne napravi drugi posao.
+  Za probu 18+ koristiti lokalni kontrolisani rezultat; potvrda se mora tražiti iznova.
+- Završna provjera nastavka: puni Python discover 447 testova (2 preskočena), Node dodatak/sajt 31/31;
+  zasebno 35/35 testova sajta i pravnih dokumenata poslije dopune privatnosti. Lokalni Edge sa posebnim profilom:
+  Windows 1440 px, Mac 1280 px, Android 390 px i njemački 320 px; nema horizontalnog preliva ni JS izuzetaka,
+  dugmad/upute prate izbor, animacije rade, reduced-motion ih gasi, bez JS-a postoje sva tri paketa.
+  Snimci i privremena skripta su izvan repoa u `Build/quality-review-tests/platform-site`.
+  Konačni Android `lintDebug testDebugUnitTest assembleDebug` je uspješan: 10 Kotlin testova,
+  0 lint grešaka i istih 35 upozorenja kao u početnoj provjeri. Telefon nije instaliran niti ručno testiran.
+
 ## Prijedlozi za sljedeći korak
 
 | Prijedlog | Korist | Posao | Rizik / uslov |
 |---|---|---|---|
-| Izbor Windows / macOS / Android uz glavno dugme sajta i prikaz odgovarajuće aplikacije | Posjetilac telefona odmah vidi odgovarajuće preuzimanje; zadržati ručni izbor i sadašnju animaciju. | Srednje, oko 1–2 dana s pet jezika i mobilnim prikazom. | Nizak; odluka o rasporedu i priprema Android demoa. |
-| Sačuvati Android ekran, uneseni link i izbor pri ponovnom kreiranju aktivnosti | Manje ponovnog unosa nakon rotacije, promjene jezika ili vraćanja procesa. Trenutni podaci su polja aktivnosti; gubitak treba potvrditi na uređaju. | Srednje, oko 1–2 dana. | Srednji; ne smije ponoviti automatsko preuzimanje iz istog Share intenta niti sačuvati potvrdu 18+. |
+| Poseban Android demo uz novi izbor platforme na sajtu | Posjetilac telefona vidi stvarni mobilni interfejs; trenutna sačuvana animacija prikazuje desktop. | Srednje, oko 1 dan s provjerom svih pet jezika. | Nizak; koristiti snimke aktuelnog Android dizajna, bez izmišljenih funkcija. |
+| Ručna Android matrica rotacije, promjene jezika i obnove procesa | Provjerava pripremljenu obnovu ekrana na stvarnom telefonu i hvata razlike proizvođača. | Malo, oko 1 sat po uređaju. | Potreban slobodan telefon i lokalni kandidat; test ne smije ponoviti preuzimanje niti trajno odobriti sadržaj 18+. |
 | Vidljiv izbor „Koristi prijavu sa sajta” u dodatku | Dozvola za kolačiće traži se tek kada korisnik želi preuzimanje iza prijave. | Srednje, oko 1 dan plus E2E. | Srednji; sačuvati postojeći rad privatnih videa i pravilo samo za domen izvora. |
 | Trajna izolacija native registracije u E2E alatu | Svaka buduća proba automatski čuva stvarnu Store/instaler vezu; trenutni runner bez omotača je prepisuje razvojnim hostom. | Malo do srednje. | Provjeriti i scenario kada ranija registracija ne postoji; ne brisati naslijepo završno ime hosta zbog poznatog Windows problema s ponovnom upotrebom putanje. |
 | CMD interfejs za link, format i izlazni folder | Skripte i napredni korisnici koriste isti provjereni mehanizam bez otvaranja GUI-ja. | Srednje, oko 2–3 dana za prvi upotrebljiv obim. | Nizak do srednji; jasni izlazni kodovi, prekid i poštovanje postojećih provjera. |

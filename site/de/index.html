@@ -72,7 +72,7 @@
       <a class="heart" href="#support">♥ Unterstützen</a>
     </nav>
     <span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html">BS</a> · <a href="../de/index.html" aria-current="true">DE</a> · <a href="../es/index.html">ES</a> · <a href="../fr/index.html">FR</a></span>
-    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Herunterladen</a>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-download-short>Herunterladen</a>
     <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menü" title="Menü"><span></span><span></span><span></span></button>
   </div>
   <nav class="mobile-nav" id="mobile-nav" aria-label="Menü" hidden>
@@ -93,17 +93,25 @@
       <div data-reveal>
         <div class="eyebrow"><span class="badge">Neu</span> <b>Android und macOS</b> in der Beta</div>
         <h1>Video und Audio.<br><span class="grad">Mit einem Klick.</span></h1>
-        <p class="lead">Eine kostenlose App für Windows und Mac: MP4 in voller Qualität oder MP3, direkt aus dem Browser oder aus einem kopierten Link.</p>
+        <p class="lead">Eine kostenlose App für Windows, Mac und Android. Speichere Videos als MP4 oder Audio als MP3 über einen Link. Am Computer kannst du Videos auch direkt aus der Browser-Erweiterung senden.</p>
+        <div class="platform-choice" role="group" aria-label="Plattform wählen" hidden>
+          <button type="button" data-platform="win" aria-pressed="true">Windows</button>
+          <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
+          <button type="button" data-platform="android" aria-pressed="false">Android</button>
+        </div>
         <div class="cta">
-          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Für Windows herunterladen
           </a>
-          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">Beta</span></a>
-          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Für macOS herunterladen</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Für Android herunterladen</a>
         </div>
         <ul class="promise"><li>Kein Konto</li><li>Kein Tageslimit</li><li>Deine Links landen nicht bei uns</li></ul>
-        <div class="meta"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit) · <a href="#install">Hilfe zur Installation</a></div>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit)</span>
+          <span data-platform-requirements="mac" hidden>Version 1.0.3 · macOS 13+ · Apple M1 oder neuer · Beta</span>
+          <span data-platform-requirements="android" hidden>Version 1.0.3 · Android 10+ · ARM64 · Beta</span>
+          · <a href="#install" data-install-help>Hilfe zur Installation</a></div>
         <p class="note">Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href="terms.html">Nutzungsbedingungen</a>. DRM-geschützte Inhalte werden nicht heruntergeladen.</p>
       </div>
 

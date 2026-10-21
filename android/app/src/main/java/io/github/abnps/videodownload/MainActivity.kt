@@ -42,47 +42,76 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.chaquo.python.Python
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CancellationException
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Tri ekrana (Početna, Preuzimanja, Postavke) + „Izaberi kvalitet" preko Početne, po Ahmedovom dizajnu. */
 class MainActivity : ComponentActivity() {
-    private val link = mutableStateOf("")
-    private val tab = mutableIntStateOf(TAB_HOME)
-    private var tabBeforeSettings = TAB_HOME // Postavke su poseban ekran; „nazad" vraća tamo odakle se došlo
+    private val screen by lazy { ViewModelProvider(this)[MainState::class.java] }
+    private val link get() = screen.link
+    private val tab get() = screen.tab
+    private var tabBeforeSettings: Int
+        get() = screen.tabBeforeSettings
+        set(value) { screen.tabBeforeSettings = value }
     private var lastBackAt = 0L // prvi „nazad" na Početnoj; drugi u roku od 2 s zatvara aplikaciju
-    private val downloadsTab = mutableIntStateOf(0)
-    private val info = mutableStateOf<VideoInfo?>(null)
-    private val finding = mutableStateOf(false)
-    private val findError = mutableStateOf<String?>(null)
+    private val downloadsTab get() = screen.downloadsTab
+    private val info get() = screen.info
+    private val finding get() = screen.finding
+    private val findError get() = screen.findError
     private val location = mutableStateOf(SaveLocation.DOWNLOADS)
     private val quality = mutableIntStateOf(0)
-    private var autoFind by mutableStateOf(false)
-    private var pasteOnFocus = false // widget/pločica: zalijepi čim prozor bude u fokusu
-    private var fromShare = false // link je stigao iz „Podijeli" (za brzo preuzimanje)
+    private var pasteOnFocus: Boolean
+        get() = screen.pasteOnFocus
+        set(value) { screen.pasteOnFocus = value }
     private val welcome = mutableStateOf(false)
     private val loggedIn = mutableStateOf(emptySet<LoginSite>()) // na koje sajtove je korisnik prijavljen
-    private val playlist = mutableStateOf<PlaylistInfo?>(null)
+    private val playlist get() = screen.playlist
     private val askAdultFor = mutableStateOf<List<Job>>(emptyList()) // 18+ koji čekaju potvrdu (jedan prozor)
-    private val showAchievements = mutableStateOf(false) // Postavke → Moja dostignuća
+    private val showAchievements get() = screen.showAchievements
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         location.value = Settings.location(this)
         quality.intValue = Settings.quality(this)
-        handle(intent)
+        val firstCreation = !screen.initialized
+        if (firstCreation) {
+            screen.initialized = true
+            val saved = savedInstanceState?.getBundle("main_screen")
+            if (saved != null) {
+                screen.restore(MainSnapshot(saved.getString("link").orEmpty(), saved.getInt("tab"),
+                    saved.getInt("tab_before_settings"), saved.getInt("downloads_tab"),
+                    saved.getBoolean("achievements"), saved.getBoolean("paste")))
+                // Poslije gašenja procesa ponovo čitamo link, ali NIKAD ne ponavljamo brzo preuzimanje.
+                if (saved.getBoolean("probe")) find()
+            } else if (savedInstanceState == null) handle(intent)
+        }
         askForNotifications()
         welcome.value = !getSharedPreferences("postavke", MODE_PRIVATE).getBoolean("uslovi_prihvaceni", false)
         // U pozadini, najviše jednom dnevno: nova verzija aplikacije (GitHub) i čitača sajtova (PyPI).
-        Thread {
-            Counter.newInstall(this)
-            AppUpdater.check(this)
+        val app = applicationContext
+        if (firstCreation) Thread {
+            Counter.newInstall(app)
+            AppUpdater.check(app)
             runCatching { Python.getInstance().getModule("vd_core").callAttr("update_ytdlp") }
         }.start()
         setContent { AppTheme { App() } }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        val saved = screen.snapshot()
+        outState.putBundle("main_screen", Bundle().apply {
+            putString("link", saved.link)
+            putInt("tab", saved.tab)
+            putInt("tab_before_settings", saved.tabBeforeSettings)
+            putInt("downloads_tab", saved.downloadsTab)
+            putBoolean("achievements", saved.showAchievements)
+            putBoolean("paste", saved.pasteOnFocus)
+            putBoolean("probe", saved.resumeProbe)
+        })
+        super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
@@ -100,13 +129,14 @@ class MainActivity : ComponentActivity() {
         if (hasFocus && pasteOnFocus) {
             pasteOnFocus = false
             paste()
-            if (findUrl(link.value) != null) lifecycleScope.launch { find() }
+            if (findUrl(link.value) != null) find()
             else Toast.makeText(this, R.string.paste_empty, Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handle(intent)
     }
 
@@ -116,6 +146,7 @@ class MainActivity : ComponentActivity() {
             // Widget ili pločica: međuspremnik se smije čitati tek kad prozor dobije fokus (onWindowFocusChanged).
             intent.getStringExtra(EXTRA_SOURCE)?.takeIf { it == "widget" || it == "tile" }?.let { Achievements.recordSource(it) }
             pasteOnFocus = true
+            screen.cancelProbe()
             tab.intValue = TAB_HOME
             info.value = null
             playlist.value = null
@@ -130,8 +161,8 @@ class MainActivity : ComponentActivity() {
             link.value = it
             tab.intValue = TAB_HOME
             info.value = null
-            fromShare = true
-            autoFind = true
+            playlist.value = null
+            find(quick = Settings.quickShare(this))
             Achievements.recordSource("share")
         }
     }
@@ -147,18 +178,17 @@ class MainActivity : ComponentActivity() {
     private fun paste() {
         val clip = getSystemService(ClipboardManager::class.java).primaryClip
         val text = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(this)?.toString()
-        findUrl(text)?.let { link.value = it }
+        findUrl(text)?.let { screen.cancelProbe(); link.value = it }
     }
 
-    private suspend fun find() {
+    private fun find(quick: Boolean = false) {
         val url = findUrl(link.value) ?: return
-        finding.value = true
-        findError.value = null
-        try {
+        val app = applicationContext
+        screen.find(quick, load = {
             val json = withContext(Dispatchers.IO) {
-                val cookies = SiteLogin.cookieFile(cacheDir, url)
+                val cookies = SiteLogin.cookieFile(app.cacheDir, url)
                 try {
-                    Python.getInstance().getModule("vd_core").callAttr("probe", url, cacheDir.absolutePath, cookies)
+                    Python.getInstance().getModule("vd_core").callAttr("probe", url, app.cacheDir.absolutePath, cookies)
                         .toString()
                 } finally {
                     if (cookies.isNotEmpty()) java.io.File(cookies).delete() // privremeni kolačići nikad ne ostaju
@@ -166,21 +196,8 @@ class MainActivity : ComponentActivity() {
             }
             val list = PlaylistInfo.parseOrNull(json)
             val video = if (list == null) VideoInfo.parse(json) else null
-            val quick = fromShare && Settings.quickShare(this)
-            fromShare = false
-            when {
-                list != null -> playlist.value = list
-                // Brzo preuzimanje: samo običan video; plejlista, 18+ i roditeljska zaštita idu kroz ekran (odluka korisnika).
-                quick && video != null && !video.adult -> quickDownload(video)
-                else -> info.value = video
-            }
-        } catch (error: CancellationException) {
-            throw error // prekid nije greška sajta
-        } catch (error: Exception) {
-            findError.value = DownloadService.cleanError(this, error.message)
-        } finally {
-            finding.value = false
-        }
+            ProbeResult(video, list)
+        }, errorText = { DownloadService.cleanError(app, it.message) })
     }
 
     /** Kao „Preuzmi" na ekranu kvaliteta s podrazumijevanim kvalitetom; korisnik ostaje u aplikaciji iz koje je dijelio. */
@@ -241,7 +258,7 @@ class MainActivity : ComponentActivity() {
             info.value = null
             playlist.value = null
             tab.intValue = TAB_HOME
-            lifecycleScope.launch { find() }
+            find()
         },
         copyLink = { item ->
             getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Video Download", item.url))
@@ -352,13 +369,8 @@ class MainActivity : ComponentActivity() {
             welcome.value = false
             getSharedPreferences("postavke", MODE_PRIVATE).edit().putBoolean("uslovi_prihvaceni", true).apply()
         }
-        LaunchedEffect(autoFind) {
-            if (autoFind) {
-                autoFind = false
-                // Ne u ovom efektu: promjena autoFind ga ponovo pokrene i prekine čitanje (link iz „Podijeli"
-                // je zato uvijek prvi put padao, S26 Ultra 2.10.2026). Čitanje pripada aktivnosti, ne ekranu.
-                lifecycleScope.launch { find() }
-            }
+        LaunchedEffect(screen.quickVideo.value) {
+            screen.takeQuickVideo()?.let { quickDownload(it) }
         }
         val shownList = playlist.value
         BackHandler {
@@ -412,7 +424,7 @@ class MainActivity : ComponentActivity() {
                 onAction = {
                     tab.intValue = TAB_HOME; info.value = null; playlist.value = null
                     paste()
-                    if (findUrl(link.value) != null) lifecycleScope.launch { find() }
+                    if (findUrl(link.value) != null) find()
                 },
             ) { index -> tab.intValue = index; if (index != TAB_HOME) { info.value = null; playlist.value = null } }
         }) { padding ->
@@ -445,8 +457,8 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                     tab.intValue == TAB_HOME -> HomeScreen(
-                        link = link.value, onLinkChange = { link.value = it; findError.value = null }, onPaste = { paste() },
-                        onFind = { lifecycleScope.launch { find() } }, finding = finding.value, error = findError.value,
+                        link = link.value, onLinkChange = { screen.cancelProbe(); link.value = it; findError.value = null }, onPaste = { paste() },
+                        onFind = { find() }, finding = finding.value, error = findError.value,
                         onCopyReport = { copyReport() }, history = history.filterNot { it.failed },
                         // Prijava postoji samo za Instagram; za druge sajtove (npr. TikTok) dugme bi zbunjivalo.
                         loginSite = LoginSite.forUrl(link.value).takeIf { findError.value == getString(R.string.error_login) },

@@ -45,6 +45,27 @@ class SiteTest(unittest.TestCase):
                 self.assertEqual((build_site.SITE / name).read_text(encoding="utf-8"), text,
                                  f"site/{name} nije ažuran — pokreni python tools/build_site.py")
 
+    def test_platform_downloads_work_without_javascript_in_every_language(self):
+        for lang in build_site.LANGUAGES:
+            page = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            for platform, url, label in (
+                ("win", build_site.INSTALLER_URL, "win_btn"),
+                ("mac", build_site.MAC_DMG_URL, "mac_btn"),
+                ("android", build_site.ANDROID_APK_URL, "android_btn"),
+            ):
+                with self.subTest(lang=lang, platform=platform):
+                    link = re.search(rf'<a\b[^>]*data-platform-download="{platform}"[^>]*>(.*?)</a>', page, re.S)
+                    self.assertIsNotNone(link)
+                    self.assertIn(f'href="{url}"', link.group())
+                    self.assertNotRegex(link.group().split(">", 1)[0], r'\bhidden\b')
+                    self.assertIn(site_home.HOME[lang][label], link.group(1))
+            self.assertIn(html.escape(site_home.HOME[lang]["platform_label"]), page)
+            self.assertIn(site_home.HOME[lang]["mac_req"], page)
+            self.assertIn(site_home.HOME[lang]["android_req"], page)
+            for platform in ("mac", "android"):
+                meta = re.search(rf'<span data-platform-requirements="{platform}"[^>]*>(.*?)</span>', page)
+                self.assertNotIn(" MB", meta.group(1))  # veličina Windows instalera ne pripada APK-u ni DMG-u
+
     def test_front_pages_show_current_version_news_and_smartscreen_help(self):
         for lang, label, more_info, run_anyway in (("en", "Version", "More info", "Run anyway"),
                                                    ("bs", "Verzija", "Više informacija", "Ipak pokreni"),

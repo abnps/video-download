@@ -72,7 +72,7 @@
       <a class="heart" href="#support">♥ Podrži</a>
     </nav>
     <span class="lang"><a href="../index.html">EN</a> · <a href="../bs/index.html" aria-current="true">BS</a> · <a href="../de/index.html">DE</a> · <a href="../es/index.html">ES</a> · <a href="../fr/index.html">FR</a></span>
-    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Preuzmi</a>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-download-short>Preuzmi</a>
     <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Meni" title="Meni"><span></span><span></span><span></span></button>
   </div>
   <nav class="mobile-nav" id="mobile-nav" aria-label="Meni" hidden>
@@ -93,17 +93,25 @@
       <div data-reveal>
         <div class="eyebrow"><span class="badge">Novo</span> <b>Android i macOS</b> u probnoj fazi</div>
         <h1>Video i zvuk.<br><span class="grad">Jednim klikom.</span></h1>
-        <p class="lead">Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.</p>
+        <p class="lead">Besplatan program za Windows, Mac i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.</p>
+        <div class="platform-choice" role="group" aria-label="Izaberi platformu" hidden>
+          <button type="button" data-platform="win" aria-pressed="true">Windows</button>
+          <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
+          <button type="button" data-platform="android" aria-pressed="false">Android</button>
+        </div>
         <div class="cta">
-          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Preuzmi za Windows
           </a>
-          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">Beta</span></a>
-          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za macOS</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za Android</a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
-        <div class="meta"><!-- version -->Verzija 1.0.3 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit) · <a href="#install">pomoć za instalaciju</a></div>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Verzija 1.0.3 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit)</span>
+          <span data-platform-requirements="mac" hidden>Verzija 1.0.3 · macOS 13+ · Apple M1 ili noviji · Beta</span>
+          <span data-platform-requirements="android" hidden>Verzija 1.0.3 · Android 10+ · ARM64 · Beta</span>
+          · <a href="#install" data-install-help>pomoć za instalaciju</a></div>
         <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
       </div>
 

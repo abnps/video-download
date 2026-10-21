@@ -951,6 +951,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             lang, up=_up(lang), switcher=switcher(lang), alternates=alternates(lang, "index.html"),
             footer=footer_html(lang), news=news_html(lang),
             version_line=f"<!-- version -->{TEXTS[lang]['version']} {__version__} · {size} MB<!-- /version -->",
+            version_short=f"{TEXTS[lang]['version']} {__version__}",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
             android_url=ANDROID_APK_URL, android_text=ANDROID_TEXT[lang],
             obtainium=(OBTAINIUM_URL, *OBTAINIUM_TEXT[lang]),

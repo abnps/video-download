@@ -51,6 +51,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,9 +79,16 @@ import java.util.Calendar
 fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (List<Job>) -> Unit) {
     val parental = Parental.enabled(LocalContext.current)
     val allowed = playlist.entries.indices.filter { !(parental && playlist.entries[it].adult) }
-    val selected = remember(playlist) { mutableStateListOf<Int>().apply { addAll(allowed) } }
-    var audio by remember { mutableStateOf(false) }
-    var mp3 by remember { mutableStateOf(true) }
+    val signature = remember(playlist) { playlist.selectionKey() }
+    val selected = rememberSaveable(playlist.url, saver = listSaver(
+        save = { listOf(signature) + it.toList() },
+        restore = { saved -> mutableStateListOf<Int>().apply {
+            addAll(if (saved.firstOrNull() == signature) saved.drop(1).filterIsInstance<Int>().filter { it in allowed }
+                   else emptyList())
+        } },
+    )) { mutableStateListOf<Int>().apply { addAll(allowed) } }
+    var audio by rememberSaveable(playlist.url) { mutableStateOf(false) }
+    var mp3 by rememberSaveable(playlist.url) { mutableStateOf(true) }
     var askAdult by remember { mutableStateOf<List<Job>?>(null) }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {

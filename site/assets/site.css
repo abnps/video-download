@@ -128,6 +128,14 @@ header.past-hero .btn-mini { display: inline-flex; animation: rowin .3s var(--ea
 }
 .hero .lead { font-size: 20px; color: var(--muted); max-width: 520px; margin: 0 0 32px; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.platform-choice { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.platform-choice[hidden], [data-platform-download][hidden] { display: none; }
+.platform-choice button { border: 0; border-radius: 999px; background: transparent; color: var(--muted);
+  font: inherit; font-size: 14px; padding: 8px 15px; cursor: pointer; }
+.platform-choice button[aria-pressed="true"] { background: var(--card-solid); color: var(--text);
+  box-shadow: var(--shadow-1); font-weight: 600; }
+.platform-choice button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .promise { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; padding: 0; margin: 18px 0 0; font-size: 14.5px; }
 .promise li::before { content: "✓"; color: var(--green); font-weight: 700; margin-right: 6px; }
 .meta { font-size: 13.5px; color: var(--muted); margin-top: 14px; }

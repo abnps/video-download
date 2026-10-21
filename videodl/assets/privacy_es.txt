@@ -19,6 +19,8 @@ Estos servicios ven tu dirección IP y la versión del programa; se aplican sus 
 3. Qué se guarda en tu dispositivo
 En Windows: configuración (registro: HKCU\Software\VideoDownload), cola e historial (enlaces, títulos, rutas, tamaños, horas), yt-dlp descargado en %LOCALAPPDATA%\VideoDownload y una clave local para el navegador. En Mac: datos de la aplicación en ~/Library/Application Support/VideoDownload y ajustes del sistema. En Android: configuración, cola (con enlaces), historial, diagnóstico y yt-dlp descargado en el almacenamiento privado de la aplicación; los archivos terminados van a Downloads/Video Download o a Galería/Música, según elijas. Estos datos no se envían al autor.
 
+En Android, el sistema también guarda localmente el enlace introducido, la pantalla actual y el formato elegido para restaurarlos tras girar el dispositivo o recrear la actividad. Este estado no contiene cookies ni confirmaciones para contenido de mayores de 18 años.
+
 4. Cookies de inicio de sesión
 Solo si lo permites en el navegador. Al programa solo llegan las cookies del sitio desde el que descargas; se guardan solo en memoria y el archivo temporal para yt-dlp se borra de inmediato. Nunca se escriben en la cola, el historial ni los informes. En Android: si inicias sesión en Instagram, TikTok o X dentro de la app (Ajustes → Cuenta de Instagram / TikTok / X), escribes tu contraseña solo en la página de ese sitio; las cookies de sesión quedan en el almacenamiento privado de la app, se pasan a yt-dlp en cada lectura y descarga mediante un archivo temporal que se borra enseguida y solo se envían al sitio en el que iniciaste sesión. Cerrar sesión las borra.
 

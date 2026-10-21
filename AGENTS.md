@@ -340,6 +340,19 @@ dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repo
   E2E u privremenom Edge profilu prošao; za tu probu korišten je omotač iz `Build/quality-review-tests` koji čuva
   i vraća postojeće native-host fajlove i svih šest HKCU vrijednosti. Pokretanje samog starog E2E runnera i dalje
   registruje razvojni host: prije takve probe zaštititi postojeću Store registraciju. Nema nove probe na telefonu.
+- Nastavak istog pregleda: Android `MainState` (ViewModel) čuva ekran i rezultat tokom rotacije/promjene jezika;
+  čitanje nije vezano za uništenu aktivnost. Mali Bundle obnavlja link/navigaciju poslije gašenja procesa i po
+  potrebi ponovo čita link, bez automatskog preuzimanja. Isti Share intent se ne obrađuje opet pri obnovi;
+  nova dijeljenja poništavaju stare rezultate. Izbor kvaliteta, zvuka/isječka i stavki plejliste je saveable;
+  potvrda 18+ nije. Prevelik unos (>8192 znakova) ne ide u Bundle i ne skraćuje se u drugi URL.
+- Početna sajta ima automatski i ručni izbor Windows/macOS/Android: glavno/malo dugme, zahtjevi i kartica uputa
+  ostaju usklađeni. Bez JS-a vidljiva su sva tri stvarna linka. Samo Windows prikazuje veličinu EXE instalera;
+  postojeća animacija ostaje desktop demo. Privatnost na svih 5 jezika opisuje lokalno čuvanje Android stanja.
+  Završni Python discover: 447 testova (2 preskočena); Node 31/31; naknadno sajt/pravni dokumenti 35/35.
+  Stvarni lokalni Edge prikaz provjeren na 320/390/1280/1440 px, bez JS-a i uz smanjeno kretanje.
+  Konačni Android lint/test/debug build: 10 Kotlin testova, 0 lint grešaka, 35 ranijih upozorenja.
+  Sačuvani izbor plejliste provjerava otisak redoslijeda URL-ova; promjena liste poništava stare indekse.
+  Izmjene ostaju lokalne u istoj grani do Ahmedove potvrde spajanja/objave.
 
 ## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 
