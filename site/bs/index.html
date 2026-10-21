@@ -113,14 +113,17 @@
                 data-play="Pokreni animaciju"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg><span>Pauziraj animaciju</span></button>
         <div class="app" role="region" aria-label="Demonstracija prozora programa (nije pravo preuzimanje)">
           <div class="app-title" aria-hidden="true"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-menu" aria-hidden="true"><span>Fajl</span><span>Preuzimanja</span><span>Pomoć</span><span class="app-menu-folder">Otvori folder</span></div>
           <div class="app-tools">
             <button class="paste" type="button">+ Zalijepi</button>
-            <div class="fmt" aria-hidden="true">Video – najbolji kvalitet (MP4)</div>
-            <div class="go" aria-hidden="true">↓ Preuzmi</div>
+            <div class="fmt" aria-hidden="true">Video – najbolji kvalitet (MP4)<span>⌄</span></div>
+            <div class="go" aria-hidden="true" data-download="↓ Preuzmi" data-stop="■ Zaustavi">↓ Preuzmi</div>
+            <div class="demo-settings" aria-hidden="true" title="Postavke">⚙</div>
           </div>
-          <div class="rows" aria-hidden="true"></div>
+          <div class="app-filters" aria-hidden="true"><span class="demo-filter selected" data-filter="all" data-template="Sve ({count})">Sve (2)</span><span class="demo-filter" data-filter="active" data-template="U toku ({count})">U toku (0)</span><span class="demo-filter" data-filter="waiting" data-template="Na čekanju ({count})">Na čekanju (0)</span><span class="demo-filter" data-filter="done" data-template="Završeno ({count})">Završeno (2)</span><span class="demo-filter" data-filter="failed" data-template="Neuspjelo ({count})">Neuspjelo (0)</span></div>
+          <div class="rows" aria-hidden="true"><div class="row done-row"><div class="thumb" style="--t1:#3d5c7a;--t2:#5b3fd1"><i>45:10</i></div><div class="row-main"><div class="t">Predavanje: osnove fotografije</div><div class="row-detail"><span class="format-pill">MP4 720p</span><span class="s done">Završeno · 28,4 MB</span></div></div><div class="row-actions"><span class="row-play">▶</span><span class="ico ok">✓</span><span class="row-convert">MP3</span><span class="row-remove">×</span></div></div><div class="row done-row audio-row"><div class="thumb" style="--t1:#7a6a3d;--t2:#7a3d5c"><i>1:13:08</i></div><div class="row-main"><div class="t">Podcast #12 – razgovor o putovanjima</div><div class="row-detail"><span class="format-pill">MP3</span><span class="s done">Završeno · 7,1 MB</span></div></div><div class="row-actions"><span class="row-play">▶</span><span class="ico ok">✓</span><span class="row-convert">MP3</span><span class="row-remove">×</span></div></div></div>
           <p class="sr" role="status" aria-live="polite" data-announce></p>
-          <div class="app-foot" aria-hidden="true"><span>Folder: Video Download</span><span class="heart">♥ Podrži projekat</span></div>
+          <div class="app-foot" aria-hidden="true"><span></span><span data-summary>završeno: 2</span><span>Folder: <b>Video Download</b></span><span class="heart">♥ Podrži projekat</span></div>
         </div>
         <p class="stage-note">Probaj: klikni <b>+ Zalijepi</b>.</p>
       </div>
@@ -380,7 +383,7 @@
   </div>
 </footer>
 
-<script>window.VD_TEXT = {"progress": "Preuzimanje · {p}% · {v} MB/s · još {s} s", "done": "Završeno · {m} MB", "decimal": ",", "finished": [{"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Planinarska tura – Prokoško jezero (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 najbolji", "audio": false}, {"title": "Moj koncert uživo – snimak iz publike", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Dodano: {t}", "ended": "Završeno: {t}"};</script>
+<script>window.VD_TEXT = {"progress": "Preuzimanje · {p}% · {v} MB/s · još {s} s", "done": "Završeno · {m} MB", "decimal": ",", "finished": [{"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Planinarska tura – Prokoško jezero (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 najbolji", "audio": false}, {"title": "Moj koncert uživo – snimak iz publike", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Dodano: {t}", "ended": "Završeno: {t}", "filters": {"all": "Sve ({count})", "active": "U toku ({count})", "waiting": "Na čekanju ({count})", "done": "Završeno ({count})", "failed": "Neuspjelo ({count})"}, "summary_done": "završeno: {count}"};</script>
 <script src="../assets/site.js" defer></script>
 </body>
 </html>

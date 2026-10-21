@@ -113,14 +113,17 @@
                 data-play="Animation abspielen"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" fill="currentColor" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg><span>Animation anhalten</span></button>
         <div class="app" role="region" aria-label="Demo des Programmfensters (kein echter Download)">
           <div class="app-title" aria-hidden="true"><img src="../assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-menu" aria-hidden="true"><span>Datei</span><span>Downloads</span><span>Hilfe</span><span class="app-menu-folder">Ordner öffnen</span></div>
           <div class="app-tools">
             <button class="paste" type="button">+ Einfügen</button>
-            <div class="fmt" aria-hidden="true">Video – beste Qualität (MP4)</div>
-            <div class="go" aria-hidden="true">↓ Herunterladen</div>
+            <div class="fmt" aria-hidden="true">Video – beste Qualität (MP4)<span>⌄</span></div>
+            <div class="go" aria-hidden="true" data-download="↓ Herunterladen" data-stop="■ Stoppen">↓ Herunterladen</div>
+            <div class="demo-settings" aria-hidden="true" title="Einstellungen">⚙</div>
           </div>
-          <div class="rows" aria-hidden="true"></div>
+          <div class="app-filters" aria-hidden="true"><span class="demo-filter selected" data-filter="all" data-template="Alle ({count})">Alle (2)</span><span class="demo-filter" data-filter="active" data-template="Läuft ({count})">Läuft (0)</span><span class="demo-filter" data-filter="waiting" data-template="Wartend ({count})">Wartend (0)</span><span class="demo-filter" data-filter="done" data-template="Fertig ({count})">Fertig (2)</span><span class="demo-filter" data-filter="failed" data-template="Fehlgeschlagen ({count})">Fehlgeschlagen (0)</span></div>
+          <div class="rows" aria-hidden="true"><div class="row done-row"><div class="thumb" style="--t1:#3d5c7a;--t2:#5b3fd1"><i>45:10</i></div><div class="row-main"><div class="t">Vortrag: Grundlagen der Fotografie</div><div class="row-detail"><span class="format-pill">MP4 720p</span><span class="s done">Fertig · 28,4 MB</span></div></div><div class="row-actions"><span class="row-play">▶</span><span class="ico ok">✓</span><span class="row-convert">MP3</span><span class="row-remove">×</span></div></div><div class="row done-row audio-row"><div class="thumb" style="--t1:#7a6a3d;--t2:#7a3d5c"><i>1:13:08</i></div><div class="row-main"><div class="t">Podcast #12 – ein Gespräch übers Reisen</div><div class="row-detail"><span class="format-pill">MP3</span><span class="s done">Fertig · 7,1 MB</span></div></div><div class="row-actions"><span class="row-play">▶</span><span class="ico ok">✓</span><span class="row-convert">MP3</span><span class="row-remove">×</span></div></div></div>
           <p class="sr" role="status" aria-live="polite" data-announce></p>
-          <div class="app-foot" aria-hidden="true"><span>Ordner: Video Download</span><span class="heart">♥ Projekt unterstützen</span></div>
+          <div class="app-foot" aria-hidden="true"><span></span><span data-summary>fertig: 2</span><span>Ordner: <b>Video Download</b></span><span class="heart">♥ Projekt unterstützen</span></div>
         </div>
         <p class="stage-note">Probier's aus: klicke auf <b>+ Einfügen</b>.</p>
       </div>
@@ -380,7 +383,7 @@
   </div>
 </footer>
 
-<script>window.VD_TEXT = {"progress": "Herunterladen · {p}% · {v} MB/s · noch {s} s", "done": "Fertig · {m} MB", "decimal": ",", "finished": [{"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Bergwanderung – Prokoško-See (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 beste", "audio": false}, {"title": "Mein Live-Konzert – aus dem Publikum gefilmt", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Hinzugefügt: {t}", "ended": "Fertig: {t}"};</script>
+<script>window.VD_TEXT = {"progress": "Herunterladen · {p}% · {v} MB/s · noch {s} s", "done": "Fertig · {m} MB", "decimal": ",", "finished": [{"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Bergwanderung – Prokoško-See (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 beste", "audio": false}, {"title": "Mein Live-Konzert – aus dem Publikum gefilmt", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Hinzugefügt: {t}", "ended": "Fertig: {t}", "filters": {"all": "Alle ({count})", "active": "Läuft ({count})", "waiting": "Wartend ({count})", "done": "Fertig ({count})", "failed": "Fehlgeschlagen ({count})"}, "summary_done": "fertig: {count}"};</script>
 <script src="../assets/site.js" defer></script>
 </body>
 </html>

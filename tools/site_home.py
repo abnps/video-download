@@ -485,8 +485,14 @@ def app_labels(lang: str) -> dict:
     i18n.set_language(lang)
     try:
         return {"paste": "+ " + i18n.tr("toolbar.paste"), "download": "↓ " + i18n.tr("toolbar.download"),
+                "stop": "■ " + i18n.tr("toolbar.stop"),
                 "format": i18n.tr("preset.best"), "folder": i18n.tr("folder.label"), "support": i18n.tr("support.link"),
-                "done": i18n.tr("row.done"),
+                "done": i18n.tr("row.done"), "menus": tuple(i18n.tr(f"menu.{key}").replace("&", "")
+                                                        for key in ("file", "downloads", "help")),
+                "open_folder": i18n.tr("corner.open_folder"), "settings": i18n.tr("settings.title"),
+                "filters": {key: i18n.tr(f"filter.{key}", count="{count}")
+                            for key in ("all", "active", "waiting", "done", "failed")},
+                "summary_done": i18n.tr("summary.done", count="{count}"),
                 "short": {key: i18n.tr(f"preset.{key}.short") for key in ("best", "1080p", "720p", "mp3")}}
     finally:
         i18n.set_language(previous)
@@ -500,6 +506,8 @@ def demo_script(lang: str) -> str:
             for title, (length, mb, speed, c1, c2, preset, audio) in zip(h["demo_titles"], DEMO_ROWS)]
     data = {"progress": progress, "done": labels["done"] + " · {m} MB", "decimal": decimal,
             "finished": [rows[2], rows[3]], "demos": rows, "added": h["a11y"][4], "ended": h["a11y"][5]}
+    data["filters"] = labels["filters"]
+    data["summary_done"] = labels["summary_done"]
     # </ u JSON-u ne smije zatvoriti <script>
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
@@ -575,6 +583,20 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
            obtainium: tuple = (), page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
+    # Statičan red ostaje vidljiv bez JavaScripta; skripta ga zamijeni animiranim redovima.
+    preview_rows = "".join(
+        f'<div class="row done-row{ " audio-row" if _audio else ""}"><div class="thumb" style="--t1:{color1};--t2:{color2}"><i>{length}</i></div>'
+        f'<div class="row-main"><div class="t">{esc(title)}</div><div class="row-detail">'
+        f'<span class="format-pill">{esc(labels["short"][preset])}</span>'
+        f'<span class="s done">{esc(labels["done"])} · {str(mb).replace(".", h["demo"][1])} MB</span></div></div>'
+        f'<div class="row-actions"><span class="row-play">▶</span><span class="ico ok">✓</span>'
+        f'<span class="row-convert">MP3</span><span class="row-remove">×</span></div></div>'
+        for title, (length, mb, _speed, color1, color2, preset, _audio)
+        in zip(h["demo_titles"][2:], DEMO_ROWS[2:]))
+    demo_filters = "".join(
+        f'<span class="demo-filter{ " selected" if key == "all" else ""}" data-filter="{key}" '
+        f'data-template="{esc(template)}">{esc(template.replace("{count}", "2" if key in ("all", "done") else "0"))}</span>'
+        for key, template in labels["filters"].items())
     nav = "\n".join(f'      <a{" class=\"heart\"" if anchor == "support" else ""} href="#{anchor}">{label}</a>'
                     for anchor, label in zip(ANCHORS, h["nav"]))
     badge, mac_lead, mac_button, mac_note, mac_steps = mac_text
@@ -670,14 +692,17 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
                 data-play="{esc(h["a11y"][2])}">{PAUSE_ICON}<span>{h["a11y"][1]}</span></button>
         <div class="app" role="region" aria-label="{esc(h["a11y"][6])}">
           <div class="app-title" aria-hidden="true"><img src="{up}assets/icon.png" alt="">Video Download<span class="dots">– ▢ ✕</span></div>
+          <div class="app-menu" aria-hidden="true"><span>{esc(labels["menus"][0])}</span><span>{esc(labels["menus"][1])}</span><span>{esc(labels["menus"][2])}</span><span class="app-menu-folder">{esc(labels["open_folder"])}</span></div>
           <div class="app-tools">
             <button class="paste" type="button">{esc(labels["paste"])}</button>
-            <div class="fmt" aria-hidden="true">{esc(labels["format"])}</div>
-            <div class="go" aria-hidden="true">{esc(labels["download"])}</div>
+            <div class="fmt" aria-hidden="true">{esc(labels["format"])}<span>⌄</span></div>
+            <div class="go" aria-hidden="true" data-download="{esc(labels["download"])}" data-stop="{esc(labels["stop"])}">{esc(labels["download"])}</div>
+            <div class="demo-settings" aria-hidden="true" title="{esc(labels["settings"])}">⚙</div>
           </div>
-          <div class="rows" aria-hidden="true"></div>
+          <div class="app-filters" aria-hidden="true">{demo_filters}</div>
+          <div class="rows" aria-hidden="true">{preview_rows}</div>
           <p class="sr" role="status" aria-live="polite" data-announce></p>
-          <div class="app-foot" aria-hidden="true"><span>{esc(labels["folder"])} Video Download</span><span class="heart">{esc(labels["support"])}</span></div>
+          <div class="app-foot" aria-hidden="true"><span></span><span data-summary>{esc(labels["summary_done"].replace("{count}", "2"))}</span><span>{esc(labels["folder"])} <b>Video Download</b></span><span class="heart">{esc(labels["support"])}</span></div>
         </div>
         <p class="stage-note">{h["try_it"].format(paste=esc(labels["paste"]))}</p>
       </div>

@@ -93,61 +93,86 @@
 
   // Živi demo: „Zalijepi" doda red koji se preuzme kao u pravom programu.
   const rows = $(".rows"), paste = $(".paste"), announce = $("[data-announce]");
+  const demoGo = $(".app-tools .go");
   const demos = T.demos || [];
+  const filters = $$(".demo-filter"), summary = $("[data-summary]");
+  const updateCounts = () => {
+    if (!rows) return;
+    const all = $$(".row", rows), done = $$(".done-row", rows).length;
+    for (const filter of filters) {
+      const count = { all: all.length, active: all.length - done, waiting: 0, done, failed: 0 }[filter.dataset.filter];
+      filter.textContent = filter.dataset.template.replace("{count}", count);
+    }
+    if (summary) summary.textContent = (T.summary_done || "").replace("{count}", done);
+  };
   // Čitaču ekrana javljamo samo ono što je posjetilac sam pokrenuo (bez procenata i bez samostalnih redova).
   const say = (text, title) => { if (announce && text) announce.textContent = text.replace("{t}", title); };
-  let next = 0, busy = false, idle;
-  const svgDone = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>';
+  let next = 0, busy = false, idle, progressFrame = 0, resumeProgress = null;
+  const svgFolder = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h6l2 2h10v11H3z"/></svg>';
+  const rowMarkup = (d, finished) => `<div class="thumb" style="--t1:${d.c1};--t2:${d.c2}"><i>${d.len}</i></div>
+      <div class="row-main"><div class="t"></div><div class="row-detail"><span class="format-pill"></span><span class="s${finished ? " done" : ""}"></span></div>
+      <div class="bar-p"${finished ? " hidden" : ""}><b class="${d.audio ? "audio" : ""}"></b></div></div>
+      <div class="row-actions"><span class="row-play">▶</span><span class="ico" aria-hidden="true">${finished ? svgFolder : "■"}</span><span class="row-convert">MP3</span><span class="row-remove">×</span></div>`;
   const addRow = (byUser = false) => {
     if (!rows || busy || !demos.length) return;
     busy = true; paste.classList.remove("pulse");
+    if (app) app.classList.add("downloading");
+    if (demoGo) demoGo.textContent = demoGo.dataset.stop;
     const d = demos[next++ % demos.length];
     const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<div class="thumb" style="--t1:${d.c1};--t2:${d.c2}"><i>${d.len}</i></div>
-      <div><div class="t"></div><div class="s"></div><div class="bar-p"><b class="${d.audio ? "audio" : ""}"></b></div></div>
-      <div class="ico" aria-hidden="true">■</div>`;
+    row.className = `row${d.audio ? " audio-row" : ""}`;
+    row.innerHTML = rowMarkup(d, false);
     row.querySelector(".t").textContent = d.title;
+    row.querySelector(".format-pill").textContent = d.fmt;
     rows.prepend(row);
     if (byUser) say(T.added, d.title);
     while (rows.children.length > 4) rows.lastElementChild.remove();
+    updateCounts();
     const s = row.querySelector(".s"), bar = row.querySelector(".bar-p b"), ico = row.querySelector(".ico");
     const total = d.mb, speed = d.speed;
     let done = 0, last = performance.now();
     const step = (t) => {
+      if (paused || document.hidden) return;
       const dt = Math.max(0, Math.min(0.1, (t - last) / 1000)); last = t;  // prvi okvir zna doći „prije" sata
       done = Math.min(total, done + speed * dt * (0.8 + Math.random() * 0.4));
       const pct = Math.round((done / total) * 100), left = Math.max(0, Math.round((total - done) / speed));
       bar.style.width = `${pct}%`;
-      s.textContent = `${d.fmt}   ${T.progress.replace("{p}", pct).replace("{v}", num(speed)).replace("{s}", left)}`;
-      if (done < total) return requestAnimationFrame(step);
-      bar.classList.add("ok");
-      s.textContent = `${d.fmt}   ${T.done.replace("{m}", num(total))}`;
+      s.textContent = T.progress.replace("{p}", pct).replace("{v}", num(speed)).replace("{s}", left);
+      if (done < total) { progressFrame = requestAnimationFrame(step); return; }
+      row.classList.add("done-row");
+      row.querySelector(".bar-p").hidden = true;
+      s.textContent = T.done.replace("{m}", num(total));
       s.classList.add("done");
-      ico.className = "ico ok"; ico.innerHTML = svgDone;
+      ico.classList.add("ok"); ico.innerHTML = svgFolder;
       if (byUser) say(T.ended, d.title);
-      busy = false;
+      busy = false; resumeProgress = null; progressFrame = 0;
+      if (app) app.classList.remove("downloading");
+      if (demoGo) demoGo.textContent = demoGo.dataset.download;
+      updateCounts();
       scheduleIdle();
     };
-    if (calm) { done = total - 0.001; }
-    requestAnimationFrame(step);
+    resumeProgress = () => { last = performance.now(); progressFrame = requestAnimationFrame(step); };
+    if (calm) done = total;
+    if (!paused && !document.hidden) resumeProgress();
   };
   const scheduleIdle = () => {
     clearTimeout(idle);
     if (!calm) idle = setTimeout(() => { if (!document.hidden && !paused) addRow(); scheduleIdle(); }, 6500);
   };
   // Na početku dva već gotova preuzimanja, da prozor izgleda kao pravi program.
+  if (rows && demos.length) rows.replaceChildren();
   for (const d of (T.finished || [])) {
     const row = document.createElement("div");
-    row.className = "row";
+    row.className = `row done-row${d.audio ? " audio-row" : ""}`;
     row.style.animation = "none";
-    row.innerHTML = `<div class="thumb" style="--t1:${d.c1};--t2:${d.c2}"><i>${d.len}</i></div>
-      <div><div class="t"></div><div class="s done"></div><div class="bar-p"><b class="ok" style="width:100%"></b></div></div>
-      <div class="ico ok" aria-hidden="true">${svgDone}</div>`;
+    row.innerHTML = rowMarkup(d, true);
     row.querySelector(".t").textContent = d.title;
-    row.querySelector(".s").textContent = `${d.fmt}   ${T.done.replace("{m}", num(d.mb))}`;
+    row.querySelector(".format-pill").textContent = d.fmt;
+    row.querySelector(".s").textContent = T.done.replace("{m}", num(d.mb));
+    row.querySelector(".ico").classList.add("ok");
     rows && rows.append(row);
   }
+  updateCounts();
   if (paste) {
     paste.addEventListener("click", () => { clearTimeout(idle); addRow(true); });
     setTimeout(() => (calm || !paused) && addRow(), calm ? 0 : 900);
@@ -157,9 +182,14 @@
     toggle.addEventListener("click", () => {
       setPaused(!paused);
       if (paused && app) { app.style.removeProperty("--ry"); app.style.removeProperty("--rx"); }
-      if (!paused) scheduleIdle();
+      if (paused) { cancelAnimationFrame(progressFrame); clearTimeout(idle); }
+      else { if (resumeProgress) resumeProgress(); scheduleIdle(); }
     });
   }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelAnimationFrame(progressFrame); clearTimeout(idle); }
+    else if (!paused) { if (resumeProgress) resumeProgress(); scheduleIdle(); }
+  });
 
   // Dodatak: popup se otvori kad sekcija dođe na ekran (i na klik ikone).
   const browser = $(".browser");
