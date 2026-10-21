@@ -826,11 +826,11 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       </div>
       <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
         <p><span class="badge">{badge}</span> {android_lead.format(issue=issue_url)}</p>
+        <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
         <p>{android_note}</p>
         <ol>
 {android_items}
         </ol>
-        <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
 {obtainium_html}        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
       </div>
     </div>

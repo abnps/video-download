@@ -148,8 +148,8 @@ class DownloadService : Service() {
             } else {
                 val message = cleanError(this, error.message)
                 Downloads.lastError.value = message
-                // Sirova poruka i u sistemski log (adb logcat -s VideoDownload), da se vidi i bez „Kopiraj izvještaj".
-                android.util.Log.w("VideoDownload", "Preuzimanje nije uspjelo: ${job.url}\n${error.message}")
+                // U sistemski dnevnik smije samo poznata kategorija, bez linka i sirove poruke sajta.
+                android.util.Log.w("VideoDownload", "Preuzimanje nije uspjelo: $message")
                 History.add(HistoryItem(job.id, job.title.ifBlank { job.url }, "", job.isAudio, job.label, 0, job.duration,
                     job.thumbnail, System.currentTimeMillis(), adult = job.adult, failed = true, url = job.url,
                     error = message))

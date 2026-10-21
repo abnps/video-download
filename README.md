@@ -202,7 +202,7 @@ python -m videodl.native_messaging --uninstall
 
 ```
 python -m unittest discover -s tests
-node --test "tests/extension/*.test.mjs"
+node --test "tests/extension/*.test.mjs" "tests/site/*.test.mjs"
 node tools/e2e_browser/run.mjs
 ```
 

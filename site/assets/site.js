@@ -225,8 +225,10 @@
       try {
         await navigator.clipboard.writeText(url);
       } catch (e) {
+        input.focus();
         input.select();
-        document.execCommand("copy");  // stariji preglednici bez clipboard dozvole
+        // Ako ni rezervni način ne uspije, adresa ostaje izabrana za ručno kopiranje.
+        try { if (!document.execCommand("copy")) return; } catch { return; }
       }
       copy.textContent = `${box.dataset.copied} ✓`;
       copy.classList.add("done");

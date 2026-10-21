@@ -156,7 +156,7 @@ def run_checks() -> None:
     env = {**os.environ, "QT_QPA_PLATFORM": "offscreen", "PYTHONIOENCODING": "utf-8"}
     python = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests"], cwd=PROJECT, env=env,
                             capture_output=True, text=True, encoding="utf-8", errors="replace")
-    node = subprocess.run(["node", "--test", "tests/extension/*.test.mjs"], cwd=PROJECT, env=env,
+    node = subprocess.run(["node", "--test", "tests/extension/*.test.mjs", "tests/site/*.test.mjs"], cwd=PROJECT, env=env,
                           capture_output=True, text=True, encoding="utf-8", errors="replace", shell=False)
     report.write_text(f"Python testovi (izlaz {python.returncode}):\n{python.stderr}\n\n"
                       f"JS testovi (izlaz {node.returncode}):\n{node.stdout}\n", encoding="utf-8")

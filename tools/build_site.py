@@ -49,7 +49,7 @@ ANDROID_TEXT = {
            "The app isn't in Google Play, so the first install takes a few extra taps:",
            ("Open the downloaded file (Downloads or the browser's download list).",
             "If Android asks, allow installing apps from your browser: <b>Settings → Allow from this source</b>.",
-            "On Samsung phones, turn off <b>Auto Blocker</b> only for the install (Settings → Security and privacy) and turn it back on afterwards.",
+            "If <b>Auto Blocker</b> blocks the install on a Samsung phone, turn it off only for the install (Settings → Security and privacy) and turn it back on afterwards.",
             "If Google Play Protect warns about an unknown app, tap <b>More details → Install anyway</b>.",
             "Later versions install from the app itself: <b>Settings → Check for updates</b>.")),
     "bs": ("<b>Novo: Video Download za Android.</b> Za telefone s Androidom 10 ili novijim. Podijeli video iz bilo koje "
@@ -59,7 +59,7 @@ ANDROID_TEXT = {
            "Aplikacija nije na Google Playu, pa prva instalacija traži par tapova više:",
            ("Otvori preuzeti fajl (Preuzimanja ili lista preuzimanja u pregledniku).",
             "Ako Android pita, dozvoli instalaciju iz preglednika: <b>Podešavanja → Dozvoli iz ovog izvora</b>.",
-            "Na Samsung telefonima <b>Auto Blocker</b> isključi samo za instalaciju (Podešavanja → Sigurnost i privatnost), a poslije ga ponovo uključi.",
+            "Ako <b>Auto Blocker</b> na Samsung telefonu blokira instalaciju, isključi ga samo za instalaciju (Podešavanja → Sigurnost i privatnost), a poslije ga ponovo uključi.",
             "Ako Google Play Protect upozori na nepoznatu aplikaciju, tapni <b>Više detalja → Ipak instaliraj</b>.",
             "Nove verzije se instaliraju iz same aplikacije: <b>Postavke → Provjeri ažuriranje</b>.")),
     "de": ("<b>Neu: Video Download für Android.</b> Für Handys mit Android 10 oder neuer. Teile ein Video aus einer "
@@ -69,7 +69,7 @@ ANDROID_TEXT = {
            "Die App ist nicht bei Google Play, daher braucht die erste Installation ein paar Fingertipps mehr:",
            ("Öffne die heruntergeladene Datei (Downloads oder Downloadliste des Browsers).",
             "Wenn Android fragt, erlaube Installationen aus deinem Browser: <b>Einstellungen → Von dieser Quelle zulassen</b>.",
-            "Auf Samsung-Handys den <b>Auto Blocker</b> nur für die Installation ausschalten (Einstellungen → Sicherheit und Datenschutz) und danach wieder einschalten.",
+            "Falls der <b>Auto Blocker</b> auf einem Samsung-Handy die Installation blockiert, ihn nur dafür ausschalten (Einstellungen → Sicherheit und Datenschutz) und danach wieder einschalten.",
             "Wenn Google Play Protect vor einer unbekannten App warnt, tippe auf <b>Weitere Details → Trotzdem installieren</b>.",
             "Neue Versionen installierst du direkt in der App: <b>Einstellungen → Nach Updates suchen</b>.")),
     "es": ("<b>Novedad: Video Download para Android.</b> Para móviles con Android 10 o posterior. Comparte un vídeo "
@@ -79,7 +79,7 @@ ANDROID_TEXT = {
            "La app no está en Google Play, así que la primera instalación requiere unos toques más:",
            ("Abre el archivo descargado (Descargas o la lista de descargas del navegador).",
             "Si Android lo pide, permite instalar apps desde tu navegador: <b>Ajustes → Permitir de esta fuente</b>.",
-            "En móviles Samsung, desactiva <b>Auto Blocker</b> solo para la instalación (Ajustes → Seguridad y privacidad) y vuelve a activarlo después.",
+            "Si <b>Auto Blocker</b> bloquea la instalación en un móvil Samsung, desactívalo solo para instalar (Ajustes → Seguridad y privacidad) y vuelve a activarlo después.",
             "Si Google Play Protect avisa de una app desconocida, pulsa <b>Más detalles → Instalar de todas formas</b>.",
             "Las nuevas versiones se instalan desde la propia app: <b>Ajustes → Buscar actualizaciones</b>.")),
     "fr": ("<b>Nouveau : Video Download pour Android.</b> Pour les téléphones sous Android 10 ou plus récent. Partagez "
@@ -89,7 +89,7 @@ ANDROID_TEXT = {
            "L'application n'est pas sur Google Play, la première installation demande donc quelques touches de plus :",
            ("Ouvrez le fichier téléchargé (Téléchargements ou la liste des téléchargements du navigateur).",
             "Si Android le demande, autorisez l'installation depuis votre navigateur : <b>Paramètres → Autoriser cette source</b>.",
-            "Sur les téléphones Samsung, désactivez <b>Auto Blocker</b> seulement pour l'installation (Paramètres → Sécurité et confidentialité), puis réactivez-le.",
+            "Si <b>Auto Blocker</b> bloque l'installation sur un téléphone Samsung, désactivez-le seulement pour installer (Paramètres → Sécurité et confidentialité), puis réactivez-le.",
             "Si Google Play Protect signale une application inconnue, touchez <b>Plus de détails → Installer quand même</b>.",
             "Les nouvelles versions s'installent depuis l'application : <b>Réglages → Rechercher des mises à jour</b>.")),
 }
@@ -171,8 +171,8 @@ Help → Downloading from the browser, click <b>Copy the folder path</b> and pas
 The same window has a button that opens the extensions page in Edge or Chrome.</li>
 <li>Pin the Video Download icon to the browser toolbar (puzzle icon → pin).</li>
 </ol>
-<div class="box">For now the extension is loaded by hand, because extension stores don't accept programs like this.
-The browser may therefore remind you about “Developer mode”; that is expected and the extension works normally.</div>
+<div class="box">The Edge/Chrome instructions below use manual installation. Firefox can be installed from the official
+add-on page linked above. With manual installation, the browser may remind you about “Developer mode”; that is expected.</div>
 <h2>Using it</h2>
 <ul>
 <li>Play a video on the page and click the Video Download icon: <b>Download the playing video</b> or <b>Download as MP3</b>.</li>
@@ -230,8 +230,8 @@ Pomoć → Preuzimanje iz browsera, klikni <b>Kopiraj putanju foldera</b> i zali
 U istom prozoru je i dugme koje otvara stranicu dodataka u Edge-u ili Chrome-u.</li>
 <li>Prikvači ikonu Video Download na traku browsera (ikona slagalice → pribadača).</li>
 </ol>
-<div class="box">Dodatak se za sada učitava ručno jer prodavnice dodataka ne primaju ovakve programe.
-Browser zato ponekad podsjeti na „Developer mode"; to je očekivano i dodatak radi normalno.</div>
+<div class="box">Upute za Edge/Chrome koriste ručnu instalaciju. Firefox dodatak instalira se sa zvanične stranice
+povezane iznad. Pri ručnoj instalaciji browser ponekad podsjeti na „Developer mode"; to je očekivano.</div>
 <h2>Korištenje</h2>
 <ul>
 <li>Pusti video na stranici i klikni ikonu Video Download: <b>Preuzmi video koji se pušta</b> ili <b>Preuzmi kao MP3</b>.</li>
@@ -290,8 +290,8 @@ Hilfe → Aus dem Browser herunterladen öffnen, auf <b>Ordnerpfad kopieren</b> 
 Im selben Fenster öffnet ein Knopf die Erweiterungsseite in Edge oder Chrome.</li>
 <li>Hefte das Symbol von Video Download an die Symbolleiste (Puzzle-Symbol → Anheften).</li>
 </ol>
-<div class="box">Die Erweiterung wird vorerst von Hand geladen, weil Erweiterungs-Stores solche Programme nicht aufnehmen.
-Der Browser erinnert deshalb manchmal an den „Entwicklermodus“; das ist normal, und die Erweiterung funktioniert trotzdem.</div>
+<div class="box">Die Anleitung für Edge/Chrome beschreibt die manuelle Installation. Die Firefox-Erweiterung lässt sich
+über die oben verlinkte offizielle Add-on-Seite installieren. Bei manueller Installation kann der Browser an den „Entwicklermodus“ erinnern; das ist normal.</div>
 <h2>Benutzung</h2>
 <ul>
 <li>Spiele ein Video auf der Seite ab und klicke auf das Symbol von Video Download: <b>Laufendes Video herunterladen</b> oder
@@ -352,8 +352,8 @@ Ayuda → Descargar desde el navegador, pulsa <b>Copiar la ruta de la carpeta</b
 En la misma ventana hay un botón que abre la página de extensiones en Edge o Chrome.</li>
 <li>Fija el icono de Video Download en la barra del navegador (icono de pieza de puzle → fijar).</li>
 </ol>
-<div class="box">Por ahora la extensión se carga a mano, porque las tiendas de extensiones no aceptan programas como este.
-Por eso el navegador a veces recuerda el «Modo de desarrollador»; es lo esperado y la extensión funciona con normalidad.</div>
+<div class="box">Las instrucciones para Edge/Chrome usan la instalación manual. La extensión para Firefox se instala
+desde la página oficial enlazada arriba. Con la instalación manual, el navegador puede recordar el «Modo de desarrollador»; es lo esperado.</div>
 <h2>Uso</h2>
 <ul>
 <li>Reproduce un vídeo en la página y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o
@@ -416,8 +416,8 @@ Aide → Télécharger depuis le navigateur, cliquez sur <b>Copier le chemin du 
 du dossier. La même fenêtre a un bouton qui ouvre la page des extensions dans Edge ou Chrome.</li>
 <li>Épinglez l'icône de Video Download dans la barre du navigateur (icône de pièce de puzzle → épingler).</li>
 </ol>
-<div class="box">Pour l'instant, l'extension se charge à la main, car les boutiques d'extensions n'acceptent pas ce genre de
-programme. Le navigateur peut donc rappeler le « Mode développeur » ; c'est normal et l'extension fonctionne quand même.</div>
+<div class="box">Les instructions pour Edge/Chrome décrivent l'installation manuelle. L'extension Firefox s'installe
+depuis la page officielle liée ci-dessus. Lors d'une installation manuelle, le navigateur peut rappeler le « Mode développeur » ; c'est normal.</div>
 <h2>Utilisation</h2>
 <ul>
 <li>Lancez une vidéo sur la page et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou

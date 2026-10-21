@@ -92,6 +92,21 @@ class SiteTest(unittest.TestCase):
         self.assertTrue(build_site.forbidden_words({"fr/index.html": "<p>contourner la protection</p>"}))
         self.assertFalse(build_site.forbidden_words({"index.html": "<p>the site reader yt-dlp</p>"}))
 
+    def test_android_apk_is_available_before_installation_steps(self):
+        for lang in build_site.LANGUAGES:
+            page = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            panel = page.split('id="panel-android"', 1)[1].split('</ol>', 1)[0]
+            with self.subTest(language=lang):
+                self.assertLess(panel.index(build_site.ANDROID_APK_URL), panel.index('<ol>'))
+
+    def test_extension_manual_install_notice_distinguishes_firefox(self):
+        for lang in build_site.LANGUAGES:
+            page = self.pages[build_site.TEXTS[lang]["dir"] + "extension.html"]
+            notices = re.findall(r'<div class="box">(.*?)</div>', page, re.S)
+            with self.subTest(language=lang):
+                self.assertTrue(any('Edge/Chrome' in notice and 'Firefox' in notice for notice in notices))
+                self.assertIn(build_site.FIREFOX_AMO, page)
+
     def test_legal_pages_carry_the_same_text_as_the_app(self):
         self.assertIn("vlastitih videa", self.pages["bs/terms.html"])
         self.assertIn("TERMS OF USE".title().split()[0], self.pages["terms.html"])
