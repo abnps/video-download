@@ -384,6 +384,19 @@ footer { border-top: 1px solid var(--line); padding: 30px 0 46px; color: var(--m
 footer .wrap { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; }
 footer a { color: var(--muted); }
+/* Dugme „Na vrh": dole desno, pojavi se tek poslije skrola (bez JS-a uvijek vidljivo). */
+.to-top {
+  position: fixed; z-index: 40; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%;
+  color: var(--text); background: var(--glass); border: 1px solid var(--line); box-shadow: var(--shadow-2);
+  backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  transition: opacity .25s var(--ease), transform .25s var(--ease), visibility .25s;
+}
+.to-top svg { width: 22px; height: 22px; }
+.to-top:hover { text-decoration: none; color: var(--blue); transform: translateY(-2px); }
+.to-top:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.js .to-top:not(.show) { opacity: 0; visibility: hidden; transform: translateY(12px); }
+@media print { .to-top { display: none; } }
 
 /* ---------- pojavljivanje pri skrolu ---------- */
 /* Sakriva se samo kad skripta radi (html.js); bez nje je sve odmah vidljivo. */

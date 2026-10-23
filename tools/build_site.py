@@ -448,7 +448,7 @@ HEAD = """<!doctype html>
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
 </head>
-<body>
+<body id="top">
 
 <header>
   <div class="wrap bar">
@@ -531,9 +531,17 @@ def sitemap_xml() -> str:
     return "\n".join(lines) + "\n"
 
 
+TO_TOP = {"en": "Back to top", "bs": "Nazad na vrh", "de": "Nach oben", "es": "Volver arriba", "fr": "Haut de page"}
+TO_TOP_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+               'stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>')
+
+
 def footer_html(lang: str) -> str:
     terms, privacy, licenses = TEXTS[lang]["footer"]
-    return f"""<footer>
+    top = html.escape(TO_TOP[lang])
+    # „Na vrh": #top (id na <body>) radi i bez JavaScripta; site.js ga pokazuje tek poslije skrola.
+    return f"""<a class="to-top" href="#top" aria-label="{top}" title="{top}">{TO_TOP_ICON}</a>
+<footer>
   <div class="wrap">
     <span>© 2026 Video Download</span>
     <div class="links">

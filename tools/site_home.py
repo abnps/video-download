@@ -647,7 +647,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
 </head>
-<body>
+<body id="top">
 
 <header>
   <div class="wrap bar">

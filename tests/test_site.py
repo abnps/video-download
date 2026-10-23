@@ -112,6 +112,16 @@ class SiteTest(unittest.TestCase):
         for lang in build_site.LANGUAGES:
             self.assertIn(build_site.CONTACT_EMAIL, self.pages[build_site.TEXTS[lang]["dir"] + "privacy.html"])
 
+    def test_back_to_top_button_on_every_page(self):
+        # „Na vrh" radi i bez JavaScripta (#top), s opisom za čitač ekrana na jeziku stranice.
+        for name, text in self.pages.items():
+            if "<footer>" not in text:
+                continue
+            lang = next((l for l in build_site.LANGUAGES if build_site.TEXTS[l]["dir"] and name.startswith(build_site.TEXTS[l]["dir"])), "en")
+            with self.subTest(page=name):
+                self.assertEqual(text.count('class="to-top"'), 1)
+                self.assertIn(f'href="#top" aria-label="{build_site.TO_TOP[lang]}"', text)
+
     def test_no_third_party_code_and_motion_can_be_turned_off(self):
         # Privatnost: bez tuđih skripti, fontova i stilova; pristupačnost: animacije se gase na zahtjev sistema.
         css = (build_site.SITE / "assets" / "site.css").read_text(encoding="utf-8")

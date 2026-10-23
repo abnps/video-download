@@ -16,6 +16,19 @@
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  // „Na vrh": vidljivo kad se odskrola više od jednog ekrana; vraća na vrh bez #top u adresi.
+  const toTop = $(".to-top");
+  if (toTop) {
+    const showTop = () => toTop.classList.toggle("show", scrollY > innerHeight);
+    addEventListener("scroll", showTop, { passive: true });
+    showTop();
+    toTop.addEventListener("click", (e) => {
+      e.preventDefault();
+      scrollTo({ top: 0, behavior: calm ? "instant" : "smooth" });
+      $(".brand")?.focus({ preventScroll: true });  // tastatura nastavlja od vrha, ne od dna stranice
+    });
+  }
+
   // Meni na telefonu (☰): otvara iste linkove; zatvara se na link, Esc ili kad se prozor raširi.
   const menuBtn = $(".menu-btn"), menu = $("#mobile-nav");
   if (menuBtn && menu) {
