@@ -11,8 +11,8 @@ import html
 # Popunjava se TEK po Ahmedovim podacima, npr.:
 # DATA = {"name": "Ime Prezime", "street": "Ulica 1", "city": "12345 Grad", "country": "Deutschland",
 #         "phone": "+49 …"}  # ili "contact_form": "https://…" umjesto telefona
-DATA: dict | None = {"name": "Ahmed Biševac", "street": "Im Niederbruch 9a", "city": "46509 Xanten",
-                     "country": "Deutschland", "phone": "+49 176 79916914"}  # Ahmed 3.10.2026
+DATA: dict | None = {"name": "Ahmed Biševac", "street": "Jaklja 41a", "city": "36300 Novi Pazar",
+                     "country": "Srbija", "phone": "+49 176 79916914"}  # Ahmed 3.10.2026, adresa 23.10.2026
 
 PAGE = "impressum.html"
 
