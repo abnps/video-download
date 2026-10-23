@@ -17,7 +17,9 @@ BRAND_ICON = ('<svg class="brand-icon" viewBox="0 0 128 128" width="28" height="
               '<path class="bi-track" d="M35.5 99.5H92.5" stroke="#fff" stroke-width="13" stroke-linecap="round"/>'
               '<path class="bi-fill" d="M35.5 99.5H92.5" stroke="#fff" stroke-width="13" stroke-linecap="round" '
               'pathLength="100"/></svg>')
+import hashlib
 import json
+from pathlib import Path
 
 # Sidra sekcija (ista na svim jezicima; nazivi su u HOME[lang]["nav"]).
 ANCHORS = ("features", "extension", "install", "news", "help", "support")
@@ -516,6 +518,13 @@ PAUSE_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause"
               'd="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/><path class="i-play" fill="currentColor" d="M8 5v14l11-7z"/></svg>')
 
 
+def asset(name: str) -> str:
+    """„site.css?v=…": nova verzija sajta uvijek dobija svoj stil i skriptu, a ne staru kopiju iz keša browsera
+    (GitHub Pages ih čuva 10 minuta; mješavina novog HTML-a i starog CSS-a pravi greške kao ogromnu strelicu)."""
+    data = (Path(__file__).resolve().parent.parent / "site" / "assets" / name).read_bytes()
+    return f"{name}?v={hashlib.sha256(data).hexdigest()[:10]}"
+
+
 def menu_button(lang: str) -> str:
     """☰ za telefone i uske prozore: otvara #mobile-nav (isti linkovi kao gornji meni)."""
     label = html.escape(HOME[lang]["a11y"][3])
@@ -643,7 +652,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 <link rel="apple-touch-icon" href="{up}assets/icon.png">
 <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="{up}assets/site.css">
+<link rel="stylesheet" href="{up}assets/{asset("site.css")}">
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
 </head>
@@ -887,7 +896,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {footer}
 
 <script>window.VD_TEXT = {demo_script(lang)};</script>
-<script src="{up}assets/site.js" defer></script>
+<script src="{up}assets/{asset("site.js")}" defer></script>
 </body>
 </html>
 """

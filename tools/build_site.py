@@ -444,7 +444,7 @@ HEAD = """<!doctype html>
 <link rel="apple-touch-icon" href="{up}assets/icon.png">
 <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="{up}assets/site.css">
+<link rel="stylesheet" href="{up}assets/{css}">
 <script>document.documentElement.classList.add("js")</script>
 {alternates}
 </head>
@@ -532,7 +532,7 @@ def sitemap_xml() -> str:
 
 
 TO_TOP = {"en": "Back to top", "bs": "Nazad na vrh", "de": "Nach oben", "es": "Volver arriba", "fr": "Haut de page"}
-TO_TOP_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+TO_TOP_ICON = ('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
                'stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>')
 
 
@@ -638,9 +638,9 @@ def _page(lang: str, name: str, title: str, description: str, body: str) -> str:
     head = HEAD.format(brand_icon=site_home.BRAND_ICON, lang=lang, title=html.escape(title), description=html.escape(description), up=_up(lang),
                        nav=nav, home=t["home"], switcher=switcher(lang, name), alternates=alternates(lang, name),
                        meta=meta_tags(lang, name, f"{title} — Video Download", description),
-                       menu=site_home.menu_button(lang), menu_label=html.escape(site_home.HOME[lang]["a11y"][3]))
+                       css=site_home.asset("site.css"), menu=site_home.menu_button(lang), menu_label=html.escape(site_home.HOME[lang]["a11y"][3]))
     return (head + body + "\n</main>\n\n" + footer_html(lang) +
-            f'\n\n<script src="{_up(lang)}assets/site.js" defer></script>\n</body>\n</html>\n')
+            f'\n\n<script src="{_up(lang)}assets/{site_home.asset("site.js")}" defer></script>\n</body>\n</html>\n')
 
 
 def page_terms(lang: str) -> str:
@@ -919,7 +919,7 @@ def page_not_found() -> str:
 <title>404 — Video Download</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="{base}assets/icon.png">
-<link rel="stylesheet" href="{base}assets/site.css">
+<link rel="stylesheet" href="{base}assets/{site_home.asset("site.css")}">
 </head>
 <body>
 <main class="doc">

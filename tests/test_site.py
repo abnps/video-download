@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import build_site  # noqa: E402
 import site_guides  # noqa: E402
 import site_home  # noqa: E402
+import site_home  # noqa: E402
 
 from videodl import __version__, changelog  # noqa: E402
 
@@ -111,6 +112,15 @@ class SiteTest(unittest.TestCase):
                 self.assertLessEqual(emails, {build_site.CONTACT_EMAIL})
         for lang in build_site.LANGUAGES:
             self.assertIn(build_site.CONTACT_EMAIL, self.pages[build_site.TEXTS[lang]["dir"] + "privacy.html"])
+
+    def test_style_and_script_carry_their_current_version(self):
+        # Novi HTML nikad sa starim CSS-om iz keša (tako je strelica „Na vrh" bila preko cijelog ekrana).
+        for name, text in self.pages.items():
+            for asset in ("site.css", "site.js"):
+                if f"assets/{asset}" in text:
+                    with self.subTest(page=name, asset=asset):
+                        self.assertIn(f"assets/{site_home.asset(asset)}\"", text)
+                        self.assertNotIn(f"assets/{asset}\"", text)
 
     def test_back_to_top_button_on_every_page(self):
         # „Na vrh" radi i bez JavaScripta (#top), s opisom za čitač ekrana na jeziku stranice.
@@ -258,7 +268,7 @@ class SiteTest(unittest.TestCase):
         for target in re.findall(r'(?:href|src)="([^"]+)"', page):
             with self.subTest(target=target):
                 self.assertTrue(target.startswith("/video-download/"), target)
-                path = target.removeprefix("/video-download/") or "index.html"
+                path = target.removeprefix("/video-download/").split("?")[0] or "index.html"
                 self.assertTrue((build_site.SITE / (path + "index.html" if path.endswith("/") else path)).is_file())
         for lang in build_site.LANGUAGES:
             self.assertIn(f'<div lang="{lang}"', page)
@@ -266,7 +276,8 @@ class SiteTest(unittest.TestCase):
     def test_local_links_and_images_exist(self):
         for name, text in self.pages.items():
             folder = posixpath.dirname(name)
-            for target in re.findall(r'(?:href|src|srcset)="([^"#:]+)(?:#[^"]*)?"', text):
+            # „?v=…" je samo oznaka verzije za keš browsera; fajl je isti.
+            for target in re.findall(r'(?:href|src|srcset)="([^"#:?]+)(?:\?[^"#]*)?(?:#[^"]*)?"', text):
                 path = posixpath.normpath(posixpath.join(folder, target))
                 with self.subTest(page=name, target=target):
                     self.assertTrue((build_site.SITE / path).is_file(), path)

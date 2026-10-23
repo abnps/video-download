@@ -16,10 +16,10 @@
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // „Na vrh": vidljivo kad se odskrola više od jednog ekrana; vraća na vrh bez #top u adresi.
+  // „Na vrh": vidljivo tek poslije dva ekrana (PatternFly/Red Hat); vraća na vrh bez #top u adresi.
   const toTop = $(".to-top");
   if (toTop) {
-    const showTop = () => toTop.classList.toggle("show", scrollY > innerHeight);
+    const showTop = () => toTop.classList.toggle("show", scrollY > innerHeight * 2);
     addEventListener("scroll", showTop, { passive: true });
     showTop();
     toTop.addEventListener("click", (e) => {
