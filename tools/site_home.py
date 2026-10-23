@@ -522,6 +522,7 @@ def asset(name: str) -> str:
     """„site.css?v=…": nova verzija sajta uvijek dobija svoj stil i skriptu, a ne staru kopiju iz keša browsera
     (GitHub Pages ih čuva 10 minuta; mješavina novog HTML-a i starog CSS-a pravi greške kao ogromnu strelicu)."""
     data = (Path(__file__).resolve().parent.parent / "site" / "assets" / name).read_bytes()
+    data = data.replace(b"\r\n", b"\n")  # isti otisak na Windowsu (CRLF) i na GitHubu (LF)
     return f"{name}?v={hashlib.sha256(data).hexdigest()[:10]}"
 
 
