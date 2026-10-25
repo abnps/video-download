@@ -30,6 +30,18 @@ object Settings {
 
     fun setQuickShare(context: Context, value: Boolean) = prefs(context).edit().putBoolean("quick_share", value).apply()
 
+    /** „Sljedeći video bez zvuka" (Ahmed 25.10.2026): važi za JEDAN sljedeći video, pa se samo isključi. */
+    fun muteNext(context: Context): Boolean = prefs(context).getBoolean("mute_next", false)
+
+    fun setMuteNext(context: Context, value: Boolean) = prefs(context).edit().putBoolean("mute_next", value).apply()
+
+    /** Uzme jednokratnu postavku i odmah je isključi (true samo prvi put). */
+    @Synchronized fun takeMuteNext(context: Context): Boolean {
+        if (!muteNext(context)) return false
+        check(prefs(context).edit().putBoolean("mute_next", false).commit()) { "Postavka nije sačuvana" }
+        return true
+    }
+
     private fun prefs(context: Context) = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 }
 

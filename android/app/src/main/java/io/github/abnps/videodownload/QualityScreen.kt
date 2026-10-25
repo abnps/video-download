@@ -89,18 +89,25 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
     var subtitles by rememberSaveable(info.url) { mutableStateOf(false) }
+    val context = LocalContext.current
+    // Uključeno ako je u Postavkama „Sljedeći video bez zvuka"; ovdje se može i isključiti za ovaj video.
+    var mute by rememberSaveable(info.url) { mutableStateOf(Settings.muteNext(context)) }
     var clip by rememberSaveable(info.url) { mutableStateOf(false) }
     var clipFrom by rememberSaveable(info.url) { mutableStateOf("") }
     var clipTo by rememberSaveable(info.url) { mutableStateOf("") }
     val clipRange = parseClip(clipFrom, clipTo, info.duration)
     // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
-    val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
+    val blockedByParental = info.adult && Parental.enabled(context)
+    val mutedLabel = stringResource(R.string.mute_short)
     fun start(asAudio: Boolean, asMp3: Boolean) {
         val label = if (asAudio) (if (asMp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
+        val silent = mute && !asAudio
+        // Video odavde troši jednokratnu postavku (kvačica je ono što važi), zvuk je ne dira.
+        if (!asAudio) Settings.setMuteNext(context, false)
         val range = if (clip) clipRange else null
         val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, asAudio,
-            if (asAudio) 0 else chosen.height, label, adult = info.adult, subtitles = subtitles && !asAudio,
-            clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1)
+            if (asAudio) 0 else chosen.height, if (silent) "$label · $mutedLabel" else label, adult = info.adult,
+            subtitles = subtitles && !asAudio, clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1, mute = silent)
         if (info.adult) askAdult = job else onDownload(job)
     }
     Column(Modifier.fillMaxSize()) {
@@ -151,6 +158,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 CheckRow(subtitles, stringResource(R.string.subtitles_option), stringResource(R.string.subtitles_note)) {
                     subtitles = it
                 }
+                CheckRow(mute, stringResource(R.string.mute_option), stringResource(R.string.mute_note)) { mute = it }
             }
             CheckRow(clip, stringResource(R.string.clip_option), stringResource(R.string.clip_note)) { clip = it }
             if (clip) Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {

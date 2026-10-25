@@ -82,11 +82,16 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
         Row(Modifier.fillMaxWidth().padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.nav_downloads), fontSize = 30.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 8.dp).weight(1f))
+            InfoButton(stringResource(R.string.nav_downloads), stringResource(R.string.info_downloads))
             SettingsButton(onSettings)
         }
         PrimaryTabRow(selectedTabIndex = tab, containerColor = Color.Transparent) {
-            Tab(selected = tab == 0, onClick = { onTab(0) }, text = { Text(stringResource(R.string.tab_active, active.size)) })
-            Tab(selected = tab == 1, onClick = { onTab(1) }, text = { Text(stringResource(R.string.tab_done)) })
+            Hint(stringResource(R.string.hint_tab_active)) {
+                Tab(selected = tab == 0, onClick = { onTab(0) }, text = { Text(stringResource(R.string.tab_active, active.size)) })
+            }
+            Hint(stringResource(R.string.hint_tab_done)) {
+                Tab(selected = tab == 1, onClick = { onTab(1) }, text = { Text(stringResource(R.string.tab_done)) })
+            }
         }
         if (tab == 0) {
             // Posljednja greška zamjenjuje „Ništa se ne preuzima" (bila je iscrtana preko tog teksta).
@@ -100,6 +105,8 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
             // Filter čipovi (kao kod sličnih aplikacija): Sve, Video, Zvuk, Nije uspjelo.
             var filter by remember { mutableStateOf(0) }
             val filters = listOf(R.string.filter_all, R.string.tab_video, R.string.tab_audio, R.string.failed_label)
+            val filterHints = listOf(R.string.hint_filter_all, R.string.hint_filter_video, R.string.hint_filter_audio,
+                R.string.hint_filter_failed)
             val shown = when (filter) {
                 1 -> history.filter { !it.failed && !it.isAudio }
                 2 -> history.filter { !it.failed && it.isAudio }
@@ -109,8 +116,10 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
             if (history.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 filters.forEachIndexed { index, label ->
-                    FilterChip(selected = filter == index, onClick = { filter = index }, label = { Text(stringResource(label)) },
-                        shape = RoundedCornerShape(50))
+                    Hint(stringResource(filterHints[index])) {
+                        FilterChip(selected = filter == index, onClick = { filter = index }, label = { Text(stringResource(label)) },
+                            shape = RoundedCornerShape(50))
+                    }
                 }
             }
             val today = startOfToday()
@@ -171,15 +180,17 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
                     Phase.INTERRUPTED -> R.string.phase_interrupted
                     Phase.NEEDS_ADULT -> R.string.phase_needs_adult
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (active.phase == Phase.INTERRUPTED) TextButton(onClick = { onRetry(active.job) }) {
-                    Text(stringResource(R.string.retry))
+                if (active.phase == Phase.INTERRUPTED) Hint(stringResource(R.string.hint_retry)) {
+                    TextButton(onClick = { onRetry(active.job) }) { Text(stringResource(R.string.retry)) }
                 }
                 // 18+ bez potvrde: MainActivity pita jednim prozorom za sve koji čekaju.
                 if (active.phase == Phase.NEEDS_ADULT) TextButton(onClick = { onRetry(active.job) }) {
                     Text(stringResource(R.string.adult_confirm))
                 }
             }
-            IconButton(onClick = { onCancel(active.job.id) }) { AppIcon(R.drawable.ic_close, tint = MaterialTheme.colorScheme.onSurface) }
+            Hint(stringResource(R.string.hint_cancel)) {
+                IconButton(onClick = { onCancel(active.job.id) }) { AppIcon(R.drawable.ic_close, tint = MaterialTheme.colorScheme.onSurface) }
+            }
         }
     }
 }
@@ -195,7 +206,7 @@ internal fun DoneCard(item: HistoryItem, actions: ItemActions) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(item.title, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.weight(1f))
-                    ItemMenu(item, actions)
+                    Hint(stringResource(R.string.hint_menu)) { ItemMenu(item, actions) }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AppIcon(R.drawable.ic_check_circle, Modifier.size(16.dp), tint = Brand.Green)
@@ -204,13 +215,17 @@ internal fun DoneCard(item: HistoryItem, actions: ItemActions) {
                 }
                 PillRow(item.format.split(" • ") + formatSize(item.size.toDouble()), Modifier.padding(top = 4.dp))
                 Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(onClick = { actions.open(item) }, shape = RoundedCornerShape(10.dp)) {
-                        AppIcon(R.drawable.ic_play, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
-                        Text(stringResource(R.string.open), Modifier.padding(start = 6.dp))
+                    Hint(stringResource(R.string.hint_open)) {
+                        FilledTonalButton(onClick = { actions.open(item) }, shape = RoundedCornerShape(10.dp)) {
+                            AppIcon(R.drawable.ic_play, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(R.string.open), Modifier.padding(start = 6.dp))
+                        }
                     }
-                    OutlinedButton(onClick = { actions.share(item) }, shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp)) {
-                        AppIcon(R.drawable.ic_share, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Hint(stringResource(R.string.hint_share)) {
+                        OutlinedButton(onClick = { actions.share(item) }, shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp)) {
+                            AppIcon(R.drawable.ic_share, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                        }
                     }
                 }
             }
@@ -229,7 +244,7 @@ internal fun FailedCard(item: HistoryItem, actions: ItemActions) {
                 Row(verticalAlignment = Alignment.Top) {
                     Text(item.title, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.weight(1f))
-                    ItemMenu(item, actions)
+                    Hint(stringResource(R.string.hint_menu)) { ItemMenu(item, actions) }
                 }
                 Text(stringResource(R.string.failed_label), color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
@@ -238,12 +253,16 @@ internal fun FailedCard(item: HistoryItem, actions: ItemActions) {
                 Text(item.url, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(onClick = { actions.retry(item) }, shape = RoundedCornerShape(10.dp)) {
-                        Text(stringResource(R.string.retry))
+                    Hint(stringResource(R.string.hint_retry)) {
+                        FilledTonalButton(onClick = { actions.retry(item) }, shape = RoundedCornerShape(10.dp)) {
+                            Text(stringResource(R.string.retry))
+                        }
                     }
-                    OutlinedButton(onClick = { actions.copyLink(item) }, shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp)) {
-                        AppIcon(R.drawable.ic_link, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Hint(stringResource(R.string.hint_copy_link)) {
+                        OutlinedButton(onClick = { actions.copyLink(item) }, shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp)) {
+                            AppIcon(R.drawable.ic_link, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                        }
                     }
                 }
             }

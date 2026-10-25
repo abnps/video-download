@@ -69,6 +69,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.ui.unit.sp
 import java.util.Calendar
 
@@ -104,16 +105,31 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         // Moderne postavke (Ahmed 3.10.2026): grupe u zaobljenim karticama, mreže na jednom mjestu.
         SettingsGroup(stringResource(R.string.settings_downloads)) {
             GroupRow(OneUi.Blue, R.drawable.ic_videocam, stringResource(R.string.set_quality),
-                if (quality == 0) stringResource(R.string.best_quality) else "${quality}p", onClick = { pickQuality = true })
+                if (quality == 0) stringResource(R.string.best_quality) else "${quality}p", onClick = { pickQuality = true },
+                info = stringResource(R.string.info_quality))
             GroupDivider()
             GroupRow(OneUi.Orange, R.drawable.ic_folder, stringResource(R.string.set_location), locationName(location),
-                onClick = { pickLocation = true })
+                onClick = { pickLocation = true }, info = stringResource(R.string.info_location))
             GroupDivider()
             var quick by remember { mutableStateOf(Settings.quickShare(context)) }
             val toggleQuick = { quick = !quick; Settings.setQuickShare(context, quick) }
             GroupRow(OneUi.Green, R.drawable.ic_download, stringResource(R.string.quick_title),
-                stringResource(if (quick) R.string.quick_on else R.string.quick_off), onClick = toggleQuick) {
+                stringResource(if (quick) R.string.quick_on else R.string.quick_off), onClick = toggleQuick,
+                info = stringResource(R.string.info_quick)) {
                 Switch(checked = quick, onCheckedChange = { toggleQuick() })
+            }
+            GroupDivider()
+            // Jednokratno: poslije jednog videa se samo isključi (Settings.takeMuteNext); pri povratku se čita ponovo.
+            var muteNext by remember { mutableStateOf(Settings.muteNext(context)) }
+            LifecycleResumeEffect(Unit) {
+                muteNext = Settings.muteNext(context)
+                onPauseOrDispose { }
+            }
+            val toggleMute = { muteNext = !muteNext; Settings.setMuteNext(context, muteNext) }
+            GroupRow(OneUi.Purple, R.drawable.ic_videocam, stringResource(R.string.mute_next_title),
+                stringResource(if (muteNext) R.string.mute_next_on else R.string.mute_next_off), onClick = toggleMute,
+                info = stringResource(R.string.info_mute_next)) {
+                Switch(checked = muteNext, onCheckedChange = { toggleMute() })
             }
         }
         SettingsGroup(stringResource(R.string.settings_accounts), stringResource(R.string.settings_accounts_note)) {
@@ -126,7 +142,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
         SettingsGroup(stringResource(R.string.settings_protection)) {
             GroupRow(OneUi.Purple, R.drawable.ic_info, stringResource(R.string.parental_title),
                 stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off),
-                onClick = { if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true }) {
+                onClick = { if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true },
+                info = stringResource(R.string.parental_note)) {
                 StatusChip(stringResource(if (parentalOn) R.string.chip_on else R.string.chip_off), parentalOn)
             }
         }
@@ -135,49 +152,55 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 val toggleColors = { ThemeState.set(context, !ThemeState.systemColors) }
                 GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.system_colors_title),
                     stringResource(if (ThemeState.systemColors) R.string.system_colors_on else R.string.system_colors_off),
-                    onClick = toggleColors) {
+                    onClick = toggleColors, info = stringResource(R.string.info_colors)) {
                     Switch(checked = ThemeState.systemColors, onCheckedChange = { toggleColors() })
                 }
                 GroupDivider()
             }
             GroupRow(OneUi.Teal, R.drawable.ic_language, stringResource(R.string.set_language),
-                LocalConfiguration.current.locales[0].displayLanguage, onClick = onLanguage)
+                LocalConfiguration.current.locales[0].displayLanguage, onClick = onLanguage,
+                info = stringResource(R.string.info_language))
             GroupDivider()
             GroupRow(OneUi.Blue, R.drawable.ic_download, stringResource(R.string.update_check),
-                if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate)
+                if (update is UpdateState.UpToDate) stringResource(R.string.update_none) else null, onClick = onCheckUpdate,
+                info = stringResource(R.string.info_update))
             GroupDivider()
             GroupRow(OneUi.Gray, R.drawable.ic_settings, stringResource(R.string.set_version),
                 "$appVersion · ${stringResource(R.string.test_version)} · yt-dlp $readerVersion\n" +
-                    stringResource(R.string.whats_new_sub), onClick = { showWhatsNew = true })
+                    stringResource(R.string.whats_new_sub), onClick = { showWhatsNew = true },
+                info = stringResource(R.string.info_version))
         }
         SettingsGroup(stringResource(R.string.settings_support)) {
             GroupRow(OneUi.Orange, R.drawable.ic_check_circle, stringResource(R.string.badge_title),
-                stringResource(R.string.badge_settings_sub, Achievements.downloadCount), onClick = onAchievements)
+                stringResource(R.string.badge_settings_sub, Achievements.downloadCount), onClick = onAchievements,
+                info = stringResource(R.string.info_badges))
             GroupDivider()
             GroupRow(OneUi.Orange, R.drawable.ic_info, stringResource(R.string.feedback_title), stringResource(R.string.feedback_sub),
-                onClick = onFeedback)
+                onClick = onFeedback, info = stringResource(R.string.info_feedback))
             GroupDivider()
             GroupRow(OneUi.Purple, R.drawable.ic_share, stringResource(R.string.discord_title), stringResource(R.string.discord_sub),
-                onClick = { onOpenLink(Links.DISCORD) })
+                onClick = { onOpenLink(Links.DISCORD) }, info = stringResource(R.string.info_discord))
             GroupDivider()
             GroupRow(OneUi.Green, R.drawable.ic_share, stringResource(R.string.invite_title), stringResource(R.string.invite_sub),
-                onClick = onInvite)
+                onClick = onInvite, info = stringResource(R.string.info_invite))
             GroupDivider()
             GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.set_support), null,
-                onClick = { onOpenLink(Links.SUPPORT) })
+                onClick = { onOpenLink(Links.SUPPORT) }, info = stringResource(R.string.info_support))
             GroupDivider()
             GroupRow(OneUi.Pink, R.drawable.ic_heart, stringResource(R.string.set_support_card), null,
-                onClick = { onOpenLink(Links.CARD) })
+                onClick = { onOpenLink(Links.CARD) }, info = stringResource(R.string.info_card))
             GroupDivider()
             GroupRow(OneUi.Pink, R.drawable.ic_heart, "Ko-fi", stringResource(R.string.set_support_kofi),
-                onClick = { onOpenLink(Links.KOFI) })
+                onClick = { onOpenLink(Links.KOFI) }, info = stringResource(R.string.info_kofi))
             GroupDivider()
-            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_terms), null, onClick = { onOpenLink(Links.site("terms.html")) })
+            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_terms), null, onClick = { onOpenLink(Links.site("terms.html")) },
+                info = stringResource(R.string.info_terms))
             GroupDivider()
             GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_privacy), null,
-                onClick = { onOpenLink(Links.site("privacy.html")) })
+                onClick = { onOpenLink(Links.site("privacy.html")) }, info = stringResource(R.string.info_privacy))
             GroupDivider()
-            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_licenses), null, onClick = { showLicenses = true })
+            GroupRow(OneUi.Gray, R.drawable.ic_info, stringResource(R.string.set_licenses), null, onClick = { showLicenses = true },
+                info = stringResource(R.string.info_licenses))
         }
         Spacer(Modifier.height(12.dp))
     }
@@ -334,7 +357,7 @@ private fun GroupDivider() = HorizontalDivider(Modifier.padding(start = 68.dp, e
 /** Red u grupi: ikona u obojenom krugu, naslov, opis i desno strelica ili kontrola (prekidač, oznaka). */
 @Composable
 private fun GroupRow(accent: Color, icon: Int, title: String, value: String?,
-                     onClick: (() -> Unit)?, trailing: (@Composable () -> Unit)? = null) {
+                     onClick: (() -> Unit)?, info: String? = null, trailing: (@Composable () -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
         .padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(36.dp).background(accent, RoundedCornerShape(11.dp)), contentAlignment = Alignment.Center) {
@@ -345,6 +368,7 @@ private fun GroupRow(accent: Color, icon: Int, title: String, value: String?,
             if (value != null) Text(value, style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        if (info != null) InfoButton(title, info)
         when {
             trailing != null -> trailing()
             onClick != null -> AppIcon(R.drawable.ic_chevron)
@@ -370,6 +394,7 @@ private fun AccountRow(site: LoginSite, loggedIn: Boolean, onClick: () -> Unit) 
             if (!loggedIn) Text(stringResource(site.offText), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        InfoButton(stringResource(site.title), stringResource(R.string.info_account, stringResource(site.title)))
         StatusChip(stringResource(if (loggedIn) R.string.login_on else R.string.chip_login), loggedIn)
     }
 }

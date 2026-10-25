@@ -64,7 +64,7 @@ class DownloadService : Service() {
             val cookies = SiteLogin.cookieFile(work, job.url)
             val result = Python.getInstance().getModule("vd_core").callAttr(
                 "download", job.url, if (!job.isAudio) "video" else if (job.label == MP3_LABEL) "mp3" else "audio", work.absolutePath, Listener(job), job.height,
-                cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "",
+                cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "", job.mute && !job.isAudio,
             ).asList()
             val name = result[1].toString()
             val first = File(result[2].toString())
@@ -76,6 +76,14 @@ class DownloadService : Service() {
                 File(work, "$name.mp4").also { Muxer.merge(first, second, it) { job.id in cancelled } }
             } else {
                 File(work, "$name.${first.extension}").also { check(first.renameTo(it)) { "Privremeni fajl nije premješten" } }
+            }
+            if (job.mute && !job.isAudio) {
+                // Sajt nudi samo video sa zvukom (Instagram, TikTok…): zvuk se skida bez ponovnog kodiranja.
+                // Kad je stigla samo slika, ovo je obična kopija od par sekundi.
+                val silent = File(work, "${file.nameWithoutExtension}.silent.${file.extension}")
+                Muxer.dropAudio(file, silent) { job.id in cancelled }
+                file.delete()
+                check(silent.renameTo(file)) { "Privremeni fajl nije premješten" }
             }
             if (job.hasClip) {
                 // Isječak bez ffmpeg-a (Muxer.trim); ime kao na računaru: „Naslov [id] (2.30–6.10).mp4".
@@ -288,7 +296,11 @@ class DownloadService : Service() {
         private const val ACTION_CANCEL = "cancel"
 
         fun start(context: Context, job: Job) {
-            context.startForegroundService(Intent(context, DownloadService::class.java).putExtra(EXTRA_JOB, job.toBundle()))
+            // „Sljedeći video bez zvuka" iz Postavki: prvi sljedeći video (i iz „Podijeli", liste…), samo jednom.
+            val next = if (!job.isAudio && !job.mute && Settings.takeMuteNext(context)) {
+                job.copy(mute = true, label = "${job.label} · ${context.getString(R.string.mute_short)}")
+            } else job
+            context.startForegroundService(Intent(context, DownloadService::class.java).putExtra(EXTRA_JOB, next.toBundle()))
         }
 
         fun cancel(context: Context, id: Long) {
