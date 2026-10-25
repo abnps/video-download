@@ -146,6 +146,9 @@
     <string name="parental_save">Speichern</string>
     <string name="subtitles_option">Untertitel</string>
     <string name="subtitles_note">App-Sprache und Englisch, als eigene Datei neben dem Video (in Downloads)</string>
+    <string name="mute_option">Ohne Ton</string>
+    <string name="mute_note">Nur das Bild, ohne Ton</string>
+    <string name="mute_short">ohne Ton</string>
     <string name="clip_option">Nur einen Teil des Videos</string>
     <string name="clip_note">Von–bis (z. B. 0:30–2:15); beginnt am nächsten Bild einige Sekunden früher</string>
     <string name="clip_from">Von</string>

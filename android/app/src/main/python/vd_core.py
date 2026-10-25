@@ -83,9 +83,10 @@ def _best_audio(formats: list):
     return audio[-1] if audio else None
 
 
-def plan(info: dict, kind: str, height: int = 0) -> list[str]:
+def plan(info: dict, kind: str, height: int = 0, mute: bool = False) -> list[str]:
     """Koje formate preuzeti: jedan ID, dva ID-a (slika pa zvuk, za spajanje) ili opšti izbor yt-dlp-a.
-    `height` > 0 ograničava visinu slike (izbor 1080p/720p/480p); 0 = najbolja dostupna."""
+    `height` > 0 ograničava visinu slike (izbor 1080p/720p/480p); 0 = najbolja dostupna.
+    `mute` (video bez zvuka): samo slika kad je sajt nudi posebno; inače video sa zvukom, a Kotlin skida zvuk."""
     formats = info.get("formats") or [info]
     audio = _best_audio(formats)
     if kind == "mp3" and audio is None:
@@ -105,6 +106,9 @@ def plan(info: dict, kind: str, height: int = 0) -> list[str]:
     combined = sorted((f for f in formats if _has_video(f) and _has_audio(f) and f.get("ext") == "mp4" and fits(f)),
                       key=lambda f: (f.get("height") or 0, _size(f)))
     best_combined = combined[-1] if combined else None
+    if mute and video_h264 and (best_combined is None
+                                or (video_h264[-1].get("height") or 0) >= (best_combined.get("height") or 0)):
+        return [video_h264[-1]["format_id"]]  # zvuk se ni ne preuzima: brže i manje podataka
     if video_h264 and audio and (best_combined is None
                                  or (video_h264[-1].get("height") or 0) > (best_combined.get("height") or 0)):
         return [video_h264[-1]["format_id"], audio["format_id"]]
@@ -255,7 +259,7 @@ def probe(url: str, cache_dir: str, cookie_file: str = "") -> str:
 
 
 def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cookie_file: str = "",
-             adult_ok: bool = False, subtitles: str = ""):
+             adult_ok: bool = False, subtitles: str = "", mute: bool = False):
     """`listener` je Kotlin objekat: onProgress(udio, preuzeto, ukupno, brzina, preostalo) i isCancelled().
     Vraća [naslov, ime fajla bez ekstenzije, putanja prvog dijela, putanja drugog dijela ili ""]."""
     # SVE ide kroz JEDNU sesiju yt-dlp-a: linkovi formata (npr. YouTube) vezani su za kolačiće i podatke sesije
@@ -272,12 +276,12 @@ def download(url: str, kind: str, work_dir: str, listener, height: int = 0, cook
     hook.cancelled = listener.isCancelled
 
     log = _FileLog(os.path.join(os.path.dirname(work_dir), "zadnji-log.txt"))
-    log.info(f"link: {url} | vrsta: {kind} | prijava: {'da' if cookie_file else 'ne'}")
+    log.info(f"link: {url} | vrsta: {kind}{' bez zvuka' if mute else ''} | prijava: {'da' if cookie_file else 'ne'}")
     options = {"quiet": True, "no_warnings": True, "noprogress": True, "noplaylist": True, "retries": 3,
                "progress_hooks": [hook], "logger": log, "verbose": False, "dump_intermediate_pages": False}
     _with_cookies(options, cookie_file)
     try:
-        return _run(url, kind, work_dir, options, part, log, height, adult_ok, subtitles)
+        return _run(url, kind, work_dir, options, part, log, height, adult_ok, subtitles, mute)
     except Exception as error:
         log.error(f"{type(error).__name__}: {error}")
         raise
@@ -302,7 +306,7 @@ def listener_cancelled(options) -> bool:
     return any(getattr(hook, "cancelled", lambda: False)() for hook in options["progress_hooks"])
 
 
-def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False, subtitles=""):
+def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False, subtitles="", mute=False):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(url, download=False)
         if info.get("_type") == "playlist":  # prototip: iz plejliste samo prvi video
@@ -317,7 +321,7 @@ def _run(url, kind, work_dir, options, part, log, height=0, adult_ok=False, subt
         # 18+ bez potvrde za OVO preuzimanje: video čeka (Kotlin pita korisnika), ostali poslovi idu dalje.
         if is_adult(info, url) and not adult_ok:
             raise ValueError("ADULT_CONFIRM")
-        specs = plan(info, kind, height)
+        specs = plan(info, kind, height, mute and kind == "video")
         sizes = [_size(next((f for f in info.get("formats") or [] if f.get("format_id") == spec), {}))
                  for spec in specs]
         weights = [size / sum(sizes) for size in sizes] if all(sizes) else [1 / len(specs)] * len(specs)

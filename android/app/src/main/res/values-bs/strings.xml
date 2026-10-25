@@ -149,6 +149,9 @@
     <string name="parental_save">Sačuvaj</string>
     <string name="subtitles_option">Titlovi</string>
     <string name="subtitles_note">Jezik aplikacije i engleski, kao poseban fajl pored videa (u Preuzimanjima)</string>
+    <string name="mute_option">Bez zvuka</string>
+    <string name="mute_note">Samo slika, bez zvuka</string>
+    <string name="mute_short">bez zvuka</string>
     <string name="clip_option">Samo dio videa</string>
     <string name="clip_note">Od–do (npr. 0:30–2:15); počinje od najbližeg kadra par sekundi ranije</string>
     <string name="clip_from">Od</string>

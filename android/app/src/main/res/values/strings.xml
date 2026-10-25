@@ -147,6 +147,9 @@
     <string name="parental_save">Save</string>
     <string name="subtitles_option">Subtitles</string>
     <string name="subtitles_note">App language and English, as a separate file next to the video (in Downloads)</string>
+    <string name="mute_option">Without sound</string>
+    <string name="mute_note">Only the picture, without audio</string>
+    <string name="mute_short">no sound</string>
     <string name="clip_option">Only part of the video</string>
     <string name="clip_note">From–to (e.g. 0:30–2:15); starts at the nearest frame a few seconds earlier</string>
     <string name="clip_from">From</string>

@@ -251,5 +251,24 @@ class AndroidAv1Test(unittest.TestCase):
         self.assertEqual(video[1]["size"], 53)  # veličina H.264 za 1080p, ne AV1
 
 
+class AndroidMuteTest(unittest.TestCase):
+    """Video bez zvuka: samo slika kad je sajt nudi posebno; inače video sa zvukom (Kotlin skida zvuk)."""
+
+    def test_only_picture_is_downloaded_when_offered_separately(self):
+        info = AndroidAv1Test.INFO
+        self.assertEqual(vd_core.plan(info, "video", mute=True), ["h1080"])
+        self.assertEqual(vd_core.plan(info, "video"), ["h1080", "a"])  # bez kvačice ostaje kao prije
+
+    def test_site_with_only_combined_video_keeps_the_combined_file(self):
+        info = {"formats": [{"format_id": "c", "ext": "mp4", "vcodec": "avc1", "acodec": "mp4a", "height": 720}]}
+        self.assertEqual(vd_core.plan(info, "video", mute=True), ["c"])
+
+    def test_better_combined_video_wins_over_lower_picture_only(self):
+        info = {"formats": [
+            {"format_id": "v480", "ext": "mp4", "vcodec": "avc1", "acodec": "none", "height": 480},
+            {"format_id": "c720", "ext": "mp4", "vcodec": "avc1", "acodec": "mp4a", "height": 720},
+        ]}
+        self.assertEqual(vd_core.plan(info, "video", mute=True), ["c720"])
+
 if __name__ == "__main__":
     unittest.main()

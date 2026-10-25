@@ -129,4 +129,37 @@ object Muxer {
             muxer.release()
         }
     }
+
+    /** Isti video bez zvuka: kopira se samo slika, bez ponovnog kodiranja (kvačica „Bez zvuka"). */
+    fun dropAudio(input: File, output: File, isCancelled: () -> Boolean = { false }) {
+        val extractor = MediaExtractor().apply { setDataSource(input.path) }
+        val muxer = MediaMuxer(output.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        try {
+            val index = (0 until extractor.trackCount).firstOrNull {
+                extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME).orEmpty().startsWith("video/")
+            } ?: error("${input.name}: nema slike")
+            extractor.selectTrack(index)
+            val format = extractor.getTrackFormat(index)
+            if (format.containsKey(MediaFormat.KEY_ROTATION)) muxer.setOrientationHint(format.getInteger(MediaFormat.KEY_ROTATION))
+            val track = muxer.addTrack(format)
+            val buffer = ByteBuffer.allocateDirect(
+                if (format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)
+                else 4 * 1024 * 1024)
+            muxer.start()
+            val info = MediaCodec.BufferInfo()
+            while (true) {
+                if (isCancelled()) throw InterruptedException("Preuzimanje je zaustavljeno")
+                val size = extractor.readSampleData(buffer, 0)
+                if (size < 0) break
+                val flags = if (extractor.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0
+                info.set(0, size, extractor.sampleTime, flags)
+                muxer.writeSampleData(track, buffer, info)
+                extractor.advance()
+            }
+            muxer.stop()
+        } finally {
+            extractor.release()
+            muxer.release()
+        }
+    }
 }
