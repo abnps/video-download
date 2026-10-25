@@ -93,7 +93,8 @@ def load_history(path: Path) -> list[dict]:
 
 
 def per_day(history: list[dict]) -> list[tuple[str, dict]]:
-    """Posljednji snimak svakog dana, pa razlika prema prethodnom danu = javljanja tog dana."""
+    """Posljednji snimak svakog dana, pa razlika prema prethodnom snimku = javljanja u tom periodu.
+    Kad alat nije pokretan svaki dan, red pokriva više dana: `_from` je prvi dan perioda, `_days` broj dana."""
     last = {}
     for snap in history:
         last[snap["time"][:10]] = snap
@@ -102,7 +103,9 @@ def per_day(history: list[dict]) -> list[tuple[str, dict]]:
     for previous, day in zip(days, days[1:]):
         a, b = last[previous]["checks"], last[day]["checks"]
         # Novo izdanje ima nov android.json s brojem od nule: negativna razlika znači „nepoznato", ne minus.
-        rows.append((day, {k: (b[k] - a[k]) if b[k] >= a[k] else None for k in b}))
+        span = (dt.date.fromisoformat(day) - dt.date.fromisoformat(previous)).days
+        first = (dt.date.fromisoformat(previous) + dt.timedelta(days=1)).isoformat()
+        rows.append((day, {**{k: (b[k] - a[k]) if b[k] >= a[k] else None for k in b}, "_from": first, "_days": span}))
     return rows
 
 
@@ -120,9 +123,15 @@ def render(snap: dict, days: list[tuple[str, dict]], net: dict | None = None, de
     devices = devices or dict.fromkeys(d, 0)
     own = own or vlastita.empty()
     own_days = own_days or {}
-    # Stvarna javljanja: bez mojih uređaja i bez naših provjera tog dana (objava izdanja skida opise verzija).
-    days = [(day, {k: (None if v is None else max(0, v - devices.get(k, 0) - own_days.get(day, {}).get(k, 0)))
-                   for k, v in vals.items() if k in ("windows", "mac", "android")})
+    # Stvarna javljanja: bez mojih uređaja (svaki se javi jednom DNEVNO, pa puta broj dana u periodu) i bez naših
+    # provjera u tim danima (objava izdanja skida opise verzija).
+    def own_in(first: str, last: str, kind: str) -> int:
+        return sum(v.get(kind, 0) for day, v in own_days.items() if first <= day <= last)
+
+    days = [(day if vals.get("_days", 1) <= 1 else f"{vals['_from']} – {day} ({vals['_days']} dana)",
+             {k: (None if v is None else max(0, v - devices.get(k, 0) * vals.get("_days", 1)
+                                              - own_in(vals.get("_from", day), day, k)))
+              for k, v in vals.items() if k in ("windows", "mac", "android")})
             for day, vals in days if day >= START]
     counted = snap.get("counters") or dict.fromkeys(COUNTERS, 0)
     esc = html.escape
