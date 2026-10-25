@@ -87,17 +87,21 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
     var subtitles by remember { mutableStateOf(false) }
-    var mute by remember { mutableStateOf(false) } // video bez zvuka
+    val context = LocalContext.current
+    // Uključeno ako je u Postavkama „Sljedeći video bez zvuka"; ovdje se može i isključiti za ovaj video.
+    var mute by remember { mutableStateOf(Settings.muteNext(context)) }
     var clip by remember { mutableStateOf(false) }
     var clipFrom by remember { mutableStateOf("") }
     var clipTo by remember { mutableStateOf("") }
     val clipRange = parseClip(clipFrom, clipTo, info.duration)
     // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
-    val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
+    val blockedByParental = info.adult && Parental.enabled(context)
     val mutedLabel = stringResource(R.string.mute_short)
     fun start(asAudio: Boolean, asMp3: Boolean) {
         val label = if (asAudio) (if (asMp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
         val silent = mute && !asAudio
+        // Video odavde troši jednokratnu postavku (kvačica je ono što važi), zvuk je ne dira.
+        if (!asAudio) Settings.setMuteNext(context, false)
         val range = if (clip) clipRange else null
         val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, asAudio,
             if (asAudio) 0 else chosen.height, if (silent) "$label · $mutedLabel" else label, adult = info.adult,

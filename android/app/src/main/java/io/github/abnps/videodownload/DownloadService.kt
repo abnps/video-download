@@ -296,7 +296,11 @@ class DownloadService : Service() {
         private const val ACTION_CANCEL = "cancel"
 
         fun start(context: Context, job: Job) {
-            context.startForegroundService(Intent(context, DownloadService::class.java).putExtra(EXTRA_JOB, job.toBundle()))
+            // „Sljedeći video bez zvuka" iz Postavki: prvi sljedeći video (i iz „Podijeli", liste…), samo jednom.
+            val next = if (!job.isAudio && !job.mute && Settings.takeMuteNext(context)) {
+                job.copy(mute = true, label = "${job.label} · ${context.getString(R.string.mute_short)}")
+            } else job
+            context.startForegroundService(Intent(context, DownloadService::class.java).putExtra(EXTRA_JOB, next.toBundle()))
         }
 
         fun cancel(context: Context, id: Long) {
