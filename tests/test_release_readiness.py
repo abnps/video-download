@@ -158,6 +158,21 @@ class OwnDownloadsTest(unittest.TestCase):
                                                         "2026-10-06": {"windows": 1, "mac": 0, "android": 0}})
             self.assertEqual(vlastita.load(path)["checks"]["android"], 2)
 
+    def test_my_devices_are_subtracted_for_every_day_of_a_longer_period(self):
+        # Alat pokrenut 5.10. pa tek 23.10.: tvoji uređaji su se javili 18 puta, ne jednom.
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import statistika
+        snap = lambda time, w, a: {"time": time, "checks": {"windows": w, "mac": 0, "android": a}}  # noqa: E731
+        days = statistika.per_day([snap("2026-10-05T08:00", 10, 10), snap("2026-10-23T08:00", 38, 71)])
+        self.assertEqual(days[0][1]["_days"], 18)
+        page = statistika.render({"checks": {"windows": 0, "mac": 0, "android": 0}, "releases": [], "time": "2026-10-23T08:00",
+                                  "downloads": {"windows": 0, "mac": 0, "android": 0}}, days,
+                                 devices={"windows": 1, "mac": 0, "android": 1},
+                                 own_days={"2026-10-20": {"windows": 2, "mac": 0, "android": 4}})
+        self.assertIn("2026-10-06 – 2026-10-23 (18 dana)", page)
+        self.assertIn("<td>8</td>", page)   # Windows: 28 − 18 uređaj − 2 naše
+        self.assertIn("<td>39</td>", page)  # Android: 61 − 18 − 4
+
     def test_tests_never_write_the_real_file(self):
         import vlastita
 
