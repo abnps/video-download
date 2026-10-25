@@ -36,6 +36,13 @@ data class VideoInfo(
 data class PlaylistEntry(val url: String, val title: String, val thumbnail: String, val duration: Int, val adult: Boolean)
 
 data class PlaylistInfo(val url: String, val title: String, val site: String, val entries: List<PlaylistEntry>) {
+    /** Poslije ponovnog čitanja ista plejlista može imati drugačiji redoslijed: stari indeksi tada ne važe. */
+    fun selectionKey(): String {
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        entries.forEach { digest.update(it.url.toByteArray(Charsets.UTF_8)); digest.update(0.toByte()) }
+        return digest.digest().joinToString("") { "%02x".format(it) }
+    }
+
     companion object {
         /** null kad JSON nije plejlista (onda je VideoInfo). */
         fun parseOrNull(json: String): PlaylistInfo? {

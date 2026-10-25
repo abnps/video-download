@@ -72,7 +72,7 @@
       <a class="heart" href="#support">♥ Support</a>
     </nav>
     <span class="lang"><a href="index.html" aria-current="true">EN</a> · <a href="bs/index.html">BS</a> · <a href="de/index.html">DE</a> · <a href="es/index.html">ES</a> · <a href="fr/index.html">FR</a></span>
-    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Download</a>
+    <a class="btn btn-mini" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-download-short>Download</a>
     <button class="menu-btn" type="button" aria-controls="mobile-nav" aria-expanded="false" aria-label="Menu" title="Menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="mobile-nav" id="mobile-nav" aria-label="Menu" hidden>
@@ -93,17 +93,25 @@
       <div data-reveal>
         <div class="eyebrow"><span class="badge">New</span> <b>Android and macOS</b> in beta</div>
         <h1>Video and audio.<br><span class="grad">In one click.</span></h1>
-        <p class="lead">A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.</p>
+        <p class="lead">A free app for Windows, Mac and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.</p>
+        <div class="platform-choice" role="group" aria-label="Choose your platform" hidden>
+          <button type="button" data-platform="win" aria-pressed="true">Windows</button>
+          <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
+          <button type="button" data-platform="android" aria-pressed="false">Android</button>
+        </div>
         <div class="cta">
-          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Download for Windows
           </a>
-          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">Beta</span></a>
-          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">Beta</span></a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download for macOS</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download for Android</a>
         </div>
         <ul class="promise"><li>No account</li><li>No daily limit</li><li>Your links never reach us</li></ul>
-        <div class="meta"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 and 11 (64-bit) · <a href="#install">installation help</a></div>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 and 11 (64-bit)</span>
+          <span data-platform-requirements="mac" hidden>Version 1.0.3 · macOS 13+ · Apple M1 or newer · Beta</span>
+          <span data-platform-requirements="android" hidden>Version 1.0.3 · Android 10+ · ARM64 · Beta</span>
+          · <a href="#install" data-install-help>installation help</a></div>
         <p class="note">The app is meant for your own videos, content you have the author's permission for, and content under a free license. By downloading you accept the <a href="terms.html">Terms of use</a>. DRM-protected content is not downloaded.</p>
       </div>
 
@@ -278,15 +286,15 @@
       </div>
       <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
         <p><span class="badge">Beta</span> <b>New: Video Download for Android.</b> For phones with Android 10 or later. Share a video from any app and pick the quality. It works, but only a few people have tried it so far: please <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report anything that doesn't work</a>.</p>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Download for Android (beta)</a></p>
         <p>The app isn't in Google Play, so the first install takes a few extra taps:</p>
         <ol>
           <li>Open the downloaded file (Downloads or the browser's download list).</li>
           <li>If Android asks, allow installing apps from your browser: <b>Settings → Allow from this source</b>.</li>
-          <li>On Samsung phones, turn off <b>Auto Blocker</b> only for the install (Settings → Security and privacy) and turn it back on afterwards.</li>
+          <li>If <b>Auto Blocker</b> blocks the install on a Samsung phone, turn it off only for the install (Settings → Security and privacy) and turn it back on afterwards.</li>
           <li>If Google Play Protect warns about an unknown app, tap <b>More details → Install anyway</b>.</li>
           <li>Later versions install from the app itself: <b>Settings → Check for updates</b>.</li>
         </ol>
-        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk">Download for Android (beta)</a></p>
         <p>Use <b>Obtainium</b>? It installs the app straight from GitHub and keeps it up to date. <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/abnps/video-download">Add to Obtainium →</a></p>
         <p><a href="android-guide.html">Developer options guide →</a></p>
       </div>

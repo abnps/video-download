@@ -100,6 +100,19 @@ class RulesTest(unittest.TestCase):
                 self.assertEqual(state.pending, [])
                 state.record(Download(url="https://a.ba/1", when=NOON))  # i dalje radi
 
+    def test_broken_pending_entries_do_not_crash_or_repeat_congratulations(self):
+        state = AchievementState.from_json(
+            '{"earned": {"audio": 1.0}, "pending": [null, {}, [], 5, "audio", "audio", "clip"], '
+            '"sites": ["a.ba", "a.ba", null]}')
+        self.assertEqual(state.take_pending(), ["audio"])
+        self.assertEqual(state.sites, ["a.ba"])
+        self.assertEqual(AchievementState.from_json(5).earned, {})
+
+    def test_invalid_earned_dates_are_ignored_before_opening_the_list(self):
+        state = AchievementState.from_json(
+            '{"earned": {"audio": NaN, "clip": 1e100, "night": true, "unknown": 1.0}}')
+        self.assertEqual(state.earned, {})
+
     def test_country_second_level_domains_are_separate_sites(self):
         self.assertEqual(achievements.site_of("https://news.bbc.co.uk/v"), "bbc.co.uk")
         self.assertEqual(achievements.site_of("https://www.itv.co.uk/v"), "itv.co.uk")

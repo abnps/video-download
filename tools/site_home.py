@@ -51,7 +51,9 @@ HOME = {
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
         "download_short": "Download", "new": "New", "eyebrow": "<b>Android and macOS</b> in beta",
         "h1": ("Video and audio.", "In one click."),
-        "lead": "A free app for Windows and Mac: MP4 in full quality or MP3, straight from your browser or from a copied link.",
+        "lead": "A free app for Windows, Mac and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.",
+        "platform_label": "Choose your platform", "mac_btn": "Download for macOS", "android_btn": "Download for Android",
+        "mac_req": "macOS 13+ · Apple M1 or newer · Beta", "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Card / Apple Pay", "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
         "note": "The app is meant for your own videos, content you have the author's permission for, and content under a free "
                 "license. By downloading you accept the <a href=\"terms.html\">Terms of use</a>. DRM-protected content is not downloaded.",
@@ -121,7 +123,9 @@ HOME = {
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
         "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android i macOS</b> u probnoj fazi",
         "h1": ("Video i zvuk.", "Jednim klikom."),
-        "lead": "Besplatan program za Windows i Mac: MP4 u punom kvalitetu ili MP3, direktno iz browsera ili iz kopiranog linka.",
+        "lead": "Besplatan program za Windows, Mac i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.",
+        "platform_label": "Izaberi platformu", "mac_btn": "Preuzmi za macOS", "android_btn": "Preuzmi za Android",
+        "mac_req": "macOS 13+ · Apple M1 ili noviji · Beta", "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Kartica / Apple Pay", "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
         "note": "Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. "
                 "Preuzimanjem prihvataš <a href=\"terms.html\">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.",
@@ -192,7 +196,9 @@ HOME = {
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
         "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android und macOS</b> in der Beta",
         "h1": ("Video und Audio.", "Mit einem Klick."),
-        "lead": "Eine kostenlose App für Windows und Mac: MP4 in voller Qualität oder MP3, direkt aus dem Browser oder aus einem kopierten Link.",
+        "lead": "Eine kostenlose App für Windows, Mac und Android. Speichere Videos als MP4 oder Audio als MP3 über einen Link. Am Computer kannst du Videos auch direkt aus der Browser-Erweiterung senden.",
+        "platform_label": "Plattform wählen", "mac_btn": "Für macOS herunterladen", "android_btn": "Für Android herunterladen",
+        "mac_req": "macOS 13+ · Apple M1 oder neuer · Beta", "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Karte / Apple Pay", "win_btn": "Für Windows herunterladen", "win_req": "Windows 10 und 11 (64 Bit)", "install_help": "Hilfe zur Installation",
         "note": "Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte "
                 "unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href=\"terms.html\">Nutzungsbedingungen</a>. "
@@ -269,7 +275,9 @@ HOME = {
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
         "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android y macOS</b> en beta",
         "h1": ("Vídeo y audio.", "Con un clic."),
-        "lead": "Una aplicación gratuita para Windows y Mac: MP4 en calidad completa o MP3, directamente desde el navegador o desde un enlace copiado.",
+        "lead": "Una aplicación gratuita para Windows, Mac y Android. Guarda vídeo como MP4 o audio como MP3 desde un enlace. En el ordenador también puedes enviar vídeos directamente desde la extensión del navegador.",
+        "platform_label": "Elige tu plataforma", "mac_btn": "Descargar para macOS", "android_btn": "Descargar para Android",
+        "mac_req": "macOS 13+ · Apple M1 o posterior · Beta", "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Tarjeta / Apple Pay", "win_btn": "Descargar para Windows", "win_req": "Windows 10 y 11 (64 bits)", "install_help": "ayuda para instalar",
         "note": "La aplicación está pensada para tus propios vídeos, contenido para el que tienes permiso del autor y contenido con "
                 "licencia libre. Al descargar aceptas las <a href=\"terms.html\">Condiciones de uso</a>. El contenido protegido con "
@@ -345,7 +353,9 @@ HOME = {
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
         "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android et macOS</b> en bêta",
         "h1": ("La vidéo et le son.", "En un clic."),
-        "lead": "Une application gratuite pour Windows et Mac : MP4 en pleine qualité ou MP3, directement depuis le navigateur ou depuis un lien copié.",
+        "lead": "Une application gratuite pour Windows, Mac et Android. Enregistrez une vidéo en MP4 ou de l’audio en MP3 depuis un lien. Sur ordinateur, vous pouvez aussi envoyer des vidéos directement depuis l’extension du navigateur.",
+        "platform_label": "Choisir votre plateforme", "mac_btn": "Télécharger pour macOS", "android_btn": "Télécharger pour Android",
+        "mac_req": "macOS 13+ · Apple M1 ou plus récent · Bêta", "android_req": "Android 10+ · ARM64 · Bêta",
         "support_card": "Carte / Apple Pay", "win_btn": "Télécharger pour Windows", "win_req": "Windows 10 et 11 (64 bits)", "install_help": "aide à l'installation",
         "note": "L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur "
                 "et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href=\"terms.html\">Conditions "
@@ -587,7 +597,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
             </div>"""
 
 
-def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str,
+def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str, version_short: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
            android_url: str = "", android_text: tuple = ("", "", "", ()), android_guide_label: str = "",
            obtainium: tuple = (), page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
@@ -624,7 +634,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
                            for i, (title, text) in enumerate(steps, 1))
     in_kicker, in_h2, in_sub, in_label, in_win = h["install"]
     d_title, d_body, d_more, d_dont, d_app, d_run = h["dialog"]
-    store_hero = "\n          " + store_button() if STORE_LIVE else ""
+    store_hero = '\n          <span data-platform-download="win">' + store_button() + '</span>' if STORE_LIVE else ""
     store_panel = (f'        <p style="margin-top:22px">{esc(STORE_TEXT[lang])}</p>\n'
                    f'        <p>{store_button()}</p>\n') if STORE_LIVE else ""
     (ach_kicker, ach_heading, ach_lead, ach_list_title, ach_list_body,
@@ -666,7 +676,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {nav}
     </nav>
     {switcher}
-    <a class="btn btn-mini" href="{installer_url}">{h["download_short"]}</a>
+    <a class="btn btn-mini" href="{installer_url}" data-download-short>{h["download_short"]}</a>
     {menu_button(lang)}
   </div>
   <nav class="mobile-nav" id="mobile-nav" aria-label="{esc(h["a11y"][3])}" hidden>
@@ -683,16 +693,24 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         <div class="eyebrow"><span class="badge">{h["new"]}</span> {h["eyebrow"]}</div>
         <h1>{h["h1"][0]}<br><span class="grad">{h["h1"][1]}</span></h1>
         <p class="lead">{h["lead"]}</p>
+        <div class="platform-choice" role="group" aria-label="{esc(h["platform_label"])}" hidden>
+          <button type="button" data-platform="win" aria-pressed="true">Windows</button>
+          <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
+          <button type="button" data-platform="android" aria-pressed="false">Android</button>
+        </div>
         <div class="cta">
-          <a class="btn" href="{installer_url}">
+          <a class="btn" href="{installer_url}" data-platform-download="win">
             {download_icon}
             {h["win_btn"]}
           </a>{store_hero}
-          <a class="btn ghost" href="#panel-mac" data-mac>macOS <span class="badge">{badge}</span></a>
-          <a class="btn ghost" href="#panel-android" data-android>Android <span class="badge">{badge}</span></a>
+          <a class="btn" href="{mac_url}" data-platform-download="mac" data-mac>{download_icon}{h["mac_btn"]}</a>
+          <a class="btn" href="{android_url}" data-platform-download="android" data-android>{download_icon}{h["android_btn"]}</a>
         </div>
         <ul class="promise">{promise}</ul>
-        <div class="meta">{version_line} · {h["win_req"]} · <a href="#install">{h["install_help"]}</a></div>
+        <div class="meta"><span data-platform-requirements="win">{version_line} · {h["win_req"]}</span>
+          <span data-platform-requirements="mac" hidden>{esc(version_short)} · {h["mac_req"]}</span>
+          <span data-platform-requirements="android" hidden>{esc(version_short)} · {h["android_req"]}</span>
+          · <a href="#install" data-install-help>{h["install_help"]}</a></div>
         <p class="note">{h["note"]}</p>
       </div>
 
@@ -836,11 +854,11 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
       </div>
       <div class="panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
         <p><span class="badge">{badge}</span> {android_lead.format(issue=issue_url)}</p>
+        <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
         <p>{android_note}</p>
         <ol>
 {android_items}
         </ol>
-        <p style="margin-top:22px"><a class="btn" href="{android_url}">{android_button}</a></p>
 {obtainium_html}        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
       </div>
     </div>

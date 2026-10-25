@@ -81,7 +81,9 @@ def build_report(errors=(), settings: dict | None = None, now: float | None = No
     ]
     for tool in ("ffmpeg", "ffprobe", "node"):
         found = runtime.find_tool(tool)
-        lines.append(f"  {tool}: {'u paketu' if found and str(runtime.tools_dir()) in found else found or 'nema ga'}")
+        # Puna putanja alata može otkriti korisničko ime ili privatne nazive foldera.
+        status = "u paketu" if found and str(runtime.tools_dir()) in found else "na sistemu" if found else "nema ga"
+        lines.append(f"  {tool}: {status}")
     lines += ["", "Podešavanja:"]
     for key, value in (settings or {}).items():
         lines.append(f"  {key}: {redact(str(value))}")

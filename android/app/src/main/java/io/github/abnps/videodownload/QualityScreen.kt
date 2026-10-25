@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,19 +78,20 @@ import java.util.Calendar
 @Composable
 fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (Job) -> Unit,
                   location: SaveLocation, onLocation: (SaveLocation) -> Unit) {
-    var audio by remember { mutableStateOf(false) }
-    var mp3 by remember { mutableStateOf(true) } // zvuk: MP3 (kao na računaru) ili originalni M4A
+    var audio by rememberSaveable(info.url) { mutableStateOf(false) }
+    var mp3 by rememberSaveable(info.url) { mutableStateOf(true) } // zvuk: MP3 (kao na računaru) ili originalni M4A
     val best = QualityOption(0, 0, info.video.firstOrNull()?.size ?: 0.0)
     val options = info.video.ifEmpty { listOf(best) }
-    var chosen by remember {
-        mutableStateOf(options.firstOrNull { defaultHeight == 0 || it.label <= defaultHeight } ?: options.first())
+    var chosenHeight by rememberSaveable(info.url) {
+        mutableStateOf((options.firstOrNull { defaultHeight == 0 || it.label <= defaultHeight } ?: options.first()).height)
     }
+    val chosen = options.firstOrNull { it.height == chosenHeight } ?: options.first()
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
-    var subtitles by remember { mutableStateOf(false) }
-    var clip by remember { mutableStateOf(false) }
-    var clipFrom by remember { mutableStateOf("") }
-    var clipTo by remember { mutableStateOf("") }
+    var subtitles by rememberSaveable(info.url) { mutableStateOf(false) }
+    var clip by rememberSaveable(info.url) { mutableStateOf(false) }
+    var clipFrom by rememberSaveable(info.url) { mutableStateOf("") }
+    var clipTo by rememberSaveable(info.url) { mutableStateOf("") }
     val clipRange = parseClip(clipFrom, clipTo, info.duration)
     // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
     val blockedByParental = info.adult && Parental.enabled(LocalContext.current)
@@ -144,7 +146,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
             } else {
                 options.forEach { option ->
                     val title = if (option.label > 0) "${option.label}p" else stringResource(R.string.best_quality)
-                    OptionRow(option == chosen, title, sizePills("MP4", option.size)) { chosen = option }
+                    OptionRow(option == chosen, title, sizePills("MP4", option.size)) { chosenHeight = option.height }
                 }
                 CheckRow(subtitles, stringResource(R.string.subtitles_option), stringResource(R.string.subtitles_note)) {
                     subtitles = it

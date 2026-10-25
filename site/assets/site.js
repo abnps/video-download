@@ -238,8 +238,10 @@
       try {
         await navigator.clipboard.writeText(url);
       } catch (e) {
+        input.focus();
         input.select();
-        document.execCommand("copy");  // stariji preglednici bez clipboard dozvole
+        // Ako ni rezervni način ne uspije, adresa ostaje izabrana za ručno kopiranje.
+        try { if (!document.execCommand("copy")) return; } catch { return; }
       }
       copy.textContent = `${box.dataset.copied} ✓`;
       copy.classList.add("done");
@@ -250,6 +252,21 @@
 
   // Bez skripte su sve platforme vidljive; kartice i skrivanje uključujemo tek kad su spremne.
   const tabs = $$(".tabs a");
+  const platforms = $$("[data-platform]");
+  const downloads = $$("a[data-platform-download]");
+  const choosePlatform = (name) => {
+    if (!platforms.some((p) => p.dataset.platform === name)) return;
+    platforms.forEach((p) => p.setAttribute("aria-pressed", p.dataset.platform === name));
+    $$("[data-platform-download]").forEach((a) => { a.hidden = a.dataset.platformDownload !== name; });
+    $$("[data-platform-requirements]").forEach((s) => { s.hidden = s.dataset.platformRequirements !== name; });
+    const chosen = downloads.find((a) => a.dataset.platformDownload === name);
+    const short = $("[data-download-short]"), help = $("[data-install-help]");
+    if (short && chosen) {
+      short.href = chosen.href;
+      short.setAttribute("aria-label", chosen.textContent.trim());
+    }
+    if (help) help.href = `#panel-${name}`;
+  };
   const select = (tab) => {
     tabs.forEach((t) => {
       const on = t === tab;
@@ -257,7 +274,12 @@
       t.tabIndex = on ? 0 : -1;
       document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
     });
+    choosePlatform(tab.getAttribute("aria-controls").replace("panel-", ""));
   };
+  platforms.forEach((p) => p.addEventListener("click", () => {
+    const tab = tabs.find((t) => t.getAttribute("aria-controls") === `panel-${p.dataset.platform}`);
+    if (tab) select(tab);
+  }));
   tabs.forEach((tab, i) => {
     tab.setAttribute("role", "tab");
     tab.addEventListener("click", () => select(tab));
@@ -281,5 +303,7 @@
     if (tab) select(tab);
   };
   selectHash();
+  const choice = $(".platform-choice");
+  if (choice && tabs.length && downloads.length) choice.hidden = false;
   addEventListener("hashchange", selectHash);
 })();

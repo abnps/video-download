@@ -82,13 +82,19 @@ function showReply(reply) {
 async function send(tabId, mediaUrl, type = "send", preset = null) {
   // Dozvola za kolačiće (video iza prijave) traži se kroz dijalog browsera, samo prvi put;
   // mora biti prvi poziv u kliku. Odbijanje ne smeta: preuzimanje ide bez prijave.
-  await chrome.permissions.request({ permissions: ["cookies"] }).catch(() => false);
-  setBusy(true);
-  lastResult = null;
-  setResult(t("popup.sending"));
-  const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl, preset });
-  setBusy(false);
-  showReply(reply);
+  try {
+    await chrome.permissions.request({ permissions: ["cookies"] }).catch(() => false);
+    setBusy(true);
+    lastResult = null;
+    setResult(t("popup.sending"));
+    const reply = await chrome.runtime.sendMessage({ type, tabId, mediaUrl, preset });
+    showReply(reply);
+  } catch {
+    // Ponovno učitavanje dodatka ili gašenje pozadine ne smije zaključati dugmad.
+    showReply({ ok: false });
+  } finally {
+    setBusy(false);
+  }
 }
 
 async function main() {
@@ -107,10 +113,11 @@ async function main() {
   // Isti video, ali aplikacija ga snima kao MP3 bez obzira na izabrani format.
   playingMp3Button.addEventListener("click", () => send(tab.id, null, "send-playing", "mp3"));
 
-  const state = await chrome.runtime.sendMessage({ type: "get-state", tabId: tab.id });
-  renderMedia(tab, state);
+  const state = await chrome.runtime.sendMessage({ type: "get-state", tabId: tab.id }).catch(() => null);
+  renderMedia(tab, state || { media: [], drm: false });
+  if (!state) showReply({ ok: false });
 
-  const status = await chrome.runtime.sendMessage({ type: "app-status" });
+  const status = await chrome.runtime.sendMessage({ type: "app-status" }).catch(() => null);
   const statusLine = document.getElementById("app-status");
   if (status?.language) {
     language = pickLanguage(status.language);
@@ -124,4 +131,8 @@ async function main() {
   }
 }
 
-main();
+main().catch(() => {
+  setBusy(false);
+  document.getElementById("app-status").textContent = t("status.offline");
+  showReply({ ok: false });
+});

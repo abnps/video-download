@@ -217,7 +217,7 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 ## Rad
 
 - Testovi: `python -m unittest discover -s tests` (GUI testovi rade offscreen) i
-  `node --test "tests/extension/*.test.mjs"`.
+  `node --test "tests/extension/*.test.mjs" "tests/site/*.test.mjs"`.
 - Provjera sajtova (plan 1.0, 3.10.2026): `.github/workflows/sites.yml` svako jutro pokreće `tools/site_check.py`
   s najnovijim yt-dlp-om (YouTube, TikTok, Instagram, X, Dailymotion). Blokada GitHub servera = upozorenje; pad =
   sajt se promijenio. Mrtav testni video zamijeni drugim javnim (lista SITES).
@@ -327,6 +327,32 @@ Video Download ostaje van Playa (sajt, GitHub, Obtainium); 12 testera × 14 dana
 Dopuna (Ahmed 5.10.2026): bez reklama; savjetnik trenutno nije moguć → Toolkit samo besplatan, bez prodaje
 (ne-trgovac). U Play aplikaciji NEMA PayPal/Ko-fi/Stripe dugmadi (Play traži Googleovo plaćanje i za napojnice);
 dozvoljen samo link na naš sajt. Poreska pitanja: samo pisano (detalji van repoa).
+
+## Provjera kvaliteta poslije 1.0.3 (21.10.2026)
+
+- Grana `quality-review-20261021`, radni folder `C:\Video Downloader\Projekat-provjera`; verzije nisu povećane.
+  Androidov sistemski dnevnik koristi samo očišćenu kategoriju greške; desktop izvještaj ne otkriva putanje alata.
+  Oštećen zapis dostignuća ne ruši učitavanje niti ponavlja čestitke. Popup dodatka otključava dugmad i prikazuje
+  grešku kada se veza s pozadinom prekine. Sajt više ne potvrđuje neuspjelo kopiranje, razlikuje ručnu Edge/Chrome
+  instalaciju od Firefox stranice i nudi APK prije uputa. Detalji i prijedlozi: `00_plan/pregled_kvaliteta_2026-10-21.md`.
+- Python discover: 445 testova, 2 preskočena; poslije posljednje izmjene dijagnostike i fokusirana provjera 67/67.
+  Node dodatak i sajt: 28/28. Android lint/testDebugUnitTest/assembleDebug uspješni (4 Kotlin testa, bez lint grešaka).
+  E2E u privremenom Edge profilu prošao; za tu probu korišten je omotač iz `Build/quality-review-tests` koji čuva
+  i vraća postojeće native-host fajlove i svih šest HKCU vrijednosti. Pokretanje samog starog E2E runnera i dalje
+  registruje razvojni host: prije takve probe zaštititi postojeću Store registraciju. Nema nove probe na telefonu.
+- Nastavak istog pregleda: Android `MainState` (ViewModel) čuva ekran i rezultat tokom rotacije/promjene jezika;
+  čitanje nije vezano za uništenu aktivnost. Mali Bundle obnavlja link/navigaciju poslije gašenja procesa i po
+  potrebi ponovo čita link, bez automatskog preuzimanja. Isti Share intent se ne obrađuje opet pri obnovi;
+  nova dijeljenja poništavaju stare rezultate. Izbor kvaliteta, zvuka/isječka i stavki plejliste je saveable;
+  potvrda 18+ nije. Prevelik unos (>8192 znakova) ne ide u Bundle i ne skraćuje se u drugi URL.
+- Početna sajta ima automatski i ručni izbor Windows/macOS/Android: glavno/malo dugme, zahtjevi i kartica uputa
+  ostaju usklađeni. Bez JS-a vidljiva su sva tri stvarna linka. Samo Windows prikazuje veličinu EXE instalera;
+  postojeća animacija ostaje desktop demo. Privatnost na svih 5 jezika opisuje lokalno čuvanje Android stanja.
+  Završni Python discover: 447 testova (2 preskočena); Node 31/31; naknadno sajt/pravni dokumenti 35/35.
+  Stvarni lokalni Edge prikaz provjeren na 320/390/1280/1440 px, bez JS-a i uz smanjeno kretanje.
+  Konačni Android lint/test/debug build: 10 Kotlin testova, 0 lint grešaka, 35 ranijih upozorenja.
+  Sačuvani izbor plejliste provjerava otisak redoslijeda URL-ova; promjena liste poništava stare indekse.
+  Izmjene ostaju lokalne u istoj grani do Ahmedove potvrde spajanja/objave.
 
 ## Sakuplja se za sljedeće izdanje (Ahmed 15.10.2026: izdanje tek kad se skupi puno izmjena)
 

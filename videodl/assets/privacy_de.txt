@@ -19,6 +19,8 @@ Diese Dienste sehen deine IP-Adresse und die Programmversion; es gelten ihre Dat
 3. Was auf deinem Gerät gespeichert wird
 Unter Windows: Einstellungen (Registry: HKCU\Software\VideoDownload), Download-Liste und Verlauf (Links, Titel, Pfade, Größen, Zeiten), geladenes yt-dlp in %LOCALAPPDATA%\VideoDownload und ein lokaler Schlüssel für die Browserverbindung. Auf dem Mac: App-Daten in ~/Library/Application Support/VideoDownload und Systemeinstellungen der App. Unter Android: Einstellungen, Liste (mit Links), Verlauf, Diagnose und geladenes yt-dlp im privaten App-Speicher; fertige Dateien liegen in Downloads/Video Download oder nach deiner Wahl in Galerie/Musik. Diese Daten werden nicht an den Autor gesendet.
 
+Unter Android speichert das System auch den eingegebenen Link, den geöffneten Bildschirm und die Formatauswahl lokal, um sie nach einer Drehung oder dem Neuerstellen der Aktivität wiederherzustellen. Dieser Zustand enthält keine Cookies und keine Bestätigung für Inhalte ab 18 Jahren.
+
 4. Anmelde-Cookies
 Nur wenn du es im Browser erlaubst. An das Programm gehen nur Cookies der Seite, von der du herunterlädst; sie werden nur im Speicher gehalten, und die temporäre Datei für yt-dlp wird sofort gelöscht. Sie werden nie in Liste, Verlauf oder Berichte geschrieben. Unter Android: Wenn du dich selbst in der App bei Instagram, TikTok oder X anmeldest (Einstellungen → Instagram-, TikTok- oder X-Konto), gibst du dein Passwort nur auf der Seite dieses Dienstes ein; die Anmelde-Cookies bleiben im privaten Speicher der App, werden yt-dlp für jedes Lesen und Herunterladen über eine temporäre Datei übergeben, die sofort gelöscht wird, und nur an den Dienst gesendet, bei dem du angemeldet bist. Abmelden löscht sie.
 

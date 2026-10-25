@@ -48,6 +48,13 @@ class RedactTest(unittest.TestCase):
 
 
 class ReportTest(unittest.TestCase):
+    def test_report_does_not_expose_private_tool_installation_paths(self):
+        with mock.patch.object(diagnostics.runtime, "find_tool", return_value=r"C:\Users\PRIVATE_NAME\Tools\tool.exe"):
+            report = diagnostics.build_report()
+        self.assertNotIn("PRIVATE_NAME", report)
+        self.assertNotIn(r"C:\Users", report)
+        self.assertIn("ffmpeg: na sistemu", report)
+
     def test_report_has_versions_tools_and_errors(self):
         errors = ["HTTP Error 403 na https://x.com/a/status/1", "Unsupported URL: https://neki.sajt/abc"]
         report = diagnostics.build_report(errors, {"jezik": "bs", "istovremeno": 2}, now=0)

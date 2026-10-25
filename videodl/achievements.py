@@ -77,7 +77,7 @@ class AchievementState:
     def from_json(cls, text: str | None) -> "AchievementState":
         try:
             data = json.loads(text or "{}")
-        except ValueError:
+        except (TypeError, ValueError):
             data = {}
         if not isinstance(data, dict):
             data = {}
@@ -89,9 +89,19 @@ class AchievementState:
                 setattr(state, key, value)
             elif key in cls.__dataclass_fields__ and isinstance(default, float) and isinstance(value, int):
                 setattr(state, key, float(value))
-        state.earned = {k: v for k, v in state.earned.items() if isinstance(v, (int, float))}
-        state.pending = [k for k in state.pending if k in ICONS]
-        state.sites = [s for s in state.sites if isinstance(s, str)]
+        earned = {}
+        for key, when in state.earned.items():
+            if key not in ICONS or type(when) not in (int, float):
+                continue
+            try:
+                datetime.fromtimestamp(when)
+            except (OSError, OverflowError, ValueError):
+                continue
+            earned[key] = when
+        state.earned = earned
+        # Oštećen zapis ne smije srušiti pokretanje, ponoviti čestitku ili dodijeliti neosvojenu značku.
+        state.pending = list(dict.fromkeys(k for k in state.pending if isinstance(k, str) and k in state.earned))
+        state.sites = list(dict.fromkeys(s for s in state.sites if isinstance(s, str)))
         try:
             date.fromisoformat(state.first_day or "2000-01-01")
             date.fromisoformat(state.last_day or "2000-01-01")
