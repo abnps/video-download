@@ -142,6 +142,9 @@ class MainActivity : ComponentActivity() {
 
     /** „Podijeli" iz druge aplikacije: link odmah ide na „Izaberi kvalitet"; obavještenje otvara Preuzimanja. */
     private fun handle(intent: Intent?) {
+        // Otvaranje iz „Nedavnih" poslije zatvaranja: Android ponovo pošalje stari „Podijeli"/widget poziv,
+        // pa bi brzo preuzimanje skinulo isti video drugi put.
+        if (intent != null && intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) return
         if (intent?.getBooleanExtra(EXTRA_PASTE, false) == true) {
             // Widget ili pločica: međuspremnik se smije čitati tek kad prozor dobije fokus (onWindowFocusChanged).
             intent.getStringExtra(EXTRA_SOURCE)?.takeIf { it == "widget" || it == "tile" }?.let { Achievements.recordSource(it) }
