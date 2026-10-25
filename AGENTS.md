@@ -408,6 +408,8 @@ Za 1.0.3:
   Dok certifikacija ne završi i ne klikne se Publish now, Store ostaje privatan za
   grupu Proba; `STORE_LIVE` na sajtu ostaje False. Edge dodatak 1.0.3 je pripremljen
   u Partner Centeru, ali slanje čeka završetak otkazivanja prethodne 1.0.2 prijave.
+PRAVILO (Ahmed 25.10.2026): Microsoft Store se ažurira RJEĐE od GitHuba (certifikacija dugo traje): nova Store prijava
+tek kad se skupi više ispravki; male izmjene idu samo na GitHub/sajt. Android izmjene (npr. „Bez zvuka") Store ionako ne dira.
 PRAVILO (Ahmed 18.10.2026): na ovaj spisak i u bilješke izdanja (`changelog.py`) idu samo VEĆE promjene
 (nova funkcija, primjetno poboljšanje, važna ispravka). Sitnice (izgled, poravnanje, mali popravci) samo commit na main.
 
