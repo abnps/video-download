@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dodatak za browser — Video Download</title>
-<meta name="description" content="Kako instalirati dodatak Video Download za Edge i Chrome.">
+<meta name="description" content="Kako instalirati dodatak Video Download u Firefox, Edge i Chrome.">
 <link rel="canonical" href="https://abnps.github.io/video-download/bs/extension.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Video Download">
 <meta property="og:title" content="Dodatak za browser — Video Download">
-<meta property="og:description" content="Kako instalirati dodatak Video Download za Edge i Chrome.">
+<meta property="og:description" content="Kako instalirati dodatak Video Download u Firefox, Edge i Chrome.">
 <meta property="og:url" content="https://abnps.github.io/video-download/bs/extension.html">
 <meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-bs.png">
 <meta property="og:image:width" content="860">
@@ -70,13 +70,25 @@
 <li>Prikvači ikonu Video Download (ikona slagalice → pribadača).</li>
 </ol>
 </div>
-<h2>Edge / Chrome</h2>
+<div class="box">
+<h2 style="margin-top:0">Microsoft Edge</h2>
+<p>Instalacija u Edge iz zvanične prodavnice Edge Add-ons — bez developer moda. Dodatak se sam ažurira.</p>
+<p><a class="btn" href="https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo" rel="noopener">Preuzmi za Edge</a></p>
+<ol>
+<li>Prvo instaliraj program (dodatak radi s njim).</li>
+<li>Klikni <b>Preuzmi za Edge</b> ispod: otvara se zvanična stranica Edge Add-ons.</li>
+<li>Na stranici Edge Add-ons klikni <b>Get</b> (Nabavi), pa <b>Add extension</b> (Dodaj proširenje).</li>
+<li>Prikvači ikonu Video Download (ikona slagalice → ikona oka).</li>
+</ol>
+</div>
+<h2 style="margin-top:0">Chrome: ručno, u 3 koraka</h2>
+<p>Prvo instaliraj program (dodatak dolazi s njim). Chrome nema verziju iz prodavnice, pa se dodatak jednom učita iz foldera programa:</p>
 <div class="mock-row" aria-hidden="true">
   <div class="mock"><div class="mock-bar">Video Download — Pomoć → Preuzimanje iz browsera</div>
     <div class="mock-body"><span class="mock-btn ss-hl">Kopiraj putanju foldera</span>
-      <span class="mock-btn">Otvori dodatke u Edge-u</span></div></div>
+      <span class="mock-btn">Otvori dodatke u Chrome-u</span></div></div>
   <div class="ss-arrow">→</div>
-  <div class="mock"><div class="mock-bar">edge://extensions</div>
+  <div class="mock"><div class="mock-bar">chrome://extensions</div>
     <div class="mock-body"><b>Dodaci</b>
       <span class="mock-toggle ss-hl">Developer mode <i></i></span></div>
     <div class="mock-body"><span class="mock-btn ss-hl">Load unpacked</span>
@@ -86,20 +98,14 @@
     <div class="mock-body"><span class="mock-field ss-hl">...\Programs\Video Download\extension</span></div>
     <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">Izaberi folder</span></div></div>
 </div>
-<p class="lead">Sa dodatkom preuzimaš video koji se upravo pušta, jednim klikom ili desnim klikom na link ili video.
-Radi u Firefoxu, Edge-u i Chrome-u.</p>
-<h2>Instalacija (jednom)</h2>
 <ol>
-<li>Instaliraj program (dodatak dolazi s njim).</li>
-<li>U browseru otvori <code>edge://extensions</code> (Edge) ili <code>chrome://extensions</code> (Chrome).</li>
-<li>Uključi <b>Developer mode</b> (Način za programere) i klikni <b>Load unpacked</b> (Učitaj raspakovano).</li>
-<li>Izaberi folder <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. Najlakše: u programu otvori
-Pomoć → Preuzimanje iz browsera, klikni <b>Kopiraj putanju foldera</b> i zalijepi je (Ctrl+V) u prozor za izbor foldera.
-U istom prozoru je i dugme koje otvara stranicu dodataka u Edge-u ili Chrome-u.</li>
-<li>Prikvači ikonu Video Download na traku browsera (ikona slagalice → pribadača).</li>
+<li>U programu otvori <b>Pomoć → Preuzimanje iz browsera</b> i klikni <b>Kopiraj putanju foldera</b>.</li>
+<li>Klikni <b>Otvori dodatke u Chrome-u</b> (ili otvori <code>chrome://extensions</code>) i uključi <b>Developer mode</b> (gore desno).</li>
+<li>Klikni <b>Load unpacked</b> (Učitaj raspakovano), zalijepi putanju (Ctrl+V) u polje za folder i klikni <b>Select Folder</b>.
+Na kraju prikvači ikonu Video Download (ikona slagalice → pribadača).</li>
 </ol>
-<div class="box">Upute za Edge/Chrome koriste ručnu instalaciju. Firefox dodatak instalira se sa zvanične stranice
-povezane iznad. Pri ručnoj instalaciji browser ponekad podsjeti na „Developer mode"; to je očekivano.</div>
+<div class="box">Chrome ponekad podsjeti na „Developer mode“; to je očekivano. Ako poslije ažuriranja programa dodatak prestane
+reagovati, u <code>chrome://extensions</code> klikni <b>Reload</b> kod njega. Firefox i Edge dodatak ažuriraju sami.</div>
 <h2>Korištenje</h2>
 <ul>
 <li>Pusti video na stranici i klikni ikonu Video Download: <b>Preuzmi video koji se pušta</b> ili <b>Preuzmi kao MP3</b>.</li>
@@ -107,8 +113,6 @@ povezane iznad. Pri ručnoj instalaciji browser ponekad podsjeti na „Developer
 <li>Ako program nije pokrenut, klik ga sam pokreće.</li>
 <li>Prenos uživo i video zaštićen DRM-om se ne preuzimaju.</li>
 </ul>
-<h2>Poslije ažuriranja programa</h2>
-<p>Ako dodatak prestane reagovati, u <code>edge://extensions</code> klikni <b>Reload</b> (Ponovo učitaj) kod dodatka.</p>
 <div class="box"><b>Mac (beta):</b> folder je unutar programa. U programu Pomoć → Preuzimanje iz browsera → <b>Kopiraj putanju foldera</b>, pa u prozoru za izbor foldera pritisni <b>⌘⇧G</b>, zalijepi (⌘V) i Enter.</div>
 </main>
 

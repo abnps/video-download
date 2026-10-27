@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extensión para el navegador — Video Download</title>
-<meta name="description" content="Cómo instalar la extensión Video Download para Edge y Chrome.">
+<meta name="description" content="Cómo instalar la extensión Video Download en Firefox, Edge y Chrome.">
 <link rel="canonical" href="https://abnps.github.io/video-download/es/extension.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Video Download">
 <meta property="og:title" content="Extensión para el navegador — Video Download">
-<meta property="og:description" content="Cómo instalar la extensión Video Download para Edge y Chrome.">
+<meta property="og:description" content="Cómo instalar la extensión Video Download en Firefox, Edge y Chrome.">
 <meta property="og:url" content="https://abnps.github.io/video-download/es/extension.html">
 <meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-es.png">
 <meta property="og:image:width" content="860">
@@ -70,13 +70,25 @@
 <li>Fija el icono de Video Download (icono de pieza de puzle → fijar).</li>
 </ol>
 </div>
-<h2>Edge / Chrome</h2>
+<div class="box">
+<h2 style="margin-top:0">Microsoft Edge</h2>
+<p>Instalación en Edge desde la tienda oficial Complementos de Edge, sin modo de desarrollador. La extensión se actualiza sola.</p>
+<p><a class="btn" href="https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo" rel="noopener">Obtener para Edge</a></p>
+<ol>
+<li>Instala primero la aplicación (la extensión trabaja con ella).</li>
+<li>Pulsa <b>Obtener para Edge</b> abajo: se abre la página oficial de Complementos de Edge.</li>
+<li>En la página de Complementos de Edge pulsa <b>Obtener</b> y luego <b>Agregar extensión</b>.</li>
+<li>Fija el icono de Video Download (icono de puzle → icono de ojo).</li>
+</ol>
+</div>
+<h2 style="margin-top:0">Chrome: a mano, en 3 pasos</h2>
+<p>Instala primero la aplicación (la extensión viene con ella). Chrome no tiene versión en tienda, así que se carga una vez desde la carpeta de la aplicación:</p>
 <div class="mock-row" aria-hidden="true">
   <div class="mock"><div class="mock-bar">Video Download — Ayuda → Descargar desde el navegador</div>
     <div class="mock-body"><span class="mock-btn ss-hl">Copiar la ruta de la carpeta</span>
-      <span class="mock-btn">Abrir extensiones en Edge</span></div></div>
+      <span class="mock-btn">Abrir extensiones en Chrome</span></div></div>
   <div class="ss-arrow">→</div>
-  <div class="mock"><div class="mock-bar">edge://extensions</div>
+  <div class="mock"><div class="mock-bar">chrome://extensions</div>
     <div class="mock-body"><b>Extensiones</b>
       <span class="mock-toggle ss-hl">Modo de desarrollador <i></i></span></div>
     <div class="mock-body"><span class="mock-btn ss-hl">Cargar descomprimida</span>
@@ -86,30 +98,22 @@
     <div class="mock-body"><span class="mock-field ss-hl">...\Programs\Video Download\extension</span></div>
     <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">Seleccionar carpeta</span></div></div>
 </div>
-<p class="lead">Con la extensión descargas el vídeo en reproducción con un clic, o con clic derecho en un enlace
-o un vídeo. Funciona en Firefox, Edge y Chrome.</p>
-<h2>Instalación (una vez)</h2>
 <ol>
-<li>Instala la aplicación (la extensión viene con ella).</li>
-<li>En el navegador abre <code>edge://extensions</code> (Edge) o <code>chrome://extensions</code> (Chrome).</li>
-<li>Activa el <b>Modo de desarrollador</b> (Developer mode) y pulsa <b>Cargar descomprimida</b> (Load unpacked).</li>
-<li>Elige la carpeta <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. Lo más fácil: en la aplicación abre
-Ayuda → Descargar desde el navegador, pulsa <b>Copiar la ruta de la carpeta</b> y pégala (Ctrl+V) en la ventana de selección de carpeta.
-En la misma ventana hay un botón que abre la página de extensiones en Edge o Chrome.</li>
-<li>Fija el icono de Video Download en la barra del navegador (icono de pieza de puzle → fijar).</li>
+<li>En la aplicación abre <b>Ayuda → Descargar desde el navegador</b> y pulsa <b>Copiar la ruta de la carpeta</b>.</li>
+<li>Pulsa <b>Abrir extensiones en Chrome</b> (o abre <code>chrome://extensions</code>) y activa el <b>Modo de desarrollador</b>
+(arriba a la derecha).</li>
+<li>Pulsa <b>Cargar descomprimida</b>, pega la ruta (Ctrl+V) en el campo de carpeta y pulsa <b>Seleccionar carpeta</b>.
+Después fija el icono de Video Download (icono de puzle → fijar).</li>
 </ol>
-<div class="box">Las instrucciones para Edge/Chrome usan la instalación manual. La extensión para Firefox se instala
-desde la página oficial enlazada arriba. Con la instalación manual, el navegador puede recordar el «Modo de desarrollador»; es lo esperado.</div>
+<div class="box">Chrome puede recordarte el «Modo de desarrollador»; es normal. Si tras actualizar la aplicación la extensión deja de
+responder, pulsa <b>Recargar</b> junto a ella en <code>chrome://extensions</code>. Firefox y Edge actualizan la extensión solos.</div>
 <h2>Uso</h2>
 <ul>
-<li>Reproduce un vídeo en la página y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o
-<b>Descargar como MP3</b>.</li>
-<li>Clic derecho en un enlace o vídeo: <b>Descargar este enlace con Video Download</b> o <b>…como MP3</b>.</li>
+<li>Reproduce un vídeo y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o <b>Descargar como MP3</b>.</li>
+<li>Clic derecho en un enlace o vídeo: <b>Descargar este enlace</b> o <b>…como MP3</b>.</li>
 <li>Si la aplicación no está abierta, el clic la inicia.</li>
-<li>Las emisiones en directo y el vídeo protegido con DRM no se descargan.</li>
+<li>Las emisiones en directo y los vídeos con DRM no se descargan.</li>
 </ul>
-<h2>Después de actualizar la aplicación</h2>
-<p>Si la extensión deja de responder, pulsa <b>Volver a cargar</b> (Reload) junto a ella en <code>edge://extensions</code>.</p>
 <div class="box"><b>Mac (beta):</b> la carpeta está dentro de la aplicación. En la aplicación, Ayuda → Descargar desde el navegador → <b>Copiar la ruta de la carpeta</b>; luego, en el selector de carpetas, pulsa <b>⌘⇧G</b>, pega (⌘V) y pulsa Intro.</div>
 </main>
 

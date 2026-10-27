@@ -121,13 +121,17 @@ class SiteTest(unittest.TestCase):
             with self.subTest(language=lang):
                 self.assertLess(panel.index(build_site.ANDROID_APK_URL), panel.index('<ol>'))
 
-    def test_extension_manual_install_notice_distinguishes_firefox(self):
+    def test_extension_page_offers_stores_for_firefox_and_edge_and_manual_steps_only_for_chrome(self):
+        # Ahmed 27.10.2026: Firefox i Edge iz prodavnice (jedan klik), ručna instalacija samo za Chrome, u 3 koraka.
         for lang in build_site.LANGUAGES:
             page = self.pages[build_site.TEXTS[lang]["dir"] + "extension.html"]
-            notices = re.findall(r'<div class="box">(.*?)</div>', page, re.S)
             with self.subTest(language=lang):
-                self.assertTrue(any('Edge/Chrome' in notice and 'Firefox' in notice for notice in notices))
-                self.assertIn(build_site.FIREFOX_AMO, page)
+                self.assertIn(f'<a class="btn" href="{build_site.FIREFOX_AMO}"', page)
+                self.assertIn(f'<a class="btn" href="{build_site.EDGE_ADDON}"', page)
+                self.assertIn("chrome://extensions", page)
+                self.assertNotIn("edge://extensions", page)
+                chrome = page.split("<h2 style=\"margin-top:0\">Chrome", 1)[1].split("</ol>", 1)[0]
+                self.assertEqual(chrome.count("<li>"), 3)
 
     def test_legal_pages_carry_the_same_text_as_the_app(self):
         self.assertIn("vlastitih videa", self.pages["bs/terms.html"])

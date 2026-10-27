@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Browser extension — Video Download</title>
-<meta name="description" content="How to install the Video Download extension for Edge and Chrome.">
+<meta name="description" content="How to install the Video Download extension in Firefox, Edge and Chrome.">
 <link rel="canonical" href="https://abnps.github.io/video-download/extension.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Video Download">
 <meta property="og:title" content="Browser extension — Video Download">
-<meta property="og:description" content="How to install the Video Download extension for Edge and Chrome.">
+<meta property="og:description" content="How to install the Video Download extension in Firefox, Edge and Chrome.">
 <meta property="og:url" content="https://abnps.github.io/video-download/extension.html">
 <meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-en.png">
 <meta property="og:image:width" content="860">
@@ -70,13 +70,25 @@
 <li>Pin the Video Download icon (puzzle icon → pin).</li>
 </ol>
 </div>
-<h2>Edge / Chrome</h2>
+<div class="box">
+<h2 style="margin-top:0">Microsoft Edge</h2>
+<p>Install in Edge from the official Edge Add-ons store — no developer mode needed. The extension updates itself.</p>
+<p><a class="btn" href="https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo" rel="noopener">Get it for Edge</a></p>
+<ol>
+<li>Install the app first (the extension talks to it).</li>
+<li>Click <b>Get it for Edge</b> below: the official Edge Add-ons page opens.</li>
+<li>On the Edge Add-ons page click <b>Get</b>, then <b>Add extension</b>.</li>
+<li>Pin the Video Download icon (puzzle icon → eye icon).</li>
+</ol>
+</div>
+<h2 style="margin-top:0">Chrome: by hand, in 3 steps</h2>
+<p>Install the app first (the extension comes with it). Chrome has no store version, so it is loaded once from the app folder:</p>
 <div class="mock-row" aria-hidden="true">
   <div class="mock"><div class="mock-bar">Video Download — Help → Downloading from the browser</div>
     <div class="mock-body"><span class="mock-btn ss-hl">Copy the folder path</span>
-      <span class="mock-btn">Open extensions in Edge</span></div></div>
+      <span class="mock-btn">Open extensions in Chrome</span></div></div>
   <div class="ss-arrow">→</div>
-  <div class="mock"><div class="mock-bar">edge://extensions</div>
+  <div class="mock"><div class="mock-bar">chrome://extensions</div>
     <div class="mock-body"><b>Extensions</b>
       <span class="mock-toggle ss-hl">Developer mode <i></i></span></div>
     <div class="mock-body"><span class="mock-btn ss-hl">Load unpacked</span>
@@ -86,20 +98,14 @@
     <div class="mock-body"><span class="mock-field ss-hl">...\Programs\Video Download\extension</span></div>
     <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">Select Folder</span></div></div>
 </div>
-<p class="lead">With the extension you download the video that is playing with one click, or with a right-click
-on a link or video. Works in Firefox, Edge and Chrome.</p>
-<h2>Installation (once)</h2>
 <ol>
-<li>Install the app (the extension comes with it).</li>
-<li>In your browser open <code>edge://extensions</code> (Edge) or <code>chrome://extensions</code> (Chrome).</li>
-<li>Turn on <b>Developer mode</b> and click <b>Load unpacked</b>.</li>
-<li>Choose the folder <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. Easiest: in the app open
-Help → Downloading from the browser, click <b>Copy the folder path</b> and paste it (Ctrl+V) into the folder picker.
-The same window has a button that opens the extensions page in Edge or Chrome.</li>
-<li>Pin the Video Download icon to the browser toolbar (puzzle icon → pin).</li>
+<li>In the app open <b>Help → Downloading from the browser</b> and click <b>Copy the folder path</b>.</li>
+<li>Click <b>Open extensions in Chrome</b> (or open <code>chrome://extensions</code>) and turn on <b>Developer mode</b> (top right).</li>
+<li>Click <b>Load unpacked</b>, paste the path (Ctrl+V) into the folder field and click <b>Select Folder</b>. Then pin the
+Video Download icon (puzzle icon → pin).</li>
 </ol>
-<div class="box">The Edge/Chrome instructions below use manual installation. Firefox can be installed from the official
-add-on page linked above. With manual installation, the browser may remind you about “Developer mode”; that is expected.</div>
+<div class="box">Chrome may remind you about “Developer mode”; that is expected. After an app update, if the extension stops
+responding, click <b>Reload</b> next to it in <code>chrome://extensions</code>. Firefox and Edge update the extension by themselves.</div>
 <h2>Using it</h2>
 <ul>
 <li>Play a video on the page and click the Video Download icon: <b>Download the playing video</b> or <b>Download as MP3</b>.</li>
@@ -107,8 +113,6 @@ add-on page linked above. With manual installation, the browser may remind you a
 <li>If the app isn't running, the click starts it.</li>
 <li>Live streams and DRM-protected video are not downloaded.</li>
 </ul>
-<h2>After updating the app</h2>
-<p>If the extension stops responding, click <b>Reload</b> next to it in <code>edge://extensions</code>.</p>
 <div class="box"><b>Mac (beta):</b> the folder is inside the app. In the app use Help → Downloading from the browser → <b>Copy the folder path</b>, then in the folder picker press <b>⌘⇧G</b>, paste (⌘V) and press Return.</div>
 </main>
 

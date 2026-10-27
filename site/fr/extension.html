@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Extension pour le navigateur — Video Download</title>
-<meta name="description" content="Comment installer l&#x27;extension Video Download pour Edge et Chrome.">
+<meta name="description" content="Comment installer l&#x27;extension Video Download dans Firefox, Edge et Chrome.">
 <link rel="canonical" href="https://abnps.github.io/video-download/fr/extension.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Video Download">
 <meta property="og:title" content="Extension pour le navigateur — Video Download">
-<meta property="og:description" content="Comment installer l&#x27;extension Video Download pour Edge et Chrome.">
+<meta property="og:description" content="Comment installer l&#x27;extension Video Download dans Firefox, Edge et Chrome.">
 <meta property="og:url" content="https://abnps.github.io/video-download/fr/extension.html">
 <meta property="og:image" content="https://abnps.github.io/video-download/assets/screenshot-light-fr.png">
 <meta property="og:image:width" content="860">
@@ -70,13 +70,25 @@
 <li>Épinglez l'icône de Video Download (icône de pièce de puzzle → épingler).</li>
 </ol>
 </div>
-<h2>Edge / Chrome</h2>
+<div class="box">
+<h2 style="margin-top:0">Microsoft Edge</h2>
+<p>Installation dans Edge depuis la boutique officielle Modules complémentaires Edge, sans mode développeur. L&#x27;extension se met à jour toute seule.</p>
+<p><a class="btn" href="https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo" rel="noopener">Obtenir pour Edge</a></p>
+<ol>
+<li>Installez d'abord l'application (l'extension fonctionne avec elle).</li>
+<li>Cliquez sur <b>Obtenir pour Edge</b> ci-dessous : la page officielle des modules Edge s'ouvre.</li>
+<li>Sur la page des modules Edge, cliquez sur <b>Obtenir</b>, puis sur <b>Ajouter l'extension</b>.</li>
+<li>Épinglez l'icône de Video Download (icône puzzle → icône œil).</li>
+</ol>
+</div>
+<h2 style="margin-top:0">Chrome : à la main, en 3 étapes</h2>
+<p>Installez d'abord l'application (l'extension est incluse). Chrome n'a pas de version en boutique : l'extension se charge une fois depuis le dossier de l'application :</p>
 <div class="mock-row" aria-hidden="true">
   <div class="mock"><div class="mock-bar">Video Download — Aide → Télécharger depuis le navigateur</div>
     <div class="mock-body"><span class="mock-btn ss-hl">Copier le chemin du dossier</span>
-      <span class="mock-btn">Ouvrir les extensions dans Edge</span></div></div>
+      <span class="mock-btn">Ouvrir les extensions dans Chrome</span></div></div>
   <div class="ss-arrow">→</div>
-  <div class="mock"><div class="mock-bar">edge://extensions</div>
+  <div class="mock"><div class="mock-bar">chrome://extensions</div>
     <div class="mock-body"><b>Extensions</b>
       <span class="mock-toggle ss-hl">Mode développeur <i></i></span></div>
     <div class="mock-body"><span class="mock-btn ss-hl">Charger l&#x27;extension non empaquetée</span>
@@ -86,30 +98,23 @@
     <div class="mock-body"><span class="mock-field ss-hl">...\Programs\Video Download\extension</span></div>
     <div class="mock-body" style="justify-content:flex-end"><span class="mock-btn">Sélectionner un dossier</span></div></div>
 </div>
-<p class="lead">Avec l'extension, vous téléchargez la vidéo en cours d'un clic, ou d'un clic droit sur un lien
-ou une vidéo. Fonctionne dans Firefox, Edge et Chrome.</p>
-<h2>Installation (une seule fois)</h2>
 <ol>
-<li>Installez l'application (l'extension est fournie avec).</li>
-<li>Dans le navigateur, ouvrez <code>edge://extensions</code> (Edge) ou <code>chrome://extensions</code> (Chrome).</li>
-<li>Activez le <b>Mode développeur</b> (Developer mode) et cliquez sur <b>Charger l'extension non empaquetée</b> (Load unpacked).</li>
-<li>Choisissez le dossier <code>%LOCALAPPDATA%\Programs\Video Download\extension</code>. Le plus simple : dans l'application, ouvrez
-Aide → Télécharger depuis le navigateur, cliquez sur <b>Copier le chemin du dossier</b> et collez-le (Ctrl+V) dans la fenêtre de choix
-du dossier. La même fenêtre a un bouton qui ouvre la page des extensions dans Edge ou Chrome.</li>
-<li>Épinglez l'icône de Video Download dans la barre du navigateur (icône de pièce de puzzle → épingler).</li>
+<li>Dans l'application, ouvrez <b>Aide → Télécharger depuis le navigateur</b> et cliquez sur <b>Copier le chemin du dossier</b>.</li>
+<li>Cliquez sur <b>Ouvrir les extensions dans Chrome</b> (ou ouvrez <code>chrome://extensions</code>) et activez le
+<b>Mode développeur</b> (en haut à droite).</li>
+<li>Cliquez sur <b>Charger l'extension non empaquetée</b>, collez le chemin (Ctrl+V) dans le champ du dossier et cliquez sur
+<b>Sélectionner un dossier</b>. Épinglez ensuite l'icône de Video Download (icône puzzle → épingler).</li>
 </ol>
-<div class="box">Les instructions pour Edge/Chrome décrivent l'installation manuelle. L'extension Firefox s'installe
-depuis la page officielle liée ci-dessus. Lors d'une installation manuelle, le navigateur peut rappeler le « Mode développeur » ; c'est normal.</div>
+<div class="box">Chrome peut vous rappeler le « Mode développeur » ; c'est normal. Si, après une mise à jour de l'application,
+l'extension ne réagit plus, cliquez sur <b>Actualiser</b> à côté d'elle dans <code>chrome://extensions</code>. Firefox et Edge mettent
+l'extension à jour tout seuls.</div>
 <h2>Utilisation</h2>
 <ul>
-<li>Lancez une vidéo sur la page et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou
-<b>Télécharger en MP3</b>.</li>
-<li>Clic droit sur un lien ou une vidéo : <b>Télécharger ce lien avec Video Download</b> ou <b>…en MP3</b>.</li>
-<li>Si l'application n'est pas lancée, le clic la démarre.</li>
+<li>Lancez une vidéo et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou <b>Télécharger en MP3</b>.</li>
+<li>Clic droit sur un lien ou une vidéo : <b>Télécharger ce lien</b> ou <b>…en MP3</b>.</li>
+<li>Si l'application n'est pas ouverte, le clic la démarre.</li>
 <li>Les directs et les vidéos protégées par DRM ne sont pas téléchargés.</li>
 </ul>
-<h2>Après une mise à jour de l'application</h2>
-<p>Si l'extension ne répond plus, cliquez sur <b>Actualiser</b> (Reload) à côté d'elle dans <code>edge://extensions</code>.</p>
 <div class="box"><b>Mac (bêta) :</b> le dossier se trouve dans l'application. Dans l'application, Aide → Télécharger depuis le navigateur → <b>Copier le chemin du dossier</b>, puis dans le sélecteur de dossier appuyez sur <b>⌘⇧G</b>, collez (⌘V) et appuyez sur Entrée.</div>
 </main>
 

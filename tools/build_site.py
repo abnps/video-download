@@ -158,30 +158,24 @@ TEXTS = {
         "licenses_note": "FFmpeg is licensed under GPL-3.0: the source code of the exact build in the installer is at the "
                          "links above, and a copy of the source code is also available on request.",
         "ext_title": "Browser extension",
-        "ext_desc": "How to install the Video Download extension for Edge and Chrome.",
-        "ext_body": f"""<p class="lead">With the extension you download the video that is playing with one click, or with a right-click
-on a link or video. Works in Firefox, Edge and Chrome.</p>
-<h2>Installation (once)</h2>
+        "ext_desc": "How to install the Video Download extension in Firefox, Edge and Chrome.",
+        "ext_body": """<h2 style="margin-top:0">Chrome: by hand, in 3 steps</h2>
+<p>Install the app first (the extension comes with it). Chrome has no store version, so it is loaded once from the app folder:</p>
 <ol>
-<li>Install the app (the extension comes with it).</li>
-<li>In your browser open <code>edge://extensions</code> (Edge) or <code>chrome://extensions</code> (Chrome).</li>
-<li>Turn on <b>Developer mode</b> and click <b>Load unpacked</b>.</li>
-<li>Choose the folder <code>{html.escape(INSTALL_DIR)}</code>. Easiest: in the app open
-Help → Downloading from the browser, click <b>Copy the folder path</b> and paste it (Ctrl+V) into the folder picker.
-The same window has a button that opens the extensions page in Edge or Chrome.</li>
-<li>Pin the Video Download icon to the browser toolbar (puzzle icon → pin).</li>
+<li>In the app open <b>Help → Downloading from the browser</b> and click <b>Copy the folder path</b>.</li>
+<li>Click <b>Open extensions in Chrome</b> (or open <code>chrome://extensions</code>) and turn on <b>Developer mode</b> (top right).</li>
+<li>Click <b>Load unpacked</b>, paste the path (Ctrl+V) into the folder field and click <b>Select Folder</b>. Then pin the
+Video Download icon (puzzle icon → pin).</li>
 </ol>
-<div class="box">The Edge/Chrome instructions below use manual installation. Firefox can be installed from the official
-add-on page linked above. With manual installation, the browser may remind you about “Developer mode”; that is expected.</div>
+<div class="box">Chrome may remind you about “Developer mode”; that is expected. After an app update, if the extension stops
+responding, click <b>Reload</b> next to it in <code>chrome://extensions</code>. Firefox and Edge update the extension by themselves.</div>
 <h2>Using it</h2>
 <ul>
 <li>Play a video on the page and click the Video Download icon: <b>Download the playing video</b> or <b>Download as MP3</b>.</li>
 <li>Right-click a link or video: <b>Download this link</b> or <b>…as MP3</b>.</li>
 <li>If the app isn't running, the click starts it.</li>
 <li>Live streams and DRM-protected video are not downloaded.</li>
-</ul>
-<h2>After updating the app</h2>
-<p>If the extension stops responding, click <b>Reload</b> next to it in <code>edge://extensions</code>.</p>""",
+</ul>""",
     },
     "bs": {
         "dir": "bs/", "nav": ("Funkcije", "Kako radi", "Šta je novo", "Pomoć", "♥ Podrži"),
@@ -217,30 +211,24 @@ add-on page linked above. With manual installation, the browser may remind you a
         "licenses_note": "FFmpeg je pod licencom GPL-3.0: izvorni kod tačnog builda koji je u instaleru je na linkovima "
                          "iznad, a kopiju izvornog koda možeš dobiti i na zahtjev.",
         "ext_title": "Dodatak za browser",
-        "ext_desc": "Kako instalirati dodatak Video Download za Edge i Chrome.",
-        "ext_body": f"""<p class="lead">Sa dodatkom preuzimaš video koji se upravo pušta, jednim klikom ili desnim klikom na link ili video.
-Radi u Firefoxu, Edge-u i Chrome-u.</p>
-<h2>Instalacija (jednom)</h2>
+        "ext_desc": "Kako instalirati dodatak Video Download u Firefox, Edge i Chrome.",
+        "ext_body": """<h2 style="margin-top:0">Chrome: ručno, u 3 koraka</h2>
+<p>Prvo instaliraj program (dodatak dolazi s njim). Chrome nema verziju iz prodavnice, pa se dodatak jednom učita iz foldera programa:</p>
 <ol>
-<li>Instaliraj program (dodatak dolazi s njim).</li>
-<li>U browseru otvori <code>edge://extensions</code> (Edge) ili <code>chrome://extensions</code> (Chrome).</li>
-<li>Uključi <b>Developer mode</b> (Način za programere) i klikni <b>Load unpacked</b> (Učitaj raspakovano).</li>
-<li>Izaberi folder <code>{html.escape(INSTALL_DIR)}</code>. Najlakše: u programu otvori
-Pomoć → Preuzimanje iz browsera, klikni <b>Kopiraj putanju foldera</b> i zalijepi je (Ctrl+V) u prozor za izbor foldera.
-U istom prozoru je i dugme koje otvara stranicu dodataka u Edge-u ili Chrome-u.</li>
-<li>Prikvači ikonu Video Download na traku browsera (ikona slagalice → pribadača).</li>
+<li>U programu otvori <b>Pomoć → Preuzimanje iz browsera</b> i klikni <b>Kopiraj putanju foldera</b>.</li>
+<li>Klikni <b>Otvori dodatke u Chrome-u</b> (ili otvori <code>chrome://extensions</code>) i uključi <b>Developer mode</b> (gore desno).</li>
+<li>Klikni <b>Load unpacked</b> (Učitaj raspakovano), zalijepi putanju (Ctrl+V) u polje za folder i klikni <b>Select Folder</b>.
+Na kraju prikvači ikonu Video Download (ikona slagalice → pribadača).</li>
 </ol>
-<div class="box">Upute za Edge/Chrome koriste ručnu instalaciju. Firefox dodatak instalira se sa zvanične stranice
-povezane iznad. Pri ručnoj instalaciji browser ponekad podsjeti na „Developer mode"; to je očekivano.</div>
+<div class="box">Chrome ponekad podsjeti na „Developer mode“; to je očekivano. Ako poslije ažuriranja programa dodatak prestane
+reagovati, u <code>chrome://extensions</code> klikni <b>Reload</b> kod njega. Firefox i Edge dodatak ažuriraju sami.</div>
 <h2>Korištenje</h2>
 <ul>
 <li>Pusti video na stranici i klikni ikonu Video Download: <b>Preuzmi video koji se pušta</b> ili <b>Preuzmi kao MP3</b>.</li>
 <li>Desni klik na link ili video: <b>Preuzmi ovaj link</b> ili <b>…kao MP3</b>.</li>
 <li>Ako program nije pokrenut, klik ga sam pokreće.</li>
 <li>Prenos uživo i video zaštićen DRM-om se ne preuzimaju.</li>
-</ul>
-<h2>Poslije ažuriranja programa</h2>
-<p>Ako dodatak prestane reagovati, u <code>edge://extensions</code> klikni <b>Reload</b> (Ponovo učitaj) kod dodatka.</p>""",
+</ul>""",
     },
     "de": {
         "dir": "de/", "nav": ("Funktionen", "So funktioniert's", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
@@ -277,31 +265,25 @@ povezane iznad. Pri ručnoj instalaciji browser ponekad podsjeti na „Developer
         "licenses_note": "FFmpeg steht unter GPL-3.0: Der Quellcode genau des Builds im Installer ist unter den Links oben, "
                          "und eine Kopie des Quellcodes gibt es auch auf Anfrage.",
         "ext_title": "Browser-Erweiterung",
-        "ext_desc": "So installierst du die Erweiterung Video Download für Edge und Chrome.",
-        "ext_body": f"""<p class="lead">Mit der Erweiterung lädst du das laufende Video mit einem Klick herunter oder per Rechtsklick
-auf einen Link oder ein Video. Funktioniert in Firefox, Edge und Chrome.</p>
-<h2>Installation (einmalig)</h2>
+        "ext_desc": "So installierst du die Erweiterung Video Download in Firefox, Edge und Chrome.",
+        "ext_body": """<h2 style="margin-top:0">Chrome: manuell, in 3 Schritten</h2>
+<p>Installiere zuerst die App (die Erweiterung ist dabei). Für Chrome gibt es keine Store-Version, daher wird sie einmal aus dem App-Ordner geladen:</p>
 <ol>
-<li>Installiere die App (die Erweiterung ist dabei).</li>
-<li>Öffne im Browser <code>edge://extensions</code> (Edge) oder <code>chrome://extensions</code> (Chrome).</li>
-<li>Schalte den <b>Entwicklermodus</b> (Developer mode) ein und klicke auf <b>Entpackte Erweiterung laden</b> (Load unpacked).</li>
-<li>Wähle den Ordner <code>{html.escape(INSTALL_DIR)}</code>. Am einfachsten: in der App
-Hilfe → Aus dem Browser herunterladen öffnen, auf <b>Ordnerpfad kopieren</b> klicken und den Pfad (Strg+V) im Ordnerdialog einfügen.
-Im selben Fenster öffnet ein Knopf die Erweiterungsseite in Edge oder Chrome.</li>
-<li>Hefte das Symbol von Video Download an die Symbolleiste (Puzzle-Symbol → Anheften).</li>
+<li>Öffne in der App <b>Hilfe → Aus dem Browser herunterladen</b> und klicke auf <b>Ordnerpfad kopieren</b>.</li>
+<li>Klicke auf <b>Erweiterungen in Chrome öffnen</b> (oder öffne <code>chrome://extensions</code>) und schalte den
+<b>Entwicklermodus</b> ein (oben rechts).</li>
+<li>Klicke auf <b>Entpackte Erweiterung laden</b>, füge den Pfad (Strg+V) in das Ordnerfeld ein und klicke auf
+<b>Ordner auswählen</b>. Hefte dann das Symbol von Video Download an (Puzzle-Symbol → Anheften).</li>
 </ol>
-<div class="box">Die Anleitung für Edge/Chrome beschreibt die manuelle Installation. Die Firefox-Erweiterung lässt sich
-über die oben verlinkte offizielle Add-on-Seite installieren. Bei manueller Installation kann der Browser an den „Entwicklermodus“ erinnern; das ist normal.</div>
-<h2>Benutzung</h2>
+<div class="box">Chrome erinnert eventuell an den „Entwicklermodus“; das ist normal. Reagiert die Erweiterung nach einem App-Update
+nicht mehr, klicke in <code>chrome://extensions</code> bei ihr auf <b>Neu laden</b>. Firefox und Edge aktualisieren die Erweiterung selbst.</div>
+<h2>Verwendung</h2>
 <ul>
-<li>Spiele ein Video auf der Seite ab und klicke auf das Symbol von Video Download: <b>Laufendes Video herunterladen</b> oder
-<b>Als MP3 herunterladen</b>.</li>
-<li>Rechtsklick auf einen Link oder ein Video: <b>Diesen Link mit Video Download laden</b> oder <b>…als MP3</b>.</li>
+<li>Spiele ein Video ab und klicke auf das Symbol von Video Download: <b>Laufendes Video herunterladen</b> oder <b>Als MP3 herunterladen</b>.</li>
+<li>Rechtsklick auf einen Link oder ein Video: <b>Diesen Link herunterladen</b> oder <b>…als MP3</b>.</li>
 <li>Läuft die App nicht, startet der Klick sie.</li>
 <li>Livestreams und DRM-geschützte Videos werden nicht heruntergeladen.</li>
-</ul>
-<h2>Nach einem Update der App</h2>
-<p>Reagiert die Erweiterung nicht mehr, klicke in <code>edge://extensions</code> bei ihr auf <b>Neu laden</b> (Reload).</p>""",
+</ul>""",
     },
     "es": {
         "dir": "es/", "nav": ("Funciones", "Cómo funciona", "Novedades", "Ayuda", "♥ Apoyar"),
@@ -339,31 +321,25 @@ Im selben Fenster öffnet ein Knopf die Erweiterungsseite in Edge oder Chrome.</
         "licenses_note": "FFmpeg tiene licencia GPL-3.0: el código fuente de la compilación exacta del instalador está en los "
                          "enlaces de arriba, y también puedes pedir una copia del código fuente.",
         "ext_title": "Extensión para el navegador",
-        "ext_desc": "Cómo instalar la extensión Video Download para Edge y Chrome.",
-        "ext_body": f"""<p class="lead">Con la extensión descargas el vídeo en reproducción con un clic, o con clic derecho en un enlace
-o un vídeo. Funciona en Firefox, Edge y Chrome.</p>
-<h2>Instalación (una vez)</h2>
+        "ext_desc": "Cómo instalar la extensión Video Download en Firefox, Edge y Chrome.",
+        "ext_body": """<h2 style="margin-top:0">Chrome: a mano, en 3 pasos</h2>
+<p>Instala primero la aplicación (la extensión viene con ella). Chrome no tiene versión en tienda, así que se carga una vez desde la carpeta de la aplicación:</p>
 <ol>
-<li>Instala la aplicación (la extensión viene con ella).</li>
-<li>En el navegador abre <code>edge://extensions</code> (Edge) o <code>chrome://extensions</code> (Chrome).</li>
-<li>Activa el <b>Modo de desarrollador</b> (Developer mode) y pulsa <b>Cargar descomprimida</b> (Load unpacked).</li>
-<li>Elige la carpeta <code>{html.escape(INSTALL_DIR)}</code>. Lo más fácil: en la aplicación abre
-Ayuda → Descargar desde el navegador, pulsa <b>Copiar la ruta de la carpeta</b> y pégala (Ctrl+V) en la ventana de selección de carpeta.
-En la misma ventana hay un botón que abre la página de extensiones en Edge o Chrome.</li>
-<li>Fija el icono de Video Download en la barra del navegador (icono de pieza de puzle → fijar).</li>
+<li>En la aplicación abre <b>Ayuda → Descargar desde el navegador</b> y pulsa <b>Copiar la ruta de la carpeta</b>.</li>
+<li>Pulsa <b>Abrir extensiones en Chrome</b> (o abre <code>chrome://extensions</code>) y activa el <b>Modo de desarrollador</b>
+(arriba a la derecha).</li>
+<li>Pulsa <b>Cargar descomprimida</b>, pega la ruta (Ctrl+V) en el campo de carpeta y pulsa <b>Seleccionar carpeta</b>.
+Después fija el icono de Video Download (icono de puzle → fijar).</li>
 </ol>
-<div class="box">Las instrucciones para Edge/Chrome usan la instalación manual. La extensión para Firefox se instala
-desde la página oficial enlazada arriba. Con la instalación manual, el navegador puede recordar el «Modo de desarrollador»; es lo esperado.</div>
+<div class="box">Chrome puede recordarte el «Modo de desarrollador»; es normal. Si tras actualizar la aplicación la extensión deja de
+responder, pulsa <b>Recargar</b> junto a ella en <code>chrome://extensions</code>. Firefox y Edge actualizan la extensión solos.</div>
 <h2>Uso</h2>
 <ul>
-<li>Reproduce un vídeo en la página y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o
-<b>Descargar como MP3</b>.</li>
-<li>Clic derecho en un enlace o vídeo: <b>Descargar este enlace con Video Download</b> o <b>…como MP3</b>.</li>
+<li>Reproduce un vídeo y pulsa el icono de Video Download: <b>Descargar el vídeo en reproducción</b> o <b>Descargar como MP3</b>.</li>
+<li>Clic derecho en un enlace o vídeo: <b>Descargar este enlace</b> o <b>…como MP3</b>.</li>
 <li>Si la aplicación no está abierta, el clic la inicia.</li>
-<li>Las emisiones en directo y el vídeo protegido con DRM no se descargan.</li>
-</ul>
-<h2>Después de actualizar la aplicación</h2>
-<p>Si la extensión deja de responder, pulsa <b>Volver a cargar</b> (Reload) junto a ella en <code>edge://extensions</code>.</p>""",
+<li>Las emisiones en directo y los vídeos con DRM no se descargan.</li>
+</ul>""",
     },
     "fr": {
         "dir": "fr/", "nav": ("Fonctions", "Comment ça marche", "Nouveautés", "Aide", "♥ Soutenir"),
@@ -403,31 +379,26 @@ desde la página oficial enlazada arriba. Con la instalación manual, el navegad
         "licenses_note": "FFmpeg est sous licence GPL-3.0 : le code source de la version exacte incluse dans le programme "
                          "d'installation se trouve aux liens ci-dessus, et une copie du code source est aussi disponible sur demande.",
         "ext_title": "Extension pour le navigateur",
-        "ext_desc": "Comment installer l'extension Video Download pour Edge et Chrome.",
-        "ext_body": f"""<p class="lead">Avec l'extension, vous téléchargez la vidéo en cours d'un clic, ou d'un clic droit sur un lien
-ou une vidéo. Fonctionne dans Firefox, Edge et Chrome.</p>
-<h2>Installation (une seule fois)</h2>
+        "ext_desc": "Comment installer l'extension Video Download dans Firefox, Edge et Chrome.",
+        "ext_body": """<h2 style="margin-top:0">Chrome : à la main, en 3 étapes</h2>
+<p>Installez d'abord l'application (l'extension est incluse). Chrome n'a pas de version en boutique : l'extension se charge une fois depuis le dossier de l'application :</p>
 <ol>
-<li>Installez l'application (l'extension est fournie avec).</li>
-<li>Dans le navigateur, ouvrez <code>edge://extensions</code> (Edge) ou <code>chrome://extensions</code> (Chrome).</li>
-<li>Activez le <b>Mode développeur</b> (Developer mode) et cliquez sur <b>Charger l'extension non empaquetée</b> (Load unpacked).</li>
-<li>Choisissez le dossier <code>{html.escape(INSTALL_DIR)}</code>. Le plus simple : dans l'application, ouvrez
-Aide → Télécharger depuis le navigateur, cliquez sur <b>Copier le chemin du dossier</b> et collez-le (Ctrl+V) dans la fenêtre de choix
-du dossier. La même fenêtre a un bouton qui ouvre la page des extensions dans Edge ou Chrome.</li>
-<li>Épinglez l'icône de Video Download dans la barre du navigateur (icône de pièce de puzzle → épingler).</li>
+<li>Dans l'application, ouvrez <b>Aide → Télécharger depuis le navigateur</b> et cliquez sur <b>Copier le chemin du dossier</b>.</li>
+<li>Cliquez sur <b>Ouvrir les extensions dans Chrome</b> (ou ouvrez <code>chrome://extensions</code>) et activez le
+<b>Mode développeur</b> (en haut à droite).</li>
+<li>Cliquez sur <b>Charger l'extension non empaquetée</b>, collez le chemin (Ctrl+V) dans le champ du dossier et cliquez sur
+<b>Sélectionner un dossier</b>. Épinglez ensuite l'icône de Video Download (icône puzzle → épingler).</li>
 </ol>
-<div class="box">Les instructions pour Edge/Chrome décrivent l'installation manuelle. L'extension Firefox s'installe
-depuis la page officielle liée ci-dessus. Lors d'une installation manuelle, le navigateur peut rappeler le « Mode développeur » ; c'est normal.</div>
+<div class="box">Chrome peut vous rappeler le « Mode développeur » ; c'est normal. Si, après une mise à jour de l'application,
+l'extension ne réagit plus, cliquez sur <b>Actualiser</b> à côté d'elle dans <code>chrome://extensions</code>. Firefox et Edge mettent
+l'extension à jour tout seuls.</div>
 <h2>Utilisation</h2>
 <ul>
-<li>Lancez une vidéo sur la page et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou
-<b>Télécharger en MP3</b>.</li>
-<li>Clic droit sur un lien ou une vidéo : <b>Télécharger ce lien avec Video Download</b> ou <b>…en MP3</b>.</li>
-<li>Si l'application n'est pas lancée, le clic la démarre.</li>
+<li>Lancez une vidéo et cliquez sur l'icône de Video Download : <b>Télécharger la vidéo en cours</b> ou <b>Télécharger en MP3</b>.</li>
+<li>Clic droit sur un lien ou une vidéo : <b>Télécharger ce lien</b> ou <b>…en MP3</b>.</li>
+<li>Si l'application n'est pas ouverte, le clic la démarre.</li>
 <li>Les directs et les vidéos protégées par DRM ne sont pas téléchargés.</li>
-</ul>
-<h2>Après une mise à jour de l'application</h2>
-<p>Si l'extension ne répond plus, cliquez sur <b>Actualiser</b> (Reload) à côté d'elle dans <code>edge://extensions</code>.</p>""",
+</ul>""",
     },
 }
 LANGUAGES = tuple(TEXTS)
@@ -697,34 +668,34 @@ def page_licenses(lang: str) -> str:
 
 MOCK_LABELS = {
     "en": ("Extensions", "Developer mode", "Load unpacked", "Pack extension", "Select folder", "Select Folder",
-           "Help → Downloading from the browser", "Copy the folder path", "Open extensions in Edge",
+           "Help → Downloading from the browser", "Copy the folder path", "Open extensions in Chrome",
            ""),
     "bs": ("Dodaci", "Developer mode", "Load unpacked", "Pack extension", "Izaberi folder", "Izaberi folder",
-           "Pomoć → Preuzimanje iz browsera", "Kopiraj putanju foldera", "Otvori dodatke u Edge-u",
+           "Pomoć → Preuzimanje iz browsera", "Kopiraj putanju foldera", "Otvori dodatke u Chrome-u",
            ""),
     "de": ("Erweiterungen", "Entwicklermodus", "Entpackte Erweiterung laden", "Erweiterung packen", "Ordner auswählen",
            "Ordner auswählen", "Hilfe → Aus dem Browser herunterladen", "Ordnerpfad kopieren",
-           "Erweiterungen in Edge öffnen", ""),
+           "Erweiterungen in Chrome öffnen", ""),
     "es": ("Extensiones", "Modo de desarrollador", "Cargar descomprimida", "Empaquetar extensión", "Seleccionar carpeta",
            "Seleccionar carpeta", "Ayuda → Descargar desde el navegador", "Copiar la ruta de la carpeta",
-           "Abrir extensiones en Edge", ""),
+           "Abrir extensiones en Chrome", ""),
     "fr": ("Extensions", "Mode développeur", "Charger l'extension non empaquetée", "Empaqueter l'extension",
            "Sélectionner un dossier", "Sélectionner un dossier", "Aide → Télécharger depuis le navigateur",
-           "Copier le chemin du dossier", "Ouvrir les extensions dans Edge", ""),
+           "Copier le chemin du dossier", "Ouvrir les extensions dans Chrome", ""),
 }
 MOCK_FOLDER = r"...\Programs\Video Download\extension"
 
 
 def extension_mock(lang: str) -> str:
     """Tri male slike koraka (u HTML-u, pa rade u svijetloj i tamnoj temi i na svim jezicima)."""
-    extensions, dev_mode, load, pack, select, select_button, help_menu, copy_path, open_edge, _ = \
+    extensions, dev_mode, load, pack, select, select_button, help_menu, copy_path, open_chrome, _ = \
         (html.escape(label) for label in MOCK_LABELS[lang])
     return f"""<div class="mock-row" aria-hidden="true">
   <div class="mock"><div class="mock-bar">Video Download — {help_menu}</div>
     <div class="mock-body"><span class="mock-btn ss-hl">{copy_path}</span>
-      <span class="mock-btn">{open_edge}</span></div></div>
+      <span class="mock-btn">{open_chrome}</span></div></div>
   <div class="ss-arrow">→</div>
-  <div class="mock"><div class="mock-bar">edge://extensions</div>
+  <div class="mock"><div class="mock-bar">chrome://extensions</div>
     <div class="mock-body"><b>{extensions}</b>
       <span class="mock-toggle ss-hl">{dev_mode} <i></i></span></div>
     <div class="mock-body"><span class="mock-btn ss-hl">{load}</span>
@@ -784,8 +755,56 @@ def firefox_section(lang: str) -> str:
 <ol>
 {items}
 </ol>
-</div>
-<h2>Edge / Chrome</h2>"""
+</div>"""
+
+
+# Od 27.10.2026 dodatak je javno i u Microsoft Edge Add-ons: jedan klik, Microsoft isporučuje ažuriranja.
+EDGE_ADDON = "https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo"
+EDGE_TEXT = {
+    "en": ("Microsoft Edge", "Install in Edge from the official Edge Add-ons store — no developer mode needed. "
+           "The extension updates itself.", "Get it for Edge",
+           ("Install the app first (the extension talks to it).",
+            "Click <b>Get it for Edge</b> below: the official Edge Add-ons page opens.",
+            "On the Edge Add-ons page click <b>Get</b>, then <b>Add extension</b>.",
+            "Pin the Video Download icon (puzzle icon → eye icon).")),
+    "bs": ("Microsoft Edge", "Instalacija u Edge iz zvanične prodavnice Edge Add-ons — bez developer moda. "
+           "Dodatak se sam ažurira.", "Preuzmi za Edge",
+           ("Prvo instaliraj program (dodatak radi s njim).",
+            "Klikni <b>Preuzmi za Edge</b> ispod: otvara se zvanična stranica Edge Add-ons.",
+            "Na stranici Edge Add-ons klikni <b>Get</b> (Nabavi), pa <b>Add extension</b> (Dodaj proširenje).",
+            "Prikvači ikonu Video Download (ikona slagalice → ikona oka).")),
+    "de": ("Microsoft Edge", "Installation in Edge aus dem offiziellen Store Edge-Add-ons – ohne Entwicklermodus. "
+           "Die Erweiterung aktualisiert sich selbst.", "Für Edge herunterladen",
+           ("Installiere zuerst die App (die Erweiterung arbeitet mit ihr).",
+            "Klicke unten auf <b>Für Edge herunterladen</b>: die offizielle Seite von Edge-Add-ons öffnet sich.",
+            "Klicke auf der Seite von Edge-Add-ons auf <b>Abrufen</b> und dann auf <b>Erweiterung hinzufügen</b>.",
+            "Hefte das Symbol von Video Download an (Puzzle-Symbol → Augen-Symbol).")),
+    "es": ("Microsoft Edge", "Instalación en Edge desde la tienda oficial Complementos de Edge, sin modo de desarrollador. "
+           "La extensión se actualiza sola.", "Obtener para Edge",
+           ("Instala primero la aplicación (la extensión trabaja con ella).",
+            "Pulsa <b>Obtener para Edge</b> abajo: se abre la página oficial de Complementos de Edge.",
+            "En la página de Complementos de Edge pulsa <b>Obtener</b> y luego <b>Agregar extensión</b>.",
+            "Fija el icono de Video Download (icono de puzle → icono de ojo).")),
+    "fr": ("Microsoft Edge", "Installation dans Edge depuis la boutique officielle Modules complémentaires Edge, sans mode "
+           "développeur. L'extension se met à jour toute seule.", "Obtenir pour Edge",
+           ("Installez d'abord l'application (l'extension fonctionne avec elle).",
+            "Cliquez sur <b>Obtenir pour Edge</b> ci-dessous : la page officielle des modules Edge s'ouvre.",
+            "Sur la page des modules Edge, cliquez sur <b>Obtenir</b>, puis sur <b>Ajouter l'extension</b>.",
+            "Épinglez l'icône de Video Download (icône puzzle → icône œil).")),
+}
+
+
+def edge_section(lang: str) -> str:
+    title, lead, button, steps = EDGE_TEXT[lang]
+    items = "\n".join(f"<li>{step}</li>" for step in steps)
+    return f"""<div class="box">
+<h2 style="margin-top:0">{title}</h2>
+<p>{html.escape(lead)}</p>
+<p><a class="btn" href="{EDGE_ADDON}" rel="noopener">{html.escape(button)}</a></p>
+<ol>
+{items}
+</ol>
+</div>"""
 
 
 # Mac (beta): folder dodatka je unutar programa, pa se putanja kopira iz programa i lijepi s ⌘⇧G.
@@ -807,7 +826,10 @@ MAC_EXTENSION_NOTE = {
 
 def page_extension(lang: str) -> str:
     t = TEXTS[lang]
-    body = (f"<h1>{t['ext_title']}</h1>\n{firefox_section(lang)}\n{extension_mock(lang)}\n{t['ext_body']}"
+    # Slike koraka idu ispod uvoda u Chrome dio (jedini ručni način).
+    intro, rest = t["ext_body"].split("</p>", 1)
+    body = (f"<h1>{t['ext_title']}</h1>\n{firefox_section(lang)}\n{edge_section(lang)}\n{intro}</p>\n"
+            f"{extension_mock(lang)}{rest}"
             f'\n<div class="box">{MAC_EXTENSION_NOTE[lang]}</div>')
     return _page(lang, "extension.html", t["ext_title"], t["ext_desc"], body)
 
