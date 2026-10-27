@@ -127,6 +127,28 @@ class MainWindowTest(unittest.TestCase):
     def statuses(self, window):
         return [item.status for item in window._queue.items()]
 
+    def test_corner_folder_link_fits_after_language_and_theme_changes(self):
+        window = self.make_window(self.quick_download)
+        window.show()
+        app.processEvents()
+        self.addCleanup(set_language, get_language())
+        for theme_name in ("light", "dark"):
+            window.set_theme(theme_name, save=False)
+            for width in (1366, 860, 640):
+                window.resize(width, 768)
+                for language in ("en", "bs", "de", "es", "fr", "en"):
+                    with self.subTest(theme=theme_name, width=width, language=language):
+                        window.change_language(language)
+                        app.processEvents()
+                        link = window.corner_link
+                        self.assertGreaterEqual(link.width(), link.sizeHint().width())
+                        self.assertTrue(window.menuBar().rect().contains(link.geometry()))
+                        for action in window.menuBar().actions():
+                            self.assertFalse(window.menuBar().actionGeometry(action).intersects(link.geometry()))
+        with mock.patch.object(window, "_open_folder") as open_folder:
+            window.corner_link.linkActivated.emit("open")
+        open_folder.assert_called_once_with()
+
     def test_pasted_links_wait_for_download_button(self):
         window = self.make_window(self.quick_download)
         self.assertEqual(window.stack.currentIndex(), 0)  # prazan ekran

@@ -454,6 +454,8 @@ class MainWindow(QMainWindow):
         self.support_banner_later.setText(tr("support.later"))
         self.about_action.setText(tr("menu.about"))
         self.corner_link.setText(f'<a href="open" style="color:{theme.c("link")}">{tr("corner.open_folder")}</a>')
+        # Meni inače još jedan raspored koristi širinu prethodnog prevoda i odsiječe duži tekst.
+        self.menuBar().setCornerWidget(self.corner_link, Qt.Corner.TopRightCorner)
         self.settings_action.setText(tr("menu.settings"))
         self.settings_button.setIcon(icon("settings", theme.c("icon")))
         self.settings_button.setToolTip(tr("settings.title"))

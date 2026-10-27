@@ -19,6 +19,28 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - `00_plan/plan_projekta.md` je izvor istine za faze, Definition of Done i exit
   gate-ove. Faza se ne proglašava završenom bez dokaza ili Ahmedovog izuzetka.
 
+## Nastavak rada 27.10.2026
+
+- Kanonski radni folder je `C:\Video Downloader\Projekat-podrska`, grana `main`. Prema Ahmedovoj
+  primopredaji, ranije grane `browser-host-novo-ime` i `quality-review-20261021` već su spojene;
+  ne koristiti stare radne kopije za novi rad niti ih brisati bez njegovog pristanka.
+- Prema istoj primopredaji, GitHub izdanje 1.0.4 i Store 1.0.3.0 su javni. Raniji zapisi ispod o
+  privatnoj grupi Proba i čekanju Submission 4 predstavljaju istoriju, a ne aktuelni status.
+  Submission 5 s paketom 1.0.4.0 pripremljen je kao nacrt; slanje na certifikaciju radi Ahmed.
+  Microsoftova objava nakon certifikacije podešena je automatski. U ovom koraku status nije provjeravan uživo.
+- Ahmed je odobrio preusmjeravanje postojeće dnevne automatizacije na Submission 5 / 1.0.4.0.
+  Praćenje ostaje jednom dnevno; agent ne šalje prijavu, ne klikće Publish now i ne objavljuje sajt.
+  Push na main, izdanja, PR-ovi i slanje u prodavnice traže novo Ahmedovo „objavi”.
+- Lokalno ispravljen odsječeni link „Ordner öffnen”: `retranslate_ui` odmah osvježava raspored ugaonog
+  widgeta menija, koji je zadržavao širinu prethodnog prevoda. Regresiona provjera obuhvata svih 5 jezika,
+  obje teme, širine 640/860/1366 i aktiviranje linka; prošla je i pri skaliranju 125/150/200%.
+  Obnovljeno je 10 snimaka sajta; novih 10 Store snimaka je u
+  `C:\Video Downloader\Build\ordner-oeffnen-20261027\store-snimci`, odvojeno od pripremljene prijave.
+  Verzija i instalacioni paketi nisu mijenjani; ništa nije objavljeno.
+- Provjere ove popravke: 454 Python testa (2 preskočena) i 31 Node test prolaze. Puni Python discover
+  morao je biti ponovljen izvan Codex sandboxa, koji je blokirao lokalne HTTP veze (`WinError 10013`);
+  izvan tog ograničenja prolazi. Dnevnici su u `Build\ordner-oeffnen-20261027` pored projekta.
+
 ## Obim i upotreba
 
 - Bez zaobilaženja DRM-a i bez piratskih izvora. Prodaja i sajt traže pravnu provjeru;
