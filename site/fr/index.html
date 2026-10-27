@@ -26,7 +26,7 @@
  "inLanguage": "fr",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
- "softwareVersion": "1.0.3",
+ "softwareVersion": "1.0.4",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -104,13 +104,14 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Télécharger pour Windows
           </a>
+          <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour Android</a>
         </div>
         <ul class="promise"><li>Sans compte</li><li>Sans limite quotidienne</li><li>Vos liens ne nous parviennent pas</li></ul>
-        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
-          <span data-platform-requirements="mac" hidden>Version 1.0.3 · macOS 13+ · Apple M1 ou plus récent · Bêta</span>
-          <span data-platform-requirements="android" hidden>Version 1.0.3 · Android 10+ · ARM64 · Bêta</span>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.4 · 117 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
+          <span data-platform-requirements="mac" hidden>Version 1.0.4 · macOS 13+ · Apple M1 ou plus récent · Bêta</span>
+          <span data-platform-requirements="android" hidden>Version 1.0.4 · Android 10+ · ARM64 · Bêta</span>
           · <a href="#install" data-install-help>aide à l'installation</a></div>
         <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.</p>
       </div>
@@ -272,6 +273,8 @@
           <div class="dlg"><div class="h">Windows a protégé votre ordinateur</div><div>Application : VideoDownload-Setup.exe<br>Éditeur : Éditeur inconnu</div><div class="btns"><span class="hl">Exécuter quand même</span><span>Ne pas exécuter</span></div></div>
         </div>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Télécharger pour Windows</a></p>
+        <p style="margin-top:22px">Ou téléchargez la version pour Windows 11 depuis le Microsoft Store. Microsoft signe le paquet et fournit les mises à jour.</p>
+        <p><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></p>
       </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">Bêta</span> <b>Nouveau : Video Download pour Mac.</b> Pour les Mac avec puce Apple (M1 ou plus récent) et macOS 13 ou plus récent. Il fonctionne, mais peu de personnes l'ont encore essayé : <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez ce qui ne marche pas</a>.</p>
@@ -307,18 +310,17 @@
       <h2 data-reveal>Meilleur chaque semaine.</h2>
       <p class="sub" data-reveal>La même liste que dans l'application (Aide → Nouveautés).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>1.0.3 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>1.0.4 <span>27.10.2026</span></h3><ul>
+          <li>Android : vidéo sans son — une case « Sans son » sur l’écran de qualité et « Prochaine vidéo sans son » dans les réglages (vaut pour une vidéo, puis se désactive toute seule).</li>
+          <li>Android : chaque réglage a un ⓘ avec une explication détaillée, et dans Téléchargements un appui long sur un bouton indique ce qu’il fait ; l’écran reste identique quand tu tournes le téléphone ou changes de langue, et ouvrir l’appli depuis Récents ne répète plus le même téléchargement.</li>
+          <li>L’extension du navigateur se rétablit seule quand la connexion avec l’application est coupée ; le rapport de problème n’affiche plus les chemins de dossiers de ton ordinateur.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.3 <span>20.10.2026</span></h3><ul>
           <li>Sur Windows 11, la version Microsoft Store relie désormais automatiquement l’extension du navigateur à l’application ; les extensions existantes continuent de fonctionner.</li>
           <li>Android : les réglages affichent désormais les nouveautés ; le rappel de soutien facultatif peut être reporté ou désactivé et ne débloque aucune fonction.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
           <li>Succès : des félicitations à 10, 50, 100… téléchargements et 18 succès selon ton utilisation (son seul, playlist entière, extrait, 4K, oiseau de nuit…). Aide → Mes succès affiche ceux obtenus et le total téléchargé. Tout est compté uniquement sur ton ordinateur.</li>
           <li>Android : les succès aussi sur le téléphone (plus Partager, widget, vignette rapide et Inviter un ami), dans Réglages → Mes succès ; l&#x27;appli se ferme seulement au deuxième « retour ».</li>
           <li>Extension du navigateur : un message clair quand l&#x27;application est trop ancienne pour l&#x27;extension, avec le conseil d&#x27;installer la dernière version.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.1 <span>18.10.2026</span></h3><ul>
-          <li>Nouveaux formats pour la voiture : « Vidéo – pour la voiture (AVI, 720×480) » et « MP3 pour la voiture (44,1 kHz) », pour les anciens systèmes de voiture qui ne lisent pas les MP4 ou MP3 ordinaires.</li>
-          <li>Le programme s&#x27;ouvre plus vite : le lecteur de sites se charge en arrière-plan, la fenêtre ne l&#x27;attend pas.</li>
-          <li>Aide → Communauté Discord : questions et aide en 5 langues.</li>
-          <li>Android : « Supprimer de l&#x27;appareil » dans le menu d&#x27;un téléchargement terminé (avec confirmation) ; les boutons rapides ne cachent plus la durée de la vidéo ; Discord dans les Paramètres.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Toutes les versions →</a></p>
     </div>

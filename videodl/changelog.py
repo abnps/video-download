@@ -8,6 +8,23 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.4", "27.10.2026", {
+        "bs": ["Android: video bez zvuka — kvačica „Bez zvuka“ na ekranu kvaliteta i „Sljedeći video bez zvuka“ u Postavkama (važi za jedan video, pa se samo isključi).",
+               "Android: svaka postavka ima ⓘ s detaljnim objašnjenjem, a u Preuzimanjima dugi pritisak na dugme kaže šta radi; ekran ostaje isti pri okretanju telefona i promjeni jezika, a otvaranje iz „Nedavnih“ ne ponavlja isto preuzimanje.",
+               "Dodatak za browser se sam oporavi kad veza s programom pukne; izvještaj o problemu više ne prikazuje putanje foldera na tvom računaru."],
+        "en": ["Android: video without sound — a “Without sound” checkbox on the quality screen and “Next video without sound” in Settings (applies to one video, then switches off by itself).",
+               "Android: every setting has an ⓘ with a detailed explanation, and in Downloads a long press on a button tells what it does; the screen stays the same when you rotate the phone or change the language, and opening the app from Recents no longer repeats the same download.",
+               "The browser extension recovers by itself when the connection to the app breaks; the problem report no longer shows folder paths on your computer."],
+        "de": ["Android: Video ohne Ton — ein Häkchen „Ohne Ton“ auf dem Qualitätsbildschirm und „Nächstes Video ohne Ton“ in den Einstellungen (gilt für ein Video und schaltet sich dann selbst aus).",
+               "Android: Jede Einstellung hat ein ⓘ mit ausführlicher Erklärung, und unter Downloads zeigt langes Drücken auf eine Schaltfläche, was sie tut; der Bildschirm bleibt beim Drehen des Handys und beim Sprachwechsel erhalten, und das Öffnen aus „Zuletzt verwendet“ wiederholt denselben Download nicht mehr.",
+               "Die Browser-Erweiterung erholt sich selbst, wenn die Verbindung zum Programm abbricht; der Problembericht zeigt keine Ordnerpfade deines Computers mehr."],
+        "es": ["Android: vídeo sin sonido — una casilla «Sin sonido» en la pantalla de calidad y «Próximo vídeo sin sonido» en Ajustes (vale para un vídeo y luego se desactiva sola).",
+               "Android: cada ajuste tiene un ⓘ con una explicación detallada, y en Descargas una pulsación larga en un botón indica qué hace; la pantalla se mantiene al girar el teléfono o cambiar el idioma, y abrir la app desde Recientes ya no repite la misma descarga.",
+               "La extensión del navegador se recupera sola cuando se corta la conexión con la aplicación; el informe de problemas ya no muestra rutas de carpetas de tu ordenador."],
+        "fr": ["Android : vidéo sans son — une case « Sans son » sur l’écran de qualité et « Prochaine vidéo sans son » dans les réglages (vaut pour une vidéo, puis se désactive toute seule).",
+               "Android : chaque réglage a un ⓘ avec une explication détaillée, et dans Téléchargements un appui long sur un bouton indique ce qu’il fait ; l’écran reste identique quand tu tournes le téléphone ou changes de langue, et ouvrir l’appli depuis Récents ne répète plus le même téléchargement.",
+               "L’extension du navigateur se rétablit seule quand la connexion avec l’application est coupée ; le rapport de problème n’affiche plus les chemins de dossiers de ton ordinateur."],
+    }),
     ("1.0.3", "20.10.2026", {
         "bs": ["Microsoft Store verzija na Windowsu 11 sama povezuje dodatak za browser s programom; postojeći dodaci i dalje rade.",
                "Android: Postavke prikazuju šta je novo; podsjetnik za dobrovoljnu podršku može se odgoditi ili utišati i ništa ne otključava."],

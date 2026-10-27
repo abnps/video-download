@@ -1,5 +1,36 @@
 [
  {
+  "version": "1.0.4",
+  "date": "27.10.2026",
+  "notes": {
+   "bs": [
+    "Android: video bez zvuka — kvačica „Bez zvuka“ na ekranu kvaliteta i „Sljedeći video bez zvuka“ u Postavkama (važi za jedan video, pa se samo isključi).",
+    "Android: svaka postavka ima ⓘ s detaljnim objašnjenjem, a u Preuzimanjima dugi pritisak na dugme kaže šta radi; ekran ostaje isti pri okretanju telefona i promjeni jezika, a otvaranje iz „Nedavnih“ ne ponavlja isto preuzimanje.",
+    "Dodatak za browser se sam oporavi kad veza s programom pukne; izvještaj o problemu više ne prikazuje putanje foldera na tvom računaru."
+   ],
+   "en": [
+    "Android: video without sound — a “Without sound” checkbox on the quality screen and “Next video without sound” in Settings (applies to one video, then switches off by itself).",
+    "Android: every setting has an ⓘ with a detailed explanation, and in Downloads a long press on a button tells what it does; the screen stays the same when you rotate the phone or change the language, and opening the app from Recents no longer repeats the same download.",
+    "The browser extension recovers by itself when the connection to the app breaks; the problem report no longer shows folder paths on your computer."
+   ],
+   "de": [
+    "Android: Video ohne Ton — ein Häkchen „Ohne Ton“ auf dem Qualitätsbildschirm und „Nächstes Video ohne Ton“ in den Einstellungen (gilt für ein Video und schaltet sich dann selbst aus).",
+    "Android: Jede Einstellung hat ein ⓘ mit ausführlicher Erklärung, und unter Downloads zeigt langes Drücken auf eine Schaltfläche, was sie tut; der Bildschirm bleibt beim Drehen des Handys und beim Sprachwechsel erhalten, und das Öffnen aus „Zuletzt verwendet“ wiederholt denselben Download nicht mehr.",
+    "Die Browser-Erweiterung erholt sich selbst, wenn die Verbindung zum Programm abbricht; der Problembericht zeigt keine Ordnerpfade deines Computers mehr."
+   ],
+   "es": [
+    "Android: vídeo sin sonido — una casilla «Sin sonido» en la pantalla de calidad y «Próximo vídeo sin sonido» en Ajustes (vale para un vídeo y luego se desactiva sola).",
+    "Android: cada ajuste tiene un ⓘ con una explicación detallada, y en Descargas una pulsación larga en un botón indica qué hace; la pantalla se mantiene al girar el teléfono o cambiar el idioma, y abrir la app desde Recientes ya no repite la misma descarga.",
+    "La extensión del navegador se recupera sola cuando se corta la conexión con la aplicación; el informe de problemas ya no muestra rutas de carpetas de tu ordenador."
+   ],
+   "fr": [
+    "Android : vidéo sans son — une case « Sans son » sur l’écran de qualité et « Prochaine vidéo sans son » dans les réglages (vaut pour une vidéo, puis se désactive toute seule).",
+    "Android : chaque réglage a un ⓘ avec une explication détaillée, et dans Téléchargements un appui long sur un bouton indique ce qu’il fait ; l’écran reste identique quand tu tournes le téléphone ou changes de langue, et ouvrir l’appli depuis Récents ne répète plus le même téléchargement.",
+    "L’extension du navigateur se rétablit seule quand la connexion avec l’application est coupée ; le rapport de problème n’affiche plus les chemins de dossiers de ton ordinateur."
+   ]
+  }
+ },
+ {
   "version": "1.0.3",
   "date": "20.10.2026",
   "notes": {
@@ -120,42 +151,6 @@
     "Video Download 1.0 : le programme pour ordinateur, l'application Android et l'extension du navigateur passent en version 1.0 le même jour.",
     "L'application Android est deux fois plus légère (29 Mo au lieu de 61 Mo) : plus rapide à télécharger et à envoyer à un ami.",
     "Tout ce qui était dans les versions d'essai est là : MP4 en meilleure qualité, MP3, playlists, extraits, sous-titres, chapitres, contrôle parental et mises à jour automatiques signées."
-   ]
-  }
- },
- {
-  "version": "0.9.11",
-  "date": "8.10.2026",
-  "notes": {
-   "bs": [
-    "Postavke: duga putanja foldera se skraćuje po sredini, a cijela se vidi kad pređeš mišem preko nje.",
-    "Format u listi preuzimanja izgleda isto u svakom redu; klik na njega i dalje mijenja format.",
-    "Mac: samostalno ažuriranje je pouzdanije (ponovni pokušaj kad macOS kratko odbije otvoriti paket).",
-    "Android: aplikacija broji nove instalacije i poziv prijatelju anonimno (samo ukupan broj, vidi Privatnost); sitna čišćenja."
-   ],
-   "en": [
-    "Settings: a long folder path is shortened in the middle, and the full path shows when you hover over it.",
-    "The format in the download list looks the same in every row; clicking it still changes the format.",
-    "Mac: self-updating is more reliable (it retries when macOS briefly refuses to open the package).",
-    "Android: the app counts new installations and friend invitations anonymously (only a total, see Privacy); small clean-ups."
-   ],
-   "de": [
-    "Einstellungen: Ein langer Ordnerpfad wird in der Mitte gekürzt; der ganze Pfad erscheint, wenn du mit der Maus darauf zeigst.",
-    "Das Format in der Downloadliste sieht in jeder Zeile gleich aus; ein Klick darauf ändert weiterhin das Format.",
-    "Mac: Die automatische Aktualisierung ist zuverlässiger (neuer Versuch, wenn macOS das Paket kurz nicht öffnet).",
-    "Android: Die App zählt neue Installationen und Einladungen an Freunde anonym (nur eine Gesamtzahl, siehe Datenschutz); kleine Aufräumarbeiten."
-   ],
-   "es": [
-    "Ajustes: una ruta de carpeta larga se acorta por el medio y la ruta completa aparece al pasar el ratón por encima.",
-    "El formato en la lista de descargas se ve igual en cada fila; hacer clic en él sigue cambiando el formato.",
-    "Mac: la actualización automática es más fiable (reintenta cuando macOS se niega brevemente a abrir el paquete).",
-    "Android: la app cuenta las instalaciones nuevas y las invitaciones a amigos de forma anónima (solo un total, ver Privacidad); pequeñas limpiezas."
-   ],
-   "fr": [
-    "Paramètres : un long chemin de dossier est raccourci au milieu, et le chemin complet s'affiche au survol de la souris.",
-    "Le format dans la liste des téléchargements a le même aspect sur chaque ligne ; un clic dessus change toujours le format.",
-    "Mac : la mise à jour automatique est plus fiable (nouvel essai quand macOS refuse brièvement d'ouvrir le paquet).",
-    "Android : l'application compte les nouvelles installations et les invitations d'amis de façon anonyme (seulement un total, voir Confidentialité) ; petits nettoyages."
    ]
   }
  }

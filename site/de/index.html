@@ -26,7 +26,7 @@
  "inLanguage": "de",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
- "softwareVersion": "1.0.3",
+ "softwareVersion": "1.0.4",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -104,13 +104,14 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Für Windows herunterladen
           </a>
+          <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Für macOS herunterladen</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Für Android herunterladen</a>
         </div>
         <ul class="promise"><li>Kein Konto</li><li>Kein Tageslimit</li><li>Deine Links landen nicht bei uns</li></ul>
-        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.3 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit)</span>
-          <span data-platform-requirements="mac" hidden>Version 1.0.3 · macOS 13+ · Apple M1 oder neuer · Beta</span>
-          <span data-platform-requirements="android" hidden>Version 1.0.3 · Android 10+ · ARM64 · Beta</span>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.4 · 117 MB<!-- /version --> · Windows 10 und 11 (64 Bit)</span>
+          <span data-platform-requirements="mac" hidden>Version 1.0.4 · macOS 13+ · Apple M1 oder neuer · Beta</span>
+          <span data-platform-requirements="android" hidden>Version 1.0.4 · Android 10+ · ARM64 · Beta</span>
           · <a href="#install" data-install-help>Hilfe zur Installation</a></div>
         <p class="note">Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href="terms.html">Nutzungsbedingungen</a>. DRM-geschützte Inhalte werden nicht heruntergeladen.</p>
       </div>
@@ -272,6 +273,8 @@
           <div class="dlg"><div class="h">Der Computer wurde durch Windows geschützt</div><div>App: VideoDownload-Setup.exe<br>Herausgeber: Unbekannter Herausgeber</div><div class="btns"><span class="hl">Trotzdem ausführen</span><span>Nicht ausführen</span></div></div>
         </div>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Für Windows herunterladen</a></p>
+        <p style="margin-top:22px">Oder lade die Windows-11-Version aus dem Microsoft Store herunter. Microsoft signiert das Paket und liefert Updates.</p>
+        <p><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></p>
       </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">Beta</span> <b>Neu: Video Download für Mac.</b> Für Macs mit Apple-Chip (M1 oder neuer) und macOS 13 oder neuer. Es funktioniert, aber bisher haben es erst wenige ausprobiert: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">melde bitte, was nicht klappt</a>.</p>
@@ -307,18 +310,17 @@
       <h2 data-reveal>Jede Woche besser.</h2>
       <p class="sub" data-reveal>Dieselbe Liste wie in der App (Hilfe → Was ist neu).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>1.0.3 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>1.0.4 <span>27.10.2026</span></h3><ul>
+          <li>Android: Video ohne Ton — ein Häkchen „Ohne Ton“ auf dem Qualitätsbildschirm und „Nächstes Video ohne Ton“ in den Einstellungen (gilt für ein Video und schaltet sich dann selbst aus).</li>
+          <li>Android: Jede Einstellung hat ein ⓘ mit ausführlicher Erklärung, und unter Downloads zeigt langes Drücken auf eine Schaltfläche, was sie tut; der Bildschirm bleibt beim Drehen des Handys und beim Sprachwechsel erhalten, und das Öffnen aus „Zuletzt verwendet“ wiederholt denselben Download nicht mehr.</li>
+          <li>Die Browser-Erweiterung erholt sich selbst, wenn die Verbindung zum Programm abbricht; der Problembericht zeigt keine Ordnerpfade deines Computers mehr.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.3 <span>20.10.2026</span></h3><ul>
           <li>Unter Windows 11 verbindet die Microsoft-Store-Version die Browser-Erweiterung jetzt automatisch mit dem Programm; vorhandene Erweiterungen funktionieren weiter.</li>
           <li>Android: In den Einstellungen gibt es jetzt „Neuigkeiten“; die freiwillige Erinnerung an Unterstützung lässt sich verschieben oder stummschalten und schaltet keine Funktion frei.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
           <li>Erfolge: ein Glückwunsch bei 10, 50, 100… Downloads und 18 Erfolge für die Art der Nutzung (nur Ton, ganze Playlist, Clip, 4K, Nachteule…). Hilfe → Meine Erfolge zeigt Erreichtes und die Gesamtmenge. Alles wird nur auf deinem Computer gezählt.</li>
           <li>Android: Erfolge auch auf dem Handy (dazu Teilen, Widget, Schnellkachel und Freunde einladen), unter Einstellungen → Meine Erfolge; die App schließt erst beim zweiten „Zurück“.</li>
           <li>Browser-Erweiterung: eine klare Meldung, wenn die App für die Erweiterung zu alt ist, mit dem Hinweis, die neueste Version zu installieren.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.1 <span>18.10.2026</span></h3><ul>
-          <li>Neue Formate fürs Auto: „Video – fürs Auto (AVI, 720×480)“ und „MP3 fürs Auto (44,1 kHz)“, für ältere Autosysteme, die normales MP4 oder MP3 nicht abspielen.</li>
-          <li>Das Programm öffnet schneller: Der Seitenleser lädt im Hintergrund, das Fenster wartet nicht darauf.</li>
-          <li>Hilfe → Discord-Community: Fragen und Hilfe in 5 Sprachen.</li>
-          <li>Android: „Vom Gerät löschen“ im Menü eines fertigen Downloads (mit Bestätigung); die Schnelltasten verdecken die Videolänge nicht mehr; Discord in den Einstellungen.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Alle Versionen →</a></p>
     </div>

@@ -430,8 +430,8 @@ HOME = {
 # Discord zajednica (Ahmed 14.10.2026): trajna pozivnica; obična veza i tekstualno dugme, bez tuđeg logotipa i koda.
 # Microsoft Store (Ahmed 19.10.2026: sajt nudi i Store i običnu verziju za računar). Samo tekstualno dugme,
 # bez Microsoftovog logoa. Skriveno dok je aplikacija u Storeu privatna (link bi drugima javljao da je nema):
-# Uključiti tek kad je javna prijava 1.0.3 dostupna svima.
-STORE_LIVE = False
+# Javno u Storeu od 27.10.2026 (Ahmed: „Publish now"), pa je dugme uključeno.
+STORE_LIVE = True
 STORE_URL = "https://apps.microsoft.com/detail/9NT46S6L7KGN"
 STORE_TEXT = {
     "en": "Or get the Windows 11 version from Microsoft Store. Microsoft signs the package and delivers its updates.",

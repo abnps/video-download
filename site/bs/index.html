@@ -26,7 +26,7 @@
  "inLanguage": "bs",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
- "softwareVersion": "1.0.3",
+ "softwareVersion": "1.0.4",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -104,13 +104,14 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Preuzmi za Windows
           </a>
+          <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za Android</a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
-        <div class="meta"><span data-platform-requirements="win"><!-- version -->Verzija 1.0.3 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit)</span>
-          <span data-platform-requirements="mac" hidden>Verzija 1.0.3 · macOS 13+ · Apple M1 ili noviji · Beta</span>
-          <span data-platform-requirements="android" hidden>Verzija 1.0.3 · Android 10+ · ARM64 · Beta</span>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Verzija 1.0.4 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit)</span>
+          <span data-platform-requirements="mac" hidden>Verzija 1.0.4 · macOS 13+ · Apple M1 ili noviji · Beta</span>
+          <span data-platform-requirements="android" hidden>Verzija 1.0.4 · Android 10+ · ARM64 · Beta</span>
           · <a href="#install" data-install-help>pomoć za instalaciju</a></div>
         <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
       </div>
@@ -272,6 +273,8 @@
           <div class="dlg"><div class="h">Windows je zaštitio vaš računar</div><div>Aplikacija: VideoDownload-Setup.exe<br>Izdavač: Nepoznat izdavač</div><div class="btns"><span class="hl">Ipak pokreni</span><span>Ne pokreći</span></div></div>
         </div>
         <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Preuzmi za Windows</a></p>
+        <p style="margin-top:22px">Ili preuzmi verziju za Windows 11 iz Microsoft Storea. Microsoft potpisuje paket i isporučuje ažuriranja.</p>
+        <p><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></p>
       </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">Beta</span> <b>Novo: Video Download za Mac.</b> Za Mac sa Apple čipom (M1 ili noviji) i macOS 13 ili noviji. Radi, ali ga je probalo još malo ljudi: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">javi ako nešto ne radi</a>.</p>
@@ -307,18 +310,17 @@
       <h2 data-reveal>Svake sedmice bolje.</h2>
       <p class="sub" data-reveal>Ista lista kao u programu (Pomoć → Šta je novo).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>1.0.3 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>1.0.4 <span>27.10.2026</span></h3><ul>
+          <li>Android: video bez zvuka — kvačica „Bez zvuka“ na ekranu kvaliteta i „Sljedeći video bez zvuka“ u Postavkama (važi za jedan video, pa se samo isključi).</li>
+          <li>Android: svaka postavka ima ⓘ s detaljnim objašnjenjem, a u Preuzimanjima dugi pritisak na dugme kaže šta radi; ekran ostaje isti pri okretanju telefona i promjeni jezika, a otvaranje iz „Nedavnih“ ne ponavlja isto preuzimanje.</li>
+          <li>Dodatak za browser se sam oporavi kad veza s programom pukne; izvještaj o problemu više ne prikazuje putanje foldera na tvom računaru.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.3 <span>20.10.2026</span></h3><ul>
           <li>Microsoft Store verzija na Windowsu 11 sama povezuje dodatak za browser s programom; postojeći dodaci i dalje rade.</li>
           <li>Android: Postavke prikazuju šta je novo; podsjetnik za dobrovoljnu podršku može se odgoditi ili utišati i ništa ne otključava.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.2 <span>20.10.2026</span></h3><ul>
           <li>Dostignuća: čestitka na 10, 50, 100… preuzimanja i 18 dostignuća za način korištenja (samo zvuk, cijela lista, isječak, 4K, noćna ptica…). Pomoć → Moja dostignuća pokazuje osvojena i ukupno preuzeto. Sve se računa samo na tvom računaru.</li>
           <li>Android: dostignuća i na telefonu (uz Podijeli, widget, pločicu i Pozovi prijatelja), u Postavkama → Moja dostignuća; aplikacija se zatvara tek na drugo „nazad“.</li>
           <li>Dodatak za browser: jasna poruka kad je program prestar za dodatak, uz savjet da instaliraš najnoviju verziju.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.1 <span>18.10.2026</span></h3><ul>
-          <li>Novi formati za auto: „Video – za auto (AVI, 720×480)“ i „MP3 za auto (44,1 kHz)“, za starije auto-sisteme koji ne puštaju obični MP4 ili MP3.</li>
-          <li>Program se brže otvara: čitač sajtova se učitava u pozadini, prozor ga ne čeka.</li>
-          <li>Pomoć → Discord zajednica: pitanja i pomoć na 5 jezika.</li>
-          <li>Android: „Izbriši s uređaja“ u meniju gotovog preuzimanja (uz potvrdu); brza dugmad više ne prekrivaju trajanje videa; Discord u Postavkama.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Sve verzije →</a></p>
     </div>
