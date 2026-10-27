@@ -472,34 +472,6 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "échecs : {count}"),
 
     # pomoć i zatvaranje
-    "help.firefox": (
-        'Firefox: dodatak koji je potpisala Mozilla instalira se jednim klikom, bez „Developer mode“: '
-        '<a href="guide">uputstvo na sajtu</a>.',
-        'Firefox: the extension signed by Mozilla installs with one click, no developer mode: '
-        '<a href="guide">guide on the website</a>.',
-        'Firefox: Die von Mozilla signierte Erweiterung wird mit einem Klick installiert, ohne Entwicklermodus: '
-        '<a href="guide">Anleitung auf der Website</a>.',
-        'Firefox: la extensión firmada por Mozilla se instala con un clic, sin modo de desarrollador: '
-        '<a href="guide">guía en el sitio web</a>.',
-        "Firefox : l'extension signée par Mozilla s'installe en un clic, sans mode développeur : "
-        '<a href="guide">guide sur le site</a>.'),
-    "help.browser_text": (
-        "1. Otvori edge://extensions (ili chrome://extensions).\n2. Uključi „Developer mode“ i klikni „Load unpacked“.\n"
-        "3. Izaberi folder:\n   {folder}\n\nNa stranici pokreni video i klikni ikonu Video Download. "
-        "Ako aplikacija nije pokrenuta, klik je sam pokreće.\n\nVideo zaštićen DRM-om (Netflix, Disney+…) se ne može preuzeti.",
-        "1. Open edge://extensions (or chrome://extensions).\n2. Turn on “Developer mode” and click “Load unpacked”.\n"
-        "3. Choose the folder:\n   {folder}\n\nPlay a video on the page and click the Video Download icon. "
-        "If the app is not running, the click starts it.\n\nDRM-protected video (Netflix, Disney+…) cannot be downloaded.",
-        "1. edge://extensions (oder chrome://extensions) öffnen.\n2. „Entwicklermodus“ einschalten und „Entpackt laden“ klicken.\n"
-        "3. Ordner wählen:\n   {folder}\n\nVideo auf der Seite abspielen und auf das Symbol Video Download klicken. "
-        "Läuft die App nicht, wird sie durch den Klick gestartet.\n\nDRM-geschützte Videos (Netflix, Disney+…) können nicht heruntergeladen werden.",
-        "1. Abre edge://extensions (o chrome://extensions).\n2. Activa «Modo de desarrollador» y pulsa «Cargar desempaquetada».\n"
-        "3. Elige la carpeta:\n   {folder}\n\nReproduce un vídeo en la página y pulsa el icono de Video Download. "
-        "Si la aplicación no está abierta, el clic la inicia.\n\nLos vídeos con DRM (Netflix, Disney+…) no se pueden descargar.",
-        "1. Ouvrez edge://extensions (ou chrome://extensions).\n2. Activez « Mode développeur » et cliquez sur « Charger l'extension non empaquetée ».\n"
-        "3. Choisissez le dossier :\n   {folder}\n\nLancez une vidéo sur la page et cliquez sur l'icône Video Download. "
-        "Si l'application n'est pas ouverte, le clic la démarre.\n\nLes vidéos protégées par DRM (Netflix, Disney+…) ne peuvent pas être téléchargées.",
-    ),
     "about.text": ("Video Download {version}\n\nLična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
                    "Video Download {version}\n\nPersonal app for downloading video and audio (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
                    "Video Download {version}\n\nPersönliche App zum Herunterladen von Video und Audio (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
@@ -727,11 +699,74 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                     "ohne Untertitel (das Video hat keine)", "sin subtítulos (el vídeo no tiene)",
                     "sans sous-titres (la vidéo n'en a pas)"),
     # uputstvo za dodatak (Pomoć → Preuzimanje iz browsera)
+    "help.stores_title": ("Edge i Firefox: jednim klikom (preporučeno)", "Edge and Firefox: one click (recommended)",
+                          "Edge und Firefox: mit einem Klick (empfohlen)", "Edge y Firefox: con un clic (recomendado)",
+                          "Edge et Firefox : en un clic (recommandé)"),
+    "help.install_edge": ("Instaliraj u Edge", "Install in Edge", "In Edge installieren", "Instalar en Edge",
+                          "Installer dans Edge"),
+    "help.install_firefox": ("Instaliraj u Firefox", "Install in Firefox", "In Firefox installieren", "Instalar en Firefox",
+                             "Installer dans Firefox"),
+    "help.stores_note": (
+        "Otvara se zvanična stranica dodatka: u Edge-u klikni „Get“ (Nabavi), u Firefoxu „Add to Firefox“ (Dodaj u Firefox). "
+        "Bez „Developer mode“, a dodatak se poslije sam ažurira.",
+        "The official extension page opens: in Edge click “Get”, in Firefox “Add to Firefox”. "
+        "No developer mode, and the extension updates itself afterwards.",
+        "Die offizielle Seite der Erweiterung öffnet sich: in Edge auf „Abrufen“ (Get), in Firefox auf „Zu Firefox hinzufügen“ "
+        "klicken. Ohne Entwicklermodus, und die Erweiterung aktualisiert sich danach selbst.",
+        "Se abre la página oficial de la extensión: en Edge pulsa «Obtener» (Get), en Firefox «Agregar a Firefox». "
+        "Sin modo de desarrollador, y la extensión se actualiza sola.",
+        "La page officielle de l'extension s'ouvre : dans Edge, cliquez sur « Obtenir » (Get), dans Firefox sur « Ajouter à Firefox ». "
+        "Sans mode développeur, et l'extension se met ensuite à jour toute seule."),
+    "help.store_opened": ("Stranica dodatka se otvara u browseru.", "The extension page is opening in the browser.",
+                          "Die Seite der Erweiterung öffnet sich im Browser.", "La página de la extensión se abre en el navegador.",
+                          "La page de l'extension s'ouvre dans le navigateur."),
+    "help.chrome_title": ("Chrome: ručno, u 3 koraka", "Chrome: by hand, in 3 steps", "Chrome: manuell, in 3 Schritten",
+                          "Chrome: a mano, en 3 pasos", "Chrome : à la main, en 3 étapes"),
+    "help.chrome_step1": ("1. Kopiraj putanju foldera s dodatkom:", "1. Copy the path of the extension folder:",
+                          "1. Pfad des Erweiterungsordners kopieren:", "1. Copia la ruta de la carpeta de la extensión:",
+                          "1. Copiez le chemin du dossier de l'extension :"),
+    "help.chrome_step2": ("2. Otvori stranicu dodataka i uključi „Developer mode“ (gore desno):",
+                          "2. Open the extensions page and turn on “Developer mode” (top right):",
+                          "2. Erweiterungsseite öffnen und „Entwicklermodus“ einschalten (oben rechts):",
+                          "2. Abre la página de extensiones y activa «Modo de desarrollador» (arriba a la derecha):",
+                          "2. Ouvrez la page des extensions et activez « Mode développeur » (en haut à droite) :"),
+    "help.chrome_step3": (
+        "3. Klikni „Load unpacked“ (Učitaj raspakovano), zalijepi putanju (Ctrl+V) u polje za folder i klikni „Select Folder“. "
+        "Na kraju prikvači ikonu Video Download (ikona slagalice → pribadača).",
+        "3. Click “Load unpacked”, paste the path (Ctrl+V) into the folder field and click “Select Folder”. "
+        "Finally pin the Video Download icon (puzzle icon → pin).",
+        "3. Auf „Entpackte Erweiterung laden“ klicken, den Pfad (Strg+V) in das Ordnerfeld einfügen und „Ordner auswählen“ "
+        "klicken. Zum Schluss das Symbol Video Download anheften (Puzzle-Symbol → Pinnadel).",
+        "3. Pulsa «Cargar descomprimida», pega la ruta (Ctrl+V) en el campo de carpeta y pulsa «Seleccionar carpeta». "
+        "Por último, fija el icono de Video Download (icono de puzle → chincheta).",
+        "3. Cliquez sur « Charger l'extension non empaquetée », collez le chemin (Ctrl+V) dans le champ du dossier et cliquez "
+        "sur « Sélectionner un dossier ». Enfin, épinglez l'icône Video Download (icône puzzle → épingle)."),
+    "help.chrome_step3_mac": (
+        "3. Klikni „Load unpacked“, u prozoru za izbor foldera pritisni ⌘⇧G, zalijepi putanju (⌘V) i pritisni Enter, "
+        "pa „Select“. Na kraju prikvači ikonu Video Download (ikona slagalice → pribadača).",
+        "3. Click “Load unpacked”, in the folder picker press ⌘⇧G, paste the path (⌘V), press Return and then “Select”. "
+        "Finally pin the Video Download icon (puzzle icon → pin).",
+        "3. Auf „Entpackte Erweiterung laden“ klicken, im Ordnerdialog ⌘⇧G drücken, den Pfad einfügen (⌘V), Return und "
+        "dann „Auswählen“. Zum Schluss das Symbol Video Download anheften (Puzzle-Symbol → Pinnadel).",
+        "3. Pulsa «Cargar descomprimida», en el selector pulsa ⌘⇧G, pega la ruta (⌘V), pulsa Intro y luego «Seleccionar». "
+        "Por último, fija el icono de Video Download (icono de puzle → chincheta).",
+        "3. Cliquez sur « Charger l'extension non empaquetée », dans le sélecteur appuyez sur ⌘⇧G, collez le chemin (⌘V), "
+        "Entrée puis « Sélectionner ». Enfin, épinglez l'icône Video Download (icône puzzle → épingle)."),
+    "help.usage": (
+        "Korištenje: pusti video i klikni ikonu Video Download, ili desni klik na link ili video. Ako program nije pokrenut, "
+        "klik ga sam pokreće. Prenos uživo i video zaštićen DRM-om (Netflix, Disney+…) se ne preuzimaju.",
+        "How to use: play a video and click the Video Download icon, or right-click a link or video. If the app is not "
+        "running, the click starts it. Live streams and DRM-protected video (Netflix, Disney+…) are not downloaded.",
+        "Verwendung: Video abspielen und auf das Symbol Video Download klicken oder Rechtsklick auf einen Link oder ein Video. "
+        "Läuft die App nicht, startet der Klick sie. Livestreams und DRM-geschützte Videos (Netflix, Disney+…) werden nicht "
+        "heruntergeladen.",
+        "Uso: reproduce un vídeo y pulsa el icono de Video Download, o clic derecho en un enlace o vídeo. Si la aplicación no "
+        "está abierta, el clic la inicia. Las emisiones en directo y los vídeos con DRM (Netflix, Disney+…) no se descargan.",
+        "Utilisation : lancez une vidéo et cliquez sur l'icône Video Download, ou clic droit sur un lien ou une vidéo. Si "
+        "l'application n'est pas ouverte, le clic la démarre. Les directs et les vidéos protégées par DRM (Netflix, "
+        "Disney+…) ne sont pas téléchargés."),
     "help.copy_path": ("Kopiraj putanju foldera", "Copy the folder path", "Ordnerpfad kopieren",
                        "Copiar la ruta de la carpeta", "Copier le chemin du dossier"),
-    "help.open_folder": ("Otvori folder", "Open the folder", "Ordner öffnen", "Abrir la carpeta", "Ouvrir le dossier"),
-    "help.open_edge": ("Otvori dodatke u Edge-u", "Open extensions in Edge", "Erweiterungen in Edge öffnen",
-                       "Abrir extensiones en Edge", "Ouvrir les extensions dans Edge"),
     "help.open_chrome": ("Otvori dodatke u Chrome-u", "Open extensions in Chrome", "Erweiterungen in Chrome öffnen",
                          "Abrir extensiones en Chrome", "Ouvrir les extensions dans Chrome"),
     "theme.system_mac": ("Kao sistem", "Same as macOS", "Wie macOS", "Como macOS", "Comme macOS"),
@@ -922,7 +957,7 @@ def get_language() -> str:
 
 PLATFORM = sys.platform  # testovi ga postavljaju da provjere Mac tekstove i na Windowsu
 # Mac: tekst koji pominje Windows ili njegove prečice ima svoju varijantu (ključ + "_mac").
-MAC_VARIANTS = {"theme.system", "help.copied"}
+MAC_VARIANTS = {"theme.system", "help.copied", "help.chrome_step3"}
 
 
 def tr(key: str, **values) -> str:

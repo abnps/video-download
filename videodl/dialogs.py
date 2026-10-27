@@ -310,12 +310,17 @@ SITE_URL = "https://abnps.github.io/video-download/"
 # Discord zajednica (trajna pozivnica, ista kao na sajtu); otvara se samo u browseru na klik.
 DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
 
-# Stranica dodataka u browseru; otvara se pokretanjem browsera s tom adresom.
-BROWSERS = (("msedge.exe", "edge://extensions", "help.open_edge"),
-            ("chrome.exe", "chrome://extensions", "help.open_chrome"))
+# Dodatak iz prodavnica (Ahmed 27.10.2026): Edge i Firefox jednim klikom, sam se ažurira; Chrome ostaje ručno.
+EDGE_ADDON_URL = "https://microsoftedge.microsoft.com/addons/detail/glikmhiifcloegaachgkhinigmnhnjpo"
+FIREFOX_ADDON_URL = "https://addons.mozilla.org/firefox/addon/video-download-abnps/"
+STORES = (("msedge.exe", EDGE_ADDON_URL, "help.install_edge"),
+          ("firefox.exe", FIREFOX_ADDON_URL, "help.install_firefox"))
+# Chrome: stranica dodataka se otvara pokretanjem browsera s tom adresom (iz programa je drugačije ne otvara).
+CHROME = ("chrome.exe", "chrome://extensions")
 # Mac: isti browseri u /Applications; izvršni fajl u paketu prima adresu kao i na Windowsu.
 MAC_BROWSERS = {"msedge.exe": "Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
-                "chrome.exe": "Google Chrome.app/Contents/MacOS/Google Chrome"}
+                "chrome.exe": "Google Chrome.app/Contents/MacOS/Google Chrome",
+                "firefox.exe": "Firefox.app/Contents/MacOS/firefox"}
 
 
 def browser_exe(name: str, platform: str = sys.platform, applications: tuple[Path, ...] | None = None) -> str | None:
@@ -344,54 +349,81 @@ def browser_exe(name: str, platform: str = sys.platform, applications: tuple[Pat
     return None
 
 class BrowserHelpDialog(QDialog):
-    """Uputstvo za dodatak: koraci + dugmad koja rade teške dijelove (putanja, folder, stranica dodataka)."""
+    """Dodatak za browser: Edge i Firefox jednim klikom iz prodavnice, Chrome u tri numerisana koraka."""
 
-    def __init__(self, folder: str, parent=None, find_browser=browser_exe, launch=subprocess.Popen):
+    def __init__(self, folder: str, parent=None, find_browser=browser_exe, launch=subprocess.Popen,
+                 open_url=lambda url: QDesktopServices.openUrl(QUrl(url))):
         super().__init__(parent)
         self._folder = folder
         self._launch = launch
+        self._open_url = open_url
         self.setWindowTitle(tr("menu.browser_help"))
         self.setMinimumWidth(560)
         layout = QVBoxLayout(self)
-        text = QLabel(tr("help.browser_text", folder=folder))
-        text.setWordWrap(True)
-        text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        layout.addWidget(text)
 
-        row = QHBoxLayout()
+        # 1) Edge i Firefox: zvanična stranica dodatka, otvorena baš u tom browseru (ako je instaliran).
+        stores_title = QLabel(f"<b>{tr('help.stores_title')}</b>")
+        layout.addWidget(stores_title)
+        stores = QHBoxLayout()
+        self.store_buttons = {}
+        for exe, url, key in STORES:
+            button = QPushButton(tr(key))
+            path = find_browser(exe)
+            button.clicked.connect(lambda _checked=False, path=path, url=url: self._open_store(path, url))
+            stores.addWidget(button)
+            self.store_buttons[exe] = button
+        stores.addStretch(1)
+        layout.addLayout(stores)
+        stores_note = QLabel(tr("help.stores_note"))
+        stores_note.setWordWrap(True)
+        layout.addWidget(stores_note)
+
+        # 2) Chrome: ručno, ali svaki korak ima svoje dugme ili jasnu radnju.
+        layout.addSpacing(10)
+        layout.addWidget(QLabel(f"<b>{tr('help.chrome_title')}</b>"))
+        step1 = QHBoxLayout()
+        step1.addWidget(QLabel(tr("help.chrome_step1")))
         self.copy_button = QPushButton(tr("help.copy_path"))
         self.copy_button.clicked.connect(self._copy_path)
-        row.addWidget(self.copy_button)
-        self.folder_button = QPushButton(tr("help.open_folder"))
-        self.folder_button.clicked.connect(lambda: reveal(self._folder))
-        row.addWidget(self.folder_button)
-        row.addStretch(1)
-        layout.addLayout(row)
-
-        browsers = QHBoxLayout()
+        step1.addWidget(self.copy_button)
+        step1.addStretch(1)
+        layout.addLayout(step1)
+        path_label = QLabel(folder)
+        path_label.setObjectName("supportNote")
+        path_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        path_label.setWordWrap(True)
+        layout.addWidget(path_label)
+        step2 = QHBoxLayout()
+        step2.addWidget(QLabel(tr("help.chrome_step2")))
         self.browser_buttons = {}
-        for exe, url, key in BROWSERS:
-            path = find_browser(exe)
-            if not path:
-                continue  # browser nije instaliran: bez dugmeta
-            button = QPushButton(tr(key))
-            button.clicked.connect(lambda _checked=False, path=path, url=url: self._open_extensions(path, url))
-            browsers.addWidget(button)
-            self.browser_buttons[exe] = button
-        browsers.addStretch(1)
-        layout.addLayout(browsers)
-        # Firefox ne treba ništa od gornjeg: dodatak potpisan od Mozille se instalira sa sajta jednim klikom.
-        firefox = QLabel(tr("help.firefox"))
-        firefox.setWordWrap(True)
-        firefox.linkActivated.connect(lambda _href: QDesktopServices.openUrl(QUrl(self.guide_url())))
-        layout.addWidget(firefox)
+        chrome_exe, chrome_url = CHROME
+        chrome = find_browser(chrome_exe)
+        if chrome:
+            button = QPushButton(tr("help.open_chrome"))
+            button.clicked.connect(lambda _checked=False: self._open_extensions(chrome, chrome_url))
+            step2.addWidget(button)
+            self.browser_buttons[chrome_exe] = button
+        else:
+            step2.addWidget(QLabel(f"<b>{chrome_url}</b>"))  # Chrome nije nađen: adresa za ručno otvaranje
+        step2.addStretch(1)
+        layout.addLayout(step2)
+        step3 = QLabel(tr("help.chrome_step3"))
+        step3.setWordWrap(True)
+        layout.addWidget(step3)
+
+        # 3) Kako se koristi (isto za sve browsere).
+        layout.addSpacing(10)
+        usage = QLabel(tr("help.usage"))
+        usage.setWordWrap(True)
+        layout.addWidget(usage)
 
         self.note = QLabel()
         self.note.setObjectName("supportNote")
+        self.note.setWordWrap(True)
         layout.addWidget(self.note)
         bottom = QHBoxLayout()
         guide = QLabel(f'<a href="guide">{tr("help.guide_online")}</a>')
-        guide.linkActivated.connect(lambda _href: QDesktopServices.openUrl(QUrl(self.guide_url())))
+        guide.linkActivated.connect(lambda _href: self._open_url(self.guide_url()))
         bottom.addWidget(guide)
         bottom.addStretch(1)
         close_button = QPushButton(tr("history.close"))
@@ -404,6 +436,18 @@ class BrowserHelpDialog(QDialog):
         # sajt ima svih 5 jezika: engleski u korijenu, ostali u svom podfolderu
         language = get_language()
         return SITE_URL + ("" if language == "en" else f"{language}/") + "extension.html"
+
+    def _open_store(self, exe: str | None, url: str) -> None:
+        """Stranica dodatka u prodavnici: u tom browseru ako je instaliran, inače u podrazumijevanom."""
+        try:
+            if exe:
+                self._launch([exe, url])
+            else:
+                self._open_url(url)
+            self.note.setText(tr("help.store_opened"))
+        except OSError:
+            self._open_url(url)
+            self.note.setText(tr("help.store_opened"))
 
     def _copy_path(self) -> None:
         QApplication.clipboard().setText(self._folder)
