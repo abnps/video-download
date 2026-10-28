@@ -77,3 +77,18 @@ Ukupno **oko 4–6 dana** rada. Objava samo na Ahmedovo „objavi", kao dio redo
 - Različite distribucije (stari glibc, Wayland/X11): gradnja na 22.04 i proba na 2–3 sistema.
 - AppImage traži FUSE na nekim novim sistemima: na sajtu kratko uputstvo (`--appimage-extract-and-run` kao rezerva).
 - Flatpak verzije browsera ne vide manifest u `~/.config`: napomena na sajtu (preporuka: browser iz paketa distribucije).
+
+## Stanje (28.10.2026, grana `linux`, nije poslano na GitHub)
+
+- [x] Kod: XDG putanje, `restore_system_env` (LD_LIBRARY_PATH za xdg-open/browser/node), otvaranje foldera,
+      jezik iz `~/.config/VideoDownload/VideoDownload.conf`, browseri iz PATH-a, Linux tekstovi (Ctrl+L), FFmpeg licenca.
+- [x] Veza s dodatkom: manifesti u `~/.config/{google-chrome,chromium,microsoft-edge,BraveSoftware/Brave-Browser}` i
+      `~/.mozilla/native-messaging-hosts`; host je sam AppImage (`$APPIMAGE`). Dodatak za Chrome se kopira na stalno
+      mjesto (`~/.local/share/VideoDownload/extension`), jer se AppImage otvara na drugoj /tmp putanji.
+- [x] Samoažuriranje: `release-linux.json` + `.sig`, novi AppImage pored starog, zamjena poslije gašenja.
+- [x] `tools/build_linux.py`, `.github/workflows/linux.yml` (Ubuntu 22.04, svi testovi + self-test paketa i hosta),
+      `tools/sign_linux.py`, 5 Linux fajlova obavezno u `publish_release.py` (19 ukupno).
+- [x] Sajt: dugme i kartica „Linux (beta)" u 5 jezika.
+- [ ] Prva stvarna gradnja (posao „Linux paket" na GitHubu ili WSL) i proba prozora, preuzimanja, dodatka, ažuriranja.
+- [ ] Statistika: Linux kolona u `tools/statistika.py` (vlastita.py već broji Linux).
+- [ ] Prečica u meniju (.desktop pri prvom pokretanju) — poslije prve probe.
