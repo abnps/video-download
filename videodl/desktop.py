@@ -8,7 +8,8 @@ from PySide6.QtGui import QDesktopServices
 
 
 def reveal(path: str, platform: str = sys.platform, popen=subprocess.Popen) -> None:
-    """Otvara Explorer/Finder: fajl je označen, a za folder se otvara sam folder."""
+    """Otvara Explorer/Finder: fajl je označen, a za folder se otvara sam folder.
+    Linux: označavanje fajla nije standardno, pa se otvara folder u kojem je fajl."""
     if not path or not os.path.exists(path):
         return
     if os.path.isfile(path):
@@ -18,6 +19,7 @@ def reveal(path: str, platform: str = sys.platform, popen=subprocess.Popen) -> N
         if platform == "darwin":
             popen(["open", "-R", path])  # Finder s označenim fajlom
             return
+        path = os.path.dirname(path)
     QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
 

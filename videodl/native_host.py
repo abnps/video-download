@@ -121,7 +121,7 @@ def saved_language() -> str | None:
     if sys.platform == "darwin":
         return _mac_saved_language()
     if sys.platform != "win32":
-        return None
+        return _linux_saved_language()
     import winreg
 
     try:
@@ -130,6 +130,20 @@ def saved_language() -> str | None:
             return str(value) or None
     except OSError:
         return None
+
+
+def _linux_saved_language(config: Path | None = None) -> str | None:
+    """QSettings("VideoDownload", "VideoDownload") na Linuxu piše INI u ~/.config/VideoDownload/VideoDownload.conf."""
+    from .runtime import user_config_base
+
+    try:
+        text = ((config or user_config_base()) / "VideoDownload" / "VideoDownload.conf").read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return None
+    for line in text.splitlines():
+        if line.startswith("language="):
+            return line.split("=", 1)[1].strip() or None
+    return None
 
 
 # QSettings("VideoDownload", "VideoDownload") na Macu piše plist u ~/Library/Preferences.
@@ -236,6 +250,9 @@ def current_config() -> dict:
             # „open" pokreće paket kao da ga je korisnik otvorio (ikona u Docku, jedan primjerak).
             bundle = next((parent for parent in executable.parents if parent.suffix == ".app"), executable)
             return {"launch": ["open", str(bundle)]}
+        if sys.platform != "win32":
+            # Linux: host je sam AppImage; pokreće se isti fajl, bez argumenata (obično otvaranje).
+            return {"launch": [os.environ.get("APPIMAGE") or str(executable)]}
         # Windows: videodl-host.exe stoji pored VideoDownload.exe.
         return {"launch": store_launch_command(executable) or [str(executable.with_name("VideoDownload.exe"))]}
     return load_config(Path(__file__).resolve().parent)

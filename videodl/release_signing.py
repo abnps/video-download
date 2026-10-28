@@ -28,6 +28,9 @@ SIGNATURE_NAME = "release.json.sig"
 # vlasnik potpisuje zasebno (tools/sign_macos.py) prije objave.
 MAC_MANIFEST_NAME = "release-macos.json"
 MAC_SIGNATURE_NAME = "release-macos.json.sig"
+# Linux AppImage: isto kao Mac (tools/sign_linux.py).
+LINUX_MANIFEST_NAME = "release-linux.json"
+LINUX_SIGNATURE_NAME = "release-linux.json.sig"
 # Javni ključevi kojima aplikacija vjeruje (više njih = moguća zamjena ključa bez prekida ažuriranja).
 PUBLIC_KEYS = ("8ce3563b3c8ba4bbba778fc6c6f1cd3e569a13f94ffdae2a7e61b293344347f2",)  # 26.9.2026
 

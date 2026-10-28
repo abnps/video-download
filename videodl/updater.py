@@ -12,6 +12,9 @@ otvori bez prikaza, aplikacija iz njega se kopira pored instalirane, a mala skri
 program ugasi i pokrene novu. Izdanje bez Mac potpisa ili aplikacija na mjestu bez prava pisanja: kao
 ranije, otvara se link za preuzimanje.
 
+Linux (beta): AppImage s `release-linux.json` + `.sig`. Provjeren AppImage se stavi pored trenutnog, a skripta
+ga poslije gašenja premjesti na mjesto starog (ista putanja, pa veza s dodatkom ostaje) i pokrene.
+
 VIDEODL_UPDATE_URL (testovi) zamjenjuje GitHub lokalnim HTTP serverom sa istim JSON-om.
 """
 
@@ -42,6 +45,8 @@ _NEEDS_LOGIN = (401, 403, 404)
 INSTALLER_NAME = re.compile(r"^VideoDownload-Setup-(\d+(?:\.\d+){1,3})\.exe$")
 # Mac (beta): disk image uz izdanje; program ga ne instalira sam nego otvara njegov link.
 MAC_INSTALLER_NAME = re.compile(r"^VideoDownload-macOS-arm64-(\d+(?:\.\d+){1,3})\.dmg$")
+# Linux (beta): AppImage uz izdanje.
+LINUX_INSTALLER_NAME = re.compile(r"^VideoDownload-linux-x86_64-(\d+(?:\.\d+){1,3})\.AppImage$")
 PLATFORM = sys.platform  # testovi ga postavljaju da bi isti test važio na svakom sistemu
 CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 MAX_NOTES = 800
@@ -85,13 +90,17 @@ def is_installed_app() -> bool:
 
 
 def can_self_install(release: "Release | None" = None, platform: str | None = None,
-                     bundle: Path | None = None) -> bool:
+                     bundle: Path | None = None, appimage: Path | None = None) -> bool:
     """Windows uvijek sam instalira. Mac samo kad je .dmg potpisan (izdanja od 0.9.8) i kad se aplikacija
     smije zamijeniti: prava pisanja, a ne pokrenuta iz .dmg-a ili iz macOS-ove privremene kopije (App
     Translocation). Inače se otvara link za preuzimanje."""
     platform = platform or PLATFORM
     if platform == "win32":
         return True
+    if platform.startswith("linux") and release is not None and release.manifest_url:
+        # Linux: samo AppImage u folderu u koji smijemo pisati (zamjena je preimenovanje u istom folderu).
+        appimage = appimage or runtime.linux_appimage()
+        return bool(appimage and os.access(appimage.parent, os.W_OK) and os.access(appimage, os.W_OK))
     if platform != "darwin" or release is None or not release.manifest_url:
         return False
     bundle = bundle or runtime.mac_app_bundle()
@@ -102,6 +111,8 @@ def can_self_install(release: "Release | None" = None, platform: str | None = No
 def _signed_names() -> tuple[str, str]:
     if PLATFORM == "win32":
         return release_signing.MANIFEST_NAME, release_signing.SIGNATURE_NAME
+    if PLATFORM.startswith("linux"):
+        return release_signing.LINUX_MANIFEST_NAME, release_signing.LINUX_SIGNATURE_NAME
     return release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME
 
 
@@ -109,7 +120,8 @@ def parse_release(data) -> Release | None:
     if not isinstance(data, dict) or data.get("draft") or data.get("prerelease"):
         return None
     assets = {asset.get("name"): asset for asset in data.get("assets") or [] if isinstance(asset, dict)}
-    pattern = INSTALLER_NAME if PLATFORM == "win32" else MAC_INSTALLER_NAME
+    pattern = (INSTALLER_NAME if PLATFORM == "win32" else LINUX_INSTALLER_NAME if PLATFORM.startswith("linux")
+               else MAC_INSTALLER_NAME)
     manifest_name, signature_name = _signed_names()
     for name, asset in assets.items():
         match = pattern.match(name or "")
@@ -128,7 +140,7 @@ def parse_release(data) -> Release | None:
                 signature_url=(assets.get(signature_name) or {}).get("browser_download_url") or "",
             )
     if PLATFORM != "win32":
-        return None  # izdanje bez Mac verzije: za ovaj sistem nema ništa novo
+        return None  # izdanje bez Mac/Linux verzije: za ovaj sistem nema ništa novo
     raise UpdateError("Release has no installer", key="update.no_asset")
 
 
@@ -225,6 +237,12 @@ def download_installer(release: Release, target_dir: Path, on_progress: Callable
             final.unlink(missing_ok=True)
             raise UpdateError("Not an installed Mac app")
         return prepare_mac_app(final, bundle)
+    if PLATFORM.startswith("linux"):
+        appimage = runtime.linux_appimage()
+        if appimage is None:
+            final.unlink(missing_ok=True)
+            raise UpdateError("Not a Linux AppImage")
+        return prepare_linux_appimage(final, appimage)
     return final
 
 
@@ -233,6 +251,8 @@ def launch_installer(path: Path, language: str) -> subprocess.Popen:
     Mac: `path` je već pripremljena nova .app (download_installer); zamjenu radi skripta poslije gašenja."""
     if PLATFORM == "darwin":
         return launch_mac_swap(path, runtime.mac_app_bundle() or path)
+    if PLATFORM.startswith("linux"):
+        return launch_linux_swap(path, runtime.linux_appimage() or path)
     return subprocess.Popen([
         str(path), "/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS",
         f"/LANG={INSTALLER_LANGUAGES.get(language, 'english')}", "/update=1",
@@ -317,6 +337,44 @@ def launch_mac_swap(staged: Path, bundle: Path, pid: int | None = None, launch: 
     """Zamjena poslije gašenja: skripta radi u svojoj sesiji, pa preživi zatvaranje programa."""
     return popen([shell, "-c", MAC_SWAP_SCRIPT, "videodl-update", str(pid or os.getpid()), str(bundle),
                   str(staged), launch], start_new_session=True, close_fds=True,
+                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+# ---------- Linux: AppImage → isti fajl, nova verzija ----------
+
+# Čeka da se program ugasi (najviše ~60 s), pa novi AppImage preimenuje preko starog (isti folder, pa je to jedan
+# korak koji ne može ostati napola) i pokrene ga. Argumenti: pid, stari AppImage, novi AppImage.
+LINUX_SWAP_SCRIPT = r'''
+pid="$1"; app="$2"; new="$3"
+i=0
+while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+kill -0 "$pid" 2>/dev/null && exit 1
+mv -f "$new" "$app" || exit 1
+"$app" >/dev/null 2>&1 &
+'''
+
+
+def prepare_linux_appimage(download: Path, appimage: Path) -> Path:
+    """Provjeren AppImage premjesti pored trenutnog (`.<ime>.novo`) i označi kao izvršni. Vraća novu putanju."""
+    if not LINUX_INSTALLER_NAME.match(download.name):
+        raise UpdateError(f"Unexpected Linux package name: {download.name}")
+    staged = _staged_path(appimage)
+    staged.unlink(missing_ok=True)
+    try:
+        shutil.move(str(download), str(staged))
+        staged.chmod(0o755)
+    except OSError:
+        staged.unlink(missing_ok=True)
+        download.unlink(missing_ok=True)
+        raise
+    return staged
+
+
+def launch_linux_swap(staged: Path, appimage: Path, pid: int | None = None, popen=subprocess.Popen,
+                      shell: str = "/bin/sh") -> subprocess.Popen:
+    """Zamjena poslije gašenja: skripta radi u svojoj sesiji, pa preživi zatvaranje programa."""
+    return popen([shell, "-c", LINUX_SWAP_SCRIPT, "videodl-update", str(pid or os.getpid()), str(appimage),
+                  str(staged)], start_new_session=True, close_fds=True,
                  stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 

@@ -1737,7 +1737,11 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _show_browser_help(self) -> None:
-        BrowserHelpDialog(str(extension_dir()), self).exec()
+        try:
+            folder = runtime.user_extension_dir()
+        except OSError:
+            folder = extension_dir()
+        BrowserHelpDialog(str(folder), self).exec()
 
     def _note_error(self, message: str) -> None:
         if message:
@@ -2078,6 +2082,9 @@ def main() -> int:
         QTimer.singleShot(0, lambda: QMessageBox.information(window, "Video Download", tr("mac.move_to_applications")))
     except OSError as exc:
         problems.append(tr("startup.register", error=exc))
+    if runtime.linux_appimage() is not None:
+        with contextlib.suppress(OSError):
+            runtime.user_extension_dir()  # nova verzija dodatka za Chrome poslije ažuriranja
     if problems:
         window._set_status(tr("startup.warning", problems="; ".join(problems)))
 

@@ -10,7 +10,11 @@ import sys
 
 def run(argv: list[str] | None = None) -> int:
     argv = sys.argv if argv is None else argv
+    from . import runtime
     from .native_host import is_browser_launch
+
+    if runtime.is_frozen() and runtime.IS_LINUX:
+        runtime.restore_system_env()
 
     if is_browser_launch(argv):
         from .native_host import main as host_main

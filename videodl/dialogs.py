@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import shutil
 import subprocess
 import sys
 from PySide6.QtCore import QUrl, Qt, Signal
@@ -323,9 +324,18 @@ MAC_BROWSERS = {"msedge.exe": "Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
                 "firefox.exe": "Firefox.app/Contents/MacOS/firefox"}
 
 
-def browser_exe(name: str, platform: str = sys.platform, applications: tuple[Path, ...] | None = None) -> str | None:
+# Linux: imena naredbi kako ih postavljaju paketi distribucija i proizvođača browsera.
+LINUX_BROWSERS = {"msedge.exe": ("microsoft-edge", "microsoft-edge-stable"),
+                  "chrome.exe": ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser"),
+                  "firefox.exe": ("firefox",)}
+
+
+def browser_exe(name: str, platform: str = sys.platform, applications: tuple[Path, ...] | None = None,
+                which=shutil.which) -> str | None:
     """Putanja browsera: na Windowsu iz „App Paths" registra (tako ga nalazi i Windows),
-    na Macu iz /Applications ili ~/Applications; None ako ga nema."""
+    na Macu iz /Applications ili ~/Applications, na Linuxu iz PATH-a; None ako ga nema."""
+    if platform.startswith("linux"):
+        return next((found for command in LINUX_BROWSERS.get(name, ()) if (found := which(command))), None)
     if platform == "darwin":
         inside = MAC_BROWSERS.get(name)
         folders = applications or (Path("/Applications"), Path.home() / "Applications")

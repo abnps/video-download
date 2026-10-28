@@ -42,7 +42,7 @@ class Component:
 PYTHON_DISTRIBUTIONS = ("yt-dlp", "yt-dlp-ejs", "curl_cffi", "certifi", "brotli", "requests", "urllib3",
                         "pycryptodomex")
 
-# FFmpeg u paketu zavisi od sistema: Windows koristi gyan.dev build, Mac (beta) build Martina Riedla.
+# FFmpeg u paketu zavisi od sistema: Windows koristi gyan.dev build, Mac i Linux (beta) build Martina Riedla.
 FFMPEG_WINDOWS = Component(
     "FFmpeg 9.0.2 (essentials build by gyan.dev)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
     "Bundled binaries: ffmpeg/ffprobe version 9.0.2-essentials_build-www.gyan.dev (SHA-256 in "
@@ -55,8 +55,15 @@ FFMPEG_MAC = Component(
     "Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; build script: "
     "https://git.martin-riedl.de/ffmpeg/build-script . "
     "A copy of the complete corresponding source code is available on request for three years.")
-FFMPEG = FFMPEG_MAC if sys.platform == "darwin" else FFMPEG_WINDOWS
-FFMPEG_BUILDS = (FFMPEG_WINDOWS, FFMPEG_MAC)
+FFMPEG_LINUX = Component(
+    "FFmpeg 9.0.2 (Linux x86_64 build by Martin Riedl)", "GPL-3.0", "https://ffmpeg.org/", ("GPL-3.0.txt",),
+    "Bundled binaries: ffmpeg/ffprobe 9.0.2 from https://ffmpeg.martin-riedl.de/ (SHA-256 in BUILD-MANIFEST.json). "
+    "Source code of this release: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz ; build script: "
+    "https://git.martin-riedl.de/ffmpeg/build-script . "
+    "A copy of the complete corresponding source code is available on request for three years.")
+FFMPEG = (FFMPEG_MAC if sys.platform == "darwin" else FFMPEG_LINUX if sys.platform.startswith("linux")
+          else FFMPEG_WINDOWS)
+FFMPEG_BUILDS = (FFMPEG_WINDOWS, FFMPEG_MAC, FFMPEG_LINUX)
 
 COMPONENTS = (
     Component("yt-dlp", "Unlicense", "https://github.com/yt-dlp/yt-dlp", ("yt-dlp-LICENSE",)),

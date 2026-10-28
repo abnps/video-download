@@ -769,6 +769,24 @@ TEXTS: dict[str, tuple[str, str, str, str, str]] = {
                        "Copiar la ruta de la carpeta", "Copier le chemin du dossier"),
     "help.open_chrome": ("Otvori dodatke u Chrome-u", "Open extensions in Chrome", "Erweiterungen in Chrome öffnen",
                          "Abrir extensiones en Chrome", "Ouvrir les extensions dans Chrome"),
+    "theme.system_linux": ("Kao sistem", "Same as system", "Wie System", "Como el sistema", "Comme le système"),
+    "help.copied_linux": (
+        "Putanja je kopirana: u koraku 3, u prozoru za izbor foldera pritisni Ctrl+L, zalijepi je (Ctrl+V) i pritisni Enter.",
+        "Path copied: in step 3, in the folder picker press Ctrl+L, paste it (Ctrl+V) and press Enter.",
+        "Pfad kopiert: In Schritt 3 im Ordnerdialog Strg+L drücken, einfügen (Strg+V) und Enter drücken.",
+        "Ruta copiada: en el paso 3, en el selector de carpetas pulsa Ctrl+L, pégala (Ctrl+V) y pulsa Intro.",
+        "Chemin copié : à l'étape 3, dans le sélecteur de dossier, appuyez sur Ctrl+L, collez-le (Ctrl+V) puis Entrée."),
+    "help.chrome_step3_linux": (
+        "3. Klikni „Load unpacked“, u prozoru za izbor foldera pritisni Ctrl+L, zalijepi putanju (Ctrl+V) i pritisni Enter, "
+        "pa „Select“. Na kraju prikvači ikonu Video Download (ikona slagalice → pribadača).",
+        "3. Click “Load unpacked”, in the folder picker press Ctrl+L, paste the path (Ctrl+V), press Enter and then "
+        "“Select”. Finally pin the Video Download icon (puzzle icon → pin).",
+        "3. Auf „Entpackte Erweiterung laden“ klicken, im Ordnerdialog Strg+L drücken, den Pfad einfügen (Strg+V), Enter "
+        "und dann „Auswählen“. Zum Schluss das Symbol Video Download anheften (Puzzle-Symbol → Pinnadel).",
+        "3. Pulsa «Cargar descomprimida», en el selector pulsa Ctrl+L, pega la ruta (Ctrl+V), pulsa Intro y luego "
+        "«Seleccionar». Por último, fija el icono de Video Download (icono de puzle → chincheta).",
+        "3. Cliquez sur « Charger l'extension non empaquetée », dans le sélecteur appuyez sur Ctrl+L, collez le chemin "
+        "(Ctrl+V), Entrée puis « Sélectionner ». Enfin, épinglez l'icône Video Download (icône puzzle → épingle)."),
     "theme.system_mac": ("Kao sistem", "Same as macOS", "Wie macOS", "Como macOS", "Comme macOS"),
     "help.copied_mac": (
         "Putanja je kopirana: u koraku 3, u prozoru za izbor foldera pritisni ⌘⇧G, zalijepi je (⌘V) i pritisni Enter.",
@@ -958,12 +976,16 @@ def get_language() -> str:
 PLATFORM = sys.platform  # testovi ga postavljaju da provjere Mac tekstove i na Windowsu
 # Mac: tekst koji pominje Windows ili njegove prečice ima svoju varijantu (ključ + "_mac").
 MAC_VARIANTS = {"theme.system", "help.copied", "help.chrome_step3"}
+# Linux: isti tekstovi, svoja varijanta (ključ + "_linux"); prečice ostaju Ctrl+.
+LINUX_VARIANTS = {"theme.system", "help.copied", "help.chrome_step3"}
 
 
 def tr(key: str, **values) -> str:
     mac = PLATFORM == "darwin"
     if mac and key in MAC_VARIANTS:
         key += "_mac"
+    elif PLATFORM.startswith("linux") and key in LINUX_VARIANTS:
+        key += "_linux"
     texts = TEXTS.get(key)
     if texts is None:
         return key

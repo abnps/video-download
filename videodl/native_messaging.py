@@ -1,6 +1,7 @@
 """Registracija native messaging hosta za Chrome, Edge i Firefox, samo za trenutnog korisnika.
 
 Windows: ključevi u HKCU. Mac: manifest u ~/Library/Application Support/<browser>/NativeMessagingHosts.
+Linux: manifest u ~/.config/<browser>/NativeMessagingHosts i ~/.mozilla/native-messaging-hosts.
 
 Uklanjanje: python -m videodl.native_messaging --uninstall
 """
@@ -13,7 +14,7 @@ from pathlib import Path
 
 from . import native_host
 from . import runtime
-from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_data_base
+from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_config_base, user_data_base
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
 EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
@@ -46,6 +47,8 @@ FIREFOX_REGISTRY_PATHS = tuple(path for name in native_host.HOST_NAMES for path 
 # dobije svoju pri sljedećem pokretanju.
 MAC_CHROMIUM_DIRS = ("Google/Chrome", "Microsoft Edge", "Chromium", "BraveSoftware/Brave-Browser")
 MAC_FIREFOX_DIR = "Mozilla"
+# Linux: isto pravilo; Chromium browseri u ~/.config, Firefox u ~/.mozilla (bez obzira na XDG).
+LINUX_CHROMIUM_DIRS = ("google-chrome", "chromium", "microsoft-edge", "BraveSoftware/Brave-Browser")
 
 
 class TemporaryLocationError(OSError):
@@ -77,12 +80,16 @@ def default_install_dir(platform: str = sys.platform) -> Path:
 def install_native_host(install_dir: Path | None = None, python_exe: str | None = None,
                         launch_command: list[str] | None = None, set_registry=None,
                         frozen_app_dir: Path | None = None, platform: str = sys.platform,
-                        mac_support_dir: Path | None = None, host_executable: Path | None = None) -> Path:
+                        mac_support_dir: Path | None = None, host_executable: Path | None = None,
+                        linux_home: Path | None = None) -> Path:
     install_dir = Path(install_dir or default_install_dir(platform))
     install_dir.mkdir(parents=True, exist_ok=True)
     if frozen_app_dir is None and host_executable is None and is_frozen():
         if platform == "darwin":
             host_executable = Path(sys.executable).resolve()  # Mac: host je sama aplikacija
+        elif platform.startswith("linux"):
+            # Linux: host je sam AppImage (ažuriranje ga mijenja na istom mjestu, pa putanja ostaje ista).
+            host_executable = runtime.linux_appimage() or Path(sys.executable).resolve()
         elif platform == "win32" and runtime.is_store_package() and store_host_alias().exists():
             host_executable = store_host_alias()
         else:
@@ -129,8 +136,10 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
         for host_name in native_host.HOST_NAMES:
             register(_chromium_registry_paths(host_name), str(manifests[host_name]))
             register(_firefox_registry_paths(host_name), str(firefox_manifests[host_name]))
-    elif platform == "darwin":
-        for target, source in mac_manifest_targets(mac_support_dir, manifests, firefox_manifests):
+    elif platform == "darwin" or platform.startswith("linux"):
+        targets = (mac_manifest_targets(mac_support_dir, manifests, firefox_manifests) if platform == "darwin"
+                   else linux_manifest_targets(linux_home, manifests, firefox_manifests))
+        for target, source in targets:
             if target.parent.parent.is_dir():  # browser postoji
                 target.parent.mkdir(exist_ok=True)
                 shutil.copyfile(source, target)
@@ -151,8 +160,22 @@ def mac_manifest_targets(support_dir: Path | None, chrome_manifests: dict[str, P
     return targets
 
 
+def linux_manifest_targets(home: Path | None, chrome_manifests: dict[str, Path] | None = None,
+                           firefox_manifests: dict[str, Path] | None = None) -> list[tuple[Path, Path | None]]:
+    """Isto kao mac_manifest_targets, za Linux. `home` zamjenjuje korisnički folder (testovi)."""
+    config = Path(home) / ".config" if home is not None else user_config_base()
+    home = Path(home) if home is not None else Path.home()
+    targets = []
+    for host_name in native_host.HOST_NAMES:
+        name = f"{host_name}.json"
+        targets.extend((config / folder / "NativeMessagingHosts" / name,
+                        (chrome_manifests or {}).get(host_name)) for folder in LINUX_CHROMIUM_DIRS)
+        targets.append((home / ".mozilla" / "native-messaging-hosts" / name, (firefox_manifests or {}).get(host_name)))
+    return targets
+
+
 def uninstall_native_host(install_dir: Path | None = None, platform: str = sys.platform,
-                          mac_support_dir: Path | None = None) -> None:
+                          mac_support_dir: Path | None = None, linux_home: Path | None = None) -> None:
     if platform == "win32":
         import winreg
 
@@ -161,8 +184,10 @@ def uninstall_native_host(install_dir: Path | None = None, platform: str = sys.p
                 winreg.DeleteKey(winreg.HKEY_CURRENT_USER, subkey)
             except FileNotFoundError:
                 pass
-    elif platform == "darwin":
-        for target, _source in mac_manifest_targets(mac_support_dir):
+    elif platform == "darwin" or platform.startswith("linux"):
+        targets = (mac_manifest_targets(mac_support_dir) if platform == "darwin"
+                   else linux_manifest_targets(linux_home))
+        for target, _source in targets:
             try:
                 target.unlink()
             except FileNotFoundError:
