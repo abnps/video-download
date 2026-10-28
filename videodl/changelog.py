@@ -8,6 +8,23 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.5", "29.10.2026", {
+        "bs": ["Novo: Video Download za Linux (beta) — jedan AppImage fajl za Ubuntu 22.04 i novije (i slične sisteme), bez instalacije; sam se ažurira, dodaje se u meni aplikacija i radi s dodatkom za Chrome, Edge i Firefox.",
+               "Pomoć → Preuzimanje iz browsera: dodatak za Edge i Firefox se instalira jednim klikom iz njihove prodavnice, a Chrome u tri jasna koraka.",
+               "Sitne ispravke izgleda (npr. link za otvaranje foldera na njemačkom)."],
+        "en": ["New: Video Download for Linux (beta) — a single AppImage file for Ubuntu 22.04 and newer (and similar systems), nothing to install; it updates itself, adds itself to the app menu and works with the extension for Chrome, Edge and Firefox.",
+               "Help → Download from the browser: the extension for Edge and Firefox installs with one click from their store, and Chrome in three clear steps.",
+               "Small layout fixes (e.g. the open-folder link in German)."],
+        "de": ["Neu: Video Download für Linux (Beta) — eine einzige AppImage-Datei für Ubuntu 22.04 und neuer (und ähnliche Systeme), ohne Installation; sie aktualisiert sich selbst, erscheint im Anwendungsmenü und funktioniert mit der Erweiterung für Chrome, Edge und Firefox.",
+               "Hilfe → Herunterladen aus dem Browser: Die Erweiterung für Edge und Firefox wird mit einem Klick aus deren Store installiert, für Chrome in drei klaren Schritten.",
+               "Kleine Korrekturen am Layout (z. B. der Link „Ordner öffnen“)."],
+        "es": ["Novedad: Video Download para Linux (beta) — un solo archivo AppImage para Ubuntu 22.04 o posterior (y sistemas similares), sin instalación; se actualiza solo, aparece en el menú de aplicaciones y funciona con la extensión para Chrome, Edge y Firefox.",
+               "Ayuda → Descargar desde el navegador: la extensión para Edge y Firefox se instala con un clic desde su tienda, y la de Chrome en tres pasos claros.",
+               "Pequeñas correcciones de diseño (p. ej. el enlace para abrir la carpeta en alemán)."],
+        "fr": ["Nouveau : Video Download pour Linux (bêta) — un seul fichier AppImage pour Ubuntu 22.04 et plus récent (et systèmes similaires), sans installation ; il se met à jour tout seul, s’ajoute au menu des applications et fonctionne avec l’extension pour Chrome, Edge et Firefox.",
+               "Aide → Télécharger depuis le navigateur : l’extension pour Edge et Firefox s’installe en un clic depuis leur boutique, et celle de Chrome en trois étapes claires.",
+               "Petites corrections de mise en page (p. ex. le lien d’ouverture du dossier en allemand)."],
+    }),
     ("1.0.4", "27.10.2026", {
         "bs": ["Android: video bez zvuka — kvačica „Bez zvuka“ na ekranu kvaliteta i „Sljedeći video bez zvuka“ u Postavkama (važi za jedan video, pa se samo isključi).",
                "Android: svaka postavka ima ⓘ s detaljnim objašnjenjem, a u Preuzimanjima dugi pritisak na dugme kaže šta radi; ekran ostaje isti pri okretanju telefona i promjeni jezika, a otvaranje iz „Nedavnih“ ne ponavlja isto preuzimanje.",

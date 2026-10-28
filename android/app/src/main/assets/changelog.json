@@ -1,5 +1,36 @@
 [
  {
+  "version": "1.0.5",
+  "date": "29.10.2026",
+  "notes": {
+   "bs": [
+    "Novo: Video Download za Linux (beta) — jedan AppImage fajl za Ubuntu 22.04 i novije (i slične sisteme), bez instalacije; sam se ažurira, dodaje se u meni aplikacija i radi s dodatkom za Chrome, Edge i Firefox.",
+    "Pomoć → Preuzimanje iz browsera: dodatak za Edge i Firefox se instalira jednim klikom iz njihove prodavnice, a Chrome u tri jasna koraka.",
+    "Sitne ispravke izgleda (npr. link za otvaranje foldera na njemačkom)."
+   ],
+   "en": [
+    "New: Video Download for Linux (beta) — a single AppImage file for Ubuntu 22.04 and newer (and similar systems), nothing to install; it updates itself, adds itself to the app menu and works with the extension for Chrome, Edge and Firefox.",
+    "Help → Download from the browser: the extension for Edge and Firefox installs with one click from their store, and Chrome in three clear steps.",
+    "Small layout fixes (e.g. the open-folder link in German)."
+   ],
+   "de": [
+    "Neu: Video Download für Linux (Beta) — eine einzige AppImage-Datei für Ubuntu 22.04 und neuer (und ähnliche Systeme), ohne Installation; sie aktualisiert sich selbst, erscheint im Anwendungsmenü und funktioniert mit der Erweiterung für Chrome, Edge und Firefox.",
+    "Hilfe → Herunterladen aus dem Browser: Die Erweiterung für Edge und Firefox wird mit einem Klick aus deren Store installiert, für Chrome in drei klaren Schritten.",
+    "Kleine Korrekturen am Layout (z. B. der Link „Ordner öffnen“)."
+   ],
+   "es": [
+    "Novedad: Video Download para Linux (beta) — un solo archivo AppImage para Ubuntu 22.04 o posterior (y sistemas similares), sin instalación; se actualiza solo, aparece en el menú de aplicaciones y funciona con la extensión para Chrome, Edge y Firefox.",
+    "Ayuda → Descargar desde el navegador: la extensión para Edge y Firefox se instala con un clic desde su tienda, y la de Chrome en tres pasos claros.",
+    "Pequeñas correcciones de diseño (p. ej. el enlace para abrir la carpeta en alemán)."
+   ],
+   "fr": [
+    "Nouveau : Video Download pour Linux (bêta) — un seul fichier AppImage pour Ubuntu 22.04 et plus récent (et systèmes similaires), sans installation ; il se met à jour tout seul, s’ajoute au menu des applications et fonctionne avec l’extension pour Chrome, Edge et Firefox.",
+    "Aide → Télécharger depuis le navigateur : l’extension pour Edge et Firefox s’installe en un clic depuis leur boutique, et celle de Chrome en trois étapes claires.",
+    "Petites corrections de mise en page (p. ex. le lien d’ouverture du dossier en allemand)."
+   ]
+  }
+ },
+ {
   "version": "1.0.4",
   "date": "27.10.2026",
   "notes": {
@@ -120,37 +151,6 @@
     "Le programme s'ouvre plus vite : le lecteur de sites se charge en arrière-plan, la fenêtre ne l'attend pas.",
     "Aide → Communauté Discord : questions et aide en 5 langues.",
     "Android : « Supprimer de l'appareil » dans le menu d'un téléchargement terminé (avec confirmation) ; les boutons rapides ne cachent plus la durée de la vidéo ; Discord dans les Paramètres."
-   ]
-  }
- },
- {
-  "version": "1.0.0",
-  "date": "8.10.2026",
-  "notes": {
-   "bs": [
-    "Video Download 1.0: program za računar, Android aplikacija i dodatak za browser dobijaju verziju 1.0 istog dana.",
-    "Android aplikacija je upola manja (29 MB umjesto 61 MB): brže preuzimanje i brže slanje prijatelju.",
-    "Sve iz probnih verzija je tu: MP4 do najboljeg kvaliteta, MP3, plejliste, isječci, titlovi, poglavlja, roditeljska zaštita i samostalna, potpisana ažuriranja."
-   ],
-   "en": [
-    "Video Download 1.0: the desktop app, the Android app and the browser extension all reach version 1.0 on the same day.",
-    "The Android app is half the size (29 MB instead of 61 MB): faster to download and faster to send to a friend.",
-    "Everything from the beta versions is here: MP4 up to the best quality, MP3, playlists, clips, subtitles, chapters, parental controls and signed self-updates."
-   ],
-   "de": [
-    "Video Download 1.0: Desktop-Programm, Android-App und Browser-Erweiterung erreichen am selben Tag Version 1.0.",
-    "Die Android-App ist nur noch halb so groß (29 MB statt 61 MB): schneller geladen und schneller an Freunde geschickt.",
-    "Alles aus den Testversionen ist dabei: MP4 in bester Qualität, MP3, Playlists, Ausschnitte, Untertitel, Kapitel, Jugendschutz und signierte automatische Updates."
-   ],
-   "es": [
-    "Video Download 1.0: el programa de escritorio, la app de Android y la extensión del navegador llegan a la versión 1.0 el mismo día.",
-    "La app de Android ocupa la mitad (29 MB en lugar de 61 MB): se descarga y se envía a un amigo más rápido.",
-    "Todo lo de las versiones de prueba está aquí: MP4 con la mejor calidad, MP3, listas, fragmentos, subtítulos, capítulos, control parental y actualizaciones automáticas firmadas."
-   ],
-   "fr": [
-    "Video Download 1.0 : le programme pour ordinateur, l'application Android et l'extension du navigateur passent en version 1.0 le même jour.",
-    "L'application Android est deux fois plus légère (29 Mo au lieu de 61 Mo) : plus rapide à télécharger et à envoyer à un ami.",
-    "Tout ce qui était dans les versions d'essai est là : MP4 en meilleure qualité, MP3, playlists, extraits, sous-titres, chapitres, contrôle parental et mises à jour automatiques signées."
    ]
   }
  }
