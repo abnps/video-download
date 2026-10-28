@@ -86,10 +86,13 @@ def snapshot(data: dict) -> tuple:
 def required_assets(version: str, android_name: str) -> list[str]:
     windows = f"VideoDownload-Setup-{version}.exe"
     mac = f"VideoDownload-macOS-arm64-{version}.dmg"
+    linux = f"VideoDownload-linux-x86_64-{version}.AppImage"
     apk = f"VideoDownload-android-{android_name}.apk"
     return [windows, windows + ".sha256", "VideoDownload-Setup.exe", "release.json", "release.json.sig",
             mac, mac + ".sha256", "VideoDownload-macOS-arm64.dmg",
             release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME,
+            linux, linux + ".sha256", "VideoDownload-linux-x86_64.AppImage",
+            release_signing.LINUX_MANIFEST_NAME, release_signing.LINUX_SIGNATURE_NAME,
             apk, apk + ".sha256", "VideoDownload-android.apk", "android.json"]
 
 
@@ -146,16 +149,20 @@ def validate_assets(folder: Path, version: str, code: int, name: str) -> dict:
         raise ReleaseError("Windows manifest pripada drugom programu.")
     release_signing.check_installer(manifest, version, windows)
     mac = folder / f"VideoDownload-macOS-arm64-{version}.dmg"
-    # Mac potpis (tools/sign_macos.py): bez njega Mac verzija ne bi mogla sama preći na ovo izdanje.
-    mac_manifest = release_signing.verify_manifest(
-        (folder / release_signing.MAC_MANIFEST_NAME).read_bytes(),
-        (folder / release_signing.MAC_SIGNATURE_NAME).read_text(encoding="ascii"))
-    if mac_manifest.get("app") != "Video Download":
-        raise ReleaseError("Mac manifest pripada drugom programu.")
-    release_signing.check_installer(mac_manifest, version, mac)
+    linux = folder / f"VideoDownload-linux-x86_64-{version}.AppImage"
+    # Mac i Linux potpis (tools/sign_macos.py, tools/sign_linux.py): bez njih te verzije ne bi mogle same preći
+    # na ovo izdanje.
+    for label, package, names in (("Mac", mac, (release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME)),
+                                  ("Linux", linux, (release_signing.LINUX_MANIFEST_NAME,
+                                                    release_signing.LINUX_SIGNATURE_NAME))):
+        signed = release_signing.verify_manifest((folder / names[0]).read_bytes(),
+                                                 (folder / names[1]).read_text(encoding="ascii"))
+        if signed.get("app") != "Video Download":
+            raise ReleaseError(f"{label} manifest pripada drugom programu.")
+        release_signing.check_installer(signed, version, package)
     apk = folder / f"VideoDownload-android-{name}.apk"
-    for versioned, stable in ((windows, "VideoDownload-Setup.exe"),
-                              (mac, "VideoDownload-macOS-arm64.dmg"), (apk, "VideoDownload-android.apk")):
+    for versioned, stable in ((windows, "VideoDownload-Setup.exe"), (mac, "VideoDownload-macOS-arm64.dmg"),
+                              (linux, "VideoDownload-linux-x86_64.AppImage"), (apk, "VideoDownload-android.apk")):
         digest = check_checksum(versioned)
         if sha256(folder / stable) != digest:
             raise ReleaseError(f"Stalni link vodi na drugačiji fajl: {stable}")

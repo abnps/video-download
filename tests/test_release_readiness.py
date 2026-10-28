@@ -119,6 +119,52 @@ class ReleaseReadinessTest(unittest.TestCase):
         self.assertEqual((manifest["installer"], manifest["version"]), (dmg_name, version))
 
 
+    def test_linux_signature_is_required_and_made_from_the_draft_appimage(self):
+        names = publish_release.required_assets(publish_release.__version__, "0.2.0")
+        for name in ("release-linux.json", "release-linux.json.sig", "VideoDownload-linux-x86_64.AppImage",
+                     f"VideoDownload-linux-x86_64-{publish_release.__version__}.AppImage"):
+            self.assertIn(name, names)
+
+        import hashlib
+        import os
+        import tempfile
+
+        import sign_linux
+        import sign_macos
+        from Cryptodome.PublicKey import ECC
+        from videodl import release_signing
+
+        version = publish_release.__version__
+        app_name = f"VideoDownload-linux-x86_64-{version}.AppImage"
+        uploaded = {}
+
+        def fake_run(*args, **kwargs):
+            if args[1:3] == ("release", "download"):
+                self.assertIn(app_name, args)
+                folder = Path(args[args.index("--dir") + 1])
+                (folder / app_name).write_bytes(b"app" * 100)
+                digest = hashlib.sha256(b"app" * 100).hexdigest()
+                (folder / (app_name + ".sha256")).write_text(f"{digest}  {app_name}\n", encoding="ascii")
+            elif args[1:3] == ("release", "upload"):
+                for arg in args:
+                    if arg.endswith((".json", ".sig")):
+                        uploaded[Path(arg).name] = Path(arg).read_bytes()
+            return ""
+
+        key = ECC.generate(curve="ed25519")
+        with tempfile.TemporaryDirectory() as temp:
+            key_file = Path(temp) / "test-key.pem"
+            key_file.write_text(key.export_key(format="PEM"), encoding="ascii")
+            with patch.dict(os.environ, {"VIDEODL_SIGNING_KEY": str(key_file)}), \
+                    patch.object(sign_macos, "draft"), patch.object(sign_macos, "run", side_effect=fake_run):
+                sign_linux.sign_linux(f"v{version}")
+        self.assertEqual(set(uploaded), {"release-linux.json", "release-linux.json.sig"})
+        manifest = release_signing.verify_manifest(uploaded["release-linux.json"],
+                                                   uploaded["release-linux.json.sig"].decode("ascii"),
+                                                   public_keys=(release_signing.public_key_hex(key),))
+        self.assertEqual((manifest["installer"], manifest["version"]), (app_name, version))
+
+
 class OwnDownloadsTest(unittest.TestCase):
     """Naša preuzimanja (provjera izdanja, Mac potpis, kopija za winget) se oduzimaju u statistici."""
 
@@ -129,8 +175,10 @@ class OwnDownloadsTest(unittest.TestCase):
                                      "VideoDownload-Setup.exe", "VideoDownload-macOS-arm64-1.0.0.dmg",
                                      "VideoDownload-android-1.0.0.apk", "release.json", "release.json.sig",
                                      "release-macos.json", "android.json"])
-        self.assertEqual(counted["downloads"], {"windows": 2, "mac": 1, "android": 1})
-        self.assertEqual(counted["checks"], {"windows": 1, "mac": 1, "android": 1})
+        self.assertEqual(counted["downloads"], {"windows": 2, "mac": 1, "linux": 0, "android": 1})
+        self.assertEqual(counted["checks"], {"windows": 1, "mac": 1, "linux": 0, "android": 1})
+        linux = vlastita.classify(["VideoDownload-linux-x86_64-1.1.0.AppImage", "release-linux.json"])
+        self.assertEqual((linux["downloads"]["linux"], linux["checks"]["linux"]), (1, 1))
 
     def test_record_adds_to_the_local_total_only(self):
         import json
@@ -154,8 +202,9 @@ class OwnDownloadsTest(unittest.TestCase):
             path = Path(tmp) / "vlastita.json"
             vlastita.record(["release.json", "android.json", "android.json"], path, today="2026-10-05")
             vlastita.record(["release.json", "VideoDownload-Setup-1.0.0.exe"], path, today="2026-10-06")
-            self.assertEqual(vlastita.load_days(path), {"2026-10-05": {"windows": 1, "mac": 0, "android": 2},
-                                                        "2026-10-06": {"windows": 1, "mac": 0, "android": 0}})
+            self.assertEqual(vlastita.load_days(path),
+                             {"2026-10-05": {"windows": 1, "mac": 0, "linux": 0, "android": 2},
+                              "2026-10-06": {"windows": 1, "mac": 0, "linux": 0, "android": 0}})
             self.assertEqual(vlastita.load(path)["checks"]["android"], 2)
 
     def test_my_devices_are_subtracted_for_every_day_of_a_longer_period(self):

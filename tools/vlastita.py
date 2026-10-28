@@ -12,8 +12,9 @@ import sys
 from pathlib import Path
 
 DEFAULT = Path(__file__).resolve().parent.parent.parent / "Build" / "statistika" / "vlastita.json"
-KINDS = ("windows", "mac", "android")
-CHECK_FILES = {"release.json": "windows", "release-macos.json": "mac", "android.json": "android"}
+KINDS = ("windows", "mac", "linux", "android")
+CHECK_FILES = {"release.json": "windows", "release-macos.json": "mac", "release-linux.json": "linux",
+               "android.json": "android"}
 
 
 def empty() -> dict:
@@ -28,6 +29,8 @@ def classify(names) -> dict:
             counted["downloads"]["windows"] += 1
         elif name.endswith(".dmg"):
             counted["downloads"]["mac"] += 1
+        elif name.endswith(".AppImage"):
+            counted["downloads"]["linux"] += 1
         elif name.endswith(".apk"):
             counted["downloads"]["android"] += 1
         elif name in CHECK_FILES:

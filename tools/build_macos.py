@@ -67,23 +67,28 @@ def check_environment(lock: dict) -> None:
         raise SystemExit("Okruženje se ne slaže s tools/build-lock.json:\n  " + "\n  ".join(problems))
 
 
-def fetch_tools(lock: dict) -> Path:
-    """Preuzme arhive iz lock-a, provjeri SHA-256 i raspakuje samo potrebne izvršne fajlove u STAGE/tools."""
-    downloads = WORK / "downloads"
+def download(name: str, spec: dict, downloads: Path) -> Path:
+    """Fajl iz lock-a (url + sha256): preuzme ga ako ga nema i odbije ako se SHA-256 ne slaže."""
     downloads.mkdir(parents=True, exist_ok=True)
-    tools = STAGE / "tools"
+    archive = downloads / f"{name}-{spec['url'].rsplit('/', 1)[-1]}"
+    if not archive.is_file() or build_release.sha256_file(archive) != spec["sha256"]:
+        print(f"› preuzimam {name}: {spec['url']}", flush=True)
+        request = urllib.request.Request(spec["url"], headers={"User-Agent": "VideoDownload-build"})
+        with urllib.request.urlopen(request, timeout=300) as response, open(archive, "wb") as file:
+            shutil.copyfileobj(response, file)
+    digest = build_release.sha256_file(archive)
+    if digest != spec["sha256"]:
+        raise SystemExit(f"{name}: SHA-256 {digest} se ne slaže s lock-om ({spec['sha256']}).")
+    return archive
+
+
+def fetch_tools(lock: dict, section: str = "macos_tools", work: Path = WORK, stage: Path = STAGE) -> Path:
+    """Preuzme arhive iz lock-a, provjeri SHA-256 i raspakuje samo potrebne izvršne fajlove u <stage>/tools.
+    Isto i za Linux (section="linux_tools")."""
+    tools = stage / "tools"
     tools.mkdir(parents=True, exist_ok=True)
     for name, inside in TOOL_FILES.items():
-        spec = lock["macos_tools"][name]
-        archive = downloads / f"{name}-{spec['url'].rsplit('/', 1)[-1]}"
-        if not archive.is_file() or build_release.sha256_file(archive) != spec["sha256"]:
-            print(f"› preuzimam {name}: {spec['url']}", flush=True)
-            request = urllib.request.Request(spec["url"], headers={"User-Agent": "VideoDownload-build"})
-            with urllib.request.urlopen(request, timeout=300) as response, open(archive, "wb") as file:
-                shutil.copyfileobj(response, file)
-        digest = build_release.sha256_file(archive)
-        if digest != spec["sha256"]:
-            raise SystemExit(f"{name}: SHA-256 {digest} se ne slaže s lock-om ({spec['sha256']}).")
+        archive = download(name, lock[section][name], work / "downloads")
         target = tools / name
         if archive.name.endswith(".zip"):
             with zipfile.ZipFile(archive) as bundle:
@@ -114,7 +119,8 @@ def make_icns(target: Path) -> None:
     run(["iconutil", "-c", "icns", str(iconset), "-o", str(target)])
 
 
-def write_manifest(lock: dict, tools: Path) -> None:
+def write_manifest(lock: dict, tools: Path, section: str = "macos_tools", platform_name: str = "macos-arm64",
+                   stage: Path = STAGE) -> None:
     import importlib.metadata
 
     try:
@@ -123,13 +129,13 @@ def write_manifest(lock: dict, tools: Path) -> None:
     except (OSError, subprocess.CalledProcessError):
         commit = ""
     manifest = {
-        "app": __version__, "platform": "macos-arm64", "commit": commit, "python": sys.version.split()[0],
+        "app": __version__, "platform": platform_name, "commit": commit, "python": sys.version.split()[0],
         "packages": {name: importlib.metadata.version(name) for name in lock["packages"]},
         "tools": {name: {"version": spec["version"], "source": spec["source"], "archive_sha256": spec["sha256"],
                          "sha256": build_release.sha256_file(tools / name)}
-                  for name, spec in lock["macos_tools"].items() if name != "comment"},
+                  for name, spec in lock[section].items() if name != "comment"},
     }
-    (STAGE / "BUILD-MANIFEST.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    (stage / "BUILD-MANIFEST.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def set_info_plist() -> None:

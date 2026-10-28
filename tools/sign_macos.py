@@ -18,22 +18,27 @@ from videodl import release_signing  # noqa: E402
 NAMES = (release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME)
 
 
-def sign_mac(tag: str) -> None:
+def sign_package(tag: str, package_name: str, names: tuple[str, str], job: str) -> None:
+    """Preuzme paket iz nacrta, provjeri .sha256, potpiše opis i doda ga nacrtu (isto za Mac i Linux)."""
     version = check_tag(tag)
     draft(tag)  # samo nacrt, nikad već objavljeno izdanje
-    dmg_name = f"VideoDownload-macOS-arm64-{version}.dmg"
-    with tempfile.TemporaryDirectory(prefix="videodl-mac-sign-") as temp:
+    package_name = package_name.format(version=version)
+    with tempfile.TemporaryDirectory(prefix="videodl-sign-") as temp:
         folder = Path(temp)
         run("gh", "release", "download", tag, "--repo", REPO, "--dir", str(folder),
-            "--pattern", dmg_name, "--pattern", dmg_name + ".sha256")
-        record_own([dmg_name], run)
-        dmg = folder / dmg_name
-        if not dmg.is_file():
-            raise ReleaseError(f"Nacrt nema {dmg_name}; prvo pokreni posao „Mac paket\" (README, korak 4).")
-        check_checksum(dmg)
-        manifest, signature = release_signing.write_signed_manifest(version, dmg, names=NAMES)
+            "--pattern", package_name, "--pattern", package_name + ".sha256")
+        record_own([package_name], run)
+        package = folder / package_name
+        if not package.is_file():
+            raise ReleaseError(f"Nacrt nema {package_name}; prvo pokreni posao „{job}\" (README).")
+        check_checksum(package)
+        manifest, signature = release_signing.write_signed_manifest(version, package, names=names)
         run("gh", "release", "upload", tag, str(manifest), str(signature), "--repo", REPO, "--clobber")
-    print(f"{tag}: {dmg_name} potpisan ({', '.join(NAMES)} dodati nacrtu).")
+    print(f"{tag}: {package_name} potpisan ({', '.join(names)} dodati nacrtu).")
+
+
+def sign_mac(tag: str) -> None:
+    sign_package(tag, "VideoDownload-macOS-arm64-{version}.dmg", NAMES, "Mac paket")
 
 
 def main() -> int:

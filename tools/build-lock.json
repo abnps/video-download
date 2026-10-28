@@ -51,5 +51,41 @@
       "sha256": "25495ff85bd89e2d8a24d88566d7e2f827c6b0d3d872b2cebf75371f93fcb1fe",
       "source": "https://nodejs.org/dist/v24.14.1/"
     }
+  },
+  "linux_tools": {
+    "comment": "Linux (x86_64) AppImage: arhive i alati za pakovanje se preuzimaju na GitHub Ubuntu 22.04 računaru i provjeravaju po SHA-256.",
+    "ffmpeg": {
+      "version": "9.0.2 (Martin Riedl, Linux amd64)",
+      "url": "https://ffmpeg.martin-riedl.de/download/linux/amd64/1789931100_9.0.2/ffmpeg.zip",
+      "sha256": "fa8ecf4abbd290d98f7d188b8649cc6b391ae209a98452be955a15aab1909d7f",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "ffprobe": {
+      "version": "9.0.2 (Martin Riedl, Linux amd64)",
+      "url": "https://ffmpeg.martin-riedl.de/download/linux/amd64/1789931100_9.0.2/ffprobe.zip",
+      "sha256": "3f428c49070be3d24ec338602b76d412e401ffcb8a5641ef0e729181a232fc32",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+    },
+    "node": {
+      "version": "v24.14.1",
+      "url": "https://nodejs.org/dist/v24.14.1/node-v24.14.1-linux-x64.tar.xz",
+      "sha256": "84d38715d449447117d05c3e71acd78daa49d5b1bfa8aacf610303920c3322be",
+      "source": "https://nodejs.org/dist/v24.14.1/"
+    }
+  },
+  "appimage_tools": {
+    "comment": "Samo za pakovanje (ne ide u paket osim runtime-a na početku AppImage-a).",
+    "appimagetool": {
+      "version": "1.9.1",
+      "url": "https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage",
+      "sha256": "ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0",
+      "source": "https://github.com/AppImage/appimagetool"
+    },
+    "runtime": {
+      "version": "20251108",
+      "url": "https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-x86_64",
+      "sha256": "2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d",
+      "source": "https://github.com/AppImage/type2-runtime"
+    }
   }
 }
