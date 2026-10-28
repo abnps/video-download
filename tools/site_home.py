@@ -33,7 +33,12 @@ ICONS = {
     "clips": '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
     "theme": '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
     "safe": '<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+    "platforms": '<rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M6 18h6M9 14v4"/>'
+                 '<rect x="17" y="8" width="5" height="11" rx="1"/>',
 }
+
+# Pločica „Radi skoro svuda": imena sistema i browsera su ista na svim jezicima.
+PLATFORM_NAMES = ("Windows", "macOS", "Linux", "Android", "Chrome", "Edge", "Firefox")
 
 # Boje sličica u demou (iste na svim jezicima); naslovi su u HOME[lang]["demo_titles"].
 DEMO_ROWS = (("12:34", 46.0, 9.6, "#3d7a5a", "#2b5a82", "best", False),
@@ -46,12 +51,12 @@ HOME = {
         "promise": ('No account', 'No daily limit', 'Your links never reach us'),
         "a11y": ('Demo', 'Pause animation', 'Play animation', 'Menu', 'Added: {t}', 'Finished: {t}', 'Demo of the app window (not a real download)'),
         "share": ('Share', 'Copy', 'Copied', 'Tell a friend who needs it.', 'Share Video Download', 'More…', 'Close'),
-        "title": "Video Download — MP4/MP3 for Windows; Mac and Android beta",
-        "description": "Free video and audio downloader for Windows, with Mac and Android in beta. MP4, MP3, no ads or tracking, in 5 languages.",
+        "title": "Video Download — MP4/MP3 for Windows; Mac, Linux and Android beta",
+        "description": "Free video and audio downloader for Windows, with Mac, Linux and Android in beta. MP4, MP3, no ads or tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
         "download_short": "Download", "new": "New", "eyebrow": "<b>Android, macOS and Linux</b> in beta",
         "h1": ("Video and audio.", "In one click."),
-        "lead": "A free app for Windows, Mac and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.",
+        "lead": "A free app for Windows, Mac, Linux and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.",
         "platform_label": "Choose your platform", "mac_btn": "Download for macOS", "android_btn": "Download for Android",
         "mac_req": "macOS 13+ · Apple M1 or newer · Beta", "linux_btn": "Download for Linux", "linux_req": "Ubuntu 22.04+ or similar · x86_64 · Beta",
         "android_req": "Android 10+ · ARM64 · Beta",
@@ -69,10 +74,11 @@ HOME = {
             "playlists": ("Playlists, several at once", "Whole playlists, up to 4 downloads at the same time, automatic retry when the connection drops."),
             "clips": ("Clips, subtitles, cover art", "Just a part of a video, subtitles in the MP4 and the thumbnail as the file's cover."),
             "theme": ("Light and dark theme", "Or same as your system. Progress on the taskbar and a notification at the end."),
+            "platforms": ('Works almost everywhere', 'Windows 10 and 11, macOS (Apple chip), Linux and Android, plus the browser extension for Chrome, Edge and Firefox. Mac, Linux and Android are in beta.'),
             "safe": ("Always up to date, and safe", "The app checks for new versions itself, updates the part that reads websites without "
-                     "reinstalling. On Windows and Mac it installs only updates digitally signed by us."),
+                     "reinstalling. On Windows, Mac and Linux it installs only updates digitally signed by us."),
         },
-        "chips": ("5 languages", "No account", "No ads", "No tracking", "Signed updates on Windows"),
+        "chips": ("5 languages", "No account", "No ads", "No tracking", "Signed updates"),
         "shot_alt": "The Video Download window with four downloads",
         "extension": ("Browser extension", "Download what's playing.",
                       "Play a video, click the icon, done. Or right-click any link or video. The app starts by itself if it isn't running.",
@@ -110,7 +116,7 @@ HOME = {
                  "characters of an encoded video ID. No accounts, statistics or tracking."),
                 ("How is it different from download websites?", "Download websites run everything on their server: your link and IP address go to them and to ad networks, and they pay for it with pop-ups, fake buttons and often a lower quality. Video Download works on your own computer or phone, without ads or accounts, in full quality, and your links go to no one but the site you download from."),
                 ("Is it safe?", "The code is public on GitHub, every installer has a SHA-256 checksum, and the app installs only "
-                 "updates digitally signed by us, on Windows, Mac and Android.")),
+                 "updates digitally signed by us, on Windows, Mac, Linux and Android.")),
         "demo_titles": ("Mountain hike – Prokosko lake (4K)", "My live concert – filmed from the crowd",
                         "Lecture: photography basics", "Podcast #12 – a talk about travel"),
         "demo": ("Downloading · {p}% · {v} MB/s · {s} s left", "."),
@@ -119,12 +125,12 @@ HOME = {
         "promise": ('Bez naloga', 'Bez dnevnog ograničenja', 'Tvoji linkovi ne idu nama'),
         "a11y": ('Demonstracija', 'Pauziraj animaciju', 'Pokreni animaciju', 'Meni', 'Dodano: {t}', 'Završeno: {t}', 'Demonstracija prozora programa (nije pravo preuzimanje)'),
         "share": ('Podijeli', 'Kopiraj', 'Kopirano', 'Javi prijatelju kome treba.', 'Podijeli Video Download', 'Više…', 'Zatvori'),
-        "title": "Video Download — MP4/MP3 za Windows; Mac i Android beta",
-        "description": "Besplatan program za preuzimanje videa i zvuka na Windowsu; Mac i Android su u beta fazi. MP4, MP3, bez reklama i praćenja, na 5 jezika.",
+        "title": "Video Download — MP4/MP3 za Windows; Mac, Linux i Android beta",
+        "description": "Besplatan program za preuzimanje videa i zvuka na Windowsu; Mac, Linux i Android su u beta fazi. MP4, MP3, bez reklama i praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
         "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android, macOS i Linux</b> u probnoj fazi",
         "h1": ("Video i zvuk.", "Jednim klikom."),
-        "lead": "Besplatan program za Windows, Mac i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.",
+        "lead": "Besplatan program za Windows, Mac, Linux i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.",
         "platform_label": "Izaberi platformu", "mac_btn": "Preuzmi za macOS", "android_btn": "Preuzmi za Android",
         "mac_req": "macOS 13+ · Apple M1 ili noviji · Beta", "linux_btn": "Preuzmi za Linux", "linux_req": "Ubuntu 22.04+ ili sličan · x86_64 · Beta",
         "android_req": "Android 10+ · ARM64 · Beta",
@@ -142,10 +148,11 @@ HOME = {
             "playlists": ("Plejliste, više odjednom", "Cijele plejliste, do 4 preuzimanja istovremeno, automatski novi pokušaj kad pukne veza."),
             "clips": ("Isječak, titlovi, omot", "Samo dio videa, titlovi u MP4 i sličica kao omot fajla."),
             "theme": ("Svijetla i tamna tema", "Ili kao sistem. Napredak na traci zadataka i obavještenje na kraju."),
+            "platforms": ('Radi skoro svuda', 'Windows 10 i 11, macOS (Apple čip), Linux i Android, uz dodatak za Chrome, Edge i Firefox. Mac, Linux i Android su u probnoj fazi.'),
             "safe": ("Uvijek ažuran i siguran", "Program sam provjerava nove verzije, ažurira dio koji čita sajtove bez ponovne "
-                     "instalacije. Na Windowsu i Macu instalira samo ažuriranja koja smo mi digitalno potpisali."),
+                     "instalacije. Na Windowsu, Macu i Linuxu instalira samo ažuriranja koja smo mi digitalno potpisali."),
         },
-        "chips": ("5 jezika", "Bez naloga", "Bez reklama", "Bez praćenja", "Potpisana ažuriranja na Windowsu"),
+        "chips": ("5 jezika", "Bez naloga", "Bez reklama", "Bez praćenja", "Potpisana ažuriranja"),
         "shot_alt": "Prozor programa Video Download sa četiri preuzimanja",
         "extension": ("Dodatak za browser", "Preuzmi ono što se pušta.",
                       "Pusti video, klikni ikonu i gotovo. Ili desni klik na bilo koji link ili video. Program se sam pokrene ako nije otvoren.",
@@ -184,7 +191,7 @@ HOME = {
                  "ID-a videa. Nema naloga, statistike ni praćenja."),
                 ("Po čemu se razlikuje od sajtova za preuzimanje?", "Sajtovi za preuzimanje sve rade na svom serveru: tvoj link i IP adresa idu njima i reklamnim mrežama, a to plaćaš iskačućim prozorima, lažnim dugmadima i često slabijim kvalitetom. Video Download radi na tvom računaru ili telefonu, bez reklama i naloga, u punom kvalitetu, a tvoji linkovi ne idu nikome osim sajtu s kog preuzimaš."),
                 ("Da li je siguran?", "Kod je javan na GitHubu, svaki instaler ima SHA-256 zbir, a program instalira samo "
-                 "ažuriranja koja smo mi digitalno potpisali, na Windowsu, Macu i Androidu.")),
+                 "ažuriranja koja smo mi digitalno potpisali, na Windowsu, Macu, Linuxu i Androidu.")),
         "demo_titles": ("Planinarska tura – Prokoško jezero (4K)", "Moj koncert uživo – snimak iz publike",
                         "Predavanje: osnove fotografije", "Podcast #12 – razgovor o putovanjima"),
         "demo": ("Preuzimanje · {p}% · {v} MB/s · još {s} s", ","),
@@ -193,12 +200,12 @@ HOME = {
         "promise": ('Kein Konto', 'Kein Tageslimit', 'Deine Links landen nicht bei uns'),
         "a11y": ('Demo', 'Animation anhalten', 'Animation abspielen', 'Menü', 'Hinzugefügt: {t}', 'Fertig: {t}', 'Demo des Programmfensters (kein echter Download)'),
         "share": ('Teilen', 'Kopieren', 'Kopiert', 'Erzähl es jemandem, der es braucht.', 'Video Download teilen', 'Mehr…', 'Schließen'),
-        "title": "Video Download — MP4/MP3 für Windows; Mac und Android Beta",
-        "description": "Kostenloser Video- und Audio-Downloader für Windows; Mac und Android sind in der Beta-Phase. MP4, MP3, ohne Werbung oder Tracking, in 5 Sprachen.",
+        "title": "Video Download — MP4/MP3 für Windows; Mac, Linux und Android Beta",
+        "description": "Kostenloser Video- und Audio-Downloader für Windows; Mac, Linux und Android sind in der Beta-Phase. MP4, MP3, ohne Werbung oder Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
         "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android, macOS und Linux</b> in der Beta",
         "h1": ("Video und Audio.", "Mit einem Klick."),
-        "lead": "Eine kostenlose App für Windows, Mac und Android. Speichere Videos als MP4 oder Audio als MP3 über einen Link. Am Computer kannst du Videos auch direkt aus der Browser-Erweiterung senden.",
+        "lead": "Eine kostenlose App für Windows, Mac, Linux und Android. Speichere Videos als MP4 oder Audio als MP3 über einen Link. Am Computer kannst du Videos auch direkt aus der Browser-Erweiterung senden.",
         "platform_label": "Plattform wählen", "mac_btn": "Für macOS herunterladen", "android_btn": "Für Android herunterladen",
         "mac_req": "macOS 13+ · Apple M1 oder neuer · Beta", "linux_btn": "Für Linux herunterladen", "linux_req": "Ubuntu 22.04+ oder ähnlich · x86_64 · Beta",
         "android_req": "Android 10+ · ARM64 · Beta",
@@ -217,11 +224,12 @@ HOME = {
             "playlists": ("Playlists, mehrere gleichzeitig", "Ganze Playlists, bis zu 4 Downloads gleichzeitig, automatisch ein neuer Versuch, wenn die Verbindung abbricht."),
             "clips": ("Ausschnitte, Untertitel, Cover", "Nur ein Teil eines Videos, Untertitel in der MP4 und das Vorschaubild als Cover der Datei."),
             "theme": ("Helles und dunkles Design", "Oder wie das System. Fortschritt in der Taskleiste und eine Benachrichtigung am Ende."),
+            "platforms": ('Läuft fast überall', 'Windows 10 und 11, macOS (Apple-Chip), Linux und Android, dazu die Browser-Erweiterung für Chrome, Edge und Firefox. Mac, Linux und Android sind in der Beta.'),
             "safe": ("Immer aktuell – und sicher", "Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten "
-                     "liest, ohne Neuinstallation. Unter Windows und auf dem Mac installiert sie nur Updates, die wir digital "
+                     "liest, ohne Neuinstallation. Unter Windows, auf dem Mac und unter Linux installiert sie nur Updates, die wir digital "
                      "signiert haben."),
         },
-        "chips": ("5 Sprachen", "Kein Konto", "Keine Werbung", "Kein Tracking", "Signierte Updates unter Windows"),
+        "chips": ("5 Sprachen", "Kein Konto", "Keine Werbung", "Kein Tracking", "Signierte Updates"),
         "shot_alt": "Das Fenster von Video Download mit vier Downloads",
         "extension": ("Browser-Erweiterung", "Lade herunter, was gerade läuft.",
                       "Video abspielen, auf das Symbol klicken, fertig. Oder Rechtsklick auf einen Link oder ein Video. Läuft die "
@@ -264,7 +272,7 @@ HOME = {
                  "4 Zeichen einer verschlüsselten Video-ID. Keine Konten, Statistiken oder Tracking."),
                 ("Was ist der Unterschied zu Download-Webseiten?", "Download-Webseiten erledigen alles auf ihrem Server: Dein Link und deine IP-Adresse gehen an sie und an Werbenetzwerke, bezahlt wird mit Pop-ups, falschen Knöpfen und oft schlechterer Qualität. Video Download läuft auf deinem eigenen Computer oder Handy, ohne Werbung und Konto, in voller Qualität, und deine Links gehen nur an die Seite, von der du lädst."),
                 ("Ist die App sicher?", "Der Code ist öffentlich auf GitHub, jeder Installer hat eine SHA-256-Prüfsumme, und die "
-                 "App installiert unter Windows, auf dem Mac und unter Android nur Updates, die wir digital signiert haben.")),
+                 "App installiert unter Windows, auf dem Mac, unter Linux und unter Android nur Updates, die wir digital signiert haben.")),
         "demo_titles": ("Bergwanderung – Prokoško-See (4K)", "Mein Live-Konzert – aus dem Publikum gefilmt",
                         "Vortrag: Grundlagen der Fotografie", "Podcast #12 – ein Gespräch übers Reisen"),
         "demo": ("Herunterladen · {p}% · {v} MB/s · noch {s} s", ","),
@@ -273,12 +281,12 @@ HOME = {
         "promise": ('Sin cuenta', 'Sin límite diario', 'Tus enlaces no nos llegan'),
         "a11y": ('Demostración', 'Pausar animación', 'Reanudar animación', 'Menú', 'Añadido: {t}', 'Terminado: {t}', 'Demostración de la ventana del programa (no es una descarga real)'),
         "share": ('Compartir', 'Copiar', 'Copiado', 'Cuéntaselo a quien le sirva.', 'Compartir Video Download', 'Más…', 'Cerrar'),
-        "title": "Video Download — MP4/MP3 para Windows; Mac y Android beta",
-        "description": "Descarga vídeo MP4 y audio MP3 en Windows, Mac y Android (Mac y Android en beta). Gratis, sin anuncios ni rastreo, en 5 idiomas.",
+        "title": "Video Download — MP4/MP3 para Windows; Mac, Linux y Android beta",
+        "description": "Descarga vídeo MP4 y audio MP3 en Windows, Mac, Linux y Android (Mac, Linux y Android en beta). Gratis, sin anuncios ni rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
         "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android, macOS y Linux</b> en beta",
         "h1": ("Vídeo y audio.", "Con un clic."),
-        "lead": "Una aplicación gratuita para Windows, Mac y Android. Guarda vídeo como MP4 o audio como MP3 desde un enlace. En el ordenador también puedes enviar vídeos directamente desde la extensión del navegador.",
+        "lead": "Una aplicación gratuita para Windows, Mac, Linux y Android. Guarda vídeo como MP4 o audio como MP3 desde un enlace. En el ordenador también puedes enviar vídeos directamente desde la extensión del navegador.",
         "platform_label": "Elige tu plataforma", "mac_btn": "Descargar para macOS", "android_btn": "Descargar para Android",
         "mac_req": "macOS 13+ · Apple M1 o posterior · Beta", "linux_btn": "Descargar para Linux", "linux_req": "Ubuntu 22.04+ o similar · x86_64 · Beta",
         "android_req": "Android 10+ · ARM64 · Beta",
@@ -297,11 +305,12 @@ HOME = {
             "playlists": ("Listas, varias a la vez", "Listas de reproducción completas, hasta 4 descargas a la vez y reintento automático si se corta la conexión."),
             "clips": ("Fragmentos, subtítulos, portada", "Solo una parte del vídeo, subtítulos en el MP4 y la miniatura como portada del archivo."),
             "theme": ("Tema claro y oscuro", "O igual que el sistema. Progreso en la barra de tareas y un aviso al final."),
+            "platforms": ('Funciona casi en todas partes', 'Windows 10 y 11, macOS (chip de Apple), Linux y Android, además de la extensión para Chrome, Edge y Firefox. Mac, Linux y Android están en beta.'),
             "safe": ("Siempre al día y seguro", "La aplicación busca nuevas versiones por sí sola, actualiza la parte que lee los "
-                     "sitios web sin reinstalar. En Windows y en Mac instala solo actualizaciones firmadas digitalmente por "
+                     "sitios web sin reinstalar. En Windows, en Mac y en Linux instala solo actualizaciones firmadas digitalmente por "
                      "nosotros."),
         },
-        "chips": ("5 idiomas", "Sin cuenta", "Sin anuncios", "Sin rastreo", "Actualizaciones firmadas en Windows"),
+        "chips": ("5 idiomas", "Sin cuenta", "Sin anuncios", "Sin rastreo", "Actualizaciones firmadas"),
         "shot_alt": "La ventana de Video Download con cuatro descargas",
         "extension": ("Extensión para el navegador", "Descarga lo que se está reproduciendo.",
                       "Reproduce un vídeo, pulsa el icono y listo. O clic derecho en cualquier enlace o vídeo. La aplicación se "
@@ -343,7 +352,7 @@ HOME = {
                  "caracteres de un ID de vídeo cifrado. Sin cuentas, estadísticas ni rastreo."),
                 ("¿En qué se diferencia de las webs de descarga?", "Las webs de descarga lo hacen todo en su servidor: tu enlace y tu IP van a ellas y a redes publicitarias, y lo pagas con ventanas emergentes, botones falsos y a menudo menos calidad. Video Download funciona en tu propio ordenador o móvil, sin anuncios ni cuentas, con calidad completa, y tus enlaces solo van al sitio del que descargas."),
                 ("¿Es segura?", "El código es público en GitHub, cada instalador tiene una suma SHA-256 y la aplicación solo "
-                 "instala actualizaciones firmadas digitalmente por nosotros, en Windows, Mac y Android.")),
+                 "instala actualizaciones firmadas digitalmente por nosotros, en Windows, Mac, Linux y Android.")),
         "demo_titles": ("Ruta de montaña – lago Prokoško (4K)", "Mi concierto en directo – grabado desde el público",
                         "Clase: fundamentos de fotografía", "Pódcast #12 – una charla sobre viajes"),
         "demo": ("Descargando · {p}% · {v} MB/s · quedan {s} s", ","),
@@ -352,12 +361,12 @@ HOME = {
         "promise": ('Sans compte', 'Sans limite quotidienne', 'Vos liens ne nous parviennent pas'),
         "a11y": ('Démonstration', "Mettre l'animation en pause", "Relancer l'animation", 'Menu', 'Ajouté : {t}', 'Terminé : {t}', 'Démonstration de la fenêtre du programme (pas un vrai téléchargement)'),
         "share": ('Partager', 'Copier', 'Copié', "Parlez-en à quelqu'un qui en a besoin.", 'Partager Video Download', 'Plus…', 'Fermer'),
-        "title": "Video Download — MP4/MP3 pour Windows ; Mac et Android bêta",
-        "description": "Téléchargez des vidéos MP4 et de l'audio MP3 sur Windows, Mac et Android (Mac et Android en bêta). Gratuit, sans publicité ni suivi, en 5 langues.",
+        "title": "Video Download — MP4/MP3 pour Windows ; Mac, Linux et Android bêta",
+        "description": "Téléchargez des vidéos MP4 et de l'audio MP3 sur Windows, Mac, Linux et Android (Mac, Linux et Android en bêta). Gratuit, sans publicité ni suivi, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
         "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android, macOS et Linux</b> en bêta",
         "h1": ("La vidéo et le son.", "En un clic."),
-        "lead": "Une application gratuite pour Windows, Mac et Android. Enregistrez une vidéo en MP4 ou de l’audio en MP3 depuis un lien. Sur ordinateur, vous pouvez aussi envoyer des vidéos directement depuis l’extension du navigateur.",
+        "lead": "Une application gratuite pour Windows, Mac, Linux et Android. Enregistrez une vidéo en MP4 ou de l’audio en MP3 depuis un lien. Sur ordinateur, vous pouvez aussi envoyer des vidéos directement depuis l’extension du navigateur.",
         "platform_label": "Choisir votre plateforme", "mac_btn": "Télécharger pour macOS", "android_btn": "Télécharger pour Android",
         "mac_req": "macOS 13+ · Apple M1 ou plus récent · Bêta", "linux_btn": "Télécharger pour Linux", "linux_req": "Ubuntu 22.04+ ou similaire · x86_64 · Bêta",
         "android_req": "Android 10+ · ARM64 · Bêta",
@@ -376,11 +385,12 @@ HOME = {
             "playlists": ("Playlists, plusieurs à la fois", "Des playlists entières, jusqu'à 4 téléchargements simultanés, nouvelle tentative automatique si la connexion coupe."),
             "clips": ("Extraits, sous-titres, pochette", "Seulement une partie d'une vidéo, les sous-titres dans le MP4 et la miniature comme pochette du fichier."),
             "theme": ("Thème clair et sombre", "Ou comme le système. La progression dans la barre des tâches et une notification à la fin."),
+            "platforms": ('Fonctionne presque partout', "Windows 10 et 11, macOS (puce Apple), Linux et Android, plus l'extension pour Chrome, Edge et Firefox. Mac, Linux et Android sont en bêta."),
             "safe": ("Toujours à jour, et sûr", "L'application cherche elle-même les nouvelles versions, met à jour la partie qui "
-                     "lit les sites sans réinstallation. Sous Windows et sur Mac, elle n'installe que des mises à jour signées "
+                     "lit les sites sans réinstallation. Sous Windows, sur Mac et sous Linux, elle n'installe que des mises à jour signées "
                      "numériquement par nous."),
         },
-        "chips": ("5 langues", "Sans compte", "Sans publicité", "Sans pistage", "Mises à jour signées sous Windows"),
+        "chips": ("5 langues", "Sans compte", "Sans publicité", "Sans pistage", "Mises à jour signées"),
         "shot_alt": "La fenêtre de Video Download avec quatre téléchargements",
         "extension": ("Extension pour le navigateur", "Téléchargez ce qui est en lecture.",
                       "Lancez une vidéo, cliquez sur l'icône, c'est fait. Ou clic droit sur n'importe quel lien ou vidéo. "
@@ -424,7 +434,7 @@ HOME = {
                  "l'activez, et seulement avec 4 caractères d'un ID vidéo chiffré. Ni compte, ni statistiques, ni pistage."),
                 ("Quelle différence avec les sites de téléchargement ?", "Les sites de téléchargement font tout sur leur serveur : votre lien et votre adresse IP vont chez eux et chez des régies publicitaires, et vous le payez en pop-ups, faux boutons et souvent une qualité moindre. Video Download fonctionne sur votre propre ordinateur ou téléphone, sans pub ni compte, en qualité maximale, et vos liens ne vont qu'au site depuis lequel vous téléchargez."),
                 ("Est-ce sûr ?", "Le code est public sur GitHub, chaque programme d'installation a une somme SHA-256 et "
-                 "l'application n'installe que des mises à jour signées par nous, sous Windows, sur Mac et sur Android.")),
+                 "l'application n'installe que des mises à jour signées par nous, sous Windows, sur Mac, sous Linux et sur Android.")),
         "demo_titles": ("Randonnée en montagne – lac de Prokoško (4K)", "Mon concert en direct – filmé depuis le public",
                         "Cours : les bases de la photographie", "Podcast #12 – une discussion sur le voyage"),
         "demo": ("Téléchargement · {p}% · {v} MB/s · encore {s} s", ","),
@@ -771,6 +781,12 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           </picture>
         </div>
 {small_html}
+        <div class="tile full" data-reveal>
+          {_icon("platforms")}
+          <h3>{tiles["platforms"][0]}</h3>
+          <p>{tiles["platforms"][1]}</p>
+          <div class="chips">{"".join(f"<span>{name}</span>" for name in PLATFORM_NAMES)}</div>
+        </div>
         <div class="tile full" data-reveal>
           {_icon("safe")}
           <h3>{tiles["safe"][0]}</h3>

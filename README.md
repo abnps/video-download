@@ -66,6 +66,11 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    potpis izdanja: `python tools/sign_macos.py --tag v<verzija>` (dodaje `release-macos.json` i `.sig`;
    bez njih Mac verzija ne može sama preći na novo izdanje, pa objava odbija nacrt).
 
+4b. **Linux (beta)** isto: `gh workflow run linux.yml --repo abnps/video-download --ref v<verzija> -f tag=v<verzija>`.
+   Posao gradi AppImage na Ubuntu 22.04 (svi testovi, self-test paketa i hosta) i dodaje
+   `VideoDownload-linux-x86_64-<verzija>.AppImage`, `.sha256` i stalnu kopiju `VideoDownload-linux-x86_64.AppImage`.
+   Zatim `python tools/sign_linux.py --tag v<verzija>` (dodaje `release-linux.json` i `.sig`).
+
 5. Na računaru sa Android ključem (`%USERPROFILE%/.videodl/android-release.*`) pokreni
    `python tools/publish_android.py --tag v<verzija>`. Skripta provjerava lint, testove, potpis,
    paket i verziju, pa dodaje APK, `.sha256`, stalnu kopiju i `android.json` samo tom nacrtu.
@@ -73,7 +78,7 @@ gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder i
    Samo Android (bez novog desktop izdanja): poveća se `versionCode`/`versionName`, commit i push, pa
    `python tools/publish_android.py --android-update` (APK u postojeće javno izdanje; provjerava potpis i veći versionCode).
 
-6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 14 fajlova,
+6. Pokreni `python tools/publish_release.py --tag v<verzija>` da provjeri svih 19 fajlova,
    hashove, Windows manifest, Android potpis, verzije i nepromijenjen nacrt. Tek po odluci za
    objavu pokreni istu naredbu uz `--publish`; ona ponovi provjere i zatim objavi cjelinu kao `latest`.
    Javno ostaje samo posljednje izdanje (Ahmedova odluka 23.9.2026): `--publish` poslije objave

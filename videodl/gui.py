@@ -2065,6 +2065,8 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("Video Download")
     app.setWindowIcon(QIcon(str(extension_dir() / "icons" / "icon128.png")))
+    if runtime.IS_LINUX:
+        app.setDesktopFileName(runtime.LINUX_DESKTOP_ID)  # ikona i ime na traci zadataka (Wayland)
     apply_theme(app)
     window = MainWindow(settings=_settings(), check_updates_on_start=updater.is_installed_app())
 
@@ -2082,9 +2084,12 @@ def main() -> int:
         QTimer.singleShot(0, lambda: QMessageBox.information(window, "Video Download", tr("mac.move_to_applications")))
     except OSError as exc:
         problems.append(tr("startup.register", error=exc))
-    if runtime.linux_appimage() is not None:
+    appimage = runtime.linux_appimage()
+    if appimage is not None:
         with contextlib.suppress(OSError):
             runtime.user_extension_dir()  # nova verzija dodatka za Chrome poslije ažuriranja
+        with contextlib.suppress(OSError):
+            runtime.install_linux_menu_entry(appimage, extension_dir() / "icons" / "icon128.png")
     if problems:
         window._set_status(tr("startup.warning", problems="; ".join(problems)))
 

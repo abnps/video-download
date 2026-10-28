@@ -75,6 +75,33 @@ def restore_system_env(environ=os.environ) -> None:
             environ.pop(name, None)
 
 
+LINUX_DESKTOP_ID = "io.github.abnps.videodownload"  # ime .desktop fajla i ikone (Wayland ga koristi kao app_id)
+
+
+def _desktop_exec(path: Path) -> str:
+    """Putanja za Exec= u .desktop fajlu: u navodnicima, s escape-om po Desktop Entry specifikaciji."""
+    quoted = "".join("\\" + char if char in '"`$\\' else char for char in str(path))
+    return '"' + quoted.replace("\\", "\\\\") + '"'
+
+
+def install_linux_menu_entry(appimage: Path, icon: Path, data_home: Path | None = None) -> Path:
+    """Linux „instalacija": prečica u meniju aplikacija i ikona za AppImage iz kojeg program radi. Osvježava se pri
+    svakom pokretanju, pa prati i premješten fajl; ništa ne traži administratora."""
+    base = Path(data_home) if data_home is not None else user_data_base()
+    icons = base / "icons" / "hicolor" / "128x128" / "apps"
+    icons.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(icon, icons / f"{LINUX_DESKTOP_ID}.png")
+    entry = base / "applications" / f"{LINUX_DESKTOP_ID}.desktop"
+    entry.parent.mkdir(parents=True, exist_ok=True)
+    text = ("[Desktop Entry]\nType=Application\nName=Video Download\n"
+            "Comment=Save videos as MP4 or audio as MP3\n"
+            f"Exec={_desktop_exec(appimage)}\nIcon={LINUX_DESKTOP_ID}\nCategories=AudioVideo;Network;\n"
+            f"Terminal=false\nStartupWMClass=VideoDownload\n")
+    if not entry.is_file() or entry.read_text(encoding="utf-8") != text:
+        entry.write_text(text, encoding="utf-8")
+    return entry
+
+
 def mac_app_bundle() -> Path | None:
     """`…/Video Download.app` instalirane Mac verzije, inače None."""
     if not (is_frozen() and IS_MAC):

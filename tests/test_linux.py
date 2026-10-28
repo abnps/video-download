@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -58,6 +58,27 @@ class LinuxPathsTest(unittest.TestCase):
             self.assertEqual(sorted(p.name for p in target.iterdir()), ["manifest.json"])
             with mock.patch.object(runtime, "linux_appimage", return_value=None):
                 self.assertEqual(runtime.user_extension_dir(source), source)  # Windows/Mac/razvoj: bez kopije
+
+
+    def test_menu_entry_points_to_the_appimage_and_follows_a_move(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            icon = Path(tmp) / "icon.png"
+            icon.write_bytes(b"png")
+            data = Path(tmp) / "share"
+            entry = runtime.install_linux_menu_entry(PurePosixPath("/home/ana/Programi/Video Download.AppImage"), icon,
+                                                     data)
+            self.assertEqual(entry, data / "applications" / "io.github.abnps.videodownload.desktop")
+            text = entry.read_text(encoding="utf-8")
+            self.assertIn('Exec="/home/ana/Programi/Video Download.AppImage"\n', text)
+            self.assertIn("Icon=io.github.abnps.videodownload\n", text)
+            self.assertTrue((data / "icons/hicolor/128x128/apps/io.github.abnps.videodownload.png").is_file())
+            runtime.install_linux_menu_entry(PurePosixPath("/opt/x/VideoDownload.AppImage"), icon, data)
+            self.assertIn('Exec="/opt/x/VideoDownload.AppImage"\n', entry.read_text(encoding="utf-8"))
+
+    def test_menu_entry_escapes_special_characters(self):
+        # Specifikacija: prvo escape za navodnike (\$, \"), pa se svaka kosa crta u vrijednosti udvostruči.
+        self.assertEqual(runtime._desktop_exec(PurePosixPath('/home/a/$x"y.AppImage')),
+                         r'"/home/a/\\$x\\"y.AppImage"')
 
 
 class LinuxNativeMessagingTest(unittest.TestCase):
