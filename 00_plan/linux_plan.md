@@ -17,7 +17,7 @@ preuzmi jedan fajl, pokreni, program se sam ažurira i radi s dodatkom za Chrome
 | L2 | Najstariji sistem | glibc kao Ubuntu 22.04 (gradnja na `ubuntu-22.04`, pa radi i na novijim) | [Ahmed] |
 | L3 | Arhitektura | samo x86_64 (ARM/Raspberry Pi tek ako neko traži) | [Ahmed] |
 | L4 | Flatpak/Flathub, .deb, AUR | ne sada (Flatpak sandbox otežava vezu s dodatkom); kasnije po potražnji | [Ahmed] |
-| L5 | Oznaka na sajtu | „Linux (beta)", kao Mac, dok ga ne proba bar par ljudi | [Ahmed] |
+| L5 | Oznaka na sajtu | „Linux (beta)", kao Mac, dok ga ne proba bar par ljudi | **potvrđeno** (Ahmed 29.10.2026) |
 
 ## Šta treba u kodu (tačno 10 modula zavisi od sistema)
 
