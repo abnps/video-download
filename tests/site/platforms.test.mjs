@@ -14,7 +14,7 @@ function page(userAgent = "Windows", hash = "") {
     addEventListener(key, handler) { this.handlers[key] = handler; },
     focus() { this.focused = true; },
   });
-  const names = ["win", "mac", "android"];
+  const names = ["win", "mac", "android", "linux"];
   const choices = names.map((platform) => node({ platform }));
   const links = names.map((platformDownload) => Object.assign(node({ platformDownload }), {
     href: `https://example.org/${platformDownload}`, textContent: `Download ${platformDownload}`,
@@ -54,7 +54,7 @@ function selected(p, name) {
 }
 
 test("glavno i malo dugme nude paket za posjetiočev sistem", () => {
-  for (const [ua, name] of [["Windows", "win"], ["MacIntel", "mac"], ["Linux Android", "android"], ["Linux", "win"]]) {
+  for (const [ua, name] of [["Windows", "win"], ["MacIntel", "mac"], ["Linux Android", "android"], ["Linux x86_64", "linux"]]) {
     selected(page(ua), name);
   }
 });

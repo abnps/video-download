@@ -37,6 +37,7 @@ PUBLIC_URL = "https://abnps.github.io/video-download/"  # javna adresa sajta (ka
 OG_LOCALES = {"en": "en_US", "bs": "bs_BA", "de": "de_DE", "es": "es_ES", "fr": "fr_FR"}
 # Mac (beta): stalna kopija .dmg-a uz posljednje izdanje (kao VideoDownload-Setup.exe za Windows).
 MAC_DMG_URL = f"{REPO}/releases/latest/download/VideoDownload-macOS-arm64.dmg"
+LINUX_APPIMAGE_URL = f"{REPO}/releases/latest/download/VideoDownload-linux-x86_64.AppImage"
 
 # Android (beta, Ahmed 27.9.2026: „kao Mac beta, na GitHubu"): APK je u posljednjem izdanju (stalno ime), a nove
 # verzije aplikacija sama nađe preko android.json iz istog izdanja. (uvod, dugme, napomena, koraci)
@@ -885,6 +886,77 @@ MAC_TEXT = {
 }
 
 
+# Linux (beta): (uvod s linkom {issue}, dugme, napomena, koraci). Oznaka „Beta" je ista kao za Mac (MAC_TEXT[0]).
+LINUX_TEXT = {
+    "en": ("<b>New: Video Download for Linux.</b> For 64-bit PCs (x86_64) with Ubuntu 22.04 or newer, Linux Mint 21+, "
+           "Debian 12+, Fedora 38+ or similar. It works, but only a few people have tried it so far: please "
+           "<a href=\"{issue}\">report anything that doesn't work</a>.",
+           "Download for Linux (beta)",
+           "One file, nothing to install:",
+           ("Download the .AppImage file and keep it in a folder of your choice (for example your home folder).",
+            "Allow it to run: right-click → <b>Properties</b> → <b>Allow executing file as program</b>, or in a terminal "
+            "<code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.",
+            "Double-click it to start. Updates replace the same file, so you never need to download it again.",
+            "If it doesn't start, install FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) or start it with "
+            "<code>--appimage-extract-and-run</code>.",
+            "The browser extension works with Chrome, Edge and Firefox from your distribution or the browser's website; "
+            "browsers installed as Flatpak can't connect to the app yet.")),
+    "bs": ("<b>Novo: Video Download za Linux.</b> Za 64-bitne računare (x86_64) s Ubuntu 22.04 ili novijim, Linux Mint 21+, "
+           "Debian 12+, Fedora 38+ ili sličnim. Radi, ali ga je probalo još malo ljudi: "
+           "<a href=\"{issue}\">javi ako nešto ne radi</a>.",
+           "Preuzmi za Linux (beta)",
+           "Jedan fajl, ništa se ne instalira:",
+           ("Preuzmi .AppImage fajl i drži ga u folderu po želji (npr. u ličnom folderu).",
+            "Dozvoli pokretanje: desni klik → <b>Properties</b> (Svojstva) → <b>Allow executing file as program</b> "
+            "(Dozvoli pokretanje kao program), ili u terminalu <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.",
+            "Pokreni ga dvoklikom. Ažuriranja mijenjaju isti fajl, pa ga ne treba ponovo preuzimati.",
+            "Ako se ne pokreće, instaliraj FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) ili ga pokreni s "
+            "<code>--appimage-extract-and-run</code>.",
+            "Dodatak za browser radi s Chromeom, Edgeom i Firefoxom iz tvoje distribucije ili sa sajta browsera; "
+            "browseri instalirani kao Flatpak se zasad ne mogu povezati s programom.")),
+    "de": ("<b>Neu: Video Download für Linux.</b> Für 64-Bit-PCs (x86_64) mit Ubuntu 22.04 oder neuer, Linux Mint 21+, "
+           "Debian 12+, Fedora 38+ oder ähnlich. Es funktioniert, aber bisher haben es erst wenige ausprobiert: "
+           "<a href=\"{issue}\">melde bitte, was nicht klappt</a>.",
+           "Für Linux herunterladen (Beta)",
+           "Eine Datei, keine Installation:",
+           ("Lade die .AppImage-Datei herunter und lege sie in einen Ordner deiner Wahl (z. B. deinen Persönlichen Ordner).",
+            "Ausführen erlauben: Rechtsklick → <b>Eigenschaften</b> → <b>Datei als Programm ausführen</b>, oder im Terminal "
+            "<code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.",
+            "Mit Doppelklick starten. Updates ersetzen dieselbe Datei, du musst sie also nie neu herunterladen.",
+            "Startet sie nicht, installiere FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) oder starte sie mit "
+            "<code>--appimage-extract-and-run</code>.",
+            "Die Browser-Erweiterung funktioniert mit Chrome, Edge und Firefox aus deiner Distribution oder von der Website "
+            "des Browsers; als Flatpak installierte Browser können sich noch nicht mit der App verbinden.")),
+    "es": ("<b>Novedad: Video Download para Linux.</b> Para PC de 64 bits (x86_64) con Ubuntu 22.04 o posterior, Linux Mint 21+, "
+           "Debian 12+, Fedora 38+ o similar. Funciona, pero aún lo han probado pocas personas: "
+           "<a href=\"{issue}\">avísanos si algo no funciona</a>.",
+           "Descargar para Linux (beta)",
+           "Un solo archivo, sin instalación:",
+           ("Descarga el archivo .AppImage y guárdalo en la carpeta que quieras (por ejemplo, tu carpeta personal).",
+            "Permite ejecutarlo: clic derecho → <b>Propiedades</b> → <b>Permitir ejecutar el archivo como programa</b>, "
+            "o en una terminal <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.",
+            "Haz doble clic para iniciarlo. Las actualizaciones reemplazan el mismo archivo, así que no hace falta volver a "
+            "descargarlo.",
+            "Si no se inicia, instala FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) o inícialo con "
+            "<code>--appimage-extract-and-run</code>.",
+            "La extensión del navegador funciona con Chrome, Edge y Firefox de tu distribución o del sitio del navegador; "
+            "los navegadores instalados como Flatpak aún no pueden conectarse con la app.")),
+    "fr": ("<b>Nouveau : Video Download pour Linux.</b> Pour les PC 64 bits (x86_64) avec Ubuntu 22.04 ou plus récent, "
+           "Linux Mint 21+, Debian 12+, Fedora 38+ ou similaire. Il fonctionne, mais peu de personnes l'ont encore essayé : "
+           "<a href=\"{issue}\">signalez ce qui ne marche pas</a>.",
+           "Télécharger pour Linux (bêta)",
+           "Un seul fichier, rien à installer :",
+           ("Téléchargez le fichier .AppImage et gardez-le dans le dossier de votre choix (par exemple votre dossier personnel).",
+            "Autorisez son exécution : clic droit → <b>Propriétés</b> → <b>Autoriser l'exécution du fichier comme un "
+            "programme</b>, ou dans un terminal <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.",
+            "Double-cliquez pour le lancer. Les mises à jour remplacent le même fichier : inutile de le télécharger à nouveau.",
+            "S'il ne démarre pas, installez FUSE (Ubuntu/Debian : <code>sudo apt install fuse3</code>) ou lancez-le avec "
+            "<code>--appimage-extract-and-run</code>.",
+            "L'extension du navigateur fonctionne avec Chrome, Edge et Firefox de votre distribution ou du site du navigateur ; "
+            "les navigateurs installés en Flatpak ne peuvent pas encore se connecter à l'app.")),
+}
+
+
 # Stranica sa svim verzijama (vlastita adresa, pa je Google može naći): (uvod, opis, link s početne, izdanja).
 CHANGELOG_TEXT = {
     "en": ("Every version of the app, newest first.", "All changes to Video Download: new features and fixes by version.",
@@ -984,6 +1056,7 @@ def build(size_mb: int | None = None) -> dict[str, str]:
             version_short=f"{TEXTS[lang]['version']} {__version__}",
             installer_url=INSTALLER_URL, mac_url=MAC_DMG_URL, issue_url=ISSUE_URL, mac_text=MAC_TEXT[lang],
             android_url=ANDROID_APK_URL, android_text=ANDROID_TEXT[lang],
+            linux_url=LINUX_APPIMAGE_URL, linux_text=LINUX_TEXT[lang],
             obtainium=(OBTAINIUM_URL, *OBTAINIUM_TEXT[lang]),
             android_guide_label=site_android.TEXT[lang]["dev_guide_title"],
             meta=meta_tags(lang, "index.html", site_home.HOME[lang]["title"], site_home.HOME[lang]["description"])

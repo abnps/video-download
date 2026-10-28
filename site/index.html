@@ -91,13 +91,14 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">New</span> <b>Android and macOS</b> in beta</div>
+        <div class="eyebrow"><span class="badge">New</span> <b>Android, macOS and Linux</b> in beta</div>
         <h1>Video and audio.<br><span class="grad">In one click.</span></h1>
         <p class="lead">A free app for Windows, Mac and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.</p>
         <div class="platform-choice" role="group" aria-label="Choose your platform" hidden>
           <button type="button" data-platform="win" aria-pressed="true">Windows</button>
           <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
           <button type="button" data-platform="android" aria-pressed="false">Android</button>
+          <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
         <div class="cta">
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
@@ -107,11 +108,13 @@
           <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download for macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download for Android</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage" data-platform-download="linux" data-linux><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Download for Linux</a>
         </div>
         <ul class="promise"><li>No account</li><li>No daily limit</li><li>Your links never reach us</li></ul>
         <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.4 · 117 MB<!-- /version --> · Windows 10 and 11 (64-bit)</span>
           <span data-platform-requirements="mac" hidden>Version 1.0.4 · macOS 13+ · Apple M1 or newer · Beta</span>
           <span data-platform-requirements="android" hidden>Version 1.0.4 · Android 10+ · ARM64 · Beta</span>
+          <span data-platform-requirements="linux" hidden>Version 1.0.4 · Ubuntu 22.04+ or similar · x86_64 · Beta</span>
           · <a href="#install" data-install-help>installation help</a></div>
         <p class="note">The app is meant for your own videos, content you have the author's permission for, and content under a free license. By downloading you accept the <a href="terms.html">Terms of use</a>. DRM-protected content is not downloaded.</p>
       </div>
@@ -264,6 +267,7 @@
         <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
         <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">Beta</span></a>
         <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">Beta</span></a>
+        <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">Beta</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows may show “Windows protected your PC”.</b> Make sure the file comes from this site, then click <b>More info</b> and <b>Run anyway</b>.</p>
@@ -300,6 +304,18 @@
         </ol>
         <p>Use <b>Obtainium</b>? It installs the app straight from GitHub and keeps it up to date. <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/abnps/video-download">Add to Obtainium →</a></p>
         <p><a href="android-guide.html">Developer options guide →</a></p>
+      </div>
+      <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux">
+        <p><span class="badge">Beta</span> <b>New: Video Download for Linux.</b> For 64-bit PCs (x86_64) with Ubuntu 22.04 or newer, Linux Mint 21+, Debian 12+, Fedora 38+ or similar. It works, but only a few people have tried it so far: please <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">report anything that doesn't work</a>.</p>
+        <p>One file, nothing to install:</p>
+        <ol>
+          <li>Download the .AppImage file and keep it in a folder of your choice (for example your home folder).</li>
+          <li>Allow it to run: right-click → <b>Properties</b> → <b>Allow executing file as program</b>, or in a terminal <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.</li>
+          <li>Double-click it to start. Updates replace the same file, so you never need to download it again.</li>
+          <li>If it doesn't start, install FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) or start it with <code>--appimage-extract-and-run</code>.</li>
+          <li>The browser extension works with Chrome, Edge and Firefox from your distribution or the browser's website; browsers installed as Flatpak can't connect to the app yet.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage">Download for Linux (beta)</a></p>
       </div>
     </div>
   </section>
@@ -395,6 +411,6 @@
 </footer>
 
 <script>window.VD_TEXT = {"progress": "Downloading · {p}% · {v} MB/s · {s} s left", "done": "Finished · {m} MB", "decimal": ".", "finished": [{"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Mountain hike – Prokosko lake (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 best", "audio": false}, {"title": "My live concert – filmed from the crowd", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Added: {t}", "ended": "Finished: {t}", "filters": {"all": "All ({count})", "active": "Downloading ({count})", "waiting": "Waiting ({count})", "done": "Finished ({count})", "failed": "Failed ({count})"}, "summary_done": "finished: {count}"};</script>
-<script src="assets/site.js?v=6113fe6cea" defer></script>
+<script src="assets/site.js?v=72033c1e06" defer></script>
 </body>
 </html>

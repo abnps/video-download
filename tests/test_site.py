@@ -53,6 +53,7 @@ class SiteTest(unittest.TestCase):
                 ("win", build_site.INSTALLER_URL, "win_btn"),
                 ("mac", build_site.MAC_DMG_URL, "mac_btn"),
                 ("android", build_site.ANDROID_APK_URL, "android_btn"),
+                ("linux", build_site.LINUX_APPIMAGE_URL, "linux_btn"),
             ):
                 with self.subTest(lang=lang, platform=platform):
                     link = re.search(rf'<a\b[^>]*data-platform-download="{platform}"[^>]*>(.*?)</a>', page, re.S)
@@ -63,7 +64,8 @@ class SiteTest(unittest.TestCase):
             self.assertIn(html.escape(site_home.HOME[lang]["platform_label"]), page)
             self.assertIn(site_home.HOME[lang]["mac_req"], page)
             self.assertIn(site_home.HOME[lang]["android_req"], page)
-            for platform in ("mac", "android"):
+            self.assertIn(site_home.HOME[lang]["linux_req"], page)
+            for platform in ("mac", "android", "linux"):
                 meta = re.search(rf'<span data-platform-requirements="{platform}"[^>]*>(.*?)</span>', page)
                 self.assertNotIn(" MB", meta.group(1))  # veličina Windows instalera ne pripada APK-u ni DMG-u
 
@@ -94,6 +96,11 @@ class SiteTest(unittest.TestCase):
                 for step in build_site.ANDROID_TEXT[lang][3]:
                     self.assertIn(step, index)
                 for step in build_site.MAC_TEXT[lang][4]:
+                    self.assertIn(step, index)
+                # Linux (beta): stalni link na AppImage, kartica i koraci za prvo pokretanje
+                self.assertIn(build_site.LINUX_APPIMAGE_URL, index)
+                self.assertIn('id="panel-linux"', index)
+                for step in build_site.LINUX_TEXT[lang][3]:
                     self.assertIn(step, index)
                 # Redizajn: namjena i uslovi ostaju vidljivi, demo nosi nazive iz programa, animacije iz site.js
                 self.assertIn('<p class="note">', index)

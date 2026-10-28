@@ -91,13 +91,14 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">Novo</span> <b>Android i macOS</b> u probnoj fazi</div>
+        <div class="eyebrow"><span class="badge">Novo</span> <b>Android, macOS i Linux</b> u probnoj fazi</div>
         <h1>Video i zvuk.<br><span class="grad">Jednim klikom.</span></h1>
         <p class="lead">Besplatan program za Windows, Mac i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.</p>
         <div class="platform-choice" role="group" aria-label="Izaberi platformu" hidden>
           <button type="button" data-platform="win" aria-pressed="true">Windows</button>
           <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
           <button type="button" data-platform="android" aria-pressed="false">Android</button>
+          <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
         <div class="cta">
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
@@ -107,11 +108,13 @@
           <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za Android</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage" data-platform-download="linux" data-linux><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Preuzmi za Linux</a>
         </div>
         <ul class="promise"><li>Bez naloga</li><li>Bez dnevnog ograničenja</li><li>Tvoji linkovi ne idu nama</li></ul>
         <div class="meta"><span data-platform-requirements="win"><!-- version -->Verzija 1.0.4 · 117 MB<!-- /version --> · Windows 10 i 11 (64-bit)</span>
           <span data-platform-requirements="mac" hidden>Verzija 1.0.4 · macOS 13+ · Apple M1 ili noviji · Beta</span>
           <span data-platform-requirements="android" hidden>Verzija 1.0.4 · Android 10+ · ARM64 · Beta</span>
+          <span data-platform-requirements="linux" hidden>Verzija 1.0.4 · Ubuntu 22.04+ ili sličan · x86_64 · Beta</span>
           · <a href="#install" data-install-help>pomoć za instalaciju</a></div>
         <p class="note">Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. Preuzimanjem prihvataš <a href="terms.html">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.</p>
       </div>
@@ -264,6 +267,7 @@
         <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
         <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">Beta</span></a>
         <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">Beta</span></a>
+        <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">Beta</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows može prikazati „Windows je zaštitio vaš računar“.</b> Provjeri da je fajl sa ovog sajta, pa klikni <b>Više informacija</b> i <b>Ipak pokreni</b>.</p>
@@ -300,6 +304,18 @@
         </ol>
         <p>Koristiš <b>Obtainium</b>? On instalira aplikaciju direktno s GitHuba i sam je ažurira. <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/abnps/video-download">Dodaj u Obtainium →</a></p>
         <p><a href="android-guide.html">Tutorijal: opcije za programere →</a></p>
+      </div>
+      <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux">
+        <p><span class="badge">Beta</span> <b>Novo: Video Download za Linux.</b> Za 64-bitne računare (x86_64) s Ubuntu 22.04 ili novijim, Linux Mint 21+, Debian 12+, Fedora 38+ ili sličnim. Radi, ali ga je probalo još malo ljudi: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">javi ako nešto ne radi</a>.</p>
+        <p>Jedan fajl, ništa se ne instalira:</p>
+        <ol>
+          <li>Preuzmi .AppImage fajl i drži ga u folderu po želji (npr. u ličnom folderu).</li>
+          <li>Dozvoli pokretanje: desni klik → <b>Properties</b> (Svojstva) → <b>Allow executing file as program</b> (Dozvoli pokretanje kao program), ili u terminalu <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.</li>
+          <li>Pokreni ga dvoklikom. Ažuriranja mijenjaju isti fajl, pa ga ne treba ponovo preuzimati.</li>
+          <li>Ako se ne pokreće, instaliraj FUSE (Ubuntu/Debian: <code>sudo apt install fuse3</code>) ili ga pokreni s <code>--appimage-extract-and-run</code>.</li>
+          <li>Dodatak za browser radi s Chromeom, Edgeom i Firefoxom iz tvoje distribucije ili sa sajta browsera; browseri instalirani kao Flatpak se zasad ne mogu povezati s programom.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage">Preuzmi za Linux (beta)</a></p>
       </div>
     </div>
   </section>
@@ -395,6 +411,6 @@
 </footer>
 
 <script>window.VD_TEXT = {"progress": "Preuzimanje · {p}% · {v} MB/s · još {s} s", "done": "Završeno · {m} MB", "decimal": ",", "finished": [{"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Planinarska tura – Prokoško jezero (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 najbolji", "audio": false}, {"title": "Moj koncert uživo – snimak iz publike", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Predavanje: osnove fotografije", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – razgovor o putovanjima", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Dodano: {t}", "ended": "Završeno: {t}", "filters": {"all": "Sve ({count})", "active": "U toku ({count})", "waiting": "Na čekanju ({count})", "done": "Završeno ({count})", "failed": "Neuspjelo ({count})"}, "summary_done": "završeno: {count}"};</script>
-<script src="../assets/site.js?v=6113fe6cea" defer></script>
+<script src="../assets/site.js?v=72033c1e06" defer></script>
 </body>
 </html>

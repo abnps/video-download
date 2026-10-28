@@ -91,13 +91,14 @@
     <div class="bloom" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap hero-grid">
       <div data-reveal>
-        <div class="eyebrow"><span class="badge">Nouveau</span> <b>Android et macOS</b> en bêta</div>
+        <div class="eyebrow"><span class="badge">Nouveau</span> <b>Android, macOS et Linux</b> en bêta</div>
         <h1>La vidéo et le son.<br><span class="grad">En un clic.</span></h1>
         <p class="lead">Une application gratuite pour Windows, Mac et Android. Enregistrez une vidéo en MP4 ou de l’audio en MP3 depuis un lien. Sur ordinateur, vous pouvez aussi envoyer des vidéos directement depuis l’extension du navigateur.</p>
         <div class="platform-choice" role="group" aria-label="Choisir votre plateforme" hidden>
           <button type="button" data-platform="win" aria-pressed="true">Windows</button>
           <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
           <button type="button" data-platform="android" aria-pressed="false">Android</button>
+          <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
         <div class="cta">
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
@@ -107,11 +108,13 @@
           <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour Android</a>
+          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage" data-platform-download="linux" data-linux><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour Linux</a>
         </div>
         <ul class="promise"><li>Sans compte</li><li>Sans limite quotidienne</li><li>Vos liens ne nous parviennent pas</li></ul>
         <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.4 · 117 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
           <span data-platform-requirements="mac" hidden>Version 1.0.4 · macOS 13+ · Apple M1 ou plus récent · Bêta</span>
           <span data-platform-requirements="android" hidden>Version 1.0.4 · Android 10+ · ARM64 · Bêta</span>
+          <span data-platform-requirements="linux" hidden>Version 1.0.4 · Ubuntu 22.04+ ou similaire · x86_64 · Bêta</span>
           · <a href="#install" data-install-help>aide à l'installation</a></div>
         <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.</p>
       </div>
@@ -264,6 +267,7 @@
         <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
         <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">Bêta</span></a>
         <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">Bêta</span></a>
+        <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">Bêta</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p><b>Windows peut afficher « Windows a protégé votre ordinateur ».</b> Vérifiez que le fichier provient de ce site, puis cliquez sur <b>Informations complémentaires</b> et <b>Exécuter quand même</b>.</p>
@@ -300,6 +304,18 @@
         </ol>
         <p>Vous utilisez <b>Obtainium</b> ? Il installe l'application directement depuis GitHub et la tient à jour. <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/abnps/video-download">Ajouter à Obtainium →</a></p>
         <p><a href="android-guide.html">Guide : options pour développeurs →</a></p>
+      </div>
+      <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux">
+        <p><span class="badge">Bêta</span> <b>Nouveau : Video Download pour Linux.</b> Pour les PC 64 bits (x86_64) avec Ubuntu 22.04 ou plus récent, Linux Mint 21+, Debian 12+, Fedora 38+ ou similaire. Il fonctionne, mais peu de personnes l'ont encore essayé : <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">signalez ce qui ne marche pas</a>.</p>
+        <p>Un seul fichier, rien à installer :</p>
+        <ol>
+          <li>Téléchargez le fichier .AppImage et gardez-le dans le dossier de votre choix (par exemple votre dossier personnel).</li>
+          <li>Autorisez son exécution : clic droit → <b>Propriétés</b> → <b>Autoriser l'exécution du fichier comme un programme</b>, ou dans un terminal <code>chmod +x VideoDownload-linux-x86_64.AppImage</code>.</li>
+          <li>Double-cliquez pour le lancer. Les mises à jour remplacent le même fichier : inutile de le télécharger à nouveau.</li>
+          <li>S'il ne démarre pas, installez FUSE (Ubuntu/Debian : <code>sudo apt install fuse3</code>) ou lancez-le avec <code>--appimage-extract-and-run</code>.</li>
+          <li>L'extension du navigateur fonctionne avec Chrome, Edge et Firefox de votre distribution ou du site du navigateur ; les navigateurs installés en Flatpak ne peuvent pas encore se connecter à l'app.</li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage">Télécharger pour Linux (bêta)</a></p>
       </div>
     </div>
   </section>
@@ -395,6 +411,6 @@
 </footer>
 
 <script>window.VD_TEXT = {"progress": "Téléchargement · {p}% · {v} MB/s · encore {s} s", "done": "Terminé · {m} MB", "decimal": ",", "finished": [{"title": "Cours : les bases de la photographie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – une discussion sur le voyage", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Randonnée en montagne – lac de Prokoško (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 meilleure", "audio": false}, {"title": "Mon concert en direct – filmé depuis le public", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Cours : les bases de la photographie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – une discussion sur le voyage", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Ajouté : {t}", "ended": "Terminé : {t}", "filters": {"all": "Tout ({count})", "active": "En cours ({count})", "waiting": "En attente ({count})", "done": "Terminés ({count})", "failed": "Échoués ({count})"}, "summary_done": "terminés : {count}"};</script>
-<script src="../assets/site.js?v=6113fe6cea" defer></script>
+<script src="../assets/site.js?v=72033c1e06" defer></script>
 </body>
 </html>

@@ -49,11 +49,12 @@ HOME = {
         "title": "Video Download — MP4/MP3 for Windows; Mac and Android beta",
         "description": "Free video and audio downloader for Windows, with Mac and Android in beta. MP4, MP3, no ads or tracking, in 5 languages.",
         "nav": ("Features", "Extension", "Install", "What's new", "Help", "♥ Support"),
-        "download_short": "Download", "new": "New", "eyebrow": "<b>Android and macOS</b> in beta",
+        "download_short": "Download", "new": "New", "eyebrow": "<b>Android, macOS and Linux</b> in beta",
         "h1": ("Video and audio.", "In one click."),
         "lead": "A free app for Windows, Mac and Android. Save video as MP4 or audio as MP3 from a link. On your computer, you can also send videos straight from the browser extension.",
         "platform_label": "Choose your platform", "mac_btn": "Download for macOS", "android_btn": "Download for Android",
-        "mac_req": "macOS 13+ · Apple M1 or newer · Beta", "android_req": "Android 10+ · ARM64 · Beta",
+        "mac_req": "macOS 13+ · Apple M1 or newer · Beta", "linux_btn": "Download for Linux", "linux_req": "Ubuntu 22.04+ or similar · x86_64 · Beta",
+        "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Card / Apple Pay", "win_btn": "Download for Windows", "win_req": "Windows 10 and 11 (64-bit)", "install_help": "installation help",
         "note": "The app is meant for your own videos, content you have the author's permission for, and content under a free "
                 "license. By downloading you accept the <a href=\"terms.html\">Terms of use</a>. DRM-protected content is not downloaded.",
@@ -121,11 +122,12 @@ HOME = {
         "title": "Video Download — MP4/MP3 za Windows; Mac i Android beta",
         "description": "Besplatan program za preuzimanje videa i zvuka na Windowsu; Mac i Android su u beta fazi. MP4, MP3, bez reklama i praćenja, na 5 jezika.",
         "nav": ("Funkcije", "Dodatak", "Instalacija", "Šta je novo", "Pomoć", "♥ Podrži"),
-        "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android i macOS</b> u probnoj fazi",
+        "download_short": "Preuzmi", "new": "Novo", "eyebrow": "<b>Android, macOS i Linux</b> u probnoj fazi",
         "h1": ("Video i zvuk.", "Jednim klikom."),
         "lead": "Besplatan program za Windows, Mac i Android. Sačuvaj video kao MP4 ili zvuk kao MP3 iz linka. Na računaru možeš slati video i direktno iz dodatka za browser.",
         "platform_label": "Izaberi platformu", "mac_btn": "Preuzmi za macOS", "android_btn": "Preuzmi za Android",
-        "mac_req": "macOS 13+ · Apple M1 ili noviji · Beta", "android_req": "Android 10+ · ARM64 · Beta",
+        "mac_req": "macOS 13+ · Apple M1 ili noviji · Beta", "linux_btn": "Preuzmi za Linux", "linux_req": "Ubuntu 22.04+ ili sličan · x86_64 · Beta",
+        "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Kartica / Apple Pay", "win_btn": "Preuzmi za Windows", "win_req": "Windows 10 i 11 (64-bit)", "install_help": "pomoć za instalaciju",
         "note": "Program je namijenjen tvojim vlastitim videima, sadržaju uz dozvolu autora i sadržaju pod slobodnom licencom. "
                 "Preuzimanjem prihvataš <a href=\"terms.html\">Uslove korištenja</a>. Sadržaj zaštićen DRM-om se ne preuzima.",
@@ -194,11 +196,12 @@ HOME = {
         "title": "Video Download — MP4/MP3 für Windows; Mac und Android Beta",
         "description": "Kostenloser Video- und Audio-Downloader für Windows; Mac und Android sind in der Beta-Phase. MP4, MP3, ohne Werbung oder Tracking, in 5 Sprachen.",
         "nav": ("Funktionen", "Erweiterung", "Installation", "Neuigkeiten", "Hilfe", "♥ Unterstützen"),
-        "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android und macOS</b> in der Beta",
+        "download_short": "Herunterladen", "new": "Neu", "eyebrow": "<b>Android, macOS und Linux</b> in der Beta",
         "h1": ("Video und Audio.", "Mit einem Klick."),
         "lead": "Eine kostenlose App für Windows, Mac und Android. Speichere Videos als MP4 oder Audio als MP3 über einen Link. Am Computer kannst du Videos auch direkt aus der Browser-Erweiterung senden.",
         "platform_label": "Plattform wählen", "mac_btn": "Für macOS herunterladen", "android_btn": "Für Android herunterladen",
-        "mac_req": "macOS 13+ · Apple M1 oder neuer · Beta", "android_req": "Android 10+ · ARM64 · Beta",
+        "mac_req": "macOS 13+ · Apple M1 oder neuer · Beta", "linux_btn": "Für Linux herunterladen", "linux_req": "Ubuntu 22.04+ oder ähnlich · x86_64 · Beta",
+        "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Karte / Apple Pay", "win_btn": "Für Windows herunterladen", "win_req": "Windows 10 und 11 (64 Bit)", "install_help": "Hilfe zur Installation",
         "note": "Die App ist für eigene Videos gedacht, für Inhalte, für die du die Erlaubnis des Urhebers hast, und für Inhalte "
                 "unter freier Lizenz. Mit dem Herunterladen akzeptierst du die <a href=\"terms.html\">Nutzungsbedingungen</a>. "
@@ -273,11 +276,12 @@ HOME = {
         "title": "Video Download — MP4/MP3 para Windows; Mac y Android beta",
         "description": "Descarga vídeo MP4 y audio MP3 en Windows, Mac y Android (Mac y Android en beta). Gratis, sin anuncios ni rastreo, en 5 idiomas.",
         "nav": ("Funciones", "Extensión", "Instalación", "Novedades", "Ayuda", "♥ Apoyar"),
-        "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android y macOS</b> en beta",
+        "download_short": "Descargar", "new": "Nuevo", "eyebrow": "<b>Android, macOS y Linux</b> en beta",
         "h1": ("Vídeo y audio.", "Con un clic."),
         "lead": "Una aplicación gratuita para Windows, Mac y Android. Guarda vídeo como MP4 o audio como MP3 desde un enlace. En el ordenador también puedes enviar vídeos directamente desde la extensión del navegador.",
         "platform_label": "Elige tu plataforma", "mac_btn": "Descargar para macOS", "android_btn": "Descargar para Android",
-        "mac_req": "macOS 13+ · Apple M1 o posterior · Beta", "android_req": "Android 10+ · ARM64 · Beta",
+        "mac_req": "macOS 13+ · Apple M1 o posterior · Beta", "linux_btn": "Descargar para Linux", "linux_req": "Ubuntu 22.04+ o similar · x86_64 · Beta",
+        "android_req": "Android 10+ · ARM64 · Beta",
         "support_card": "Tarjeta / Apple Pay", "win_btn": "Descargar para Windows", "win_req": "Windows 10 y 11 (64 bits)", "install_help": "ayuda para instalar",
         "note": "La aplicación está pensada para tus propios vídeos, contenido para el que tienes permiso del autor y contenido con "
                 "licencia libre. Al descargar aceptas las <a href=\"terms.html\">Condiciones de uso</a>. El contenido protegido con "
@@ -351,11 +355,12 @@ HOME = {
         "title": "Video Download — MP4/MP3 pour Windows ; Mac et Android bêta",
         "description": "Téléchargez des vidéos MP4 et de l'audio MP3 sur Windows, Mac et Android (Mac et Android en bêta). Gratuit, sans publicité ni suivi, en 5 langues.",
         "nav": ("Fonctions", "Extension", "Installation", "Nouveautés", "Aide", "♥ Soutenir"),
-        "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android et macOS</b> en bêta",
+        "download_short": "Télécharger", "new": "Nouveau", "eyebrow": "<b>Android, macOS et Linux</b> en bêta",
         "h1": ("La vidéo et le son.", "En un clic."),
         "lead": "Une application gratuite pour Windows, Mac et Android. Enregistrez une vidéo en MP4 ou de l’audio en MP3 depuis un lien. Sur ordinateur, vous pouvez aussi envoyer des vidéos directement depuis l’extension du navigateur.",
         "platform_label": "Choisir votre plateforme", "mac_btn": "Télécharger pour macOS", "android_btn": "Télécharger pour Android",
-        "mac_req": "macOS 13+ · Apple M1 ou plus récent · Bêta", "android_req": "Android 10+ · ARM64 · Bêta",
+        "mac_req": "macOS 13+ · Apple M1 ou plus récent · Bêta", "linux_btn": "Télécharger pour Linux", "linux_req": "Ubuntu 22.04+ ou similaire · x86_64 · Bêta",
+        "android_req": "Android 10+ · ARM64 · Bêta",
         "support_card": "Carte / Apple Pay", "win_btn": "Télécharger pour Windows", "win_req": "Windows 10 et 11 (64 bits)", "install_help": "aide à l'installation",
         "note": "L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur "
                 "et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href=\"terms.html\">Conditions "
@@ -600,6 +605,7 @@ def share_html(lang: str, url: str, up: str = "") -> str:
 def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, news: str, version_line: str, version_short: str,
            installer_url: str, mac_url: str, issue_url: str, mac_text: tuple, meta: str = "",
            android_url: str = "", android_text: tuple = ("", "", "", ()), android_guide_label: str = "",
+           linux_url: str = "", linux_text: tuple = ("", "", "", ()),
            obtainium: tuple = (), page_url: str = "", news_more: str = "", guides_link: str = "") -> str:
     h, labels = HOME[lang], app_labels(lang)
     esc = html.escape
@@ -645,6 +651,8 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
     faq = "\n".join(f"        <details><summary>{q}</summary><p>{a}</p></details>" for q, a in h["faq"])
     mac_items = "\n".join(f"          <li>{step}</li>" for step in mac_steps)
     android_lead, android_button, android_note, android_steps = android_text
+    linux_lead, linux_button, linux_note, linux_steps = linux_text
+    linux_items = "\n".join(f"          <li>{step}</li>" for step in linux_steps)
     android_items = "\n".join(f"          <li>{step}</li>" for step in android_steps)
     # Obtainium (Ahmed 5.10.2026): prati GitHub izdanja i sam ažurira; obična veza, bez tuđeg koda na sajtu.
     obtainium_html = (f'        <p>{obtainium[1]} <a href="{esc(obtainium[0])}">{obtainium[2]} →</a></p>\n'
@@ -697,6 +705,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <button type="button" data-platform="win" aria-pressed="true">Windows</button>
           <button type="button" data-platform="mac" aria-pressed="false">macOS</button>
           <button type="button" data-platform="android" aria-pressed="false">Android</button>
+          <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
         <div class="cta">
           <a class="btn" href="{installer_url}" data-platform-download="win">
@@ -705,11 +714,13 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           </a>{store_hero}
           <a class="btn" href="{mac_url}" data-platform-download="mac" data-mac>{download_icon}{h["mac_btn"]}</a>
           <a class="btn" href="{android_url}" data-platform-download="android" data-android>{download_icon}{h["android_btn"]}</a>
+          <a class="btn" href="{linux_url}" data-platform-download="linux" data-linux>{download_icon}{h["linux_btn"]}</a>
         </div>
         <ul class="promise">{promise}</ul>
         <div class="meta"><span data-platform-requirements="win">{version_line} · {h["win_req"]}</span>
           <span data-platform-requirements="mac" hidden>{esc(version_short)} · {h["mac_req"]}</span>
           <span data-platform-requirements="android" hidden>{esc(version_short)} · {h["android_req"]}</span>
+          <span data-platform-requirements="linux" hidden>{esc(version_short)} · {h["linux_req"]}</span>
           · <a href="#install" data-install-help>{h["install_help"]}</a></div>
         <p class="note">{h["note"]}</p>
       </div>
@@ -834,6 +845,7 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         <a href="#panel-win" id="tab-win" aria-controls="panel-win">Windows</a>
         <a href="#panel-mac" id="tab-mac" aria-controls="panel-mac">macOS <span class="badge">{badge}</span></a>
         <a href="#panel-android" id="tab-android" aria-controls="panel-android">Android <span class="badge">{badge}</span></a>
+        <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">{badge}</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
         <p>{in_win}</p>
@@ -860,6 +872,14 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
 {android_items}
         </ol>
 {obtainium_html}        <p><a href="android-guide.html">{esc(android_guide_label)} →</a></p>
+      </div>
+      <div class="panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux">
+        <p><span class="badge">{badge}</span> {linux_lead.format(issue=issue_url)}</p>
+        <p>{linux_note}</p>
+        <ol>
+{linux_items}
+        </ol>
+        <p style="margin-top:22px"><a class="btn" href="{linux_url}">{linux_button}</a></p>
       </div>
     </div>
   </section>

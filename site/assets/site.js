@@ -294,8 +294,13 @@
   // Dugme „Mac" u vrhu stranice otvara Mac karticu uputstva.
   $$("[data-mac]").forEach((a) => a.addEventListener("click", () => tabs[1] && select(tabs[1])));
   $$("[data-android]").forEach((a) => a.addEventListener("click", () => tabs[2] && select(tabs[2])));
+  $$("[data-linux]").forEach((a) => a.addEventListener("click", () => tabs[3] && select(tabs[3])));
   // Mac posjetilac odmah vidi Mac uputstvo.
   if (/Mac/.test(navigator.platform || navigator.userAgent) && tabs[1]) select(tabs[1]);
+  // Linux računar (ne Android, i on se predstavlja kao Linux) odmah vidi Linux uputstvo.
+  if (/Linux/.test(navigator.platform || navigator.userAgent) && !/Android/.test(navigator.userAgent) && tabs[3]) {
+    select(tabs[3]);
+  }
   // Posjetilac s Android telefona odmah vidi Android uputstvo.
   if (/Android/.test(navigator.userAgent) && tabs[2]) select(tabs[2]);
   const selectHash = () => {
