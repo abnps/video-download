@@ -37,6 +37,7 @@ class WebUrlTest(unittest.TestCase):
         extract.assert_not_called()
 
 
+@unittest.skipUnless(sys.platform == "win32", "Windows putanje (host/videodl-host.exe); Linux i Mac imaju svoj host")
 class WindowsHostFolderTest(unittest.TestCase):
     def test_registration_points_to_host_folder(self):
         with tempfile.TemporaryDirectory() as tmp:
