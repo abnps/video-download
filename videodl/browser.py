@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+import shutil
 import tempfile
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -166,6 +167,37 @@ def remove_stale_cookie_files(folder: str | None = None, now: float | None = Non
                 os.remove(path)
                 removed += 1
     return removed
+
+
+# Browseri iz kojih yt-dlp sam čita kolačiće (Postavke → Prijava na sajtove, Ahmed 29.10.2026).
+COOKIE_BROWSERS = ("firefox", "edge", "chrome", "brave")
+COOKIE_BROWSER_NAMES = {"firefox": "Firefox", "edge": "Microsoft Edge", "chrome": "Google Chrome", "brave": "Brave"}
+
+
+@contextlib.contextmanager
+def cookie_options(cookies: tuple[Cookie, ...] | list[Cookie] | None = (), browser: str | None = None,
+                   cookie_txt: str | None = None) -> Iterator[dict]:
+    """yt-dlp opcije za prijavu, po prednosti: kolačići poslani iz dodatka (samo sajt s kog se preuzima), pa
+    browser izabran u Postavkama, pa korisnikov cookies.txt. Taj fajl ide kao privremena kopija, jer yt-dlp pri
+    zatvaranju prepisuje svoj cookies fajl. Vrijednosti kolačića se nikad ne ispisuju."""
+    if cookies:
+        with cookie_file(cookies) as path:
+            yield {"cookiefile": path}
+        return
+    if browser in COOKIE_BROWSERS:
+        yield {"cookiesfrombrowser": (browser,)}
+        return
+    if cookie_txt and os.path.isfile(cookie_txt):
+        handle, path = tempfile.mkstemp(prefix=COOKIE_PREFIX, suffix=".txt")
+        os.close(handle)
+        try:
+            shutil.copyfile(cookie_txt, path)
+            yield {"cookiefile": path}
+        finally:
+            with contextlib.suppress(OSError):
+                os.remove(path)
+        return
+    yield {}
 
 
 @contextlib.contextmanager

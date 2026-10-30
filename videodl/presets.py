@@ -56,6 +56,11 @@ class Preset:
         return self.audio_codec is not None
 
     @property
+    def keeps_original_audio(self) -> bool:
+        """Zvuk ostaje u kodeku sa sajta (npr. Opus, AAC): izvlači se bez ponovnog kodiranja."""
+        return self.audio_codec == "best"
+
+    @property
     def is_converted(self) -> bool:
         return self.convert_to is not None
 
@@ -88,9 +93,14 @@ PRESETS: tuple[Preset, ...] = (
     Preset("720p", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mp4"),
     Preset("480p", "bv*+ba/b", ("res:480", *_COMPATIBLE), "mp4"),
     # Preuzima se do 720p (dovoljno za 720×480, a manje za skinuti), pa se pretvara.
+    # Originalni format (Ahmed 29.10.2026): najbolja slika i zvuk u kodecima sa sajta (VP9/AV1, Opus), samo spojeni
+    # u MKV, bez ponovnog kodiranja i bez gubitka kvaliteta. MKV prima svaki kodek; poneki stari plejer ga ne pušta.
+    Preset("original", "bv*+ba/b", ("res",), "mkv"),
     Preset("car", "bv*+ba/b", ("res:720", *_COMPATIBLE), "mkv", convert_to="avi", ffmpeg_args=CAR_ARGS, plain=True),
     Preset("mp3", "ba/b", audio_codec="mp3", audio_quality="192"),
     Preset("m4a", "ba/b", ("acodec:aac",), audio_codec="m4a"),
+    # Zvuk kakav sajt šalje (najčešće Opus ili AAC), bez pretvaranja: najbolji kvalitet i najbrže.
+    Preset("audio_original", "ba/b", audio_codec="best"),
     Preset("mp3car", "ba/b", audio_codec="mp3", audio_quality="192", ffmpeg_args=CAR_AUDIO_ARGS, plain=True),
 )
 
@@ -182,7 +192,9 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
                       subtitles: bool = False, subtitle_langs: list[str] | None = None,
                       thumbnail: bool = False, ratelimit: int | None = None,
                       name_template: str | None = None, chapters: bool = False,
-                      sponsorblock: bool = False) -> dict:
+                      sponsorblock: bool = False, precise_cut: bool = True,
+                      number: str | None = None, split_chapters: bool = False,
+                      split_dir: str | None = None) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
@@ -192,8 +204,8 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
 
     opts = base_options(logger)
     opts["format"] = preset.format
-    opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _with_section(
-        _with_quality(_output_name(filename_title, source_url, name_template), preset), section)
+    opts["outtmpl"] = _escape(str(target_dir)) + os.sep + _with_number(_with_section(
+        _with_quality(_output_name(filename_title, source_url, name_template), preset), section), number)
     opts["match_filter"] = reject_live
     if http_headers:
         opts["http_headers"] = dict(http_headers)
@@ -215,8 +227,10 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         postprocessors.append(extract)
         if preset.ffmpeg_args:
             opts["postprocessor_args"] = {"extractaudio": list(preset.ffmpeg_args)}
-        # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo.
-        opts["final_ext"] = preset.audio_codec
+        # Da yt-dlp prepozna već konvertovan fajl i ne preuzima ga ponovo (originalni zvuk nema unaprijed
+        # poznatu ekstenziju: zavisi od kodeka sa sajta).
+        if not preset.keeps_original_audio:
+            opts["final_ext"] = preset.audio_codec
     elif subtitles:
         # Titl ide i u MP4 i kao .srt pored videa: mnogi playeri (Windows Media Player, TV, telefon)
         # ugrađeni titl ne prikazuju sami, a .srt istog imena učitaju odmah. Ručni imaju prednost,
@@ -243,6 +257,11 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
                                "add_infojson": False})
     if thumbnail:
         postprocessors.append({"key": "EmbedThumbnail", "already_have_thumbnail": False})
+    split = split_chapters and not section and not preset.plain
+    if split:
+        # Poglavlja kao posebni fajlovi (Ahmed 29.10.2026): cijeli fajl ostaje, a pored njega folder s imenom
+        # videa i dijelovima „01 - Uvod.mp3". Bez ponovnog kodiranja; video bez poglavlja se ne dijeli.
+        postprocessors.append({"key": "FFmpegSplitChapters", "force_keyframes": False})
     if preset.is_converted:
         # Zadnji korak, poslije eventualnog rezanja reklama: pretvaranje u traženi spoj.
         postprocessors.append({"key": "FFmpegVideoConvertor", "preferedformat": preset.convert_to})
@@ -250,10 +269,15 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         opts["final_ext"] = preset.convert_to
     if postprocessors:
         opts["postprocessors"] = postprocessors
+    if split:
+        chapter_dir = _escape(str(Path(split_dir) if split_dir else target_dir)) + os.sep + "%(title).100B"
+        opts["outtmpl"] = {"default": opts["outtmpl"],
+                           "chapter": chapter_dir + os.sep + "%(section_number)02d - %(section_title).100B.%(ext)s"}
     if section:
-        # Samo dio videa; rezovi na tačnom mjestu traže ponovno kodiranje oko ključnih kadrova.
+        # Samo dio videa. Precizno (podrazumijevano): rez na tačnoj sekundi, uz ponovno kodiranje oko ključnih
+        # kadrova. Brzo: bez kodiranja, rez na najbližem ključnom kadru (može početi koju sekundu ranije).
         opts["download_ranges"] = _ytdlp_utils().download_range_func(None, [section])
-        opts["force_keyframes_at_cuts"] = True
+        opts["force_keyframes_at_cuts"] = bool(precise_cut)
     if ratelimit:
         opts["ratelimit"] = int(ratelimit)
     return opts
@@ -287,6 +311,16 @@ def _clock_precise(value: float) -> str:
 
 def section_label(section: tuple[float, float] | None) -> str:
     return "–".join(_clock_precise(value) for value in section).replace(":", ".") if section else ""
+
+
+def playlist_number(index: int, count: int) -> str:
+    """Redni broj u plejlisti s vodećim nulama (01…09 ili 001…120), da se fajlovi sortiraju po redu."""
+    return str(index).zfill(max(2, len(str(count))))
+
+
+def _with_number(template: str, number: str | None) -> str:
+    """„03 - Naslov [id].mp4": redni broj iz plejliste ispred imena."""
+    return f"{number} - {template}" if number else template
 
 
 def _with_section(template: str, section: tuple[float, float] | None) -> str:

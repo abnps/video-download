@@ -87,5 +87,16 @@
       "sha256": "2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d",
       "source": "https://github.com/AppImage/type2-runtime"
     }
+  },
+  "windows_archives": {
+    "comment": "Windows build na GitHubu (posao „Windows paket“): arhive se provjeravaju po SHA-256, a raspakovani ffmpeg.exe/ffprobe.exe/node.exe još jednom po „tools“ iznad.",
+    "ffmpeg": {
+      "url": "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip",
+      "sha256": "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba"
+    },
+    "node": {
+      "url": "https://nodejs.org/dist/v24.14.1/node-v24.14.1-win-x64.zip",
+      "sha256": "6e50ce5498c0cebc20fd39ab3ff5df836ed2f8a31aa093cecad8497cff126d70"
+    }
   }
 }

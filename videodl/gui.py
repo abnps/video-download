@@ -21,13 +21,13 @@ from PySide6.QtGui import (
     QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPainter, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QMainWindow, QMenu, QMessageBox,
+    QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox,
     QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon, QToolButton, QVBoxLayout, QWidget,
 )
 
 from . import __version__
 from .bridge import BridgeServer
-from .browser import BrowserRequest
+from .browser import COOKIE_BROWSERS, BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, RateBudget, download
 from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
@@ -37,21 +37,26 @@ from .native_messaging import TemporaryLocationError, install_native_host, unins
 from .runtime import bundled_tool, extension_dir, find_tool, mark_running
 from .presets import (
     DEFAULT_NAME_TEMPLATE, DEFAULT_PRESET_KEY, NAME_TEMPLATES, PRESETS, format_section, get_preset, parse_section, safe_folder_name,
-    direct_output_name, section_label, subtitle_languages, title_identity,
+    direct_output_name, playlist_number, section_label, subtitle_languages, title_identity,
 )
 from .probe import ProbeResult, probe
-from . import achievements, convert, diagnostics, parental, release_signing, runtime, scheduler, store, support, theme, winshell
+from . import achievements, convert, diagnostics, release_signing, runtime, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
-    AUDIO_EXTENSIONS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog, ParentalDialog,
+    AUDIO_EXTENSIONS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog,
     AchievementDialog, AchievementsListDialog, SupportDialog, WhatsNewDialog, milestone_line, browser_exe, filter_history,
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
+from .gui_clipboard import ClipboardMixin
+from .gui_support import SupportMixin
+from .gui_updates import UpdatesMixin
+from .gui_util import (  # noqa: F401 - pomoćne funkcije su i dalje dostupne kao videodl.gui.*
+    DEFAULT_PARALLEL, PARALLEL_CHOICES, RATE_CHOICES, adult_thumbnail, default_output_dir, extract_urls,
+    fetch_thumbnail, format_eta, format_progress, format_speed, missing_tools,
+)
 
-_URL_PATTERN = re.compile(r"https?://[^\s<>\"']+", re.IGNORECASE)
-MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
 
 # Pucanje veze: koliko puta aplikacija sama ponavlja i koliko čeka između pokušaja.
 MAX_AUTO_RETRIES = 3
@@ -61,106 +66,8 @@ QUEUE_SAVE_DELAY_MS = 500
 CLOSE_WAIT_SECONDS = 10  # zajednički rok za gašenje svih poslova pri zatvaranju
 THUMBNAIL_CACHE_MAX = 300  # posljednjih N sličica ostaje u memoriji; starije se ponovo učitaju kad zatrebaju
 
-# Ukupno ograničenje brzine u MB/s (0 = bez ograničenja); dijeli se na preuzimanja u toku.
-RATE_CHOICES = (0, 1, 2, 5, 10)
-
-# Koliko preuzimanja može ići istovremeno (Preuzimanja → Istovremeno).
-PARALLEL_CHOICES = (1, 2, 3, 4)
-DEFAULT_PARALLEL = 2
-
-
 
 _needs_adult_ok = scheduler.needs_adult_ok  # i dalje dostupno kao gui._needs_adult_ok
-
-
-def adult_thumbnail(pixmap: QPixmap) -> QPixmap:
-    """Sličica sadržaja 18+: jako zamućena (smanjena pa uvećana) i s oznakom „18+", da se ne vidi preko ramena."""
-    if pixmap.isNull():
-        return pixmap
-    tiny = pixmap.scaled(8, 5, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-    result = tiny.scaled(pixmap.size(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-    painter = QPainter(result)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    # veličina prema sličici: red je prikazuje umanjenu, pa oznaka mora ostati čitljiva
-    badge = QRect(0, 0, max(44, result.width() * 2 // 5), max(24, result.height() * 2 // 5))
-    badge.moveCenter(result.rect().center())
-    painter.setPen(Qt.PenStyle.NoPen)
-    painter.setBrush(QColor(0, 0, 0, 170))
-    painter.drawRoundedRect(badge, badge.height() // 4, badge.height() // 4)
-    font = painter.font()
-    font.setBold(True)
-    font.setPixelSize(max(13, badge.height() * 3 // 5))
-    painter.setFont(font)
-    painter.setPen(QColor("white"))
-    painter.drawText(badge, int(Qt.AlignmentFlag.AlignCenter), "18+")
-    painter.end()
-    return result
-
-
-def default_output_dir(platform: str = sys.platform) -> str:
-    # Mac nema „Videos"; tamo je folder za video „Movies" (u Finderu „Filmovi").
-    return str(Path.home() / ("Movies" if platform == "darwin" else "Videos") / "Video Download")
-
-
-def format_speed(bytes_per_second: float) -> str:
-    value = bytes_per_second / 1024
-    for unit in ("KB/s", "MB/s", "GB/s"):
-        if value < 1024 or unit == "GB/s":
-            return decimal(f"{value:.1f} {unit}")
-        value /= 1024
-    raise AssertionError("nedostižno")
-
-
-def format_eta(seconds: int) -> str:
-    minutes, secs = divmod(int(seconds), 60)
-    hours, minutes = divmod(minutes, 60)
-    if hours:
-        return f"{hours}:{minutes:02d}:{secs:02d}"
-    if minutes:
-        return f"{minutes}:{secs:02d}"
-    return f"{secs} s"
-
-
-def format_progress(progress: Progress) -> str:
-    if progress.phase == PROCESSING:
-        return f"{tr(progress.label)}…"
-    parts = [tr("progress.downloading") + (f" ({tr(progress.label)})" if progress.label else "")]
-    if progress.fraction is not None:
-        parts.append(f"{progress.fraction:.0%}")
-    if progress.speed:
-        parts.append(format_speed(progress.speed))
-    if progress.eta is not None:
-        parts.append(tr("progress.eta", time=format_eta(progress.eta)))
-    return " · ".join(parts)
-
-
-def extract_urls(text: str) -> list[str]:
-    urls = []
-    for match in _URL_PATTERN.findall(text or ""):
-        url = match.rstrip(".,;)")
-        if url not in urls:
-            urls.append(url)
-    return urls
-
-
-@functools.cache
-def missing_tools() -> tuple[str, ...]:
-    # Jednom po pokretanju: zove se pri svakom prevođenju prozora, a traženje po PATH-u (npr. „deno", koji paket
-    # nema) je trajalo i pola sekunde pri otvaranju. Node iz paketa se provjeri prije nego išta po PATH-u.
-    missing = []
-    if not find_tool("ffmpeg"):
-        missing.append("missing.ffmpeg")
-    if not (any(bundled_tool(name) for name in JS_RUNTIMES) or any(find_tool(name) for name in JS_RUNTIMES)):
-        missing.append("missing.js")
-    return tuple(missing)
-
-
-def fetch_thumbnail(url: str) -> bytes | None:
-    if not url.lower().startswith(("http://", "https://")):
-        return None
-    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(request, timeout=10) as response:
-        return response.read(MAX_THUMBNAIL_BYTES)
 
 
 def apply_theme(app: QApplication) -> None:
@@ -200,7 +107,7 @@ from .workers import (  # noqa: F401 - pozadinski poslovi; i dalje dostupni kao 
 )
 
 
-class MainWindow(QMainWindow):
+class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
     # Stižu iz niti lokalnog mosta; Qt ih isporučuje u glavnoj niti.
     browser_request = Signal(object)  # BrowserRequest
     focus_requested = Signal()
@@ -255,6 +162,11 @@ class MainWindow(QMainWindow):
         self._subtitles = False
         self._thumbnail_cover = False
         self._whole_playlist = False
+        self._precise_cut = True
+        self._number_playlist = False
+        self._split_chapters = False
+        self._cookie_browser = ""  # „", firefox, edge, chrome, brave (Postavke → Prijava na sajtove)
+        self._cookie_txt = ""  # putanja do korisnikovog cookies.txt (samo putanja, nikad sadržaj)
         self._rate_limit = 0
         self._rate_budget = None
         self._name_template = DEFAULT_NAME_TEMPLATE
@@ -292,8 +204,10 @@ class MainWindow(QMainWindow):
         self.file_menu = menu.addMenu("")
         self.paste_action = self.file_menu.addAction("", self._paste_from_clipboard)
         self.paste_action.setShortcut(QKeySequence.StandardKey.Paste)
-        self.watch_clipboard_action = self.file_menu.addAction("", self.set_watch_clipboard)
+        self.watch_clipboard_action = self.file_menu.addAction("")
         self.watch_clipboard_action.setCheckable(True)
+        # triggered bez argumenta bi pozvao set_watch_clipboard() bez stanja i srušio se
+        self.watch_clipboard_action.triggered.connect(lambda checked: self.set_watch_clipboard(checked))
         self.enter_links_action = self.file_menu.addAction("", self._enter_links)
         self.enter_links_action.setShortcut(QKeySequence("Ctrl+L"))
         self.file_menu.addSeparator()
@@ -314,7 +228,6 @@ class MainWindow(QMainWindow):
         self.clear_action = self.downloads_menu.addAction("", self._clear_finished)
         self.remove_all_action = self.downloads_menu.addAction("", self._remove_all)
         self.history_action = self.downloads_menu.addAction("", self._show_history)
-        self.parental_action = self.downloads_menu.addAction("", self._show_parental)
         self.downloads_menu.addSeparator()
         self.subtitles_action = self.downloads_menu.addAction(
             "", lambda checked: self._set_option("_subtitles", checked))
@@ -399,6 +312,9 @@ class MainWindow(QMainWindow):
         self.file_menu.setTitle(tr("menu.file"))
         self.paste_action.setText(tr("menu.paste"))
         self.watch_clipboard_action.setText(tr("menu.watch_clipboard"))
+        self.watch_clipboard_box.setText(tr("toolbar.watch_clipboard"))
+        self.watch_clipboard_box.setToolTip(tr("toolbar.watch_clipboard_tip"))
+        self.watch_clipboard_box.setChecked(self._watch_clipboard)
         self.clipboard_notice_label.setText(tr("clipboard.notice"))
         self.clipboard_notice_ok.setText(tr("clipboard.notice_ok"))
         self.clipboard_notice_off.setText(tr("clipboard.notice_off"))
@@ -414,7 +330,6 @@ class MainWindow(QMainWindow):
         self.clear_action.setText(tr("menu.clear_finished"))
         self.remove_all_action.setText(tr("menu.remove_all"))
         self.history_action.setText(tr("menu.history"))
-        self.parental_action.setText(tr("menu.parental"))
         self.subtitles_action.setText(tr("menu.subtitles"))
         self.thumbnail_action.setText(tr("menu.thumbnail"))
         self.whole_playlist_action.setText(tr("menu.whole_playlist"))
@@ -501,6 +416,12 @@ class MainWindow(QMainWindow):
         self.paste_button.setIconSize(QSize(14, 14))
         self.paste_button.clicked.connect(self._paste_from_clipboard)
         bar.addWidget(self.paste_button)
+        # Isto što i Fajl → Hvataj kopirane linkove, ali uvijek pri ruci (Ahmed 29.10.2026).
+        self.watch_clipboard_box = QCheckBox()
+        self.watch_clipboard_box.setObjectName("watchClipboard")
+        self.watch_clipboard_box.toggled.connect(
+            lambda on: self.set_watch_clipboard(on) if on != self._watch_clipboard else None)
+        bar.addWidget(self.watch_clipboard_box)
         self.preset_combo = QComboBox()
         self.preset_combo.setObjectName("presetCombo")
         for preset in PRESETS:
@@ -616,12 +537,19 @@ class MainWindow(QMainWindow):
         self._achievement_dialog = None
         self._achievements = achievements.AchievementState.from_json(
             self._settings.value("achievements/state", "", type=str))
+        self._settings.remove("parental")  # uklonjena roditeljska zaštita (Ahmed 29.10.2026): ni otisak PIN-a ne ostaje
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
         # Poglavlja su uključena odmah (ništa ne šalju); SponsorBlock pita vanjski servis, pa tek na zahtjev.
         self._chapters = self._settings.value("chapters", True, type=bool)
         self._sponsorblock = self._settings.value("sponsorblock", False, type=bool)
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
+        self._precise_cut = self._settings.value("precise_cut", True, type=bool)
+        self._number_playlist = self._settings.value("number_playlist", False, type=bool)
+        self._split_chapters = self._settings.value("split_chapters", False, type=bool)
+        browser = self._settings.value("cookie_browser", "", type=str)
+        self._cookie_browser = browser if browser in COOKIE_BROWSERS else ""
+        self._cookie_txt = self._settings.value("cookie_txt", "", type=str)
         self._notify_done = self._settings.value("notify_done", True, type=bool)
         name_template = self._settings.value("name_template", DEFAULT_NAME_TEMPLATE, type=str)
         self._name_template = name_template if name_template in NAME_TEMPLATES else DEFAULT_NAME_TEMPLATE
@@ -651,6 +579,11 @@ class MainWindow(QMainWindow):
         self._settings.setValue("chapters", self._chapters)
         self._settings.setValue("sponsorblock", self._sponsorblock)
         self._settings.setValue("whole_playlist", self._whole_playlist)
+        self._settings.setValue("precise_cut", self._precise_cut)
+        self._settings.setValue("number_playlist", self._number_playlist)
+        self._settings.setValue("split_chapters", self._split_chapters)
+        self._settings.setValue("cookie_browser", self._cookie_browser)
+        self._settings.setValue("cookie_txt", self._cookie_txt)
         self._settings.setValue("notify_done", self._notify_done)
         self._settings.setValue("name_template", self._name_template)
         self._settings.setValue("rate_limit", self._rate_limit)
@@ -674,6 +607,7 @@ class MainWindow(QMainWindow):
                                    duration=row.get("duration"), adult=bool(row.get("adult")),
                                    video_id=row.get("video_id"))
             item.custom_format = bool(row.get("custom_format"))
+            item.number = row.get("number")
             section = row.get("section")
             if isinstance(section, (list, tuple)) and len(section) == 2:
                 item.section = (float(section[0]), float(section[1]))
@@ -693,159 +627,17 @@ class MainWindow(QMainWindow):
             self._set_status(message)
             self._note_error(message)
 
-    # ---------- podrška (dobrovoljni prilog) ----------
-
-    def _maybe_remind_support(self) -> None:
-        now = time.time()
-        if self._support.should_show_banner(now):
-            self.support_banner.show()
-        busy = bool(self._download_jobs) or self._running or bool(self._probe_jobs)
-        free = self._achievement_dialog is None and self._support_dialog is None
-        milestone = self._support.milestone_due(busy)
-        badges = self._achievements.take_pending() if free and not busy else []
-        if free and (milestone or badges):
-            # Čestitka ima prednost; podsjetnik za prilog čeka sljedeću priliku (ne dva prozora odjednom).
-            if milestone:
-                self._support.milestone_seen(milestone)
-            self.show_achievement(milestone, badges, now)
-        elif (free and self._support.should_show_dialog(now, busy)
-              and now - self._achievements.last_support_note >= achievements.SUPPORT_NOTE_EVERY):
-            # Isti dan kad je čestitka već pozvala na prilog nema i sedmičnog prozora (jedan poziv dnevno).
-            self.show_support_dialog(automatic=True)
-        self._save_settings()
-
-    def show_achievement(self, milestone: int, badges: list, now: float) -> None:
-        names = [(achievements.ICONS[key], tr(f"badge.{key}"), tr(f"badge.{key}.desc")) for key in badges]
-        if milestone and not names:
-            headline, lines = tr("achievement.headline", count=milestone), [milestone_line(milestone)]
-        elif len(names) == 1 and not milestone:
-            icon, name, desc = names[0]
-            headline, lines = f"{icon} {name}", [desc]
-        else:
-            headline = tr("achievement.new_many")
-            lines = ([f"🏆 {tr('achievements.count_name', count=milestone)}"] if milestone else []) + \
-                [f"{icon} {name}: {desc}" for icon, name, desc in names]
-        show_support = (not self._support.snoozed(now)
-                        and now - self._support.last_dialog >= achievements.SUPPORT_NOTE_EVERY
-                        and self._achievements.support_note_allowed(now))
-        dialog = AchievementDialog(headline, lines, show_support=show_support, parent=self)
-        dialog.support_clicked.connect(self._open_support)
-        dialog.finished.connect(lambda _result: setattr(self, "_achievement_dialog", None))
-        self._achievement_dialog = dialog
-        dialog.open()
-
-    def _record_achievements(self, item, result: DownloadResult) -> None:
-        preset = get_preset(item.preset_key)
-        self._achievements.record(achievements.Download(
-            url=item.url, audio=preset.is_audio, car=item.preset_key in ("car", "mp3car"),
-            clip=item.section is not None, height=result.height, size=self._sizes.get(item.id, 0),
-            from_browser=item.from_browser, subtitles=self._subtitles, duration=item.duration,
-            retried=item.auto_retries > 0, running_together=len(self._download_jobs) + 1))
-
-    @Slot()
-    def show_achievements_list(self) -> None:
-        AchievementsListDialog(self._achievements, self._support.downloads, self._support.milestone_shown,
-                               self).open()
-
-    @Slot()
-    def _open_support(self) -> None:
-        QDesktopServices.openUrl(QUrl(support.SUPPORT_URL))
-
-    @Slot()
-    def _support_banner_later(self) -> None:
-        self._support.banner_later()
-        self.support_banner.hide()
-        self._save_settings()
-
-    def show_support_dialog(self, automatic: bool) -> None:
-        """Nije modalan za rad: preuzimanja teku dalje, a zatvaranje ništa ne mijenja u programu."""
-        if automatic:
-            self._support.dialog_shown(time.time())
-        count = self._support.downloads
-        text = tr("support.dialog_count", count=count) if count else tr("support.dialog_plain")
-        dialog = SupportDialog(text, self)
-        dialog.support_clicked.connect(self._open_support)
-        dialog.already_clicked.connect(self._support_already)
-        dialog.finished.connect(lambda _result: setattr(self, "_support_dialog", None))
-        self._support_dialog = dialog
-        dialog.open()
-
-    @Slot()
-    def _support_already(self) -> None:
-        self._support.already_supported(time.time())
-        self.support_banner.hide()
-        self._save_settings()
-
-    @Slot()
-    def _show_legal(self) -> None:
-        LegalDialog(self).exec()
-
-    @Slot()
-    def show_settings(self) -> None:
-        from .settings_dialog import SettingsDialog
-
-        dialog = SettingsDialog(self, RATE_CHOICES, PARALLEL_CHOICES, NAME_TEMPLATES)
-        self._settings_dialog = dialog  # testovi ga nađu; prozor je modalan
-        dialog.exec()
-
-    def _show_whats_new(self) -> None:
-        WhatsNewDialog(self).exec()
-
-    @Slot()
-    def _show_history(self) -> None:
-        dialog = HistoryDialog(store.history_path(self._data_dir), self)
-        dialog.exec()
-
-    def set_watch_clipboard(self, enabled: bool, save: bool = True) -> None:
-        """Kopiran link (Ctrl+C u browseru) sam ulazi u red; preuzimanje i dalje kreće na „Preuzmi"."""
-        self._watch_clipboard = bool(enabled)
-        self.watch_clipboard_action.setChecked(self._watch_clipboard)
-        clipboard = QApplication.clipboard()
-        if self._watch_clipboard:
-            self._last_clipboard = clipboard.text()
-            clipboard.dataChanged.connect(self._on_clipboard_change, Qt.ConnectionType.UniqueConnection)
-            self._clipboard_hooked = True
-        else:
-            self._unhook_clipboard()
-        if save:
-            self._save_settings()
-
-    def _unhook_clipboard(self) -> None:
-        """Odvezuje samo ako je vezano: PySide inače ispiše upozorenje (isključeno hvatanje pri pokretanju)."""
-        if getattr(self, "_clipboard_hooked", False):
-            with contextlib.suppress(RuntimeError):
-                QApplication.clipboard().dataChanged.disconnect(self._on_clipboard_change)
-            self._clipboard_hooked = False
-
-    def _close_clipboard_notice(self, keep: bool) -> None:
-        self._settings.setValue("clipboard_notice_seen", True)
-        self.clipboard_notice.hide()
-        if not keep:
-            self.set_watch_clipboard(False)
-
-    @Slot()
-    def _on_clipboard_change(self) -> None:
-        if not self._watch_clipboard:
-            return
-        text = QApplication.clipboard().text()
-        if not text or text == self._last_clipboard:
-            return
-        self._last_clipboard = text
-        known = {item.url for item in self._queue.items()}
-        urls = [url for url in extract_urls(text) if url not in known]
-        skipped = [url for url in urls if is_obviously_not_media(url)]
-        urls = [url for url in urls if url not in skipped]
-        if not urls:
-            if skipped:
-                self._set_status(tr("status.not_media", url=skipped[0]))
-            return
-        self._set_status(tr("status.clipboard_added", title=urls[0]))
-        self._start_probe(urls)
-
     def _download_options(self, item: QueueItem) -> dict:
         options = {}
         if item.section:
             options["section"] = item.section
+            if not self._precise_cut:
+                options["precise_cut"] = False
+        if item.number:
+            options["number"] = item.number
+        if self._split_chapters:
+            options["split_chapters"] = True
+        options.update(self._cookie_source())
         if self._subtitles:
             options["subtitles"] = True
             options["subtitle_langs"] = subtitle_languages(get_language())
@@ -866,6 +658,17 @@ class MainWindow(QMainWindow):
                 self._rate_budget = RateBudget(total)
             options["ratelimit"] = self._rate_budget
         return options
+
+    def _cookie_source(self) -> dict:
+        """Kolačići iz Postavki (browser ili cookies.txt) za čitanje linka i preuzimanje; prazno = bez prijave."""
+        if self._cookie_browser:
+            return {"cookie_browser": self._cookie_browser}
+        return {"cookie_txt": self._cookie_txt} if self._cookie_txt else {}
+
+    def set_cookie_source(self, browser: str = "", cookie_txt: str = "") -> None:
+        self._cookie_browser = browser if browser in COOKIE_BROWSERS else ""
+        self._cookie_txt = "" if self._cookie_browser else cookie_txt
+        self._save_settings()
 
     def _set_option(self, name: str, value) -> None:
         setattr(self, name, value)
@@ -1024,7 +827,7 @@ class MainWindow(QMainWindow):
             return
         self._probing.update(urls)
         job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset,
-                       {"whole_playlist": self._whole_playlist})
+                       {"whole_playlist": self._whole_playlist, **self._cookie_source()})
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -1068,10 +871,13 @@ class MainWindow(QMainWindow):
         subfolder = result.title if result.is_playlist else None
         preset_key = preset or self.preset_combo.currentData()
         added = []
-        for entry in result.entries:
+        numbered = result.is_playlist and self._number_playlist
+        for index, entry in enumerate(result.entries, 1):
             item = self._queue.add(entry.url, entry.title, preset_key, output_dir, subfolder,
                                    thumbnail=entry.thumbnail, duration=entry.duration, adult=entry.adult,
                                    video_id=entry.video_id, **access)
+            if numbered:
+                item.number = playlist_number(index, len(result.entries))
             item.custom_format = bool(preset)  # format tražen iz dodatka ostaje na toj stavci
             item.from_browser = auto_start  # auto_start dolazi samo iz dodatka za browser
             self._append_row(item)
@@ -1619,24 +1425,8 @@ class MainWindow(QMainWindow):
         if row is not None:
             row.thumbnail.set_pixmap(adult_thumbnail(pixmap) if item is not None and item.adult else pixmap)
 
-    def _parental_on(self) -> bool:
-        return self._settings.value("parental/enabled", False, type=bool)
-
     def _confirm_adult(self, items) -> bool:
-        """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti.
-        Uz roditeljsku zaštitu 18+ se ne nudi: stavka se odmah označi kao blokirana (ostale idu)."""
-        if self._parental_on():
-            blocked = [item for item in items if parental.blocks(True, item)]
-            for item in blocked:
-                item.status = ItemStatus.FAILED
-                item.message = tr("parental.blocked")
-                item.adult_ok = False
-                self._manual = [item_id for item_id in self._manual if item_id != item.id]
-                self._refresh_row(item)
-            if blocked:
-                self._set_status(tr("parental.blocked_status", count=len(blocked)))
-                self._schedule_save()
-            return not blocked
+        """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti."""
         pending = [item for item in items if _needs_adult_ok(item)]
         if not pending:
             return True
@@ -1646,28 +1436,6 @@ class MainWindow(QMainWindow):
             return True
         self._set_status(tr("adult.skipped"))
         return False
-
-    @Slot()
-    def _show_parental(self) -> None:
-        """Preuzimanja → Roditeljska zaštita. Uključena zaštita s PIN-om se mijenja tek uz tačan PIN."""
-        stored = self._settings.value("parental/pin", "", type=str)
-        if self._parental_on() and stored:
-            pin, ok = QInputDialog.getText(self, tr("parental.title"), tr("parental.ask_pin"), QLineEdit.EchoMode.Password)
-            if not ok:
-                return
-            if not parental.check_pin(pin.strip(), stored):
-                QMessageBox.warning(self, tr("parental.title"), tr("parental.pin_wrong"))
-                return
-        dialog = ParentalDialog(self._parental_on(), self)
-        if not dialog.exec():
-            return
-        enabled, pin = dialog.chosen_enabled(), dialog.chosen_pin()
-        self._settings.setValue("parental/enabled", enabled)
-        if not enabled:
-            self._settings.remove("parental/pin")
-        elif pin:
-            self._settings.setValue("parental/pin", parental.hash_pin(pin))
-        self._set_status(tr("parental.on" if enabled else "parental.off"))
 
     def _ask_adult_dialog(self, items) -> bool:
         box = QMessageBox(QMessageBox.Icon.Warning, tr("adult.title"),
@@ -1733,178 +1501,6 @@ class MainWindow(QMainWindow):
     def _set_status(self, text: str) -> None:
         self.status_label.setText(text)
 
-    # ---------- pomoć ----------
-
-    @Slot()
-    def _show_browser_help(self) -> None:
-        try:
-            folder = runtime.user_extension_dir()
-        except OSError:
-            folder = extension_dir()
-        BrowserHelpDialog(str(folder), self).exec()
-
-    def _note_error(self, message: str) -> None:
-        if message:
-            self._errors.append(f"{datetime.datetime.now():%H:%M:%S} {display_message(message, friendly=False)}")
-            del self._errors[:-diagnostics.MAX_ERRORS]
-
-    @Slot()
-    def _send_feedback(self) -> None:
-        """Poruka autoru preko programa za e-poštu; bez njega se adresa kopira."""
-        url = diagnostics.feedback_url(tr("feedback.subject", version=__version__),
-                                       tr("feedback.body", info=diagnostics.feedback_info()))
-        if not QDesktopServices.openUrl(QUrl(url)):
-            QApplication.clipboard().setText(diagnostics.CONTACT_EMAIL)
-            self._set_status(tr("feedback.no_mail", email=diagnostics.CONTACT_EMAIL))
-
-    @Slot()
-    def _save_report(self) -> None:
-        """Jedan tekstualni fajl koji se može poslati: verzije, alati i posljednje greške."""
-        suggestion = diagnostics.default_report_path(self._output_dir)
-        chosen, _ = QFileDialog.getSaveFileName(self, tr("menu.report"), str(suggestion), "*.txt")
-        if not chosen:
-            return
-        settings = {
-            "jezik": get_language(),
-            "folder": self._output_dir,
-            "format": self.preset_combo.currentData(),
-            "istovremeno": self._parallel,
-            "hvatanje clipboarda": self._watch_clipboard,
-            "stavki u redu": len(self._queue.items()),
-        }
-        try:
-            Path(chosen).write_text(diagnostics.build_report(self._errors, settings), encoding="utf-8")
-        except OSError as exc:
-            self._set_status(tr("report.failed", error=exc))
-            return
-        self._set_status(tr("report.saved", path=chosen))
-        reveal(chosen)
-
-    @Slot()
-    def _show_about(self) -> None:
-        pending = ytdlp_update.pending_version()
-        ytdlp = f"{ytdlp_update.active_version()} → {pending}" if pending else ytdlp_update.active_version()
-        QMessageBox.about(self, tr("menu.about"), tr("about.text", version=__version__, ytdlp=ytdlp))
-
-    # ---------- ažuriranje yt-dlp-a ----------
-
-    def update_ytdlp(self, manual: bool, nightly: bool = False) -> None:
-        """Novi yt-dlp radi od sljedećeg pokretanja; tekući uvoz se ne može zamijeniti u hodu.
-        `nightly`: noćna verzija sa najnovijim popravkama (nudi se kad je redovna već najnovija)."""
-        if self._ytdlp_job is not None:
-            return
-        self._ytdlp_nightly = nightly
-        if not manual:
-            last = self._settings.value("last_ytdlp_check", 0.0, type=float)
-            if time.time() - last < ytdlp_update.CHECK_INTERVAL_SECONDS:
-                return
-        self._settings.setValue("last_ytdlp_check", time.time())
-        if manual:
-            self._set_status(tr("ytdlp.checking"))
-        job = YtdlpUpdateJob(manual, fetch=ytdlp_update.fetch_nightly if nightly else None)
-        job.finished.connect(self._on_ytdlp_updated)
-        self._ytdlp_job = job
-        job.start()
-
-    @Slot(object, object, bool)
-    def _on_ytdlp_updated(self, version, error, manual: bool) -> None:
-        self._ytdlp_job = None
-        if error is not None:
-            text = tr("ytdlp.failed", error=update_error_text(error))
-            self._set_status(text)
-            if manual:
-                QMessageBox.warning(self, tr("menu.update_ytdlp"), text)
-            return
-        if version is None:
-            if manual and getattr(self, "_ytdlp_nightly", False):
-                QMessageBox.information(self, tr("menu.update_ytdlp"), tr("ytdlp.nightly_none"))
-            elif manual:
-                # Redovna je najnovija, a sajt možda i dalje ne radi: ponudi noćnu verziju (popravka dan-dva ranije).
-                answer = QMessageBox.question(
-                    self, tr("menu.update_ytdlp"),
-                    tr("ytdlp.latest", version=ytdlp_update.active_version()) + "\n\n" + tr("ytdlp.nightly_offer"))
-                if answer == QMessageBox.StandardButton.Yes:
-                    self.update_ytdlp(manual=True, nightly=True)
-            return
-        text = tr("ytdlp.updated", version=version)
-        self._set_status(text)
-        if manual:
-            QMessageBox.information(self, tr("menu.update_ytdlp"), text)
-
-    # ---------- ažuriranje ----------
-
-    def check_for_updates(self, manual: bool) -> None:
-        if self._update_check_job is not None:
-            return
-        if runtime.is_store_package():
-            # Microsoft Store sam ažurira svoj paket; naš instaler tu ne smije (ni ne može) ništa mijenjati.
-            if manual:
-                QMessageBox.information(self, tr("menu.check_updates"), tr("update.store", version=__version__))
-            return
-        if not manual:
-            last = self._settings.value("last_update_check", 0.0, type=float)
-            if time.time() - last < updater.CHECK_INTERVAL_SECONDS:
-                return
-        self._settings.setValue("last_update_check", time.time())
-        job = UpdateCheckJob(self._update_fetch or updater.fetch_latest, manual)
-        job.finished.connect(self._on_update_checked)
-        self._update_check_job = job
-        job.start()
-
-    @Slot(object, object, bool)
-    def _on_update_checked(self, release, error, manual: bool) -> None:
-        self._update_check_job = None
-        if error is not None:
-            if manual:
-                QMessageBox.warning(self, tr("menu.check_updates"), tr("update.failed", error=update_error_text(error)))
-            return
-        if release is None or not updater.is_newer(release.version):
-            if manual:
-                QMessageBox.information(self, tr("menu.check_updates"), tr("update.latest", version=__version__))
-            return
-        answer = QMessageBox.question(self, tr("update.available_title"), tr(
-            "update.available_text", new=release.version, current=__version__, notes=release.notes or "—"))
-        if answer != QMessageBox.StandardButton.Yes:
-            return
-        if not updater.is_installed_app():
-            QMessageBox.information(self, tr("update.available_title"), tr("update.dev_only", new=release.version))
-            return
-        if not updater.can_self_install(release):
-            # Mac bez potpisanog .dmg-a ili bez prava zamjene: .dmg se preuzima u browseru i prevuče u Applications.
-            QDesktopServices.openUrl(QUrl(release.installer_url))
-            QMessageBox.information(self, tr("update.available_title"), tr("update.open_download", new=release.version))
-            return
-        if self._busy_for_update():
-            QMessageBox.information(self, tr("update.available_title"), tr("update.busy"))
-            return
-        self._install_update(release)
-
-    def _busy_for_update(self) -> bool:
-        """Instaler zatvara program: ne smije krenuti dok radi bilo koji posao (preuzimanje,
-        pretvaranje u MP3, čitanje linka) ili dok red još čeka da se obradi."""
-        return bool(self._download_jobs or self._convert_jobs or self._probe_jobs or self._running)
-
-    def _install_update(self, release) -> None:
-        dialog = QProgressDialog(tr("update.downloading"), tr("update.cancel"), 0, 100, self)
-        dialog.setWindowTitle(tr("update.available_title"))
-        dialog.setMinimumDuration(0)
-        job = UpdateDownloadJob(release, Path(tempfile.gettempdir()) / "VideoDownload-update")
-        dialog.canceled.connect(job.cancel)
-        job.progress.connect(lambda done, total: dialog.setValue(int(done * 100 / total)) if total else None)
-
-        def finished(path, error):
-            dialog.close()
-            job.deleteLater()
-            if error is not None:
-                if not job.cancelled:
-                    QMessageBox.warning(self, tr("update.available_title"), tr("update.failed", error=update_error_text(error)))
-                return
-            updater.launch_installer(path, get_language())
-            QApplication.quit()
-
-        job.finished.connect(finished)
-        self._update_download_job = job
-        job.start()
 
     # ---------- zatvaranje ----------
 

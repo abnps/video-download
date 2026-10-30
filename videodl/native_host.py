@@ -234,6 +234,8 @@ def store_launch_command(executable: Path) -> list[str] | None:
     pokreće direktno, bez identiteta paketa; i VideoDownload.exe pokrenut po putanji ne bi ga imao (pa bi nudio
     naše ažuriranje), zato se program otvara preko Starta: shell:AppsFolder\\<ime>_<izdavač>!VideoDownload."""
     folder = executable.parent
+    if folder.name.lower() == "host":
+        folder = folder.parent  # host je u podfolderu paketa
     if "windowsapps" not in (part.lower() for part in folder.parts[:-1]):
         return None
     parts = folder.name.split("_")
@@ -253,8 +255,9 @@ def current_config() -> dict:
         if sys.platform != "win32":
             # Linux: host je sam AppImage; pokreće se isti fajl, bez argumenata (obično otvaranje).
             return {"launch": [os.environ.get("APPIMAGE") or str(executable)]}
-        # Windows: videodl-host.exe stoji pored VideoDownload.exe.
-        return {"launch": store_launch_command(executable) or [str(executable.with_name("VideoDownload.exe"))]}
+        # Windows: host\videodl-host.exe, a VideoDownload.exe je folder iznad (starije verzije: isti folder).
+        app_folder = executable.parent.parent if executable.parent.name.lower() == "host" else executable.parent
+        return {"launch": store_launch_command(executable) or [str(app_folder / "VideoDownload.exe")]}
     return load_config(Path(__file__).resolve().parent)
 
 

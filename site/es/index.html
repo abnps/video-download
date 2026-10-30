@@ -26,7 +26,7 @@
  "inLanguage": "es",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
- "softwareVersion": "1.0.5",
+ "softwareVersion": "1.0.6",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -101,20 +101,20 @@
           <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
         <div class="cta">
-          <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
+          <a class="btn" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener" data-platform-download="win">Microsoft Store · Windows 11</a>
+          <a class="btn ghost" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe" data-platform-download="win">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
             Descargar para Windows
           </a>
-          <span data-platform-download="win"><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></span>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-macOS-arm64.dmg" data-platform-download="mac" data-mac><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Descargar para macOS</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-android.apk" data-platform-download="android" data-android><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Descargar para Android</a>
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage" data-platform-download="linux" data-linux><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Descargar para Linux</a>
         </div>
         <ul class="promise"><li>Sin cuenta</li><li>Sin límite diario</li><li>Tus enlaces no nos llegan</li></ul>
-        <div class="meta"><span data-platform-requirements="win"><!-- version -->Versión 1.0.5 · 117 MB<!-- /version --> · Windows 10 y 11 (64 bits)</span>
-          <span data-platform-requirements="mac" hidden>Versión 1.0.5 · macOS 13+ · Apple M1 o posterior · Beta</span>
-          <span data-platform-requirements="android" hidden>Versión 1.0.5 · Android 10+ · ARM64 · Beta</span>
-          <span data-platform-requirements="linux" hidden>Versión 1.0.5 · Ubuntu 22.04+ o similar · x86_64 · Beta</span>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Versión 1.0.6 · 117 MB<!-- /version --> · Windows 10 y 11 (64 bits)</span>
+          <span data-platform-requirements="mac" hidden>Versión 1.0.6 · macOS 13+ · Apple M1 o posterior · Beta</span>
+          <span data-platform-requirements="android" hidden>Versión 1.0.6 · Android 10+ · ARM64 · Beta</span>
+          <span data-platform-requirements="linux" hidden>Versión 1.0.6 · Ubuntu 22.04+ o similar · x86_64 · Beta</span>
           · <a href="#install" data-install-help>ayuda para instalar</a></div>
         <p class="note">La aplicación está pensada para tus propios vídeos, contenido para el que tienes permiso del autor y contenido con licencia libre. Al descargar aceptas las <a href="terms.html">Condiciones de uso</a>. El contenido protegido con DRM no se descarga.</p>
       </div>
@@ -276,15 +276,17 @@
         <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">Beta</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
+        <p>Recomendado en Windows 11: Microsoft Store. Microsoft firma el paquete, así que Windows no muestra el aviso de SmartScreen y las actualizaciones llegan solas.</p>
+        <p><a class="btn" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></p>
+        <p style="margin-top:22px">Windows 10 o sin Microsoft Store: el instalador (.exe).</p>
         <p><b>Windows puede mostrar «Windows protegió su PC».</b> Comprueba que el archivo viene de este sitio y pulsa <b>Más información</b> y luego <b>Ejecutar de todas formas</b>.</p>
         <div class="dialogs" aria-hidden="true">
           <div class="dlg"><div class="h">Windows protegió su PC</div><div>Microsoft Defender SmartScreen impidió el inicio de una aplicación no reconocida.</div><div style="margin-top:8px"><span class="hl" style="text-decoration:underline">Más información</span></div><div class="btns"><span>No ejecutar</span></div></div>
           <div class="arrow">→</div>
           <div class="dlg"><div class="h">Windows protegió su PC</div><div>Aplicación: VideoDownload-Setup.exe<br>Editor: Editor desconocido</div><div class="btns"><span class="hl">Ejecutar de todas formas</span><span>No ejecutar</span></div></div>
         </div>
-        <p style="margin-top:22px"><a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Descargar para Windows</a></p>
-        <p style="margin-top:22px">O descarga la versión para Windows 11 desde Microsoft Store. Microsoft firma el paquete y entrega las actualizaciones.</p>
-        <p><a class="btn ghost" href="https://apps.microsoft.com/detail/9NT46S6L7KGN" rel="noopener">Microsoft Store · Windows 11</a></p>
+        <p style="margin-top:22px"><a class="btn ghost" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe">Descargar para Windows</a></p>
+        
       </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">Beta</span> <b>Novedad: Video Download para Mac.</b> Para Mac con chip de Apple (M1 o posterior) y macOS 13 o posterior. Funciona, pero aún lo han probado pocas personas: <a href="https://github.com/abnps/video-download/issues/new?template=problem.yml">avísanos si algo no funciona</a>.</p>
@@ -332,17 +334,20 @@
       <h2 data-reveal>Mejor cada semana.</h2>
       <p class="sub" data-reveal>La misma lista que en la aplicación (Ayuda → Novedades).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>1.0.5 <span>29.10.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>1.0.6 <span>30.10.2026</span></h3><ul>
+          <li>Formatos nuevos: «MKV original» (la mejor imagen y sonido sin conversión) y «Audio original» (el sonido tal como lo da el sitio).</li>
+          <li>Ajustes → Inicio de sesión en sitios: para vídeos que piden iniciar sesión, la aplicación puede usar las cookies de tu navegador o de un archivo cookies.txt; no se envía nada a ningún otro lugar que no sea ese sitio.</li>
+          <li>Capítulos del vídeo como archivos separados si quieres, recortes precisos o rápidos, números delante de los archivos de listas (desactivado hasta que lo actives) y un interruptor «Detectar copiados» en la barra.</li>
+          <li>La extensión del navegador se conecta más rápido con la aplicación, y los Ajustes se desplazan en pantallas pequeñas.</li>
+          <li>Se ha eliminado el control parental (en el ordenador y en Android).</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.5 <span>29.10.2026</span></h3><ul>
           <li>Novedad: Video Download para Linux (beta) — un solo archivo AppImage para Ubuntu 22.04 o posterior (y sistemas similares), sin instalación; se actualiza solo, aparece en el menú de aplicaciones y funciona con la extensión para Chrome, Edge y Firefox.</li>
           <li>Ayuda → Descargar desde el navegador: la extensión para Edge y Firefox se instala con un clic desde su tienda, y la de Chrome en tres pasos claros.</li>
           <li>Pequeñas correcciones de diseño (p. ej. el enlace para abrir la carpeta en alemán).</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.4 <span>27.10.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.4 <span>27.10.2026</span></h3><ul>
           <li>Android: vídeo sin sonido — una casilla «Sin sonido» en la pantalla de calidad y «Próximo vídeo sin sonido» en Ajustes (vale para un vídeo y luego se desactiva sola).</li>
           <li>Android: cada ajuste tiene un ⓘ con una explicación detallada, y en Descargas una pulsación larga en un botón indica qué hace; la pantalla se mantiene al girar el teléfono o cambiar el idioma, y abrir la app desde Recientes ya no repite la misma descarga.</li>
           <li>La extensión del navegador se recupera sola cuando se corta la conexión con la aplicación; el informe de problemas ya no muestra rutas de carpetas de tu ordenador.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.3 <span>20.10.2026</span></h3><ul>
-          <li>En Windows 11, la versión de Microsoft Store conecta automáticamente la extensión del navegador con la aplicación; las extensiones existentes siguen funcionando.</li>
-          <li>Android: Ajustes ahora muestra las novedades; el recordatorio de apoyo voluntario se puede posponer o silenciar y no desbloquea ninguna función.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Todas las versiones →</a></p>
     </div>

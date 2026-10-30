@@ -48,6 +48,8 @@ def format_size(size: int | None) -> str:
 # Najčešće greške yt-dlp-a (engleski, tehnički) → razumljiva poruka na jeziku programa. Redoslijed je bitan:
 # „potvrdi da nisi robot" i „samo punoljetni" su i one „sign in", pa idu prije opšte prijave.
 _FRIENDLY_ERRORS = (
+    ("cookies", re.compile(r"failed to decrypt with dpapi|could not copy .{0,40}cookie database|cookies? database"
+                           r"|could not find .{0,30}cookies|failed to load cookies|app.bound encryption", re.I)),
     ("bot", re.compile(r"confirm you.?re not a bot|not a robot", re.I)),
     ("age", re.compile(r"confirm your age|age[- ]restricted|inappropriate for some users", re.I)),
     ("private", re.compile(r"private video|video is private", re.I)),

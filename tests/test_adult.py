@@ -176,6 +176,18 @@ class ConfirmationTest(unittest.TestCase):
         shown = window._rows[item.id].thumbnail._pixmap
         self.assertNotEqual(shown.cacheKey(), original.cacheKey())
 
+    def test_old_parental_settings_are_removed_and_ignored(self):
+        # Roditeljska zaštita je uklonjena (Ahmed 29.10.2026): staro podešavanje i otisak PIN-a ne smiju smetati
+        # niti ostati na disku; 18+ i dalje traži potvrdu.
+        self.settings.setValue("parental/enabled", True)
+        self.settings.setValue("parental/pin", "pbkdf2-sha256$200000$00$ff")
+        window = self.window()
+        self.assertEqual([key for key in self.settings.allKeys() if key.startswith("parental")], [])
+        self.add(window, "https://v/a")
+        window._start_all()
+        self.assertTrue(wait_until(lambda: self.downloads == ["https://v/a"]))
+        self.assertEqual(self.asked, [["https://v/a"]])
+
 
 if __name__ == "__main__":
     unittest.main()

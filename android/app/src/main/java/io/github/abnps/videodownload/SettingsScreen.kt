@@ -87,9 +87,6 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     var showLicenses by remember { mutableStateOf(false) }
     var showWhatsNew by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var parentalOn by remember { mutableStateOf(Parental.enabled(context)) }
-    var askPin by remember { mutableStateOf(false) }
-    var editParental by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
     // One UI 9 stil (Ahmed 3.10.2026): strelica gore, veliki naslov nisko u zaglavlju — dohvatljiv palcem.
     IconButton(onClick = onBack, modifier = Modifier.padding(start = 4.dp, top = 4.dp)) {
@@ -137,14 +134,6 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 if (index > 0) GroupDivider()
                 val on = site in loggedIn
                 AccountRow(site, on) { if (on) askLogout = site else onLogin(site) }
-            }
-        }
-        SettingsGroup(stringResource(R.string.settings_protection)) {
-            GroupRow(OneUi.Purple, R.drawable.ic_info, stringResource(R.string.parental_title),
-                stringResource(if (parentalOn) R.string.parental_on else R.string.parental_off),
-                onClick = { if (parentalOn && Parental.hasPin(context)) askPin = true else editParental = true },
-                info = stringResource(R.string.parental_note)) {
-                StatusChip(stringResource(if (parentalOn) R.string.chip_on else R.string.chip_off), parentalOn)
             }
         }
         SettingsGroup(stringResource(R.string.settings_app)) {
@@ -207,16 +196,6 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
     }
     if (showLicenses) LicensesDialog { showLicenses = false }
     if (showWhatsNew) WhatsNewDialog { showWhatsNew = false }
-    if (askPin) PinDialog(onCancel = { askPin = false }) { pin ->
-        if (Parental.checkPin(context, pin)) { askPin = false; editParental = true } else false.also {
-            android.widget.Toast.makeText(context, R.string.parental_pin_wrong, android.widget.Toast.LENGTH_SHORT).show()
-        }
-    }
-    if (editParental) ParentalDialog(parentalOn, onCancel = { editParental = false }) { on, pin ->
-        Parental.save(context, on, pin)
-        parentalOn = on
-        editParental = false
-    }
     askLogout?.let { site ->
         AlertDialog(onDismissRequest = { askLogout = null },
             title = { Text(stringResource(site.logoutTitle)) },
@@ -278,64 +257,6 @@ fun LicensesDialog(onClose: () -> Unit) {
         },
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.dialog_close)) } })
 }
-
-/** Unos PIN-a roditeljske zaštite prije izmjene; `onPin` vraća false kad je PIN pogrešan (prozor ostaje). */
-@Composable
-internal fun PinDialog(onCancel: () -> Unit, onPin: (String) -> Any) {
-    var pin by remember { mutableStateOf("") }
-    AlertDialog(onDismissRequest = onCancel, title = { Text(stringResource(R.string.parental_title)) },
-        text = {
-            OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) }, label = { Text(stringResource(R.string.parental_ask_pin)) },
-                singleLine = true, visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
-        },
-        confirmButton = { TextButton(onClick = { onPin(pin) }) { Text("OK") } },
-        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
-}
-
-/** Uključi/isključi blokadu 18+ i (opciono) postavi PIN od 4–8 cifara, kao na računaru. */
-@Composable
-internal fun ParentalDialog(enabled: Boolean, onCancel: () -> Unit, onSave: (Boolean, String) -> Unit) {
-    var on by remember { mutableStateOf(enabled) }
-    var pin by remember { mutableStateOf("") }
-    var repeat by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<Int?>(null) }
-    AlertDialog(onDismissRequest = onCancel, title = { Text(stringResource(R.string.parental_title)) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = on, onCheckedChange = { on = it })
-                    Text(stringResource(R.string.parental_enable))
-                }
-                Text(stringResource(R.string.parental_note), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (on) {
-                    OutlinedTextField(pin, { pin = it.filter(Char::isDigit).take(8) },
-                        label = { Text(stringResource(R.string.parental_pin)) }, singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
-                    OutlinedTextField(repeat, { repeat = it.filter(Char::isDigit).take(8) },
-                        label = { Text(stringResource(R.string.parental_pin_repeat)) }, singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword))
-                }
-                error?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val chosen = if (on) pin else ""
-                error = when {
-                    chosen.isNotEmpty() && !Parental.validPin(chosen) -> R.string.parental_pin_invalid
-                    on && chosen != repeat -> R.string.parental_pin_mismatch
-                    else -> null
-                }
-                if (error == null) onSave(on, chosen)
-            }) { Text(stringResource(R.string.parental_save)) }
-        },
-        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.dialog_cancel)) } })
-}
-
 
 /** Naslov grupe (boja aplikacije) i jedna zaobljena kartica sa svim redovima grupe, kao Postavke na Androidu 15+. */
 @Composable

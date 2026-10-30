@@ -30,8 +30,7 @@ TEXT = {
             ("Safe updates", "The app updates itself and installs only updates digitally signed by us, on Windows, "
              "Mac and Android. The part that reads websites is refreshed without reinstalling."),
             ("Checked every day", "An automatic test downloads from the most popular sites every morning, so a "
-             "change on a website is noticed and fixed quickly."),
-            ("For families", "Parental control with a PIN: content for adults is never downloaded without it."),
+             "change on a website is noticed and fixed quickly."),
         ],
         "android": "On Android: share a link from any app, download in the background, a home screen widget and a "
                    "quick settings tile.",
@@ -50,8 +49,7 @@ TEXT = {
             ("Sigurna ažuriranja", "Program se sam ažurira i instalira samo ažuriranja s našim digitalnim potpisom, "
              "na Windowsu, Macu i Androidu. Dio koji čita sajtove osvježava se bez ponovne instalacije."),
             ("Provjereno svaki dan", "Automatski test svako jutro preuzima sa najpopularnijih sajtova, pa se "
-             "promjena na nekom sajtu brzo primijeti i popravi."),
-            ("Za porodice", "Roditeljska zaštita s PIN-om: sadržaj za odrasle se bez njega nikad ne preuzima."),
+             "promjena na nekom sajtu brzo primijeti i popravi."),
         ],
         "android": "Na Androidu: podijeli link iz bilo koje aplikacije, preuzimanje u pozadini, widget na početnom "
                    "ekranu i pločica u Brzim podešavanjima.",
@@ -71,8 +69,7 @@ TEXT = {
              "Updates, unter Windows, auf dem Mac und unter Android. Der Teil, der Websites liest, wird ohne Neuinstallation "
              "erneuert."),
             ("Jeden Tag geprüft", "Ein automatischer Test lädt jeden Morgen von den beliebtesten Seiten, damit "
-             "Änderungen an einer Website schnell bemerkt und behoben werden."),
-            ("Für Familien", "Kindersicherung mit PIN: Inhalte für Erwachsene werden ohne sie nie geladen."),
+             "Änderungen an einer Website schnell bemerkt und behoben werden."),
         ],
         "android": "Unter Android: Link aus jeder App teilen, Download im Hintergrund, Widget auf dem Startbildschirm "
                    "und Kachel in den Schnelleinstellungen.",
@@ -93,8 +90,7 @@ TEXT = {
              "digitalmente por nosotros, en Windows, Mac y Android. La parte que lee los sitios se renueva sin "
              "reinstalar."),
             ("Comprobado cada día", "Una prueba automática descarga cada mañana de los sitios más populares, así "
-             "que un cambio en un sitio se detecta y se corrige rápido."),
-            ("Para familias", "Control parental con PIN: sin él nunca se descarga contenido para adultos."),
+             "que un cambio en un sitio se detecta y se corrige rápido."),
         ],
         "android": "En Android: comparte un enlace desde cualquier app, descarga en segundo plano, widget en la "
                    "pantalla de inicio y botón en los ajustes rápidos.",
@@ -115,9 +111,7 @@ TEXT = {
              "numériquement par nous, sous Windows, sur Mac et sur Android. La partie qui lit les sites se renouvelle sans "
              "réinstallation."),
             ("Vérifiée chaque jour", "Un test automatique télécharge chaque matin depuis les sites les plus "
-             "populaires : un changement sur un site est vite repéré et corrigé."),
-            ("Pour les familles", "Contrôle parental avec code PIN : sans lui, aucun contenu pour adultes n'est "
-             "téléchargé."),
+             "populaires : un changement sur un site est vite repéré et corrigé."),
         ],
         "android": "Sur Android : partagez un lien depuis n'importe quelle application, téléchargement en "
                    "arrière-plan, widget sur l'écran d'accueil et tuile dans les réglages rapides.",

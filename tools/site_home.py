@@ -7,6 +7,8 @@ programu). Sajt nema kolačiće ni tuđe skripte: animacije su CSS + assets/site
 
 import html
 
+import site_winget
+
 # Ikona u zaglavlju (Ahmed 2.10.2026: „animiraj ikonicu kao simulacija downloada"): isti oblik i boja kao
 # assets/icon.png, ali SVG — strelica se spusti u crtu, crta se napuni kao traka preuzimanja, pa iznova.
 # Animacija je samo CSS (.brand-icon u site.css); bez nje, i uz prefers-reduced-motion, ikona miruje.
@@ -448,12 +450,27 @@ HOME = {
 # Javno u Storeu od 27.10.2026 (Ahmed: „Publish now"), pa je dugme uključeno.
 STORE_LIVE = True
 STORE_URL = "https://apps.microsoft.com/detail/9NT46S6L7KGN"
+# Faza 5 (Ahmed 29.10.2026): Microsoft Store je glavno dugme za Windows (Microsoft potpisuje paket, nema SmartScreen
+# upozorenja); instaler .exe odmah ispod, za Windows 10 i bez Storea, a winget tek kad je paket u katalogu.
 STORE_TEXT = {
-    "en": "Or get the Windows 11 version from Microsoft Store. Microsoft signs the package and delivers its updates.",
-    "bs": "Ili preuzmi verziju za Windows 11 iz Microsoft Storea. Microsoft potpisuje paket i isporučuje ažuriranja.",
-    "de": "Oder lade die Windows-11-Version aus dem Microsoft Store herunter. Microsoft signiert das Paket und liefert Updates.",
-    "es": "O descarga la versión para Windows 11 desde Microsoft Store. Microsoft firma el paquete y entrega las actualizaciones.",
-    "fr": "Ou téléchargez la version pour Windows 11 depuis le Microsoft Store. Microsoft signe le paquet et fournit les mises à jour.",
+    "en": "Recommended on Windows 11: Microsoft Store. Microsoft signs the package, so Windows shows no SmartScreen "
+          "warning, and updates arrive by themselves.",
+    "bs": "Preporučeno za Windows 11: Microsoft Store. Microsoft potpisuje paket, pa Windows ne prikazuje upozorenje "
+          "SmartScreen, a ažuriranja stižu sama.",
+    "de": "Empfohlen unter Windows 11: Microsoft Store. Microsoft signiert das Paket, daher zeigt Windows keine "
+          "SmartScreen-Warnung, und Updates kommen von selbst.",
+    "es": "Recomendado en Windows 11: Microsoft Store. Microsoft firma el paquete, así que Windows no muestra el aviso de "
+          "SmartScreen y las actualizaciones llegan solas.",
+    "fr": "Recommandé sous Windows 11 : Microsoft Store. Microsoft signe le paquet, Windows n'affiche donc pas "
+          "d'avertissement SmartScreen et les mises à jour arrivent toutes seules.",
+}
+# Iznad instalera u kartici Windows: za koga je.
+INSTALLER_TEXT = {
+    "en": "Windows 10, or without Microsoft Store: the installer (.exe).",
+    "bs": "Windows 10 ili bez Microsoft Storea: instaler (.exe).",
+    "de": "Windows 10 oder ohne Microsoft Store: das Installationsprogramm (.exe).",
+    "es": "Windows 10 o sin Microsoft Store: el instalador (.exe).",
+    "fr": "Windows 10 ou sans Microsoft Store : le programme d'installation (.exe).",
 }
 
 ACHIEVEMENT_TEXT = {
@@ -485,8 +502,17 @@ ACHIEVEMENT_TEXT = {
 }
 
 
-def store_button(cls: str = "btn ghost") -> str:
-    return f'<a class="{cls}" href="{STORE_URL}" rel="noopener">Microsoft Store · Windows 11</a>' if STORE_LIVE else ""
+def store_button(cls: str = "btn ghost", attrs: str = "") -> str:
+    return (f'<a class="{cls}" href="{STORE_URL}" rel="noopener"{attrs}>Microsoft Store · Windows 11</a>'
+            if STORE_LIVE else "")
+
+
+def winget_line() -> str:
+    """Naredba za winget, tek kad je paket prihvaćen (prije toga bi javljala „nije pronađen")."""
+    if not site_winget.enabled():
+        return ""
+    return f'<p class="note"><code>{html.escape(site_winget.COMMANDS["install"])}</code></p>'
+
 
 
 DISCORD_URL = "https://discord.gg/xZ7JNKSaKb"
@@ -650,9 +676,12 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
                            for i, (title, text) in enumerate(steps, 1))
     in_kicker, in_h2, in_sub, in_label, in_win = h["install"]
     d_title, d_body, d_more, d_dont, d_app, d_run = h["dialog"]
-    store_hero = '\n          <span data-platform-download="win">' + store_button() + '</span>' if STORE_LIVE else ""
-    store_panel = (f'        <p style="margin-top:22px">{esc(STORE_TEXT[lang])}</p>\n'
-                   f'        <p>{store_button()}</p>\n') if STORE_LIVE else ""
+    # Store prvi (glavno dugme i link malog dugmeta u zaglavlju), instaler odmah iza.
+    store_hero = ("\n          " + store_button("btn", ' data-platform-download="win"')) if STORE_LIVE else ""
+    exe_class = "btn ghost" if STORE_LIVE else "btn"
+    store_panel = (f'        <p>{esc(STORE_TEXT[lang])}</p>\n'
+                   f'        <p>{store_button("btn")}</p>\n'
+                   f'        <p style="margin-top:22px">{esc(INSTALLER_TEXT[lang])}</p>\n') if STORE_LIVE else ""
     (ach_kicker, ach_heading, ach_lead, ach_list_title, ach_list_body,
      ach_toast_title, ach_toast_body, ach_example) = ACHIEVEMENT_TEXT[lang]
     news_kicker, news_h2, news_sub = h["news"]
@@ -717,11 +746,11 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
           <button type="button" data-platform="android" aria-pressed="false">Android</button>
           <button type="button" data-platform="linux" aria-pressed="false">Linux</button>
         </div>
-        <div class="cta">
-          <a class="btn" href="{installer_url}" data-platform-download="win">
+        <div class="cta">{store_hero}
+          <a class="{exe_class}" href="{installer_url}" data-platform-download="win">
             {download_icon}
             {h["win_btn"]}
-          </a>{store_hero}
+          </a>
           <a class="btn" href="{mac_url}" data-platform-download="mac" data-mac>{download_icon}{h["mac_btn"]}</a>
           <a class="btn" href="{android_url}" data-platform-download="android" data-android>{download_icon}{h["android_btn"]}</a>
           <a class="btn" href="{linux_url}" data-platform-download="linux" data-linux>{download_icon}{h["linux_btn"]}</a>
@@ -864,14 +893,15 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         <a href="#panel-linux" id="tab-linux" aria-controls="panel-linux">Linux <span class="badge">{badge}</span></a>
       </div>
       <div class="panel" id="panel-win" role="tabpanel" aria-labelledby="tab-win">
-        <p>{in_win}</p>
+{store_panel}        <p>{in_win}</p>
         <div class="dialogs" aria-hidden="true">
           <div class="dlg"><div class="h">{d_title}</div><div>{d_body}</div><div style="margin-top:8px"><span class="hl" style="text-decoration:underline">{d_more}</span></div><div class="btns"><span>{d_dont}</span></div></div>
           <div class="arrow">→</div>
           <div class="dlg"><div class="h">{d_title}</div><div>{d_app}</div><div class="btns"><span class="hl">{d_run}</span><span>{d_dont}</span></div></div>
         </div>
-        <p style="margin-top:22px"><a class="btn" href="{installer_url}">{h["win_btn"]}</a></p>
-{store_panel}      </div>
+        <p style="margin-top:22px"><a class="{exe_class}" href="{installer_url}">{h["win_btn"]}</a></p>
+        {winget_line()}
+      </div>
       <div class="panel" id="panel-mac" role="tabpanel" aria-labelledby="tab-mac">
         <p><span class="badge">{badge}</span> {mac_lead.format(issue=issue_url)}</p>
         <p>{mac_note}</p>

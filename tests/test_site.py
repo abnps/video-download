@@ -56,7 +56,8 @@ class SiteTest(unittest.TestCase):
                 ("linux", build_site.LINUX_APPIMAGE_URL, "linux_btn"),
             ):
                 with self.subTest(lang=lang, platform=platform):
-                    link = re.search(rf'<a\b[^>]*data-platform-download="{platform}"[^>]*>(.*?)</a>', page, re.S)
+                    link = re.search(rf'<a\b[^>]*href="{re.escape(url)}"[^>]*data-platform-download="{platform}"'
+                                     rf'[^>]*>(.*?)</a>', page, re.S)
                     self.assertIsNotNone(link)
                     self.assertIn(f'href="{url}"', link.group())
                     self.assertNotRegex(link.group().split(">", 1)[0], r'\bhidden\b')
@@ -68,6 +69,20 @@ class SiteTest(unittest.TestCase):
             for platform in ("mac", "android", "linux"):
                 meta = re.search(rf'<span data-platform-requirements="{platform}"[^>]*>(.*?)</span>', page)
                 self.assertNotIn(" MB", meta.group(1))  # veličina Windows instalera ne pripada APK-u ni DMG-u
+
+    def test_microsoft_store_is_the_main_windows_button_and_installer_comes_right_after(self):
+        # Faza 5 (Ahmed 29.10.2026): Store bez SmartScreen upozorenja prvi; .exe za Windows 10 odmah ispod.
+        for lang in build_site.LANGUAGES:
+            page = self.pages[build_site.TEXTS[lang]["dir"] + "index.html"]
+            with self.subTest(lang=lang):
+                windows = re.findall(r'<a class="([^"]+)" href="([^"]+)"[^>]*data-platform-download="win"', page)
+                self.assertEqual([(cls, href) for cls, href in windows],
+                                 [("btn", site_home.STORE_URL), ("btn ghost", build_site.INSTALLER_URL)])
+                panel = page[page.index('id="panel-win"'):page.index('id="panel-mac"')]
+                self.assertLess(panel.index(site_home.STORE_URL), panel.index(build_site.INSTALLER_URL))
+                self.assertIn(html.escape(site_home.STORE_TEXT[lang]), panel)
+                self.assertIn(html.escape(site_home.INSTALLER_TEXT[lang]), panel)
+                self.assertNotIn("winget install", page)  # tek kad je paket u katalogu (site_winget.LIVE)
 
     def test_front_pages_show_current_version_news_and_smartscreen_help(self):
         for lang, label, more_info, run_anyway in (("en", "Version", "More info", "Run anyway"),

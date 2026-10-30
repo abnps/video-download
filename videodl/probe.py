@@ -4,8 +4,10 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-from .browser import Cookie, cookie_file
-from .ytdl import LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media
+from .browser import Cookie, cookie_options
+from .ytdl import (
+    LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media, is_web_url,
+)
 from .ytdlp_update import ensure_ready
 
 # yt-dlp se uvozi tek pri prvom čitanju linka (_ydl), da pokretanje programa ne čeka. Testovi mogu ovo
@@ -71,11 +73,12 @@ class ProbeResult:
 
 def probe(url: str, extract: Extractor | None = None, logger=None,
           http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = (),
-          whole_playlist: bool = False) -> ProbeResult:
+          whole_playlist: bool = False, cookie_browser: str | None = None,
+          cookie_txt: str | None = None) -> ProbeResult:
     """`whole_playlist`: link videa koji je u plejlisti (watch?v=…&list=…) daje cijelu plejlistu."""
-    if is_obviously_not_media(url):
-        raise NotMediaError(url)  # .exe, .zip, .pdf…: ne treba ni pitati server
-    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist)
+    if is_obviously_not_media(url) or not is_web_url(url):
+        raise NotMediaError(url)  # .exe, .zip, .pdf…, ili link koji nije http(s): ne treba ni pitati server
+    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist, cookie_browser, cookie_txt)
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
@@ -143,7 +146,8 @@ def pick_thumbnail(info: dict) -> str | None:
 
 
 def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[Cookie, ...],
-                    whole_playlist: bool = False) -> Extractor:
+                    whole_playlist: bool = False, cookie_browser: str | None = None,
+                    cookie_txt: str | None = None) -> Extractor:
     def extract(url: str) -> dict:
         opts = base_options(logger)
         opts["extract_flat"] = "in_playlist"
@@ -152,9 +156,8 @@ def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[
         if http_headers:
             opts["http_headers"] = dict(http_headers)
         # Kolačići prijave postoje na disku samo dok traje ovo jedno čitanje.
-        with cookie_file(cookies) as cookiefile:
-            if cookiefile:
-                opts["cookiefile"] = cookiefile
+        with cookie_options(cookies, cookie_browser, cookie_txt) as cookie_opts:
+            opts.update(cookie_opts)
             with _ydl()(opts) as ydl:
                 return ydl.extract_info(url, download=False)
 

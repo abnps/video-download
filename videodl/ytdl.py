@@ -127,6 +127,19 @@ _NETWORK_ERROR = re.compile(
     re.IGNORECASE)
 
 
+def is_web_url(url: str) -> bool:
+    """yt-dlp dobija samo http(s) link s hostom: ni file://, ni „ytsearch:", ni nešto što liči na opciju.
+    Dodatak, clipboard i ručni unos to već provjeravaju; ovo je zadnja provjera, i za red sačuvan na disku.
+    (yt-dlp se koristi kao biblioteka, ne kao komanda, pa link nikad ne može postati opcija tipa „--exec".)"""
+    from urllib.parse import urlsplit
+
+    try:
+        parts = urlsplit(url or "")
+    except ValueError:
+        return False
+    return parts.scheme.lower() in ("http", "https") and bool(parts.hostname)
+
+
 def is_network_error(message: str) -> bool:
     """Greška zbog veze (vrijedi ponovo), za razliku od DRM-a, nepodržanog sajta ili 404."""
     from .i18n import MESSAGE_DRM, MESSAGE_LIVE, MESSAGE_NOT_MEDIA

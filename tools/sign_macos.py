@@ -18,8 +18,9 @@ from videodl import release_signing  # noqa: E402
 NAMES = (release_signing.MAC_MANIFEST_NAME, release_signing.MAC_SIGNATURE_NAME)
 
 
-def sign_package(tag: str, package_name: str, names: tuple[str, str], job: str) -> None:
-    """Preuzme paket iz nacrta, provjeri .sha256, potpiše opis i doda ga nacrtu (isto za Mac i Linux)."""
+def sign_package(tag: str, package_name: str, names: tuple[str, str], job: str) -> int:
+    """Preuzme paket iz nacrta, provjeri .sha256, potpiše opis i doda ga nacrtu (isto za Mac, Linux i Windows).
+    Vraća veličinu paketa u bajtima."""
     version = check_tag(tag)
     draft(tag)  # samo nacrt, nikad već objavljeno izdanje
     package_name = package_name.format(version=version)
@@ -32,9 +33,11 @@ def sign_package(tag: str, package_name: str, names: tuple[str, str], job: str) 
         if not package.is_file():
             raise ReleaseError(f"Nacrt nema {package_name}; prvo pokreni posao „{job}\" (README).")
         check_checksum(package)
+        size = package.stat().st_size
         manifest, signature = release_signing.write_signed_manifest(version, package, names=names)
         run("gh", "release", "upload", tag, str(manifest), str(signature), "--repo", REPO, "--clobber")
     print(f"{tag}: {package_name} potpisan ({', '.join(names)} dodati nacrtu).")
+    return size
 
 
 def sign_mac(tag: str) -> None:

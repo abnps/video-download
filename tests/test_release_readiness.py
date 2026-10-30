@@ -118,6 +118,45 @@ class ReleaseReadinessTest(unittest.TestCase):
                                                    public_keys=(release_signing.public_key_hex(key),))
         self.assertEqual((manifest["installer"], manifest["version"]), (dmg_name, version))
 
+    def test_windows_installer_built_on_github_is_signed_locally(self):
+        # Faza 5: GitHub gradi bez ključa; sign_windows potpiše release.json iz nacrta i vrati veličinu za sajt.
+        import hashlib
+        import os
+        import tempfile
+
+        import sign_macos
+        import sign_windows
+        from Cryptodome.PublicKey import ECC
+        from videodl import release_signing
+
+        version = publish_release.__version__
+        exe = f"VideoDownload-Setup-{version}.exe"
+        uploaded = {}
+
+        def fake_run(*args, **kwargs):
+            if args[1:3] == ("release", "download"):
+                folder = Path(args[args.index("--dir") + 1])
+                (folder / exe).write_bytes(b"exe" * 100)
+                digest = hashlib.sha256(b"exe" * 100).hexdigest()
+                (folder / (exe + ".sha256")).write_text(f"{digest}  {exe}\n", encoding="ascii")
+            elif args[1:3] == ("release", "upload"):
+                for arg in args:
+                    if arg.endswith((".json", ".sig")):
+                        uploaded[Path(arg).name] = Path(arg).read_bytes()
+            return ""
+
+        key = ECC.generate(curve="ed25519")
+        with tempfile.TemporaryDirectory() as temp:
+            key_file = Path(temp) / "test-key.pem"
+            key_file.write_text(key.export_key(format="PEM"), encoding="ascii")
+            with patch.dict(os.environ, {"VIDEODL_SIGNING_KEY": str(key_file)}), \
+                    patch.object(sign_macos, "draft"), patch.object(sign_macos, "run", side_effect=fake_run):
+                size = sign_windows.sign_windows(f"v{version}")
+        self.assertEqual(size, 300)
+        self.assertEqual(set(uploaded), {"release.json", "release.json.sig"})
+        manifest = release_signing.verify_manifest(uploaded["release.json"], uploaded["release.json.sig"].decode("ascii"),
+                                                   public_keys=(release_signing.public_key_hex(key),))
+        self.assertEqual((manifest["installer"], manifest["version"]), (exe, version))
 
     def test_linux_signature_is_required_and_made_from_the_draft_appimage(self):
         names = publish_release.required_assets(publish_release.__version__, "0.2.0")

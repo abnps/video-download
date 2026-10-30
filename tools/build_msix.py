@@ -103,7 +103,7 @@ def excluded_locations() -> str:
 def manifest(version: str) -> str:
     return MANIFEST.format(name=IDENTITY_NAME, publisher=PUBLISHER, version=version, display=DISPLAY_NAME,
                            publisher_display=PUBLISHER_DISPLAY, excluded=excluded_locations(),
-                           host_exe="videodl-host.exe", host_alias=STORE_HOST_ALIAS)  # paket je samo za Windows
+                           host_exe="host\\videodl-host.exe", host_alias=STORE_HOST_ALIAS)  # paket je samo za Windows
 
 
 def store_version(version: str) -> str:

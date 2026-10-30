@@ -11,11 +11,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from .browser import Cookie, cookie_file
+from .browser import Cookie, cookie_options
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
-from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS
-from .ytdl import YdlLogger, error_message
+from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA
+from .ytdl import YdlLogger, error_message, is_web_url
 from .ytdlp_update import ensure_ready
 
 DOWNLOADING = "downloading"
@@ -234,10 +234,20 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              sponsorblock: bool = False,
              ratelimit: "int | RateBudget | None" = None,
              name_template: str | None = None,
+             precise_cut: bool = True,
+             number: str | None = None,
+             cookie_browser: str | None = None,
+             cookie_txt: str | None = None,
+             split_chapters: bool = False,
+             split_dir: str | None = None,
              _isolated: bool = False) -> DownloadResult:
+    more = {"precise_cut": precise_cut, "number": number, "cookie_browser": cookie_browser, "cookie_txt": cookie_txt,
+            "split_chapters": split_chapters, "split_dir": split_dir}
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
+    if not is_web_url(url):
+        return DownloadResult(ItemStatus.FAILED, message=MESSAGE_NOT_MEDIA)  # samo http(s) ide yt-dlp-u
     if isinstance(ratelimit, RateBudget):
         budget = ratelimit
         budget.join()
@@ -245,28 +255,31 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             return download(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
                             filename_title=filename_title, cookies=cookies, section=section, subtitles=subtitles,
                             subtitle_langs=subtitle_langs, thumbnail=thumbnail, chapters=chapters,
-                            sponsorblock=sponsorblock, ratelimit=_LiveShare(budget), name_template=name_template)
+                            sponsorblock=sponsorblock, ratelimit=_LiveShare(budget), name_template=name_template,
+                            **more)
         finally:
             budget.leave()
     if preset.is_audio and not _isolated:
         return _download_audio(url, preset, output_dir, subfolder, on_progress, cancel_event, http_headers=http_headers,
                                filename_title=filename_title, cookies=cookies, section=section, thumbnail=thumbnail,
                                chapters=chapters, sponsorblock=sponsorblock, ratelimit=ratelimit,
-                               name_template=name_template)
+                               name_template=name_template, **more)
 
     _load()  # prije try: except-grane ispod trebaju yt-dlp-ove klase
     attempt = _Attempt(cancel_event, on_progress or (lambda progress: None))
     no_subtitles = False
     try:
         # Kolačići prijave postoje na disku samo dok radi ovo jedno preuzimanje.
-        with cookie_file(cookies) as cookiefile:
+        with cookie_options(cookies, cookie_browser, cookie_txt) as cookie_opts:
             live = ratelimit if isinstance(ratelimit, _LiveShare) else None
             opts = build_ydl_options(preset, output_dir, subfolder, YdlLogger(), http_headers=http_headers,
-                                     filename_title=filename_title, source_url=url, cookiefile=cookiefile,
+                                     filename_title=filename_title, source_url=url,
                                      section=section, subtitles=subtitles, subtitle_langs=subtitle_langs,
                                      thumbnail=thumbnail, chapters=chapters, sponsorblock=sponsorblock,
                                      ratelimit=live.budget.share() if live else ratelimit,
-                                     name_template=name_template)
+                                     name_template=name_template, precise_cut=precise_cut, number=number,
+                                     split_chapters=split_chapters, split_dir=split_dir)
+            opts.update(cookie_opts)
             opts["progress_hooks"] = [attempt.progress_hook]
             if live:
                 # Udio se osvježava pri svakom javljanju napretka (drugo preuzimanje počelo ili završilo).
@@ -299,7 +312,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
             result = download(url, preset, output_dir, subfolder, on_progress, cancel_event,
                               http_headers=http_headers, filename_title=filename_title, cookies=cookies,
                               section=section, subtitles=False, thumbnail=thumbnail, chapters=chapters,
-                              sponsorblock=sponsorblock, ratelimit=ratelimit, name_template=name_template)
+                              sponsorblock=sponsorblock, ratelimit=ratelimit, name_template=name_template,
+                              **more)
             if result.status == ItemStatus.DONE:
                 return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed,
                                       result.height)
@@ -329,6 +343,8 @@ def _download_audio(url: str, preset: Preset, output_dir: str, subfolder: str | 
     # Isto ime za isti link i format: prekinut pa ponovljen posao nastavlja svoje .part fajlove.
     key = hashlib.sha1(f"{url}|{preset.key}|{options.get('section')}".encode("utf-8")).hexdigest()[:10]
     work = target / f".videodl-{key}"
+    if options.get("split_chapters"):
+        options["split_dir"] = str(target)  # dijelovi idu u pravi folder, ne u privremeni (on se briše)
     try:
         work.mkdir(parents=True, exist_ok=True)
         _hide(work)

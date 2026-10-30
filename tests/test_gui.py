@@ -675,6 +675,38 @@ class MainWindowTest(unittest.TestCase):
         self.assertEqual(len(window._queue.items()), 1)
         self.assertEqual(self.settings.value("watch_clipboard"), False)
 
+    def test_clipboard_switch_on_main_screen_and_no_focus_stealing(self):
+        # Faza 2: prekidač je na glavnom ekranu, usklađen s menijem; kopiran link ne podiže prozor.
+        window = self.make_window(self.quick_download)
+        self.assertTrue(window.watch_clipboard_box.isChecked())
+        with mock.patch.object(window, "activateWindow") as activate, mock.patch.object(window, "raise_") as raise_:
+            QApplication.clipboard().setText("https://v/u-pozadini")
+            self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        activate.assert_not_called()
+        raise_.assert_not_called()
+        window.watch_clipboard_box.setChecked(False)
+        self.assertFalse(window._watch_clipboard)
+        self.assertFalse(window.watch_clipboard_action.isChecked())
+        window.watch_clipboard_action.trigger()
+        self.assertTrue(window.watch_clipboard_box.isChecked())
+
+    def test_playlist_files_are_numbered_and_fast_cut_is_passed_on(self):
+        window = self.make_window(self.quick_download)
+        self.assertFalse(window._number_playlist)  # kao u 1.0.5: bez brojeva dok se ne uključi u Postavkama
+        window._number_playlist = True
+        window.add_links_from_text("https://v/lista")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 2))
+        first, second = window._queue.items()
+        self.assertEqual((first.number, second.number), ("01", "02"))
+        first.section = (5.0, 9.0)
+        window._precise_cut = False
+        self.assertEqual(window._download_options(first)["number"], "01")
+        self.assertFalse(window._download_options(first)["precise_cut"])
+        window._number_playlist = False
+        window.add_links_from_text("https://v/lista2")
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 4))
+        self.assertIsNone(window._queue.items()[2].number)
+
     def test_text_without_link_in_clipboard_is_ignored(self):
         window = self.make_window(self.quick_download)
         QApplication.clipboard().setText("obična bilješka bez linka")

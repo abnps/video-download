@@ -48,6 +48,8 @@ class QueueItem:
     adult_ok: bool = False
     # ID videa na sajtu (iz čitanja linka): dva linka istog videa pišu isti fajl „naslov [id]".
     video_id: str | None = None
+    # Redni broj u plejlisti za ime fajla („03 - Naslov"); None = bez broja.
+    number: str | None = None
 
 
 class DownloadQueue:

@@ -59,6 +59,13 @@ iz stvarnih dijaloga s izmišljenim napretkom; ništa se ne preuzima.
 gh release create v<verzija> "<instaler>.exe" "<instaler>.exe.sha256" "<folder instalera>\release.json" "<folder instalera>\release.json.sig" "<folder instalera>\VideoDownload-Setup.exe" --repo abnps/video-download --draft --title "Video Download <verzija>" --notes-file "<folder instalera>\release-notes.md"
 ```
 
+   **Ili na GitHubu (Faza 5):** napravi nacrt bez fajlova (`gh release create v<verzija> --draft --title
+   "Video Download <verzija>" --notes ""`), pa `gh workflow run windows.yml --repo abnps/video-download --ref
+   v<verzija> -f tag=v<verzija>`. Posao „Windows paket" pokreće sve testove, gradi instaler i MSIX bez privatnog
+   ključa i dodaje instaler, `.sha256`, `VideoDownload-Setup.exe` i bilješke nacrtu (MSIX je artefakt posla).
+   Zatim lokalno: `python tools/sign_windows.py --tag v<verzija>` (dodaje `release.json` i `.sig` i upisuje
+   veličinu instalera na sajt; `site/` ide u commit izdanja).
+
 4. Pokreni Mac paket za taj nacrt: `gh workflow run macos.yml --repo abnps/video-download
    --ref main -f tag=v<verzija>`. Posao gradi iz taga, provjerava verziju i da je izdanje nacrt,
    pa dodaje `.dmg`, `.sha256` i `VideoDownload-macOS-arm64.dmg`. Sačekaj uspješan završetak
@@ -116,7 +123,7 @@ program je isti za sve.
 ## Uslovi korištenja
 
 Program je namijenjen preuzimanju sadržaja koji korisnik ima pravo da preuzme, prije svega
-**vlastitih videa** (npr. videa koje je sam objavio na YouTube-u), sadržaja uz dozvolu nosioca
+**vlastitih videa** (npr. videa koje je sam objavio na nekoj video platformi), sadržaja uz dozvolu nosioca
 prava i sadržaja pod slobodnom licencom. Zabranjeno je preuzimanje tuđeg zaštićenog sadržaja bez
 dozvole i dijeljenje preuzetog. DRM se ne zaobilazi. Korisnik odgovara za ono što preuzima.
 Program nije povezan sa YouTube-om ni Google-om.
@@ -137,7 +144,7 @@ Licence komponenti (FFmpeg GPL-3.0, Qt LGPL-3.0, Node.js, yt-dlp i ostale) insta
 
 - Python 3.14
 - `ffmpeg` na PATH-u (spajanje videa i zvuka, MP3/M4A, HLS)
-- Node.js ili Deno na PATH-u (YouTube zaštita linkova)
+- Node.js ili Deno na PATH-u (neki sajtovi traže JavaScript za čitanje linkova)
 
 ```
 python -m pip install --user -r requirements.txt
@@ -176,7 +183,7 @@ verziji možeš provjeriti samo kompatibilni stari host naredbom
 2. Edge: otvori `edge://extensions`, uključi „Developer mode", klikni
    „Load unpacked" i izaberi folder `extension` iz ovog projekta.
    Chrome: isto preko `chrome://extensions`.
-3. Pokreni video (i u feedu: X, TikTok, Instagram, Facebook, YouTube) i klikni
+3. Pokreni video (i u feedu društvenih mreža) i klikni
    ikonu Video Download:
    - **„Preuzmi video koji se pušta"** nađe video koji se pušta i link njegove
      objave (npr. `/status/…` na X-u, `/video/…` na TikToku), pa preuzme baš njega;

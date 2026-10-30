@@ -67,6 +67,9 @@ Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs 
 [InstallDelete]
 ; Kod ažuriranja ukloni stare biblioteke da ne ostanu fajlovi prethodne verzije.
 Type: filesandordirs; Name: "{app}\_internal"
+Type: filesandordirs; Name: "{app}\host"
+; Do 1.0.5 host je bio jedan .exe pored programa (onefile); sada je u host\.
+Type: files; Name: "{app}\videodl-host.exe"
 
 [Icons]
 Name: "{autoprograms}\Video Download"; Filename: "{app}\VideoDownload.exe"

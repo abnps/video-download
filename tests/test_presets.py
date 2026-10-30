@@ -3,10 +3,39 @@ import unittest
 
 from yt_dlp import YoutubeDL
 
-from videodl.presets import OUTPUT_NAME, PRESETS, build_ydl_options, get_preset, safe_folder_name
+from videodl.presets import OUTPUT_NAME, PRESETS, build_ydl_options, get_preset, playlist_number, safe_folder_name
 
 
 class PresetOptionsTest(unittest.TestCase):
+    def test_original_video_is_merged_into_mkv_without_reencoding(self):
+        # Faza 2 (Ahmed 29.10.2026): kodeci sa sajta (VP9/AV1, Opus) samo spojeni u MKV, bez pretvaranja.
+        opts = build_ydl_options(get_preset("original"), r"C:\Preuzimanja")
+        self.assertEqual((opts["format"], opts["merge_output_format"], opts["format_sort"]), ("bv*+ba/b", "mkv", ["res"]))
+        self.assertNotIn("postprocessors", opts)
+        self.assertNotIn("final_ext", opts)
+
+    def test_original_audio_keeps_the_codec_from_the_site(self):
+        preset = get_preset("audio_original")
+        self.assertTrue(preset.is_audio and preset.keeps_original_audio)
+        opts = build_ydl_options(preset, r"C:\Preuzimanja")
+        extract = opts["postprocessors"][0]
+        self.assertEqual((extract["key"], extract["preferredcodec"]), ("FFmpegExtractAudio", "best"))
+        self.assertNotIn("preferredquality", extract)
+        self.assertNotIn("final_ext", opts)  # ekstenzija zavisi od kodeka (opus, m4a…)
+
+    def test_clip_cut_is_precise_by_default_and_fast_on_request(self):
+        precise = build_ydl_options(get_preset("best"), r"C:\P", section=(10.0, 20.0))
+        fast = build_ydl_options(get_preset("best"), r"C:\P", section=(10.0, 20.0), precise_cut=False)
+        self.assertTrue(precise["force_keyframes_at_cuts"])
+        self.assertFalse(fast["force_keyframes_at_cuts"])
+        self.assertIn("download_ranges", fast)
+
+    def test_playlist_number_goes_in_front_of_the_name(self):
+        self.assertEqual((playlist_number(3, 9), playlist_number(7, 120), playlist_number(12, 40)), ("03", "007", "12"))
+        opts = build_ydl_options(get_preset("mp3"), r"C:\P", "Lista", number="03")
+        self.assertTrue(opts["outtmpl"].endswith(os.sep + "03 - " + OUTPUT_NAME))
+        self.assertNotIn("03 - ", build_ydl_options(get_preset("mp3"), r"C:\P", "Lista")["outtmpl"])
+
     def test_video_preset_merges_to_mp4_without_postprocessing(self):
         opts = build_ydl_options(get_preset("1080p"), r"C:\Preuzimanja")
         self.assertEqual(opts["format"], "bv*+ba/b")

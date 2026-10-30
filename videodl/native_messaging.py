@@ -14,7 +14,7 @@ from pathlib import Path
 
 from . import native_host
 from . import runtime
-from .runtime import HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_config_base, user_data_base
+from .runtime import HOST_DIR, HOST_EXE, PROJECT_ROOT, app_dir, is_frozen, user_config_base, user_data_base
 
 # ID proizlazi iz javnog ključa ("key") u extension/manifest.json.
 EXTENSION_ID = "jfgcekfmjipklibljeacchccmebppklp"
@@ -100,8 +100,8 @@ def install_native_host(install_dir: Path | None = None, python_exe: str | None 
             raise TemporaryLocationError(str(host_executable))
         script = Path(host_executable)
     elif frozen_app_dir is not None:
-        # Instalirana Windows verzija: host je poseban .exe pored aplikacije i sam zna gdje je aplikacija.
-        script = Path(frozen_app_dir) / HOST_EXE
+        # Instalirana Windows verzija: host je poseban program u host\ i sam zna gdje je aplikacija.
+        script = Path(frozen_app_dir) / HOST_DIR / HOST_EXE
     else:
         launch_command = launch_command or [_sibling_exe("pythonw.exe"), str(PROJECT_ROOT / "pokreni.pyw")]
         shutil.copyfile(native_host.__file__, install_dir / "host.py")

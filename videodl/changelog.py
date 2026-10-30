@@ -8,6 +8,33 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.6", "30.10.2026", {
+        "bs": ["Novi formati: „MKV original“ (najbolja slika i zvuk bez pretvaranja) i „Zvuk original“ (zvuk tačno kako ga sajt daje).",
+               "Postavke → Prijava na sajtove: za videe koji traže prijavu program može uzeti kolačiće iz tvog browsera ili iz cookies.txt fajla; ništa se ne šalje nikome osim tom sajtu.",
+               "Poglavlja videa po želji u zasebne fajlove, isječak precizno ili brzo, brojevi ispred fajlova iz plejliste (isključeno dok ih ne uključiš) i prekidač „Prati kopirano“ na traci.",
+               "Dodatak u browseru se brže povezuje s programom, a Postavke se skroluju na manjim ekranima.",
+               "Roditeljska zaštita je uklonjena (na računaru i Androidu)."],
+        "en": ["New formats: “MKV original” (best picture and sound without conversion) and “Audio original” (sound exactly as the site provides it).",
+               "Settings → Sign-in to sites: for videos that require signing in, the app can use cookies from your browser or from a cookies.txt file; nothing is sent anywhere except to that site.",
+               "Optionally save video chapters as separate files, cut clips precisely or fast, number playlist files (off until you turn it on), and a “Watch copied” switch on the toolbar.",
+               "The browser extension connects to the app faster, and Settings scroll on smaller screens.",
+               "Parental control has been removed (on the computer and on Android)."],
+        "de": ["Neue Formate: „MKV Original“ (bestes Bild und bester Ton ohne Umwandlung) und „Ton Original“ (Ton genau so, wie die Seite ihn liefert).",
+               "Einstellungen → Anmeldung bei Websites: Für Videos, die eine Anmeldung verlangen, kann das Programm Cookies aus deinem Browser oder aus einer cookies.txt-Datei verwenden; nichts wird irgendwohin gesendet außer an diese Seite.",
+               "Kapitel auf Wunsch als eigene Dateien, Ausschnitte genau oder schnell, Nummern vor Dateien aus Playlists (aus, bis du sie einschaltest) und ein Schalter „Kopiertes erfassen“ in der Symbolleiste.",
+               "Die Browser-Erweiterung verbindet sich schneller mit dem Programm, und die Einstellungen lassen sich auf kleineren Bildschirmen scrollen.",
+               "Die Kindersicherung wurde entfernt (am Computer und unter Android)."],
+        "es": ["Formatos nuevos: «MKV original» (la mejor imagen y sonido sin conversión) y «Audio original» (el sonido tal como lo da el sitio).",
+               "Ajustes → Inicio de sesión en sitios: para vídeos que piden iniciar sesión, la aplicación puede usar las cookies de tu navegador o de un archivo cookies.txt; no se envía nada a ningún otro lugar que no sea ese sitio.",
+               "Capítulos del vídeo como archivos separados si quieres, recortes precisos o rápidos, números delante de los archivos de listas (desactivado hasta que lo actives) y un interruptor «Detectar copiados» en la barra.",
+               "La extensión del navegador se conecta más rápido con la aplicación, y los Ajustes se desplazan en pantallas pequeñas.",
+               "Se ha eliminado el control parental (en el ordenador y en Android)."],
+        "fr": ["Nouveaux formats : « MKV d’origine » (meilleure image et meilleur son sans conversion) et « Son d’origine » (le son tel que le site le fournit).",
+               "Réglages → Connexion aux sites : pour les vidéos qui demandent une connexion, l’application peut utiliser les cookies de ton navigateur ou d’un fichier cookies.txt ; rien n’est envoyé ailleurs qu’à ce site.",
+               "Chapitres de la vidéo en fichiers séparés si tu veux, extraits précis ou rapides, numéros devant les fichiers des playlists (désactivé jusqu’à ce que tu l’actives) et un interrupteur « Suivre les copies » dans la barre.",
+               "L’extension du navigateur se connecte plus vite à l’application, et les Réglages défilent sur les petits écrans.",
+               "Le contrôle parental a été supprimé (sur l’ordinateur et sur Android)."],
+    }),
     ("1.0.5", "29.10.2026", {
         "bs": ["Novo: Video Download za Linux (beta) — jedan AppImage fajl za Ubuntu 22.04 i novije (i slične sisteme), bez instalacije; sam se ažurira, dodaje se u meni aplikacija i radi s dodatkom za Chrome, Edge i Firefox.",
                "Pomoć → Preuzimanje iz browsera: dodatak za Edge i Firefox se instalira jednim klikom iz njihove prodavnice, a Chrome u tri jasna koraka.",

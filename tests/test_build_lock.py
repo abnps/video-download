@@ -41,6 +41,17 @@ class BuildLockTest(unittest.TestCase):
         self.assertIn(spec["version"].split("-")[0], ffmpeg.name)
         self.assertIn(legal.FFMPEG, legal.COMPONENTS)  # tačno jedan FFmpeg, onaj za ovaj sistem
 
+    def test_windows_build_on_github_uses_pinned_archives(self):
+        # Faza 5: posao „Windows paket" preuzima samo ove arhive; raspakovani alati se još provjeravaju po „tools".
+        archives = self.lock["windows_archives"]
+        self.assertEqual({k for k in archives if k != "comment"}, {"ffmpeg", "node"})
+        for name in ("ffmpeg", "node"):
+            with self.subTest(tool=name):
+                self.assertRegex(archives[name]["sha256"], r"^[0-9a-f]{64}$")
+                self.assertTrue(archives[name]["url"].startswith("https://"))
+        self.assertIn(self.lock["tools"]["node"]["version"], archives["node"]["url"])
+        self.assertIn(self.lock["tools"]["ffmpeg"]["version"].split("-")[0], archives["ffmpeg"]["url"])
+
     def test_mac_tools_are_pinned_by_url_and_hash(self):
         mac = self.lock["macos_tools"]
         self.assertEqual({k for k in mac if k != "comment"}, {"ffmpeg", "ffprobe", "node"})

@@ -96,8 +96,6 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     var clipFrom by rememberSaveable(info.url) { mutableStateOf("") }
     var clipTo by rememberSaveable(info.url) { mutableStateOf("") }
     val clipRange = parseClip(clipFrom, clipTo, info.duration)
-    // Roditeljska zaštita: 18+ se ne preuzima i ne nudi se potvrda.
-    val blockedByParental = info.adult && Parental.enabled(context)
     val mutedLabel = stringResource(R.string.mute_short)
     fun start(asAudio: Boolean, asMp3: Boolean) {
         val label = if (asAudio) (if (asMp3) DownloadService.MP3_LABEL else "M4A") else if (chosen.label > 0) "${chosen.label}p" else "MP4"
@@ -125,10 +123,8 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 // izabranom kvalitetu, bez traženja dugmeta ispod. Isti posao kao glavno dugme.
                 // Gore desno, jer je dolje desno trajanje videa (dugmad su ga prekrivala).
                 Row(Modifier.align(Alignment.TopEnd).padding(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio),
-                        enabled = !blockedByParental) { start(true, true) }
-                    QuickButton(R.drawable.ic_videocam, stringResource(R.string.quick_video),
-                        enabled = !blockedByParental) { start(false, mp3) }
+                    QuickButton(R.drawable.ic_music, stringResource(R.string.quick_audio)) { start(true, true) }
+                    QuickButton(R.drawable.ic_videocam, stringResource(R.string.quick_video)) { start(false, mp3) }
                 }
             }
             Text(info.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, maxLines = 3,
@@ -140,8 +136,6 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                     shape = SegmentedButtonDefaults.itemShape(1, 2),
                     icon = { AppIcon(R.drawable.ic_music, Modifier.size(18.dp)) }) { Text(stringResource(R.string.tab_audio)) }
             }
-            if (blockedByParental) Text(stringResource(R.string.parental_blocked),
-                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
             if (audio) {
                 // MP3 192 kbps: veličina ≈ trajanje × 24 KB/s.
                 OptionRow(mp3, "MP3 · ${Mp3.KBPS} kbps", sizePills("MP3", info.duration * Mp3.KBPS * 125.0)) { mp3 = true }
@@ -182,7 +176,7 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
                 }
             }
         }
-        Button(onClick = { start(audio, mp3) }, enabled = !blockedByParental && (!clip || clipRange != null), modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
+        Button(onClick = { start(audio, mp3) }, enabled = !clip || clipRange != null, modifier = Modifier.fillMaxWidth().padding(20.dp).height(54.dp),
             shape = RoundedCornerShape(12.dp)) {
             AppIcon(R.drawable.ic_download, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onPrimary)
             Text(stringResource(if (audio) R.string.download_btn_audio else R.string.download_btn_video),
@@ -203,8 +197,8 @@ internal fun sizePills(format: String, size: Double): List<String> =
 
 /** Okruglo dugme preko sličice (zvuk / video jednim dodirom). */
 @Composable
-internal fun QuickButton(icon: Int, description: String, enabled: Boolean, onClick: () -> Unit) {
-    IconButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(52.dp)
+internal fun QuickButton(icon: Int, description: String, onClick: () -> Unit) {
+    IconButton(onClick = onClick, modifier = Modifier.size(52.dp)
         .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.92f), RoundedCornerShape(16.dp))
         .semantics { contentDescription = description }) {
         AppIcon(icon, Modifier.size(26.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)

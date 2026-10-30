@@ -77,8 +77,7 @@ import java.util.Calendar
 /** Spisak videa iz plejliste: izbor (sve ili neki), video ili zvuk, pa redom preuzimanje kao zasebni poslovi. */
 @Composable
 fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (List<Job>) -> Unit) {
-    val parental = Parental.enabled(LocalContext.current)
-    val allowed = playlist.entries.indices.filter { !(parental && playlist.entries[it].adult) }
+    val allowed = playlist.entries.indices.toList()
     val signature = remember(playlist) { playlist.selectionKey() }
     val selected = rememberSaveable(playlist.url, saver = listSaver(
         save = { listOf(signature) + it.toList() },

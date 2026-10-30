@@ -1,6 +1,8 @@
 """Pravi instaler: PyInstaller (aplikacija + host) → alati i dodatak → self-test → Inno Setup → SHA-256.
 
 Pokretanje iz foldera projekta:  python tools/build_release.py
+Na GitHubu (posao „Windows paket"): python tools/build_release.py --unsigned — bez privatnog ključa; release.json
+potpisuje Ahmed lokalno (tools/sign_windows.py), kao za Mac i Linux.
 Izlaz: folder „Build" pored projekta ako postoji (C:\\Video Downloader\\Build, vidljiv Ahmedu), inače
 %LOCALAPPDATA%\\VideoDownload-build; VIDEODL_BUILD_DIR ima prednost. Nikad u OneDrive.
 """
@@ -30,7 +32,7 @@ BUILD = Path(os.environ.get("VIDEODL_BUILD_DIR")
 DIST = BUILD / "dist"
 APP = DIST / "VideoDownload"
 INSTALLER_OUT = BUILD / "installer"
-ISCC = LOCALAPPDATA / "Programs" / "Inno Setup 6" / "ISCC.exe"
+ISCC = Path(os.environ.get("VIDEODL_ISCC") or LOCALAPPDATA / "Programs" / "Inno Setup 6" / "ISCC.exe")
 ICON_SIZES = (16, 24, 32, 48, 64, 128, 256)
 
 
@@ -289,14 +291,21 @@ def clean_output(path: Path) -> None:
     shutil.rmtree(path, onexc=retry_readonly)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Windows instaler (vidi opis modula).")
+    parser.add_argument("--unsigned", action="store_true",
+                        help="bez potpisa release.json (GitHub); potpis poslije: tools/sign_windows.py")
+    args = parser.parse_args(argv)
     if not ISCC.is_file():
         raise SystemExit(f"Inno Setup nije pronađen: {ISCC}")
     from videodl import release_signing
 
-    signing_key = release_signing.load_key()  # bez privatnog ključa nema izdanja (provjeri prije dugog builda)
-    if release_signing.public_key_hex(signing_key) not in release_signing.PUBLIC_KEYS:
-        raise SystemExit("Privatni ključ ne odgovara javnom ključu ugrađenom u aplikaciju.")
+    if not args.unsigned:
+        signing_key = release_signing.load_key()  # bez privatnog ključa nema izdanja (provjeri prije dugog builda)
+        if release_signing.public_key_hex(signing_key) not in release_signing.PUBLIC_KEYS:
+            raise SystemExit("Privatni ključ ne odgovara javnom ključu ugrađenom u aplikaciju.")
     lock = load_lock()
     problems = verify_environment(lock)
     if problems:
@@ -313,9 +322,10 @@ def main() -> int:
                 *[arg for module in UNUSED_MODULES for arg in ("--exclude-module", module)],
                 str(PROJECT / "pokreni.pyw"))
     print(f"Uklonjeno nekorištenih Qt dijelova: {trim_package() / 1_048_576:.1f} MB")
-    pyinstaller("--onefile", "--console", "--name", "videodl-host", "--icon", str(icon),
+    # Host za browser: onedir u host\ (bez raspakivanja pri svakom kliku; ~0,15 s umjesto ~0,8 s).
+    pyinstaller("--onedir", "--console", "--name", "videodl-host", "--icon", str(icon),
                 str(PROJECT / "videodl" / "native_host.py"))
-    shutil.move(str(DIST / "videodl-host.exe"), APP / "videodl-host.exe")
+    shutil.move(str(DIST / "videodl-host"), APP / "host")
 
     # Dodatak ide bez razvojnog package.json-a.
     shutil.copytree(PROJECT / "extension", APP / "extension", ignore=shutil.ignore_patterns("package.json"))
@@ -346,9 +356,8 @@ def main() -> int:
     notes.write_text(changelog.release_notes(__version__) + "\n\nSve izmjene: Pomoć → Šta je novo.\n\n♥ Podrži projekat (dobrovoljno): https://www.paypal.com/ncp/payment/PY6SBUFD6V7JQ · Karticom: https://buy.stripe.com/14A4gA9GnfcSgjVdAV8Vi00 · Ko-fi: https://ko-fi.com/abnps\n",
                      encoding="utf-8")
     # Potpisan opis izdanja (release.json + .sig): aplikacije od v0.9.6 bez njega ne instaliraju ažuriranje.
-    from videodl import release_signing
-
-    release_signing.write_signed_manifest(__version__, installer)
+    if not args.unsigned:
+        release_signing.write_signed_manifest(__version__, installer)
     # Kopija bez broja verzije: link na sajtu (releases/latest/download/VideoDownload-Setup.exe)
     # uvijek vodi na najnovije izdanje. Ažuriranje u aplikaciji traži samo ime s verzijom.
     shutil.copyfile(installer, INSTALLER_OUT / "VideoDownload-Setup.exe")

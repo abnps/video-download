@@ -14,6 +14,14 @@ enum class SaveLocation { DOWNLOADS, GALLERY }
 object Settings {
     private const val FILE = "postavke"
 
+    /** Uklonjena roditeljska zaštita (Ahmed 29.10.2026): staro podešavanje i otisak PIN-a se brišu. */
+    fun dropParental(context: Context) {
+        val prefs = prefs(context)
+        if (prefs.contains("parental_enabled") || prefs.contains("parental_pin")) {
+            prefs.edit().remove("parental_enabled").remove("parental_pin").apply()
+        }
+    }
+
     fun location(context: Context): SaveLocation = runCatching {
         SaveLocation.valueOf(prefs(context).getString("location", SaveLocation.GALLERY.name)!!)
     }.getOrDefault(SaveLocation.GALLERY)

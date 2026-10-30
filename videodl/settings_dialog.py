@@ -7,10 +7,12 @@ Svaka promjena važi odmah; nema dugmeta „Sačuvaj".
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QCheckBox, QComboBox, QDialog, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QPushButton, QVBoxLayout,
+    QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFormLayout, QFrame, QGroupBox, QHBoxLayout, QLabel,
+    QPushButton, QScrollArea, QVBoxLayout, QWidget,
 )
 
 from . import theme
+from .browser import COOKIE_BROWSER_NAMES, COOKIE_BROWSERS
 from .i18n import LANGUAGES, get_language, tr
 from .widgets import ElidedLabel
 
@@ -25,9 +27,20 @@ class SettingsDialog(QDialog):
         super().__init__(window)
         self._window = window
         self.setWindowTitle(tr("settings.title"))
-        self.setMinimumWidth(520)
-        layout = QVBoxLayout(self)
+        self.setMinimumWidth(540)
+        outer = QVBoxLayout(self)
+        # Grupe idu u prostor koji se skroluje: na nižem ekranu (laptop 768/900 px) prozor ostaje čitljiv, a
+        # „Zatvori" je uvijek vidljivo.
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setWidget(page)
+        outer.addWidget(scroll, 1)
 
         # Preuzimanje
         download = QGroupBox(tr("settings.group_download"))
@@ -83,7 +96,40 @@ class SettingsDialog(QDialog):
         self.sponsorblock.setToolTip(tr("settings.sponsorblock_tip"))
         self.playlist = self._check(box, "menu.whole_playlist", window._whole_playlist,
                                     lambda on: window._set_option("_whole_playlist", on))
+        self.number_playlist = self._check(box, "settings.number_playlist", window._number_playlist,
+                                           lambda on: window._set_option("_number_playlist", on))
+        self.precise_cut = self._check(box, "settings.precise_cut", window._precise_cut,
+                                       lambda on: window._set_option("_precise_cut", on))
+        self.precise_cut.setToolTip(tr("settings.precise_cut_tip"))
+        self.split_chapters = self._check(box, "settings.split_chapters", window._split_chapters,
+                                          lambda on: window._set_option("_split_chapters", on))
+        self.split_chapters.setToolTip(tr("settings.split_chapters_tip"))
         layout.addWidget(content)
+
+        # Prijava na sajtove: kolačići iz browsera ili cookies.txt (za video iza prijave)
+        login = QGroupBox(tr("settings.group_login"))
+        login_box = QVBoxLayout(login)
+        row = QHBoxLayout()
+        row.addWidget(QLabel(_plain("settings.cookies")))
+        self.cookies = QComboBox()
+        self.cookies.addItem(tr("cookies.none"), "")
+        for browser in COOKIE_BROWSERS:
+            self.cookies.addItem(COOKIE_BROWSER_NAMES[browser], browser)
+        self.cookies.addItem(tr("cookies.file"), "file")
+        self._select(self.cookies, window._cookie_browser or ("file" if window._cookie_txt else ""))
+        self.cookies.currentIndexChanged.connect(self._change_cookies)
+        row.addWidget(self.cookies, 1)
+        login_box.addLayout(row)
+        self.cookie_file = QLabel(window._cookie_txt)
+        self.cookie_file.setObjectName("supportNote")
+        self.cookie_file.setWordWrap(True)
+        self.cookie_file.setVisible(bool(window._cookie_txt) and not window._cookie_browser)
+        login_box.addWidget(self.cookie_file)
+        note = QLabel(tr("cookies.note"))
+        note.setWordWrap(True)
+        note.setObjectName("supportNote")
+        login_box.addWidget(note)
+        layout.addWidget(login)
 
         # Ponašanje
         behavior = QGroupBox(tr("settings.group_behavior"))
@@ -110,23 +156,19 @@ class SettingsDialog(QDialog):
         form.addRow(_plain("menu.language"), self.language)
         layout.addWidget(look)
 
-        # Zaštita
-        protection = QGroupBox(tr("settings.group_protection"))
-        box = QHBoxLayout(protection)
-        parental = QPushButton(tr("menu.parental"))
-        parental.clicked.connect(window._show_parental)
-        box.addWidget(parental)
-        box.addStretch(1)
-        layout.addWidget(protection)
-
         close = QPushButton(tr("settings.close"))
         close.setDefault(True)
         close.clicked.connect(self.accept)
         buttons = QHBoxLayout()
         buttons.addStretch(1)
         buttons.addWidget(close)
-        layout.addLayout(buttons)
+        outer.addLayout(buttons)
         self._show_folder()
+        # Visina po sadržaju, ali najviše koliko ekran dozvoljava (ostatak se skroluje).
+        screen = (window.screen() if window is not None else None) or QApplication.primaryScreen()
+        wanted = page.sizeHint().height() + close.sizeHint().height() + 48
+        available = screen.availableGeometry().height() - 60 if screen else wanted
+        self.resize(max(self.minimumWidth(), page.sizeHint().width() + 40), min(wanted, available))
 
     @staticmethod
     def _select(combo: QComboBox, value) -> None:
@@ -140,6 +182,22 @@ class SettingsDialog(QDialog):
         check.toggled.connect(on_change)
         box.addWidget(check)
         return check
+
+    def _change_cookies(self, _index: int) -> None:
+        choice = self.cookies.currentData()
+        if choice == "file":
+            path, _filter = QFileDialog.getOpenFileName(self, tr("cookies.file_title"), "", "cookies.txt (*.txt);;* (*)")
+            if not path:
+                # Odustao: vraća se prethodni izbor.
+                self.cookies.blockSignals(True)
+                self._select(self.cookies, self._window._cookie_browser or ("file" if self._window._cookie_txt else ""))
+                self.cookies.blockSignals(False)
+                return
+            self._window.set_cookie_source("", path)
+        else:
+            self._window.set_cookie_source(choice or "", "")
+        self.cookie_file.setText(self._window._cookie_txt)
+        self.cookie_file.setVisible(bool(self._window._cookie_txt))
 
     def _show_folder(self) -> None:
         self.folder_label.setText(self._window.output_dir)

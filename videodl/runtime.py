@@ -21,6 +21,9 @@ def exe(name: str) -> str:
 
 APP_EXE = exe("VideoDownload")
 HOST_EXE = exe("videodl-host")
+# Windows: host je poseban onedir paket u podfolderu (pokreće se ~0,15 s; onefile se pri svakom kliku u browseru
+# raspakivao u privremeni folder, ~0,8 s). Ahmed 29.10.2026, Faza 4.
+HOST_DIR = "host"
 
 
 def is_frozen() -> bool:

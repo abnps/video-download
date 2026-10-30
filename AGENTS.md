@@ -71,16 +71,20 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   domene), drže se samo u memoriji, a yt-dlp ih dobija kroz privremeni fajl koji se
   briše odmah poslije čitanja/preuzimanja. Vrijednosti kolačića nikad u log, poruke,
   `repr`, podešavanja ili server log testa. Ne proširivati bez Ahmedove potvrde.
+- Proširenje (Ahmed 29.10.2026, Faza 3): Postavke → Prijava na sajtove — yt-dlp sam čita kolačiće iz
+  izabranog browsera (`cookiesfrombrowser`: Firefox, Edge, Chrome, Brave) ili iz korisnikovog cookies.txt
+  (`browser.cookie_options`). Isključeno dok ga korisnik ne izabere; u podešavanjima se čuva samo izbor
+  browsera ili putanja fajla, nikad vrijednosti. cookies.txt ide kao privremena kopija (yt-dlp pri zatvaranju
+  prepisuje svoj cookies fajl). Kolačići iz dodatka imaju prednost (samo sajt s kog se preuzima).
 - DRM se ne zaobilazi; ekstenzija ga samo prepoznaje i označava.
 - Sadržaj 18+ (Ahmed 26.9.2026): video s yt-dlp `age_limit >= 18` traži potvrdu „Imam 18 ili više godina" PRI
   SVAKOM preuzimanju (dugme Preuzmi, dugme u redu, Pokušaj ponovo, dodatak); više videa = jedan prozor; bez
   potvrde video čeka, ostali idu. Potvrda (`adult_ok`) važi samo za to preuzimanje i nikad se ne čuva na disku;
   oznaka (`adult`) se čuva u redu. Sličica 18+ je uvijek zamućena s oznakom „18+". NE ide u bilješke o verziji
   (Ahmedova odluka). YouTube je IZUZET (Ahmed: „YT treba isključiti“; `probe.is_youtube`: adresa ili
-  yt-dlp extractor). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita
-  (3.10.2026): `videodl/parental.py` + Preuzimanja → Roditeljska zaštita; Android `Parental.kt` + Postavke. Uključena
-  → 18+ se ne preuzima i NE nudi potvrdu (stavka „blokirana"); PIN 4–8 cifara opcion, čuva se samo PBKDF2 otisak
-  (isti zapis na oba sistema). Nije neprobojna brava — tako je i opisana korisniku.
+  yt-dlp extractor). Nije pravna provjera starosti (JMStV) — ne predstavljati je tako. Roditeljska zaštita (PIN,
+  blokada 18+) je UKLONJENA (Ahmed 29.10.2026) na računaru i Androidu; stara podešavanja (`parental/*`,
+  `parental_enabled`/`parental_pin`) program briše pri pokretanju. Potvrda 18+ ostaje kao gore.
 
 ## Okruženje
 
@@ -340,7 +344,7 @@ koji nisu (ili nisu jasno) zapisani gore. Važe za svakog agenta.
 PayPal probna uplata 1 €; izvještaj prijatelja s Macom i prvi utisci s Androidom; Search Console provjera;
 brisanje starih nacrta 0.9.4/0.9.5 (traži potvrdu); čišćenje e-maila u `abnps/.github` i GitHub privatnost
 e-maila; prazan stari OneDrive folder (briše Ahmed); Trusted Signing (ponuđeno istraživanje).
-Kasnije: roditeljska zaštita (blokada 18+ + PIN), privatni repo, Video Toolkit.
+Kasnije: privatni repo, Video Toolkit.
 Video Toolkit (Ahmed 5.10.2026): na Google Play TEK POSLIJE Video Download 1.0.0; prvo potpuno besplatan
 (rezanje, MP3, smanjivanje fajlova s telefona; bez preuzimanja sa sajtova — Play to ne prima ni bez YouTubea),
 „Pro" (npr. titlovi bez interneta) tek poslije poreskog savjetnika. Play Console (25 $, odluka Ahmeda), ime

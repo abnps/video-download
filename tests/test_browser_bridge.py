@@ -275,6 +275,11 @@ class NativeHostTest(unittest.TestCase):
         self.assertIsNone(native_host.store_launch_command(
             WinPath(r"C:\Users\a\AppData\Local\Programs\VideoDownload\videodl-host.exe")))
         self.assertIsNone(native_host.store_launch_command(WinPath(r"C:\WindowsApps\nesto\videodl-host.exe")))
+        # Od Faze 4 host je onedir u podfolderu host\ paketa.
+        self.assertEqual(native_host.store_launch_command(store / "host" / "videodl-host.exe"),
+                         ["explorer.exe", r"shell:AppsFolder\abnps.VideoDownloadbyabnps_rtqmsrm0jkev2!VideoDownload"])
+        self.assertIsNone(native_host.store_launch_command(
+            WinPath(r"C:\Users\a\AppData\Local\Programs\VideoDownload\host\videodl-host.exe")))
 
     def test_store_package_manifest_matches_host(self):
         import sys
@@ -297,7 +302,7 @@ class NativeHostTest(unittest.TestCase):
         self.assertNotIn("AppListEntry", build_msix.manifest("1.0.2.0"))
         self.assertEqual(apps[0].get("EntryPoint"), "Windows.FullTrustApplication")
         alias = apps[0].find(".//{http://schemas.microsoft.com/appx/manifest/uap/windows10/3}Extension")
-        self.assertEqual(alias.get("Executable"), "videodl-host.exe")
+        self.assertEqual(alias.get("Executable"), r"host\videodl-host.exe")
         # makeappx za alias s posebnim .exe-om traži EntryPoint; host ne piše HKCU registraciju.
         self.assertEqual(alias.get("EntryPoint"), "Windows.FullTrustApplication")
         self.assertIn('Alias="abnps-videodl-host.exe"', build_msix.manifest("1.0.2.0"))
