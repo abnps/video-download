@@ -16,6 +16,9 @@ Le programme sert à télécharger des vidéos et du son que tu as le droit de t
 3. Ta responsabilité
 Tu es responsable de ce que tu télécharges et de l'usage que tu en fais, y compris du respect des lois de ton pays et des conditions d'utilisation de la plateforme d'où tu télécharges (p. ex. les conditions de YouTube).
 
+3a. Limites des sites
+Les sites limitent ce qu'on peut télécharger d'affilée. Le programme le respecte : quand tu télécharges beaucoup de vidéos du même site, il fait de courtes pauses, et quand un site demande une pause (p. ex. « trop de requêtes »), il attend tout seul avant de reprendre. Le programme ne contourne pas ces limites et n'utilise pas d'adresses d'autrui ni cachées. Si tu désactives la protection contre les blocages dans les Paramètres, tu es responsable du nombre plus élevé de requêtes vers le site et d'un éventuel blocage temporaire.
+
 4. Aucun lien avec les plateformes
 Video Download n'est pas affilié à YouTube, Google ou toute autre plateforme, et n'est pas soutenu par elles. Les noms des plateformes appartiennent à leurs propriétaires.
 
@@ -23,7 +26,10 @@ Video Download n'est pas affilié à YouTube, Google ou toute autre plateforme, 
 Le programme est fourni gratuitement et « en l'état », sans garantie qu'il fonctionne avec tous les sites. L'auteur n'est pas responsable des dommages causés par l'utilisation du programme, sauf lorsque la loi ne permet pas d'exclure la responsabilité.
 
 6. Confidentialité
-Le programme n'envoie aucune donnée te concernant. Il se connecte uniquement au site d'où tu télécharges, à GitHub (recherche d'une nouvelle version) et à PyPI (mise à jour du lecteur de sites yt-dlp). Les cookies de connexion du navigateur ne servent qu'à ce site, restent uniquement en mémoire et ne sont jamais écrits sur le disque.
+Le programme n'envoie à l'auteur aucune donnée te concernant. Il se connecte uniquement au site d'où tu télécharges, à GitHub (recherche d'une nouvelle version) et à PyPI (mise à jour du lecteur de sites yt-dlp), et à d'autres services (p. ex. SponsorBlock, la page de don) seulement si tu les actives ou cliques dessus. Les cookies de connexion (du navigateur, d'un fichier cookies.txt ou de la connexion dans l'appli Android) ne servent qu'au site concerné ; sur l'ordinateur ils restent uniquement en mémoire, et sur Android ils restent dans le stockage privé de l'appli jusqu'à ta déconnexion. Les chiffres des succès, du bilan mensuel et du rappel de don sont calculés et conservés uniquement sur ton appareil. Les détails figurent dans la Politique de confidentialité.
 
 7. Composants tiers
 Le programme utilise yt-dlp, FFmpeg, Qt (PySide6), Node.js et d'autres composants sous leurs propres licences ; la liste se trouve dans THIRD-PARTY-NOTICES.txt dans le dossier du programme.
+
+8. Modification des conditions
+Une nouvelle version du programme peut apporter des conditions modifiées. La version en vigueur se trouve toujours dans le programme (Aide → Contrats et licences) et sur le site du programme ; en continuant à utiliser une nouvelle version, tu acceptes les conditions modifiées.

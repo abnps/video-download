@@ -8,6 +8,28 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.7", "2.11.2026", {
+        "bs": ["Zaštita od blokade: kad skidaš mnogo videa zaredom s istog velikog video sajta, program pravi kratke pauze da sajt ne bi privremeno blokirao preuzimanje. Može se isključiti u Postavkama.",
+               "Ako sajt ipak blokira, program sam sačeka i nastavi — kartica pokazuje odbrojavanje, a možeš i „Nastaviti odmah“ ili „Nastaviti kasnije“; nedovršeno preuzimanje se nudi pri sljedećem pokretanju.",
+               "Novo: „Gotovo: 50/50 videa“ poslije velike liste bez greške, mjesečni pregled preuzimanja (samo brojke, izračunate na tvom uređaju) i dostignuće „Strpljivi“.",
+               "Postavke na računaru su podijeljene u tabove. Pauze, „Gotovo: 50/50“, mjesečni pregled i dostignuće stižu i na Android."],
+        "en": ["Block protection: when you download many videos in a row from the same big video site, the app takes short pauses so the site doesn't temporarily block downloading. You can turn it off in Settings.",
+               "If a site blocks anyway, the app waits and continues on its own — a card shows the countdown, and you can “Continue now” or “Continue later”; unfinished downloads are offered the next time you start the app.",
+               "New: “Done: 50/50 videos” after a big list without errors, a monthly download recap (numbers only, calculated on your device) and the “Patient” achievement.",
+               "On the computer, Settings are split into tabs. Pauses, “Done: 50/50”, the monthly recap and the achievement also come to Android."],
+        "de": ["Schutz vor Sperren: Wenn du viele Videos hintereinander von derselben großen Video-Website lädst, macht das Programm kurze Pausen, damit die Website das Herunterladen nicht vorübergehend sperrt. Lässt sich in den Einstellungen ausschalten.",
+               "Sperrt eine Website trotzdem, wartet das Programm und macht von selbst weiter — eine Karte zeigt den Countdown, und du kannst „Jetzt weiter“ oder „Später weiter“ wählen; unfertige Downloads werden beim nächsten Start angeboten.",
+               "Neu: „Fertig: 50/50 Videos“ nach einer großen Liste ohne Fehler, ein Monatsrückblick der Downloads (nur Zahlen, auf deinem Gerät berechnet) und die Errungenschaft „Geduldig“.",
+               "Am Computer sind die Einstellungen in Tabs aufgeteilt. Pausen, „Fertig: 50/50“, Monatsrückblick und Errungenschaft gibt es auch unter Android."],
+        "es": ["Protección contra bloqueos: cuando descargas muchos vídeos seguidos del mismo gran sitio de vídeos, la aplicación hace pausas cortas para que el sitio no bloquee temporalmente las descargas. Se puede desactivar en Ajustes.",
+               "Si un sitio bloquea igualmente, la aplicación espera y sigue sola — una tarjeta muestra la cuenta atrás, y puedes «Continuar ahora» o «Continuar más tarde»; las descargas sin terminar se ofrecen la próxima vez que abras la aplicación.",
+               "Novedad: «Listo: 50/50 vídeos» tras una lista grande sin errores, un resumen mensual de descargas (solo números, calculados en tu dispositivo) y el logro «Paciente».",
+               "En el ordenador, los Ajustes están divididos en pestañas. Las pausas, «Listo: 50/50», el resumen mensual y el logro llegan también a Android."],
+        "fr": ["Protection contre les blocages : quand tu télécharges beaucoup de vidéos d’affilée depuis le même grand site vidéo, l’application fait de courtes pauses pour que le site ne bloque pas temporairement les téléchargements. Désactivable dans les Paramètres.",
+               "Si un site bloque quand même, l’application attend et reprend toute seule — une carte affiche le compte à rebours, et tu peux « Reprendre maintenant » ou « Reprendre plus tard » ; les téléchargements non terminés sont proposés au prochain démarrage.",
+               "Nouveau : « Terminé : 50/50 vidéos » après une grande liste sans erreur, un bilan mensuel des téléchargements (uniquement des chiffres, calculés sur ton appareil) et le succès « Patient ».",
+               "Sur l’ordinateur, les Paramètres sont répartis en onglets. Les pauses, « Terminé : 50/50 », le bilan mensuel et le succès arrivent aussi sur Android."],
+    }),
     ("1.0.6", "30.10.2026", {
         "bs": ["Novi formati: „MKV original“ (najbolja slika i zvuk bez pretvaranja) i „Zvuk original“ (zvuk tačno kako ga sajt daje).",
                "Postavke → Prijava na sajtove: za videe koji traže prijavu program može uzeti kolačiće iz tvog browsera ili iz cookies.txt fajla; ništa se ne šalje nikome osim tom sajtu.",

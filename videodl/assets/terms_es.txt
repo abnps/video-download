@@ -16,6 +16,9 @@ El programa sirve para descargar vídeo y audio que tienes derecho a descargar, 
 3. Tu responsabilidad
 Eres responsable de lo que descargas y de cómo lo usas, incluido el cumplimiento de las leyes de tu país y de las condiciones de uso de la plataforma desde la que descargas (p. ej. las condiciones de YouTube).
 
+3a. Límites de los sitios
+Los sitios limitan cuánto se puede descargar seguido. El programa lo respeta: cuando descargas muchos vídeos del mismo sitio hace pausas cortas, y cuando un sitio pide una pausa (p. ej. «demasiadas solicitudes») espera solo antes de continuar. El programa no elude estos límites ni usa direcciones ajenas u ocultas. Si desactivas la protección contra bloqueos en Ajustes, eres responsable del mayor número de solicitudes al sitio y de un posible bloqueo temporal.
+
 4. Sin relación con las plataformas
 Video Download no está afiliado a YouTube, Google ni a ninguna otra plataforma, ni cuenta con su respaldo. Los nombres de las plataformas pertenecen a sus propietarios.
 
@@ -23,7 +26,10 @@ Video Download no está afiliado a YouTube, Google ni a ninguna otra plataforma,
 El programa se ofrece gratis y «tal cual», sin garantía de que funcione con todos los sitios. El autor no responde de los daños causados por el uso del programa, salvo cuando la ley no permita excluir la responsabilidad.
 
 6. Privacidad
-El programa no envía datos sobre ti. Solo se conecta al sitio desde el que descargas, a GitHub (comprobar si hay una nueva versión) y a PyPI (actualizar el lector de sitios yt-dlp). Las cookies de inicio de sesión del navegador se usan solo para ese sitio, se guardan solo en memoria y nunca se escriben en el disco.
+El programa no envía al autor ningún dato sobre ti. Solo se conecta al sitio desde el que descargas, a GitHub (comprobar si hay una nueva versión) y a PyPI (actualizar el lector de sitios yt-dlp), y a otros servicios (p. ej. SponsorBlock, la página de donación) solo si los activas o haces clic en ellos. Las cookies de inicio de sesión (del navegador, de un archivo cookies.txt o del inicio de sesión en la app de Android) se usan solo para el sitio al que pertenecen; en el ordenador se guardan solo en memoria y en Android quedan en el almacenamiento privado de la app hasta que cierres la sesión. Los números para los logros, el resumen mensual y el recordatorio de donación se calculan y guardan solo en tu dispositivo. Los detalles están en la Política de privacidad.
 
 7. Componentes de terceros
 El programa usa yt-dlp, FFmpeg, Qt (PySide6), Node.js y otros componentes bajo sus propias licencias; la lista está en THIRD-PARTY-NOTICES.txt en la carpeta del programa.
+
+8. Cambios en estas condiciones
+Una nueva versión del programa puede traer condiciones modificadas. La versión vigente está siempre en el programa (Ayuda → Contratos y licencias) y en el sitio web del programa; al seguir usando una nueva versión aceptas las condiciones modificadas.

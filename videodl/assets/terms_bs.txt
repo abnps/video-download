@@ -16,6 +16,9 @@ Program služi za preuzimanje videa i zvuka koje imaš pravo da preuzmeš, a pri
 3. Tvoja odgovornost
 Ti odgovaraš za to šta preuzimaš i kako preuzeto koristiš, uključujući poštovanje zakona tvoje zemlje i uslova korištenja platforme sa koje preuzimaš (npr. uslova YouTube-a).
 
+3a. Ograničenja sajtova
+Sajtovi ograničavaju koliko se može preuzeti zaredom. Program to poštuje: kad preuzimaš mnogo videa s istog sajta, pravi kratke pauze, a kad sajt traži pauzu (npr. „previše zahtjeva“), sam čeka i tek onda nastavlja. Program ne zaobilazi ta ograničenja i ne koristi tuđe ili skrivene adrese. Ako u Postavkama isključiš zaštitu od blokade, za veći broj zahtjeva prema sajtu i moguću privremenu blokadu odgovoran si ti.
+
 4. Bez veze sa platformama
 Video Download nije povezan sa YouTube-om, Google-om niti bilo kojom drugom platformom, niti ga one podržavaju. Nazivi platformi pripadaju njihovim vlasnicima.
 
@@ -23,7 +26,10 @@ Video Download nije povezan sa YouTube-om, Google-om niti bilo kojom drugom plat
 Program se daje besplatno i „kakav jeste", bez garancije da će raditi sa svakim sajtom. Autor ne odgovara za štetu nastalu korištenjem programa, osim u slučajevima u kojima zakon ne dozvoljava isključenje odgovornosti.
 
 6. Privatnost
-Program ne šalje podatke o tebi. Povezuje se samo sa sajtom sa kog preuzimaš, sa GitHub-om (provjera nove verzije) i sa PyPI-jem (ažuriranje čitača sajtova yt-dlp). Kolačići prijave iz browsera koriste se samo za taj sajt, drže se samo u memoriji i ne upisuju se na disk.
+Program ne šalje autoru nikakve podatke o tebi. Povezuje se samo sa sajtom sa kog preuzimaš, sa GitHub-om (provjera nove verzije) i sa PyPI-jem (ažuriranje čitača sajtova yt-dlp), a sa drugim servisima (npr. SponsorBlock, stranica za prilog) samo ako to sam uključiš ili klikneš. Kolačići prijave (iz browsera, iz cookies.txt fajla ili iz prijave u Android aplikaciji) koriste se samo za sajt na koji se odnose; na računaru se drže samo u memoriji, a na Androidu ostaju u privatnoj memoriji aplikacije dok se ne odjaviš. Brojke za dostignuća, mjesečni pregled i podsjetnik za prilog računaju se i čuvaju samo na tvom uređaju. Detalji su u Politici privatnosti.
 
 7. Komponente trećih strana
 Program koristi yt-dlp, FFmpeg, Qt (PySide6), Node.js i druge komponente pod njihovim licencama; spisak je u fajlu THIRD-PARTY-NOTICES.txt u folderu programa.
+
+8. Izmjene uslova
+Nova verzija programa može donijeti izmijenjene uslove. Važeća verzija je uvijek u programu (Pomoć → Ugovori i licence) i na sajtu programa; nastavkom korištenja nove verzije prihvataš izmijenjene uslove.
