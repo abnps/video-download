@@ -29,7 +29,7 @@ from . import __version__
 from .bridge import BridgeServer
 from .browser import COOKIE_BROWSERS, BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, RateBudget, download
-from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_RETRY, get_language, pick_language, set_language, tr
+from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_PAUSE, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
@@ -50,6 +50,7 @@ from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
 )
 from .ytdl import JS_RUNTIMES, error_message, is_network_error, is_obviously_not_media
 from .gui_clipboard import ClipboardMixin
+from .gui_pause import PauseMixin
 from .gui_support import SupportMixin
 from .gui_updates import UpdatesMixin
 from .gui_util import (  # noqa: F401 - pomoćne funkcije su i dalje dostupne kao videodl.gui.*
@@ -107,7 +108,7 @@ from .workers import (  # noqa: F401 - pozadinski poslovi; i dalje dostupni kao 
 )
 
 
-class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
+class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
     # Stižu iz niti lokalnog mosta; Qt ih isporučuje u glavnoj niti.
     browser_request = Signal(object)  # BrowserRequest
     focus_requested = Signal()
@@ -187,6 +188,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         self._update_check_job = None
         self._ytdlp_job = None
         self._ytdlp_nightly = False  # posljednja provjera je tražila noćnu verziju
+        self._init_pause_state()  # zaštita od blokade, kartica pauze, pregled (gui_pause.py)
         self._build_menu()
         self._build_ui()
         self._load_settings()
@@ -196,6 +198,8 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             QTimer.singleShot(4000, lambda: self.check_for_updates(manual=False))
             # yt-dlp se mijenja češće od aplikacije; tiha provjera najviše jednom dnevno.
             QTimer.singleShot(9000, lambda: self.update_ytdlp(manual=False))
+            # Prvo pokretanje u novom mjesecu: „Tvoj oktobar u Video Downloadu" (jednom po mjesecu).
+            QTimer.singleShot(2500, self._maybe_show_recap)
 
     # ---------- izgled ----------
 
@@ -481,6 +485,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         banner.addWidget(self.support_banner_later)
         self.support_banner.hide()
         layout.addWidget(self.support_banner)
+        self._build_pause_card(layout)
 
         self.filter_bar = FilterBar()
         self.filter_bar.changed.connect(lambda _key: self._update_controls())
@@ -530,13 +535,16 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             downloads=self._settings.value("support/downloads", 0, type=int),
             banner_next=self._settings.value("support/banner_next", support.BANNER_EVERY, type=int),
             last_dialog=self._settings.value("support/last_dialog", 0.0, type=float),
-            snooze_until=self._settings.value("support/snooze_until", 0.0, type=float))
+            snooze_until=self._settings.value("support/snooze_until", 0.0, type=float),
+            last_note=self._settings.value("support/last_note", 0.0, type=float),
+            recent=support.SupportState.recent_from_json(self._settings.value("support/recent", "", type=str)))
         # Ko je preuzimao i prije dostignuća, ne dobija naknadnu čestitku za broj koji je već prešao.
         self._support.milestone_shown = self._settings.value(
             "support/milestone_shown", support.passed_milestone(self._support.downloads), type=int)
         self._achievement_dialog = None
         self._achievements = achievements.AchievementState.from_json(
             self._settings.value("achievements/state", "", type=str))
+        self._load_pause_settings()
         self._settings.remove("parental")  # uklonjena roditeljska zaštita (Ahmed 29.10.2026): ni otisak PIN-a ne ostaje
         self._subtitles = self._settings.value("subtitles", False, type=bool)
         self._thumbnail_cover = self._settings.value("thumbnail_cover", False, type=bool)
@@ -574,6 +582,9 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         self._settings.setValue("support/last_dialog", self._support.last_dialog)
         self._settings.setValue("support/snooze_until", self._support.snooze_until)
         self._settings.setValue("support/milestone_shown", self._support.milestone_shown)
+        self._settings.setValue("support/last_note", self._support.last_note)
+        self._settings.setValue("support/recent", self._support.recent_json())
+        self._save_pause_settings()
         self._settings.setValue("achievements/state", self._achievements.to_json())
         self._settings.setValue("thumbnail_cover", self._thumbnail_cover)
         self._settings.setValue("chapters", self._chapters)
@@ -615,6 +626,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             restored += 1
         if restored:
             self._set_status(tr("status.queue_restored", count=restored))
+            self._show_resume_card(restored)  # „Nastavi kasnije" ili zatvaranje usred reda: jednim klikom dalje
         self._update_controls()
 
     def _save_queue(self) -> None:
@@ -827,7 +839,8 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             return
         self._probing.update(urls)
         job = ProbeJob(self._next_probe_id, urls, self._output_dir, self._probe_fn, access, auto_start, preset,
-                       {"whole_playlist": self._whole_playlist, **self._cookie_source()})
+                       {"whole_playlist": self._whole_playlist, "no_pacing": not self._pacer.enabled,
+                        **self._cookie_source()})
         self._next_probe_id += 1
         job.probed.connect(self._on_probed)
         job.failed.connect(self._on_probe_failed)
@@ -952,11 +965,13 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             # Izbor je u scheduler.pick_next (bez Qt-a, s vlastitim testovima); prozor samo pokreće izabrano.
             active = [job_item for job_item in map(self._queue.get, self._download_jobs) if job_item is not None]
             item, self._manual = scheduler.pick_next(self._manual, self._queue.items(), self._queue.get, active,
-                                                     self._name_template, self._running, self._retry_pending)
+                                                     self._name_template, self._running, self._retry_pending,
+                                                     self._pace_held)
             if item is None:
-                if not self._download_jobs:
-                    self._running = False
+                if not self._download_jobs and not self._pace_waiting():
+                    self._running = False  # red ne staje dok stavke čekaju samo pauzu zaštite od blokade
                 break
+            self._note_paced_start(item)
             item.status = ItemStatus.ACTIVE
             item.message = ""
             if not self._batch:
@@ -970,6 +985,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
             started.append(job)
         self._update_controls()
         self._update_taskbar()
+        self._schedule_pace()
         for job in started:
             job.start()
 
@@ -993,6 +1009,8 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         item = self._queue.get(item_id)
         if item_id in self._batch:
             self._batch[item_id] = 1.0
+        if item is not None and self._pause_on_block(item, result):
+            return  # sajt traži pauzu: stavka čeka i sama nastavlja (gui_pause.py)
         if item is not None and self._auto_retry(item, result):
             return
         if item is not None and self._retry_with_id_name(item, result):
@@ -1012,13 +1030,16 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
                 self._report_save(store.append_history(item, store.history_path(self._data_dir),
                                                        self._sizes.get(item_id)))
                 if not result.already_existed:
-                    self._support.count_download()
+                    self._support.count_download(time.time())
                     self._record_achievements(item, result)
+                    self._record_recap(item)
             if item_id in self._remove_when_done:
                 self._remove_when_done.discard(item_id)
                 self._remove_item(item_id)
             else:
                 self._refresh_row(item)
+            if result.status != ItemStatus.CANCELLED:
+                self._note_paced_finish(item)  # razmak ili predah prije sljedećeg sa istog sajta
         self._save_queue()
         self._start_next()
         self._check_batch_done()
@@ -1041,7 +1062,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         if not self._batch or self._download_jobs or self._running:
             return
         items = [self._queue.get(item_id) for item_id in self._batch]
-        if any(item is not None and item.status == ItemStatus.WAITING and item.message == MESSAGE_RETRY
+        if any(item is not None and item.status == ItemStatus.WAITING and item.message in (MESSAGE_RETRY, MESSAGE_PAUSE)
                for item in items):
             return
         done = [item for item in items if item is not None and item.status == ItemStatus.DONE]
@@ -1056,6 +1077,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
         if not stopped:
             for ok, total in playlists.values():
                 self._achievements.record_playlist(ok, total)
+            self._note_batch_success(done, items)  # „Gotovo: 50/50 videa" (gui_pause.py)
         self._batch.clear()
         self._taskbar.clear()
         if stopped or not self._notify_done or not (done or failed):
@@ -1196,6 +1218,7 @@ class MainWindow(SupportMixin, ClipboardMixin, UpdatesMixin, QMainWindow):
                 item.auto_retries = MAX_AUTO_RETRIES  # zaustavljeno ručno: bez daljeg ponavljanja
                 self._refresh_row(item)
         self._cancel_probes()
+        self._stop_pauses()
         self._batch_stopped = True  # ručno zaustavljeno: bez obavještenja „sve je gotovo"
         for job in list(self._convert_jobs.values()):
             job.cancel()  # i pretvaranje u MP3: „Zaustavi" znači zaustavi SVE što radi

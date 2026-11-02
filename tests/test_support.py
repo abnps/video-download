@@ -34,6 +34,66 @@ def wait_until(condition, timeout=30.0):  # Mac CI računar je spor; uspjeh ne �
     return condition()
 
 
+class SupportNoteTest(unittest.TestCase):
+    """Red o podršci na kartici (Ahmed 2.11.2026): jednom sedmično, dvaput uz čestu upotrebu, 90 dana tišine."""
+
+    def state(self, downloads=20):
+        return support.SupportState(downloads=downloads)
+
+    def test_not_before_ten_downloads(self):
+        self.assertFalse(self.state(9).note_allowed(100 * DAY))
+        self.assertTrue(self.state(10).note_allowed(100 * DAY))
+
+    def test_once_a_week_for_occasional_use(self):
+        state, now = self.state(), 100 * DAY
+        state.note_shown(now)
+        self.assertFalse(state.note_allowed(now + 6 * DAY))
+        self.assertTrue(state.note_allowed(now + 7 * DAY))
+
+    def test_twice_a_week_when_used_on_three_days(self):
+        state, now = self.state(), 100 * DAY
+        for day in (0, 1, 2):
+            state.count_download(now + day * DAY)
+        state.note_shown(now + 2 * DAY)
+        self.assertTrue(state.frequent(now + 2 * DAY))
+        self.assertFalse(state.note_allowed(now + 5 * DAY))
+        self.assertTrue(state.note_allowed(now + 5.5 * DAY))
+
+    def test_thirty_downloads_in_a_week_is_frequent_too(self):
+        state, now = self.state(), 100 * DAY
+        for minute in range(29):
+            state.count_download(now + minute * 60)
+        self.assertFalse(state.frequent(now + DAY))
+        state.count_download(now + 30 * 60)
+        self.assertTrue(state.frequent(now + DAY))
+        self.assertFalse(state.frequent(now + 8 * DAY))  # stara preuzimanja se ne računaju
+
+    def test_already_supported_means_ninety_quiet_days(self):
+        state, now = self.state(), 100 * DAY
+        state.already_supported(now)
+        self.assertFalse(state.note_allowed(now + 89 * DAY))
+        self.assertTrue(state.note_allowed(now + 90 * DAY))
+
+    def test_card_and_weekly_dialog_share_one_deadline(self):
+        state, now = self.state(), 100 * DAY
+        state.dialog_shown(now)
+        self.assertFalse(state.note_allowed(now + 3 * DAY))
+        state.note_shown(now + 7 * DAY)
+        self.assertFalse(state.should_show_dialog(now + 10 * DAY, busy=False))
+        self.assertTrue(state.should_show_dialog(now + 14 * DAY, busy=False))
+
+    def test_recent_survives_saving_and_bad_values(self):
+        state = self.state()
+        state.count_download(1_800_000_000.0)
+        self.assertEqual(support.SupportState.recent_from_json(state.recent_json()), [1_800_000_000.0])
+        for bad in ("", "x", "{}", '["a", true, -1, 1e300]', None):
+            self.assertEqual(support.SupportState.recent_from_json(bad), [])
+        many = support.SupportState()
+        for i in range(100):
+            many.count_download(float(i + 1))
+        self.assertEqual(len(many.recent), support.RECENT_MAX)
+
+
 class SupportStateTest(unittest.TestCase):
     def test_banner_every_ten_new_downloads_and_later_postpones(self):
         state = support.SupportState()

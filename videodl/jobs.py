@@ -32,6 +32,8 @@ class QueueItem:
     custom_format: bool = False
     # Koliko puta je aplikacija sama ponovila pokušaj poslije pucanja veze.
     auto_retries: int = 0
+    # Koliko puta je sajt blokirao ovu stavku (429, „nisi bot"), pa se čekalo (pacing.py).
+    block_waits: int = 0
     # Samo dio videa (od, do) u sekundama; None = cijeli video.
     section: tuple[float, float] | None = None
     # Postojeći fajl istog imena pripada drugom videu (šablon bez ID-a): ovaj ide s ID-om u imenu.

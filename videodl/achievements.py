@@ -18,7 +18,7 @@ BADGES = (
     ("audio", "🎵"), ("playlist", "📚"), ("clip", "✂️"), ("uhd", "🔭"), ("browser", "🧩"), ("car", "🚗"),
     ("subtitles", "💬"), ("marathon", "🎬"), ("parallel", "⚡"), ("comeback", "🔁"), ("night", "🦉"),
     ("sites5", "🌍"), ("sites25", "🗺️"), ("gb1", "💾"), ("gb10", "💽"), ("gb100", "🗄️"),
-    ("streak7", "📅"), ("anniversary", "🎂"),
+    ("streak7", "📅"), ("anniversary", "🎂"), ("patient", "⏳"),
 )
 ICONS = dict(BADGES)
 PLAYLIST_MIN = 10  # „Kolekcionar": cijela lista od bar toliko videa
@@ -115,6 +115,11 @@ class AchievementState:
         if key not in self.earned:
             self.earned[key] = now
             self.pending.append(key)
+
+    def earn(self, key: str, now: float | None = None) -> None:
+        """Dostignuće koje ne dolazi iz jednog preuzimanja (npr. „Strpljivi": pauza odbrojana do kraja)."""
+        if key in ICONS:
+            self._earn(key, time.time() if now is None else now)
 
     def record(self, download: Download, now: float | None = None) -> None:
         now = time.time() if now is None else now

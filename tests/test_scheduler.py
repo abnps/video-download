@@ -14,9 +14,18 @@ class PickNextTest(unittest.TestCase):
         self.b = self.queue.add("https://v/b", "B", "best", "C:/x", video_id="b")
         self.c = self.queue.add("https://v/c", "C", "best", "C:/x", video_id="c")
 
-    def pick(self, manual=(), active=(), auto=False, retry=lambda item: False):
+    def pick(self, manual=(), active=(), auto=False, retry=lambda item: False, held=None):
         return scheduler.pick_next(list(manual), self.queue.items(), self.queue.get, list(active),
-                                   DEFAULT_NAME_TEMPLATE, auto, retry)
+                                   DEFAULT_NAME_TEMPLATE, auto, retry, held)
+
+    def test_held_by_a_pause_waits_without_losing_its_place(self):
+        held = lambda item: item is self.a  # noqa: E731 - npr. YouTube upravo pravi predah
+        item, rest = self.pick(manual=[self.a.id, self.b.id], held=held)
+        self.assertIs(item, self.b)
+        self.assertEqual(rest, [self.a.id])  # ručna ostaje na spisku i kreće poslije pauze
+        item, _ = self.pick(auto=True, held=held)
+        self.assertIs(item, self.b)
+        self.assertEqual(self.pick(manual=[self.a.id], held=held), (None, [self.a.id]))
 
     def test_manual_first_in_order(self):
         item, rest = self.pick(manual=[self.c.id, self.a.id], auto=True)

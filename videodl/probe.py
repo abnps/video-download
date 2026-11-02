@@ -8,6 +8,7 @@ from .browser import Cookie, cookie_options
 from .ytdl import (
     LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media, is_web_url,
 )
+from .pacing import request_sleep
 from .ytdlp_update import ensure_ready
 
 # yt-dlp se uvozi tek pri prvom čitanju linka (_ydl), da pokretanje programa ne čeka. Testovi mogu ovo
@@ -74,11 +75,13 @@ class ProbeResult:
 def probe(url: str, extract: Extractor | None = None, logger=None,
           http_headers: dict[str, str] | None = None, cookies: tuple[Cookie, ...] = (),
           whole_playlist: bool = False, cookie_browser: str | None = None,
-          cookie_txt: str | None = None) -> ProbeResult:
-    """`whole_playlist`: link videa koji je u plejlisti (watch?v=…&list=…) daje cijelu plejlistu."""
+          cookie_txt: str | None = None, no_pacing: bool = False) -> ProbeResult:
+    """`whole_playlist`: link videa koji je u plejlisti (watch?v=…&list=…) daje cijelu plejlistu.
+    `no_pacing`: Postavke → „Zaštita od blokade" isključena (bez razmaka pri čitanju plejliste)."""
     if is_obviously_not_media(url) or not is_web_url(url):
         raise NotMediaError(url)  # .exe, .zip, .pdf…, ili link koji nije http(s): ne treba ni pitati server
-    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist, cookie_browser, cookie_txt)
+    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist, cookie_browser, cookie_txt,
+                                         request_sleep(url, enabled=not no_pacing))
     info = extract(url)
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
@@ -147,10 +150,12 @@ def pick_thumbnail(info: dict) -> str | None:
 
 def _make_extractor(logger, http_headers: dict[str, str] | None, cookies: tuple[Cookie, ...],
                     whole_playlist: bool = False, cookie_browser: str | None = None,
-                    cookie_txt: str | None = None) -> Extractor:
+                    cookie_txt: str | None = None, sleep_requests: float = 0.0) -> Extractor:
     def extract(url: str) -> dict:
         opts = base_options(logger)
         opts["extract_flat"] = "in_playlist"
+        if sleep_requests:
+            opts["sleep_interval_requests"] = sleep_requests  # plejlista sa strogog sajta (pacing.py)
         if whole_playlist:
             opts["noplaylist"] = False
         if http_headers:

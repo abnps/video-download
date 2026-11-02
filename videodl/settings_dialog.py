@@ -8,7 +8,7 @@ Svaka promjena važi odmah; nema dugmeta „Sačuvaj".
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFormLayout, QFrame, QGroupBox, QHBoxLayout, QLabel,
-    QPushButton, QScrollArea, QVBoxLayout, QWidget,
+    QPushButton, QScrollArea, QTabWidget, QVBoxLayout, QWidget,
 )
 
 from . import theme
@@ -29,18 +29,10 @@ class SettingsDialog(QDialog):
         self.setWindowTitle(tr("settings.title"))
         self.setMinimumWidth(540)
         outer = QVBoxLayout(self)
-        # Grupe idu u prostor koji se skroluje: na nižem ekranu (laptop 768/900 px) prozor ostaje čitljiv, a
-        # „Zatvori" je uvijek vidljivo.
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(12)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll.setWidget(page)
-        outer.addWidget(scroll, 1)
+        # Grupe su u tabovima (Ahmed 2.11.2026): kraći prozor, sve se nađe bez skrolovanja. Svaki tab se ipak
+        # skroluje ako je ekran nizak (laptop 768 px), a „Zatvori" je uvijek vidljivo.
+        self.tabs = QTabWidget()
+        outer.addWidget(self.tabs, 1)
 
         # Preuzimanje
         download = QGroupBox(tr("settings.group_download"))
@@ -80,7 +72,7 @@ class SettingsDialog(QDialog):
         hint.setWordWrap(True)
         hint.setObjectName("supportNote")
         download_box.addWidget(hint)
-        layout.addWidget(download)
+        self._add_tab(download)
 
         # Sadržaj uz video
         content = QGroupBox(tr("settings.group_content"))
@@ -104,7 +96,7 @@ class SettingsDialog(QDialog):
         self.split_chapters = self._check(box, "settings.split_chapters", window._split_chapters,
                                           lambda on: window._set_option("_split_chapters", on))
         self.split_chapters.setToolTip(tr("settings.split_chapters_tip"))
-        layout.addWidget(content)
+        self._add_tab(content)
 
         # Prijava na sajtove: kolačići iz browsera ili cookies.txt (za video iza prijave)
         login = QGroupBox(tr("settings.group_login"))
@@ -129,7 +121,7 @@ class SettingsDialog(QDialog):
         note.setWordWrap(True)
         note.setObjectName("supportNote")
         login_box.addWidget(note)
-        layout.addWidget(login)
+        self._add_tab(login)
 
         # Ponašanje
         behavior = QGroupBox(tr("settings.group_behavior"))
@@ -137,7 +129,17 @@ class SettingsDialog(QDialog):
         self.clipboard = self._check(box, "menu.watch_clipboard", window._watch_clipboard, window.set_watch_clipboard)
         self.notify = self._check(box, "menu.notify_done", window._notify_done,
                                   lambda on: window._set_option("_notify_done", on))
-        layout.addWidget(behavior)
+        # Zaštita od blokade i mjesečni pregled (Ahmed 2.11.2026): oboje uključeno dok se ne isključi.
+        self.pacing = self._check(box, "settings.pacing", window._pacer.enabled, self._change_pacing)
+        self.pacing.setToolTip(tr("settings.pacing_tip"))
+        # Dok je zaštita isključena, upozorenje ostaje vidljivo (Ahmed 2.11.2026).
+        self.pacing_note = QLabel(tr("settings.pacing_off_note"))
+        self.pacing_note.setObjectName("warning")
+        self.pacing_note.setWordWrap(True)
+        self.pacing_note.setVisible(not window._pacer.enabled)
+        box.addWidget(self.pacing_note)
+        self.recap = self._check(box, "settings.recap", window._recap_enabled, window.set_recap_enabled)
+        self._add_tab(behavior)
 
         # Izgled i jezik
         look = QGroupBox(tr("settings.group_look"))
@@ -154,7 +156,7 @@ class SettingsDialog(QDialog):
         self._select(self.language, get_language())
         self.language.currentIndexChanged.connect(self._change_language)
         form.addRow(_plain("menu.language"), self.language)
-        layout.addWidget(look)
+        self._add_tab(look)
 
         close = QPushButton(tr("settings.close"))
         close.setDefault(True)
@@ -164,11 +166,30 @@ class SettingsDialog(QDialog):
         buttons.addWidget(close)
         outer.addLayout(buttons)
         self._show_folder()
-        # Visina po sadržaju, ali najviše koliko ekran dozvoljava (ostatak se skroluje).
+        # Visina po najvišem tabu, ali najviše koliko ekran dozvoljava (ostatak se skroluje).
         screen = (window.screen() if window is not None else None) or QApplication.primaryScreen()
-        wanted = page.sizeHint().height() + close.sizeHint().height() + 48
+        pages = [self.tabs.widget(i).widget() for i in range(self.tabs.count())]
+        wanted = max(page.sizeHint().height() for page in pages) + self.tabs.tabBar().sizeHint().height()             + close.sizeHint().height() + 64
         available = screen.availableGeometry().height() - 60 if screen else wanted
-        self.resize(max(self.minimumWidth(), page.sizeHint().width() + 40), min(wanted, available))
+        width = max(page.sizeHint().width() for page in pages) + 48
+        self.resize(max(self.minimumWidth(), width), min(wanted, available))
+
+    def _add_tab(self, group: QGroupBox) -> None:
+        """Grupa postaje tab; naslov grupe je naziv taba (bez ponavljanja unutra)."""
+        title = group.title()
+        group.setTitle("")
+        group.setFlat(True)
+        page = QWidget()
+        box = QVBoxLayout(page)
+        box.setContentsMargins(4, 8, 4, 4)
+        box.addWidget(group)
+        box.addStretch(1)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setWidget(page)
+        self.tabs.addTab(scroll, title)
 
     @staticmethod
     def _select(combo: QComboBox, value) -> None:
@@ -198,6 +219,16 @@ class SettingsDialog(QDialog):
             self._window.set_cookie_source(choice or "", "")
         self.cookie_file.setText(self._window._cookie_txt)
         self.cookie_file.setVisible(bool(self._window._cookie_txt))
+
+    def _change_pacing(self, on: bool) -> None:
+        """Isključivanje zaštite od blokade traži potvrdu: YouTube tada može blokirati dalje preuzimanje."""
+        if not on and not self._window.confirm_pacing_off():
+            self.pacing.blockSignals(True)
+            self.pacing.setChecked(True)
+            self.pacing.blockSignals(False)
+            return
+        self._window.set_pacing(on)
+        self.pacing_note.setVisible(not on)
 
     def _show_folder(self) -> None:
         self.folder_label.setText(self._window.output_dir)

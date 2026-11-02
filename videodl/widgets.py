@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 
 from . import theme
 from .i18n import (
-    MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA, MESSAGE_RETRY,
+    MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA, MESSAGE_PAUSE, MESSAGE_RETRY,
     decimal, tr,
 )
 from .icons import icon
@@ -92,6 +92,8 @@ def display_message(message: str, friendly: bool = True) -> str:
         return tr("error.no_output")
     if message == MESSAGE_RETRY:
         return tr("row.retrying")
+    if message == MESSAGE_PAUSE:
+        return tr("row.paused")
     if message == MESSAGE_EXISTS:
         return tr("row.exists")
     return (friendly and friendly_error(message)) or message
@@ -556,7 +558,7 @@ class QueueRow(QFrame):
         self.play_button.setIcon(icon("play", theme.c("icon")))
         self.remove_button.setIcon(icon("close", theme.c("icon_soft")))
         if item.status == ItemStatus.WAITING:
-            self._set_status(tr("row.waiting"), "muted")
+            self._set_status(tr("row.paused") if item.message == MESSAGE_PAUSE else tr("row.waiting"), "muted")
             self._set_action("download-solid", theme.c("icon"), tr("row.download_tip"))
         elif active:
             self._set_status(tr("row.starting"), "muted")

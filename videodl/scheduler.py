@@ -38,16 +38,18 @@ def output_key(item: QueueItem, name_template: str) -> tuple:
 
 def pick_next(manual: list[int], items: Iterable[QueueItem], get: Callable[[int], QueueItem | None],
               active: Iterable[QueueItem], name_template: str, auto: bool,
-              retry_pending: Callable[[QueueItem], bool]) -> tuple[QueueItem | None, list[int]]:
+              retry_pending: Callable[[QueueItem], bool],
+              held: Callable[[QueueItem], bool] | None = None) -> tuple[QueueItem | None, list[int]]:
     """Sljedeća stavka za preuzimanje i novi spisak ručno pokrenutih.
 
     Ručno pokrenute (`manual`, redom) imaju prednost; ona koja bi pisala isti fajl kao posao u toku se odlaže
     (ostaje na početku spiska), a nevažeće (nema je, ne čeka, 18+ bez potvrde, rok za novi pokušaj) se izbacuju.
-    Kad ručnih nema, uz `auto` („Preuzmi sve") kreće prva stavka reda koja čeka i nije zauzeta. None = ništa."""
+    Kad ručnih nema, uz `auto` („Preuzmi sve") kreće prva stavka reda koja čeka i nije zauzeta. None = ništa.
+    `held`: stavka čeka pauzu zaštite od blokade (pacing.py); ručna ostaje na spisku i kreće kad pauza prođe."""
     busy = {output_key(item, name_template) for item in active}
 
     def free(item: QueueItem) -> bool:
-        return output_key(item, name_template) not in busy
+        return output_key(item, name_template) not in busy and not (held and held(item))
 
     remaining = list(manual)
     postponed = []
