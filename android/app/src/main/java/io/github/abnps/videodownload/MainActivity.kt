@@ -410,6 +410,21 @@ class MainActivity : ComponentActivity() {
             SupportDialog(downloadsDone, onPayPal = { openLink(Links.SUPPORT) }, onCard = { openLink(Links.CARD) },
                 onAlready = { Support.alreadySupported(downloadsDone) }) { supportOpen = false }
         }
+        // Mjesečni pregled (Ahmed 2.11.2026): prvo otvaranje u novom mjesecu, jednom po periodu, kad nema drugog prozora.
+        var recap by remember { mutableStateOf(Recap.due()) }
+        val recapShown = recap
+        if (recapShown != null && !supportOpen && badges.isEmpty() && !welcome.value && askAdultFor.value.isEmpty()) {
+            val line = remember(recapShown) {
+                val now = System.currentTimeMillis()
+                when {
+                    Support.snoozed(now) -> getString(R.string.pause_thanks)
+                    Support.noteAllowed(downloadsDone, now) -> { Support.noteShown(now); getString(R.string.pause_support_plain) }
+                    else -> null
+                }
+            }
+            LaunchedEffect(recapShown) { Recap.shown(recapShown.period) }
+            RecapDialog(recapShown, line, line != null && !Support.snoozed()) { recap = null }
+        }
         if (askAdultFor.value.isNotEmpty()) {
             AdultDialog(askAdultFor.value.size, onCancel = { askAdultFor.value = emptyList() }) {
                 askAdultFor.value.forEach { DownloadService.start(this@MainActivity, it.copy(adultOk = true)) }

@@ -94,6 +94,8 @@ fun DownloadsScreen(active: List<ActiveJob>, history: List<HistoryItem>, tab: In
             }
         }
         if (tab == 0) {
+            PauseCardView() // predah ili blokada sajta (zaštita od blokade, Ahmed 2.11.2026)
+            SuccessCardView() // „Gotovo: 50/50 videa"
             // Posljednja greška zamjenjuje „Ništa se ne preuzima" (bila je iscrtana preko tog teksta).
             if (active.isEmpty() && lastError != null) ErrorBanner(lastError, onCopyReport)
             else if (active.isEmpty()) Empty(stringResource(R.string.no_active))
@@ -167,6 +169,8 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
                         Text("${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                } else if (active.phase == Phase.PAUSED) {
+                    PausedLine(active) // „⏱ Pauza 4 s, čuva od blokade (YouTube)"
                 } else if (active.phase != Phase.QUEUED && active.phase != Phase.INTERRUPTED) {
                     AppProgressBar(null, BarPhase.WORK) // čitanje, spajanje, snimanje: traka klizi
                 }
@@ -179,6 +183,7 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
                     Phase.DONE -> R.string.phase_done
                     Phase.INTERRUPTED -> R.string.phase_interrupted
                     Phase.NEEDS_ADULT -> R.string.phase_needs_adult
+                    Phase.PAUSED -> R.string.phase_paused
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (active.phase == Phase.INTERRUPTED) Hint(stringResource(R.string.hint_retry)) {
                     TextButton(onClick = { onRetry(active.job) }) { Text(stringResource(R.string.retry)) }

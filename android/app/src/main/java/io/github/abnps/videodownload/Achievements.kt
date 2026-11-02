@@ -51,6 +51,7 @@ object Achievements {
             Badge("gb100", "🗄️", R.string.badge_gb100, R.string.badge_gb100_desc),
             Badge("streak7", "📅", R.string.badge_streak7, R.string.badge_streak7_desc),
             Badge("anniversary", "🎂", R.string.badge_anniversary, R.string.badge_anniversary_desc),
+            Badge("patient", "⏳", R.string.badge_patient, R.string.badge_patient_desc), // pauza odbrojana do kraja
         )
     private val byKey = BADGES.associateBy { it.key }
 

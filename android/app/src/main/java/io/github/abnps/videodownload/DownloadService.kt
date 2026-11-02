@@ -10,6 +10,7 @@ import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.IBinder
 import android.os.SystemClock
+import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -25,6 +26,10 @@ class DownloadService : Service() {
     private val cancelled: MutableSet<Long> = ConcurrentHashMap.newKeySet()
     @Volatile private var running: Long? = null
     private var pending = 0
+    // Grupa poslova dok usluga radi, za „Gotovo: 50/50 videa" (Ahmed 2.11.2026); mijenja ih samo radna nit.
+    private var batchDone = 0
+    private var batchOther = 0 // neuspjelo, prekinuto ili čeka potvrdu 18+
+    private var batchBytes = 0L
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -54,18 +59,23 @@ class DownloadService : Service() {
     private fun run(job: Job) {
         var waitsForAdult = false
         running = job.id
+        val family = Pacing.familyOf(job.url)
         val work = File(cacheDir, "preuzimanje-${job.id}-${System.nanoTime()}").apply { mkdirs() }
         try {
             if (job.id in cancelled) throw CancelledHere()
+            waitForPause(job) // razmak ili predah zaštite od blokade prije ovog posla (Pacing.kt)
+            Pacing.started(family)
             Downloads.lastError.value = null
             Downloads.update(job.id) { it.copy(phase = Phase.READING) }
             notify(progressNotification(job.title, null))
             // Kolačići Instagram prijave (ako postoji) idu u privremeni fajl u `work`, koji se briše na kraju.
             val cookies = SiteLogin.cookieFile(work, job.url)
-            val result = Python.getInstance().getModule("vd_core").callAttr(
-                "download", job.url, if (!job.isAudio) "video" else if (job.label == MP3_LABEL) "mp3" else "audio", work.absolutePath, Listener(job), job.height,
-                cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "", job.mute && !job.isAudio,
-            ).asList()
+            val result = downloadWithPauses(job, family) {
+                Python.getInstance().getModule("vd_core").callAttr(
+                    "download", job.url, if (!job.isAudio) "video" else if (job.label == MP3_LABEL) "mp3" else "audio", work.absolutePath, Listener(job), job.height,
+                    cookies, job.adultOk, if (job.subtitles && !job.isAudio) Links.language() else "", job.mute && !job.isAudio,
+                ).asList()
+            }
             val name = result[1].toString()
             val first = File(result[2].toString())
             val second = result[3].toString().takeIf { it.isNotEmpty() }?.let(::File)
@@ -138,11 +148,16 @@ class DownloadService : Service() {
                 adult = job.adult))
             Achievements.recordDownload(FinishedDownload(job.url, job.isAudio, job.hasClip, height, size,
                 job.subtitles && subtitleFiles.isNotEmpty(), job.duration, retried, job.playlistKey, job.playlistSize))
+            Support.countDownload()
+            Recap.record(job.url, size, job.duration)
+            batchDone++
+            batchBytes += size
             notifyFinished(getString(R.string.status_done, job.title), openIntent(uri, job.isAudio), shareIntent(uri, job.isAudio))
             // Kao na računaru: traka zazeleni, kratko pulsira, pa kartica nestane.
             Downloads.update(job.id) { it.copy(phase = Phase.DONE, fraction = 1f) }
             Thread.sleep(1100)
         } catch (error: Exception) {
+            batchOther++
             if (job.id in cancelled || error is CancelledHere || error is InterruptedException) {
                 notifyFinished(getString(R.string.status_cancelled), null)
             } else if ("ADULT_CONFIRM" in error.message.orEmpty()) {
@@ -162,12 +177,14 @@ class DownloadService : Service() {
             }
         } finally {
             work.deleteRecursively() // privremeni fajlovi nikad ne ostaju
+            if (job.id !in cancelled) Pacing.finished(family) // razmak ili predah prije sljedećeg s istog sajta
             cancelled -= job.id
             running = null
             if (!waitsForAdult) Downloads.remove(job.id)
             synchronized(this) {
                 pending--
                 if (pending == 0) {
+                    finishBatch()
                     stopForeground(STOP_FOREGROUND_REMOVE) // napredak nestaje; ostaje samo obavještenje o kraju
                     stopSelf()
                 }
@@ -176,6 +193,97 @@ class DownloadService : Service() {
     }
 
     private class CancelledHere : Exception()
+
+    /** Sajt blokira (429, „nisi bot"): čeka 5, 10 pa 15 min i pokušava ponovo; četvrti put je obična greška. */
+    private fun downloadWithPauses(job: Job, family: String?, call: () -> List<PyObject>): List<PyObject> {
+        var attempt = 0
+        while (true) {
+            try {
+                return call()
+            } catch (error: Exception) {
+                if (job.id in cancelled || family == null || !Pacing.isBlockError(error.message)) throw error
+                attempt++
+                Pacing.blocked(family, attempt) ?: throw error
+                waitForPause(job)
+                Downloads.update(job.id) { it.copy(phase = Phase.READING) }
+            }
+        }
+    }
+
+    /** Čeka pauzu zaštite od blokade za sajt ovog posla; kartica za predah i blokadu, tekst za kratak razmak. */
+    private fun waitForPause(job: Job) {
+        val family = Pacing.familyOf(job.url) ?: return
+        val total = Pacing.remaining(family)
+        if (total <= 0) return
+        val pause = Pacing.lastPause(family) ?: Pause(family, "gap", total)
+        val site = Pacing.NAMES[family] ?: family
+        val until = SystemClock.elapsedRealtime() + total
+        val card = if (pause.card) PauseCard(pause, until, supportLine(true), nextTip()) else null
+        Pacing.showCard(card)
+        Downloads.update(job.id) { it.copy(phase = Phase.PAUSED, pauseUntil = until, pauseSite = site) }
+        var shown = -1L
+        while (Pacing.remaining(family) > 0) {
+            if (job.id in cancelled) {
+                if (card != null && Pacing.card.value == card) Pacing.showCard(null)
+                throw CancelledHere()
+            }
+            val seconds = (Pacing.remaining(family) + 999) / 1000
+            if (seconds != shown) {
+                shown = seconds
+                val time = "%d:%02d".format(seconds / 60, seconds % 60)
+                val text = when (pause.kind) {
+                    "block" -> getString(R.string.pause_block_title, site, time)
+                    "break" -> getString(R.string.pause_break_title, site, time)
+                    else -> getString(R.string.pause_gap, seconds.toInt(), site)
+                }
+                notify(progressNotification(text, null))
+            }
+            Thread.sleep(250)
+        }
+        if (card != null) {
+            val natural = Pacing.card.value == card // „Nastavi odmah" sklanja karticu prije roka
+            Pacing.showCard(null)
+            if (natural) {
+                Achievements.recordSource("patient") // dostignuće „Strpljivi"
+                getSystemService(NotificationManager::class.java).notify(RESUME_NOTIFICATION_ID,
+                    Notification.Builder(this, VideoDownloadApp.CHANNEL_DOWNLOADS)
+                        .setSmallIcon(android.R.drawable.stat_sys_download)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.pause_resumed, site))
+                        .setAutoCancel(true).setTimeoutAfter(15_000).setContentIntent(appIntent()).build())
+            }
+        }
+    }
+
+    /** Red o podršci na kartici (Support.noteAllowed); null = bez reda. */
+    private fun supportLine(today: Boolean): String? {
+        val now = System.currentTimeMillis()
+        if (Support.snoozed(now)) return getString(R.string.pause_thanks)
+        if (!Support.noteAllowed(Achievements.downloadCount, now)) return null
+        Support.noteShown(now)
+        val (count, bytes) = Recap.today()
+        return if (today && count > 0) getString(R.string.pause_support_today, count, formatSize(bytes.toDouble()))
+        else getString(R.string.pause_support_plain)
+    }
+
+    private fun nextTip(): Int {
+        val prefs = getSharedPreferences("zastita", Context.MODE_PRIVATE)
+        val index = prefs.getInt("savjet", 0)
+        prefs.edit().putInt("savjet", (index + 1) % TIPS.size).apply()
+        return TIPS[index % TIPS.size]
+    }
+
+    /** Kraj grupe: „Gotovo: 50/50 videa" ako je bar 50 uspjelo, a ništa nije palo ni prekinuto. */
+    private fun finishBatch() {
+        if (batchDone >= SUCCESS_MIN && batchOther == 0) {
+            val line = supportLine(false)
+            Downloads.success.value = SuccessCard(batchDone, batchDone, batchBytes, line, line != null && !Support.snoozed())
+            notifyFinished(getString(R.string.success_title, batchDone, batchDone, formatSize(batchBytes.toDouble())), null)
+        }
+        batchDone = 0
+        batchOther = 0
+        batchBytes = 0
+    }
 
     /** 150 → „2.30", 3723 → „1.02.03" (kao section_label na računaru: dvotačka nije dozvoljena u imenu fajla). */
     private fun clipLabel(seconds: Int): String {
@@ -288,6 +396,9 @@ class DownloadService : Service() {
         const val MP3_LABEL = "MP3"
         private const val NOTIFICATION_ID = 1
         private const val DONE_NOTIFICATION_ID = 2
+        private const val RESUME_NOTIFICATION_ID = 3
+        private const val SUCCESS_MIN = 50
+        private val TIPS = intArrayOf(R.string.tip_1, R.string.tip_2, R.string.tip_3, R.string.tip_4, R.string.tip_5, R.string.tip_6)
         private const val EXTRA_JOB = "job"
         private const val EXTRA_ID = "id"
         private const val ACTION_CANCEL = "cancel"

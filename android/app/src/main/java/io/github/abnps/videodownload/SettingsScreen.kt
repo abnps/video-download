@@ -128,6 +128,34 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 info = stringResource(R.string.info_mute_next)) {
                 Switch(checked = muteNext, onCheckedChange = { toggleMute() })
             }
+            GroupDivider()
+            // Zaštita od blokade (Ahmed 2.11.2026): isključivanje traži potvrdu, a dok je isključena, piše upozorenje.
+            var pacing by remember { mutableStateOf(Pacing.enabled) }
+            var askPacingOff by remember { mutableStateOf(false) }
+            val togglePacing = { if (pacing) askPacingOff = true else { pacing = true; Pacing.setEnabled(context, true) } }
+            GroupRow(OneUi.Orange, R.drawable.ic_download, stringResource(R.string.pacing_title),
+                stringResource(if (pacing) R.string.pacing_on else R.string.pacing_off), onClick = togglePacing,
+                info = stringResource(R.string.info_pacing)) {
+                Switch(checked = pacing, onCheckedChange = { togglePacing() })
+            }
+            if (askPacingOff) {
+                AlertDialog(onDismissRequest = { askPacingOff = false },
+                    title = { Text(stringResource(R.string.pacing_off_title)) },
+                    text = { Text(stringResource(R.string.pacing_off_text)) },
+                    confirmButton = { TextButton(onClick = { askPacingOff = false }) { Text(stringResource(R.string.pacing_off_no)) } },
+                    dismissButton = {
+                        TextButton(onClick = { askPacingOff = false; pacing = false; Pacing.setEnabled(context, false) }) {
+                            Text(stringResource(R.string.pacing_off_yes))
+                        }
+                    })
+            }
+            GroupDivider()
+            var recap by remember { mutableStateOf(Recap.enabled) }
+            val toggleRecap = { recap = !recap; Recap.setEnabled(context, recap) }
+            GroupRow(OneUi.Teal, R.drawable.ic_heart, stringResource(R.string.recap_setting),
+                stringResource(if (recap) R.string.recap_setting_on else R.string.recap_setting_off), onClick = toggleRecap) {
+                Switch(checked = recap, onCheckedChange = { toggleRecap() })
+            }
         }
         SettingsGroup(stringResource(R.string.settings_accounts), stringResource(R.string.settings_accounts_note)) {
             LoginSite.entries.forEachIndexed { index, site ->

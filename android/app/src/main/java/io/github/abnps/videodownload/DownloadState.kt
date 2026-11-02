@@ -51,10 +51,15 @@ data class Job(
     }
 }
 
-enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, SAVING, DONE, INTERRUPTED, NEEDS_ADULT }
+enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, SAVING, DONE, INTERRUPTED, NEEDS_ADULT, PAUSED }
 
 data class ActiveJob(val job: Job, val phase: Phase, val fraction: Float? = null, val done: Long = 0, val total: Long = 0,
-                     val speed: Double = 0.0, val eta: Long = -1, val audioPart: Boolean = false)
+                     val speed: Double = 0.0, val eta: Long = -1, val audioPart: Boolean = false,
+                     // PAUSED: zaštita od blokade čeka do `pauseUntil` (elapsedRealtime) za sajt `pauseSite` (Pacing.kt)
+                     val pauseUntil: Long = 0, val pauseSite: String = "")
+
+/** „Gotovo: 50/50 videa, 6,1 GB ✓" (Ahmed 2.11.2026): grupa od bar 50 preuzimanja bez ijedne greške. */
+data class SuccessCard(val done: Int, val total: Int, val bytes: Long, val support: String?, val offerSupport: Boolean)
 
 /** Šta usluga za preuzimanje trenutno radi; ekrani samo prikazuju. */
 object Downloads {
@@ -64,6 +69,9 @@ object Downloads {
 
     /** Posljednja greška (za poruku i „Kopiraj izvještaj"); null kad je sve u redu. */
     val lastError = MutableStateFlow<String?>(null)
+
+    /** Kartica uspjeha na ekranu Preuzimanja; null = ništa. */
+    val success = MutableStateFlow<SuccessCard?>(null)
 
     /** Poslovi iz ugašenog procesa ostaju vidljivi za ponovni pokušaj, bez automatskog preuzimanja. */
     fun load(context: Context) {

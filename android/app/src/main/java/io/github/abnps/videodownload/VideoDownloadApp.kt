@@ -14,6 +14,8 @@ class VideoDownloadApp : Application() {
         History.load(this)
         Achievements.load(this) // poslije istorije: prvi put broji dosadašnja preuzimanja
         Support.load(this)
+        Pacing.load(this) // zaštita od blokade (Ahmed 2.11.2026)
+        Recap.load(this) // mjesečni pregled
         ThemeState.load(this)
         Downloads.load(this)
         runCatching { Python.getInstance().getModule("vd_core").callAttr("clean_diagnostics", cacheDir.absolutePath) }
