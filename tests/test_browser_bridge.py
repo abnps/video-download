@@ -5,6 +5,8 @@ import io
 import json
 import re
 import os
+import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -208,6 +210,25 @@ class NativeHostTest(unittest.TestCase):
         stream = io.BytesIO((native_host.MAX_MESSAGE_BYTES + 1).to_bytes(4, "little"))
         with self.assertRaises(ValueError):
             native_host.read_message(stream)
+
+    def test_running_or_unknown_process_is_not_gone(self):
+        for pid in (os.getpid(), None, True, 0, -5, "123"):
+            self.assertFalse(native_host.process_gone(pid), pid)
+
+    @unittest.skipUnless(sys.platform == "win32", "samo Windows čeka ~2 s na zatvoren lokalni port")
+    def test_bridge_left_by_ended_process_is_skipped_without_connecting(self):
+        # Program je pao ili je računar ugašen dok je radio: bridge.json ostaje, a /ping bi čekao ~2 s.
+        child = subprocess.Popen([sys.executable, "-c", "pass"])
+        child.wait()
+        self.assertTrue(native_host.process_gone(child.pid))
+        with tempfile.TemporaryDirectory() as tmp:
+            bridge_file = Path(tmp) / "bridge.json"
+            bridge_file.write_text(json.dumps({"port": 9, "token": "x", "pid": child.pid}), encoding="utf-8")
+            started = time.monotonic()
+            with mock.patch.object(native_host, "call_app", side_effect=AssertionError("ping")) as call:
+                self.assertIsNone(native_host.find_running_app(bridge_file))
+            call.assert_not_called()
+            self.assertLess(time.monotonic() - started, 1.0)
 
     def test_add_goes_to_running_app_without_launch(self):
         from videodl.i18n import set_language

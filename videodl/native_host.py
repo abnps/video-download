@@ -97,9 +97,42 @@ def call_app(bridge: dict, method: str, path: str, payload: dict | None = None,
         connection.close()
 
 
+PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+STILL_ACTIVE = 259
+ERROR_INVALID_PARAMETER = 87  # OpenProcess: proces s tim brojem ne postoji
+
+
+def process_gone(pid) -> bool:
+    """Windows: proces iz bridge.json sigurno više ne radi (pad, gašenje računara dok je program radio).
+
+    Tada se /ping ne šalje: spajanje na zatvoren lokalni port na Windowsu čeka ~2 s, a to bi kočilo
+    popup dodatka i svako pokretanje programa. Na drugim sistemima (odbijanje je trenutno, a broj
+    procesa može biti iz drugog prostora, npr. snap) i kad nije sigurno, odlučuje /ping kao i do sada.
+    """
+    if sys.platform != "win32" or isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+        return False
+    import ctypes
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+    kernel32.GetExitCodeProcess.restype = wintypes.BOOL
+    kernel32.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+    kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
+    handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not handle:
+        return ctypes.get_last_error() == ERROR_INVALID_PARAMETER  # npr. tuđi proces (bez prava): ne zna se
+    try:
+        code = wintypes.DWORD()
+        return bool(kernel32.GetExitCodeProcess(handle, ctypes.byref(code))) and code.value != STILL_ACTIVE
+    finally:
+        kernel32.CloseHandle(handle)
+
+
 def find_running_app(path: Path | None = None) -> dict | None:
     bridge = read_bridge(path)
-    if bridge is None:
+    if bridge is None or process_gone(bridge.get("pid")):
         return None
     try:
         status, data = call_app(bridge, "GET", "/ping", timeout=2.0)

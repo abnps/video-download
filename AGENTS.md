@@ -19,6 +19,27 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - `00_plan/plan_projekta.md` je izvor istine za faze, Definition of Done i exit
   gate-ove. Faza se ne proglašava završenom bez dokaza ili Ahmedovog izuzetka.
 
+## Stanje 7.11.2026 (poslije izdanja 1.0.7) — čitati prije starijih zapisa ispod
+
+- Kanonski radni folder: `C:\Video Downloader\Projekat-podrska`, grana `main`. Glavni repo `Projekat\` stoji na
+  staroj, već spojenoj grani `browser-host-novo-ime` i ne koristi se za novi rad. Nove izmjene idu u zasebnu
+  granu i radnu kopiju `C:\Video Downloader\Build\wt-*`; commit, push i objava tek na Ahmedovu riječ.
+- 1.0.7 je objavljen 2.11.2026 na svim kanalima: GitHub Latest (Windows, Mac i Linux potpisani, Android
+  versionCode 19), sajt i Microsoft Store (Submission 7; `tools/check_store_browser_link.py` prolazi na 1.0.7.0,
+  provjereno 7.11.2026). Dodatak za browser je 1.0.4 (Edge i Firefox, provjereno 7.11.2026). winget: PR #456435
+  (nov paket, 1.0.4) prošao je validaciju i čeka moderatore; poslije spajanja ide PR za novu verziju i `LIVE = True`.
+- Novo u 1.0.7 (logika bez Qt-a, s testovima): `videodl/pacing.py` (razmaci i predasi za stroge sajtove; blokada
+  429 / „nisi bot" → stavka čeka 5/10/15 min i sama nastavlja; poslije blokade 7 dana opreznije), `videodl/recap.py`
+  (mjesečni pregled, samo brojke, lokalno) i pravila poruke o podršci u `videodl/support.py` (najviše jednom
+  sedmično, dvaput sedmično uz čestu upotrebu, „Već sam podržao" = 90 dana tišine). Prikaz: `videodl/gui_pause.py`
+  (PauseMixin: kartica pauze, nastavak reda, „Gotovo: 50/50"), `videodl/recap_dialog.py`; Android `Pacing.kt`,
+  `Recap.kt`, `PauseUi.kt`. Isključivanje zaštite od blokade traži potvrdu s upozorenjem (Ahmed 2.11.2026).
+- Build: `tools/build_release.py` traži Node 24.14.1 (`tools/build-lock.json`), a globalni Node na računaru je
+  noviji; prije builda staviti `C:\Video Downloader\Build\node-24.14.1\node-v24.14.1-win-x64` na početak PATH-a.
+- Pripremljeno za 1.0.8, nije spojeno: grana `postavke-izgled` (novi izgled Postavki, `Build\wt-108`) i grana
+  `pregled-1.0.8` (ispravke iz pregleda 7.11.2026, `Build\wt-pregled`). Grana `brojac-posjeta` (brojač posjeta
+  sajta, 28.10.2026) nije spojena i čeka Ahmedovu odluku.
+
 ## Nastavak rada 27.10.2026
 
 - Kanonski radni folder je `C:\Video Downloader\Projekat-podrska`, grana `main`. Prema Ahmedovoj
