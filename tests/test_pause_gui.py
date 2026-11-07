@@ -286,8 +286,11 @@ class PauseWindowTest(unittest.TestCase):
         dialog = SettingsDialog(window, RATE_CHOICES, PARALLEL_CHOICES, NAME_TEMPLATES)
         self.addCleanup(dialog.deleteLater)
         self.assertTrue(dialog.pacing.isChecked() and dialog.recap.isChecked())
-        tabs = [dialog.tabs.tabText(i) for i in range(dialog.tabs.count())]
-        self.assertEqual(tabs, ["Preuzimanje", "Uz video", "Prijava na sajtove", "Ponašanje", "Izgled i jezik"])
+        pages = [dialog.nav.item(i).text().split("   ", 1)[1] for i in range(dialog.nav.count())]
+        self.assertEqual(pages, ["Preuzimanje", "Uz video", "Prijava na sajtove", "Ponašanje", "Izgled i jezik"])
+        self.assertEqual(dialog.pages.count(), 5)
+        self.assertEqual(dialog.language.accessibleName(), "Jezik")  # čitač ekrana zna šta bira
+        self.assertGreaterEqual(dialog.nav.width(), 210)
         self.assertTrue(dialog.pacing_note.isHidden())
         with mock.patch.object(window, "confirm_pacing_off", return_value=False) as ask:
             dialog.pacing.setChecked(False)  # upozorenje → „Ostavi uključeno"
