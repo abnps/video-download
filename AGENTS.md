@@ -36,8 +36,8 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `Recap.kt`, `PauseUi.kt`. Isključivanje zaštite od blokade traži potvrdu s upozorenjem (Ahmed 2.11.2026).
 - Build: `tools/build_release.py` traži Node 24.14.1 (`tools/build-lock.json`), a globalni Node na računaru je
   noviji; prije builda staviti `C:\Video Downloader\Build\node-24.14.1\node-v24.14.1-win-x64` na početak PATH-a.
-- Pripremljeno za 1.0.8, nije spojeno: grana `postavke-izgled` (novi izgled Postavki, `Build\wt-108`) i grana
-  `pregled-1.0.8` (ispravke iz pregleda 7.11.2026, `Build\wt-pregled`). Grana `brojac-posjeta` (brojač posjeta
+- Za 1.0.8 spojeno u main 7.11.2026 (još nije objavljeno): novi izgled Postavki (grana `postavke-izgled`) i
+  ispravke iz pregleda 7.11.2026 (grana `pregled-1.0.8`). Grana `brojac-posjeta` (brojač posjeta
   sajta, 28.10.2026) nije spojena i čeka Ahmedovu odluku.
 
 ## Nastavak rada 27.10.2026
