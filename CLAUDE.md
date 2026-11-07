@@ -7,7 +7,8 @@ komentarima u kodu. Ovaj fajl se učitava automatski; vault samo ako ga agent
 pročita.
 
 Projekat živi u `C:\Video Downloader\Projekat` (od 26.9.2026; ranije u OneDrive-u pod
-`PROJECT A`). Nadređeni `CLAUDE.md` iz `PROJECT A` se odavde NE učitava sam, zato ga pročitaj:
+`PROJECT A`); radna kopija grane `main` je `C:\Video Downloader\Projekat-podrska` (vidi „Stanje
+7.11.2026" u `AGENTS.md`). Nadređeni `CLAUDE.md` iz `PROJECT A` se odavde NE učitava sam, zato ga pročitaj:
 globalna pravila su u `C:/Users/ahmed/OneDrive/Прилози/Документи/AHMED/PROJECT A/AGENTS.md`
 (povezivanje Obsidian vaulta), vault je `C:/Users/ahmed/OneDrive/AHMED STUF/Ahmed Stuf`.
 
