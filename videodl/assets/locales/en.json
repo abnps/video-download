@@ -411,5 +411,16 @@
  "settings.desc.pacing": "Short pauses between downloads from the same site, so the site doesn’t block you.",
  "settings.desc.recap": "A recap of last month (numbers only) the first time you start the app in a month.",
  "settings.desc.theme": "Light, dark or like the system.",
- "settings.desc.language": "The language of the whole app."
+ "settings.desc.language": "The language of the whole app.",
+ "now.title": "Downloading now",
+ "now.queue": "{waiting} in queue",
+ "now.phase.video": "Video",
+ "now.phase.audio": "Audio",
+ "now.phase.merge": "Merging",
+ "now.phase.convert": "Processing",
+ "now.speed": "Speed",
+ "now.eta": "Time left",
+ "status.pacing_on": "Block protection on",
+ "status.pacing_off": "Block protection off",
+ "status.today": "Today: {count} · {size}"
 }

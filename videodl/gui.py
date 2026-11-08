@@ -42,7 +42,8 @@ from .presets import (
 from .probe import ProbeResult, probe
 from . import achievements, convert, diagnostics, release_signing, runtime, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
-from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, set_state
+from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, format_size, set_state
+from .now_panel import BloomBackground, NowPanel
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
     AUDIO_EXTENSIONS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog,
@@ -392,6 +393,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.warning_label.setVisible(bool(missing))
         self.drop_zone.retranslate()
         self.filter_bar.retranslate()
+        self.now_panel.retranslate()
         self._update_folder_label()
         for item in self._queue.items():
             self._refresh_row(item)
@@ -403,11 +405,12 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.retranslate_ui()
 
     def _build_ui(self) -> None:
-        central = QWidget()
+        # Izgled „Sada i sljedeće" (1.0.9): pozadina kao na sajtu, kartice sa zaobljenim uglovima.
+        central = BloomBackground()
         central.setObjectName("central")
         layout = QVBoxLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setContentsMargins(12, 10, 12, 4)
+        layout.setSpacing(8)
 
         toolbar = QFrame()
         toolbar.setObjectName("toolbar")
@@ -416,7 +419,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         bar.setSpacing(8)
         self.paste_button = QPushButton()
         self.paste_button.setObjectName("pasteButton")
-        self.paste_button.setIcon(icon("plus"))
+        self.paste_button.setIcon(icon("plus", theme.c("accent")))
         self.paste_button.setIconSize(QSize(14, 14))
         self.paste_button.clicked.connect(self._paste_from_clipboard)
         bar.addWidget(self.paste_button)
@@ -486,6 +489,9 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.support_banner.hide()
         layout.addWidget(self.support_banner)
         self._build_pause_card(layout)
+        self.now_panel = NowPanel()  # „Sada preuzima": video koji se upravo preuzima
+        self.now_panel.stop_clicked.connect(self._on_row_action)
+        layout.addWidget(self.now_panel)
 
         self.filter_bar = FilterBar()
         self.filter_bar.changed.connect(lambda _key: self._update_controls())
@@ -507,11 +513,21 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.rows_layout.addStretch(1)
         self.scroll.setWidget(rows)
         self.stack.addWidget(self.scroll)
-        layout.addWidget(self.stack, 1)
+        list_card = QFrame()  # „Sljedeće": red u kartici
+        list_card.setObjectName("listCard")
+        card_box = QVBoxLayout(list_card)
+        card_box.setContentsMargins(1, 1, 1, 1)
+        card_box.addWidget(self.stack)
+        layout.addWidget(list_card, 1)
         self.setCentralWidget(central)
 
+        self.shield_label = QLabel()  # stanje zaštite od blokade (pacing.py)
+        self.shield_label.setObjectName("shieldLabel")
+        self.statusBar().addWidget(self.shield_label)
         self.status_label = QLabel()
         self.statusBar().addWidget(self.status_label, 1)
+        self.today_label = QLabel()  # danas preuzeto (recap.py, samo lokalno)
+        self.statusBar().addPermanentWidget(self.today_label)
         self.summary_label = QLabel()
         self.statusBar().addPermanentWidget(self.summary_label)
         self.folder_label = QLabel()
@@ -997,6 +1013,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
             return
         audio = progress.label == "progress.audio" or get_preset(item.preset_key).is_audio
         row.show_progress(format_progress(progress), progress.fraction, "audio" if audio else "video")
+        self.now_panel.update_progress(item_id, progress)
         if progress.fraction is not None and item_id in self._batch:
             self._batch[item_id] = progress.fraction
             self._update_taskbar()
@@ -1447,6 +1464,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         row, item = self._rows.get(item_id), self._queue.get(item_id)
         if row is not None:
             row.thumbnail.set_pixmap(adult_thumbnail(pixmap) if item is not None and item.adult else pixmap)
+            self.now_panel.set_pixmap(item_id, row.thumbnail._pixmap)
 
     def _confirm_adult(self, items) -> bool:
         """Sadržaj 18+ kreće tek uz potvrdu, pri svakom preuzimanju. True = sve iz `items` smije krenuti."""
@@ -1520,6 +1538,24 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         if failed:
             parts.append(tr("summary.failed", count=failed))
         self.summary_label.setText(" · ".join(parts))
+        self._update_now_panel(items, waiting)
+
+    def _update_now_panel(self, items, waiting: int) -> None:
+        """Kartica „Sada preuzima" (prvi aktivni video u redu) i statusna traka: zaštita od blokade, danas."""
+        active = next((item for item in items if item.status == ItemStatus.ACTIVE), None)
+        if active is None:
+            self.now_panel.clear()
+        else:
+            row = self._rows.get(active.id)
+            pixmap = row.thumbnail._pixmap if row is not None else None
+            self.now_panel.show_item(active, pixmap, waiting)
+            if row is not None and self.filter_bar.current in ("all", "active"):
+                row.setVisible(False)  # isti video je gore u kartici; lista ispod je „Sljedeće"
+        on = self._pacer.enabled
+        self.shield_label.setText(("🛡 " if on else "⚠ ") + tr("status.pacing_on" if on else "status.pacing_off"))
+        set_state(self.shield_label, "" if on else "off")
+        count, size = self._recap.today(datetime.date.today())
+        self.today_label.setText(tr("status.today", count=count, size=format_size(size)) if count else "")
 
     def _set_status(self, text: str) -> None:
         self.status_label.setText(text)

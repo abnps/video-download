@@ -411,5 +411,16 @@
  "settings.desc.pacing": "Kurze Pausen zwischen Downloads von derselben Website, damit sie dich nicht sperrt.",
  "settings.desc.recap": "Ein Rückblick auf den letzten Monat (nur Zahlen) beim ersten Start im Monat.",
  "settings.desc.theme": "Hell, dunkel oder wie das System.",
- "settings.desc.language": "Die Sprache des ganzen Programms."
+ "settings.desc.language": "Die Sprache des ganzen Programms.",
+ "now.title": "Wird gerade geladen",
+ "now.queue": "{waiting} in der Warteschlange",
+ "now.phase.video": "Video",
+ "now.phase.audio": "Ton",
+ "now.phase.merge": "Zusammenfügen",
+ "now.phase.convert": "Verarbeitung",
+ "now.speed": "Geschwindigkeit",
+ "now.eta": "Noch",
+ "status.pacing_on": "Schutz vor Sperren an",
+ "status.pacing_off": "Schutz vor Sperren aus",
+ "status.today": "Heute: {count} · {size}"
 }
