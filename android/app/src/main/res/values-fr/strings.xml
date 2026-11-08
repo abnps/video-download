@@ -303,6 +303,7 @@
     <string name="recap_setting">Bilan mensuel</string>
     <string name="recap_setting_on">À la première ouverture de l’appli dans un nouveau mois</string>
     <string name="recap_setting_off">Désactivé</string>
+    <string name="info_recap">Une fois par mois, à la première ouverture de l’application, un court bilan du mois précédent : combien de vidéos, combien d’espace et de temps, et ton jour le plus actif. Uniquement des chiffres, calculés sur ton téléphone ; rien n’est envoyé nulle part. Il n’apparaît qu’à partir de 10 téléchargements, et en janvier tu reçois toute l’année précédente.</string>
     <string name="badge_patient">Patient</string>
     <string name="badge_patient_desc">Tu attends la fin d’une pause au lieu de l’écourter.</string>
     <string name="recap_title_month">Ton %1$s 🎬</string>

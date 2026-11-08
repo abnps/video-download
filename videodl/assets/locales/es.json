@@ -362,7 +362,6 @@
  "success.title": "Listo: {done}/{total} vídeos, {size} ✓",
  "success.text": "Todo se ha descargado sin un solo error.",
  "card.close": "Cerrar",
- "settings.pacing": "Protección contra bloqueos (pausas cortas entre descargas del mismo sitio)",
  "settings.pacing_tip": "YouTube, Instagram, TikTok, Facebook y X bloquean por un tiempo cuando se descargan muchos vídeos seguidos. Desde el 10.º vídeo el programa espera unos segundos entre descargas y hace un breve respiro cada 25. Si un sitio bloquea igualmente, el programa siempre espera y sigue solo.",
  "settings.recap": "Resumen mensual de descargas",
  "badge.patient": "Paciente",

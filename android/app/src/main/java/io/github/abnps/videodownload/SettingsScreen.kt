@@ -153,7 +153,8 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
             var recap by remember { mutableStateOf(Recap.enabled) }
             val toggleRecap = { recap = !recap; Recap.setEnabled(context, recap) }
             GroupRow(OneUi.Teal, R.drawable.ic_heart, stringResource(R.string.recap_setting),
-                stringResource(if (recap) R.string.recap_setting_on else R.string.recap_setting_off), onClick = toggleRecap) {
+                stringResource(if (recap) R.string.recap_setting_on else R.string.recap_setting_off), onClick = toggleRecap,
+                info = stringResource(R.string.info_recap)) {
                 Switch(checked = recap, onCheckedChange = { toggleRecap() })
             }
         }

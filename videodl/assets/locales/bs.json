@@ -362,7 +362,6 @@
  "success.title": "Gotovo: {done}/{total} videa, {size} ✓",
  "success.text": "Sve je preuzeto bez ijedne greške.",
  "card.close": "Zatvori",
- "settings.pacing": "Zaštita od blokade (kratke pauze između preuzimanja s istog sajta)",
  "settings.pacing_tip": "YouTube, Instagram, TikTok, Facebook i X privremeno blokiraju kad se skine mnogo videa zaredom. Od 10. videa program pravi razmak od nekoliko sekundi, a svakih 25 kratak predah. Kad sajt ipak blokira, program uvijek sam sačeka i nastavi.",
  "settings.recap": "Mjesečni pregled preuzimanja",
  "badge.patient": "Strpljivi",

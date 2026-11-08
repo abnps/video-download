@@ -303,6 +303,7 @@
     <string name="recap_setting">Mjesečni pregled</string>
     <string name="recap_setting_on">Kad prvi put otvoriš aplikaciju u novom mjesecu</string>
     <string name="recap_setting_off">Isključeno</string>
+    <string name="info_recap">Jednom mjesečno, kad prvi put otvoriš aplikaciju, kratak pregled prošlog mjeseca: koliko videa, koliko prostora i vremena i najaktivniji dan. Samo brojke, izračunate na tvom mobitelu; ništa se nikome ne šalje. Pojavi se tek uz barem 10 preuzimanja, a u siječnju dobiješ cijelu prošlu godinu.</string>
     <string name="badge_patient">Strpljivi</string>
     <string name="badge_patient_desc">Sačekaš pauzu do kraja umjesto da je prekineš.</string>
     <string name="recap_title_month">Tvoj %1$s 🎬</string>

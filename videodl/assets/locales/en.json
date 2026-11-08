@@ -362,7 +362,6 @@
  "success.title": "Done: {done}/{total} videos, {size} ✓",
  "success.text": "Everything was downloaded without a single error.",
  "card.close": "Close",
- "settings.pacing": "Block protection (short pauses between downloads from the same site)",
  "settings.pacing_tip": "YouTube, Instagram, TikTok, Facebook and X block for a while when many videos are downloaded in a row. From the 10th video the program waits a few seconds between downloads, and takes a short breather every 25. If a site blocks anyway, the program always waits and continues on its own.",
  "settings.recap": "Monthly download recap",
  "badge.patient": "Patient",

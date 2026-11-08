@@ -362,7 +362,6 @@
  "success.title": "Fertig: {done}/{total} Videos, {size} ✓",
  "success.text": "Alles wurde ohne einen einzigen Fehler geladen.",
  "card.close": "Schließen",
- "settings.pacing": "Schutz vor Sperren (kurze Pausen zwischen Downloads von derselben Website)",
  "settings.pacing_tip": "YouTube, Instagram, TikTok, Facebook und X sperren vorübergehend, wenn viele Videos hintereinander geladen werden. Ab dem 10. Video wartet das Programm ein paar Sekunden zwischen Downloads und macht alle 25 eine kurze Pause. Sperrt eine Website trotzdem, wartet das Programm immer selbst und macht weiter.",
  "settings.recap": "Monatsrückblick der Downloads",
  "badge.patient": "Geduldig",

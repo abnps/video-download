@@ -172,7 +172,7 @@ class PauseWindowTest(unittest.TestCase):
         self.assertTrue(all(i.status == ItemStatus.WAITING and i.message == "" for i in window._queue.items()))
         self.assertIn("2", window.status_label.text())
         window._save_queue()
-        again = MainWindow(settings=self.settings, probe_fn=lambda *a, **k: None, download_fn=window._download_fn,
+        again = MainWindow(settings=self.settings, probe_fn=lambda *a, **k: ProbeResult("", (), False), download_fn=window._download_fn,
                            thumbnail_fetch=lambda u: None, data_dir_path=self.tmp.name)
         self.addCleanup(again.deleteLater)
         again.set_output_dir(self.tmp.name)
