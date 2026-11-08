@@ -192,7 +192,7 @@
  "summary.waiting": "wartend: {count}",
  "summary.done": "fertig: {count}",
  "summary.failed": "fehlgeschlagen: {count}",
- "about.text": "Video Download {version}\n\nPersönliche App zum Herunterladen von Video und Audio (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
+ "about.text": "Video Download {version}\n\nPersönliche App zum Herunterladen von Video und Audio (yt-dlp, ffmpeg).\n\nFreie Software unter der GPL-3.0 · Quellcode: github.com/abnps/video-download\n\nyt-dlp {ytdlp}",
  "close.title": "Download läuft",
  "close.text": "Ein Download läuft. Abbrechen und die App schließen?",
  "startup.warning": "Warnung: {problems}",

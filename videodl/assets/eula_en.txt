@@ -3,10 +3,10 @@
 This agreement applies between you and the author of Video Download (the "author"). By installing or using the program you accept this agreement and the Terms of Use.
 
 1. License
-The author grants you a free, non-exclusive license to install and use the program on your own computers for personal use. The program is free; contributions via “Support the project” are voluntary and grant no additional rights or features.
+Video Download is free software under the GNU General Public License, version 3 (GPL-3.0). You may use it free of charge for any purpose, study, modify and share it, under the terms of that license. Its text is in the file licenses/GPL-3.0.txt in the program folder and at https://www.gnu.org/licenses/gpl-3.0.html; the source code is at https://github.com/abnps/video-download. Contributions via “Support the project” are voluntary and grant no additional rights or features.
 
 2. Sharing
-You may share the unmodified installer free of charge, together with this agreement. You may not sell or rent the program, or share a modified version under the name Video Download.
+You may share the program, modified or not, under the GPL-3.0, together with the source code and that license. Under section 7 of the GPL-3.0, the name “Video Download” and the program's logo are not part of the license: share a modified version under a different name and without that logo.
 
 3. Third-party components
 The program contains components by other authors (yt-dlp, FFmpeg, Qt/PySide6, Node.js and others). Their own licenses apply to them and are not limited by this agreement. The license texts are in the "licenses" folder and in THIRD-PARTY-NOTICES.txt in the program folder.
@@ -20,8 +20,8 @@ The program is provided "as is". The author does not guarantee that it will work
 6. Limitation of liability
 The author is not liable for damage resulting from the use of, or the inability to use, the program, nor for the content you download. This does not apply where the law does not allow liability to be excluded, for example for intent, gross negligence or injury to life and health.
 
-7. Termination
-If you breach this agreement or the Terms of Use, the license ends and you must remove the program.
+7. Terms of use
+What you may download is governed by the Terms of use and the law. Rights under the GPL-3.0 end only as that license provides.
 
 8. Contact
 Questions and bug reports: https://github.com/abnps/video-download/issues

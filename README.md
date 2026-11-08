@@ -137,6 +137,9 @@ prikazuje politika privatnosti; u aplikaciji su u Pomoć → Ugovori i licence):
 | Uslovi korištenja | [bs](videodl/assets/terms_bs.txt) | [en](videodl/assets/terms_en.txt) | [de](videodl/assets/terms_de.txt) | [es](videodl/assets/terms_es.txt) | [fr](videodl/assets/terms_fr.txt) |
 | Privatnost | [bs](videodl/assets/privacy_bs.txt) | [en](videodl/assets/privacy_en.txt) | [de](videodl/assets/privacy_de.txt) | [es](videodl/assets/privacy_es.txt) | [fr](videodl/assets/privacy_fr.txt) |
 
+**Licenca:** Video Download je slobodan softver pod licencom [GNU GPL-3.0](LICENSE) (od 8.11.2026). Ime
+„Video Download" i logo nisu dio licence (GPL-3.0, član 7): izmijenjena verzija se dijeli pod drugim imenom.
+
 Licence komponenti (FFmpeg GPL-3.0, Qt LGPL-3.0, Node.js, yt-dlp i ostale) instaler stavlja u folder
 `licenses` pored programa, a spisak u `THIRD-PARTY-NOTICES.txt` (`videodl/legal.py`).
 
