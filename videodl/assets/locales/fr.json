@@ -411,5 +411,16 @@
  "settings.desc.pacing": "Courtes pauses entre téléchargements du même site, pour qu’il ne te bloque pas.",
  "settings.desc.recap": "Un bilan du mois dernier (uniquement des chiffres) au premier démarrage du mois.",
  "settings.desc.theme": "Clair, sombre ou comme le système.",
- "settings.desc.language": "La langue de tout le programme."
+ "settings.desc.language": "La langue de tout le programme.",
+ "now.title": "En cours de téléchargement",
+ "now.queue": "{waiting} en file d’attente",
+ "now.phase.video": "Vidéo",
+ "now.phase.audio": "Audio",
+ "now.phase.merge": "Assemblage",
+ "now.phase.convert": "Traitement",
+ "now.speed": "Vitesse",
+ "now.eta": "Reste",
+ "status.pacing_on": "Protection contre les blocages activée",
+ "status.pacing_off": "Protection contre les blocages désactivée",
+ "status.today": "Aujourd’hui : {count} · {size}"
 }

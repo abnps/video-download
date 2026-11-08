@@ -971,7 +971,7 @@ class MainWindowTest(unittest.TestCase):
         self.settings.setValue("output_dir", r"D:\Filmovi")
         self.settings.setValue("preset_key", "720p")
         window = MainWindow(settings=self.settings, probe_fn=fake_probe, download_fn=self.quick_download,
-                            thumbnail_fetch=lambda url: None)
+                            thumbnail_fetch=lambda url: None, data_dir_path=self.tmp.name)  # ne pravi red korisnika
         self.addCleanup(window.deleteLater)
         self.assertEqual(window.output_dir, r"D:\Filmovi")
         self.assertIn("Filmovi", window.folder_label.text())

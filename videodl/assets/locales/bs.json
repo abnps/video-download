@@ -411,5 +411,16 @@
  "settings.desc.pacing": "Kratke pauze između preuzimanja s istog sajta, da te sajt ne blokira.",
  "settings.desc.recap": "Pregled prošlog mjeseca (samo brojke) pri prvom pokretanju u mjesecu.",
  "settings.desc.theme": "Svijetla, tamna ili kao sistem.",
- "settings.desc.language": "Jezik cijelog programa."
+ "settings.desc.language": "Jezik cijelog programa.",
+ "now.title": "Sada preuzima",
+ "now.queue": "{waiting} u redu",
+ "now.phase.video": "Video",
+ "now.phase.audio": "Zvuk",
+ "now.phase.merge": "Spajanje",
+ "now.phase.convert": "Obrada",
+ "now.speed": "Brzina",
+ "now.eta": "Još",
+ "status.pacing_on": "Zaštita od blokade uključena",
+ "status.pacing_off": "Zaštita od blokade isključena",
+ "status.today": "Danas: {count} · {size}"
 }

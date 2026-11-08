@@ -117,8 +117,12 @@ class AnimatedProgress(QWidget):
     PULSE_MS = 700
     DONE_HOLD_MS = 1100  # koliko zelena traka ostaje vidljiva poslije završetka
 
-    def __init__(self, parent: QWidget | None = None):
+    FLOW_MS = 4000  # koliko traje jedan prolaz boja sajta (plava → ljubičasta → roza) kroz traku
+
+    def __init__(self, parent: QWidget | None = None, bar: int | None = None):
         super().__init__(parent)
+        if bar is not None:
+            self.BAR = bar  # deblja traka u kartici „Sada preuzima"
         self.setFixedHeight(self.BAR + 2)
         self.phase = "video"
         self.indeterminate = False
@@ -253,7 +257,19 @@ class AnimatedProgress(QWidget):
             return
         bar = QPainterPath()
         bar.addRoundedRect(QRectF(0, top, max(filled, thickness), thickness), radius, radius)
-        painter.fillPath(bar, color)
+        if self.phase in ("video", "audio"):
+            # Boje sajta koje polako teku kroz traku (izgled „Sada i sljedeće", 1.0.9).
+            keys = ("accent", "accent2", "accent3") if self.phase == "video" else ("accent2", "accent3", "accent2")
+            span = max(width, 120.0)
+            shift = ((now % self.FLOW_MS) / self.FLOW_MS) * span * 2
+            flow = QLinearGradient(-shift, 0, -shift + span, 0)
+            flow.setSpread(QLinearGradient.Spread.ReflectSpread)
+            flow.setColorAt(0.0, QColor(theme.c(keys[0])))
+            flow.setColorAt(0.5, QColor(theme.c(keys[1])))
+            flow.setColorAt(1.0, QColor(theme.c(keys[2])))
+            painter.fillPath(bar, flow)
+        else:
+            painter.fillPath(bar, color)
         if self.phase != "done":
             # Sjaj koji prelazi preko popunjenog dijela: vidi se da preuzimanje radi i kad je sporo.
             shine = 60.0

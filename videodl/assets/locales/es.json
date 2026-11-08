@@ -411,5 +411,16 @@
  "settings.desc.pacing": "Pausas cortas entre descargas del mismo sitio para que no te bloquee.",
  "settings.desc.recap": "Un resumen del mes pasado (solo números) la primera vez que abres el programa en el mes.",
  "settings.desc.theme": "Clara, oscura o como el sistema.",
- "settings.desc.language": "El idioma de todo el programa."
+ "settings.desc.language": "El idioma de todo el programa.",
+ "now.title": "Descargando ahora",
+ "now.queue": "{waiting} en cola",
+ "now.phase.video": "Vídeo",
+ "now.phase.audio": "Audio",
+ "now.phase.merge": "Uniendo",
+ "now.phase.convert": "Procesando",
+ "now.speed": "Velocidad",
+ "now.eta": "Queda",
+ "status.pacing_on": "Protección contra bloqueos activada",
+ "status.pacing_off": "Protección contra bloqueos desactivada",
+ "status.today": "Hoy: {count} · {size}"
 }

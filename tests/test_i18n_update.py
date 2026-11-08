@@ -58,7 +58,7 @@ class TranslationsTest(unittest.TestCase):
             settings = QSettings(os.path.join(tmp, "s.ini"), QSettings.Format.IniFormat)
             settings.setValue("language", "bs")
             window = MainWindow(settings=settings, probe_fn=lambda url, **kw: ProbeResult("", (), False), download_fn=None,
-                                thumbnail_fetch=lambda url: None)
+                                thumbnail_fetch=lambda url: None, data_dir_path=tmp)  # ne pravi red korisnika
             self.addCleanup(window.deleteLater)
             self.assertEqual(window.paste_button.text(), "Zalijepi")
             self.assertEqual(window.help_menu.title(), "P&omoć")
@@ -322,7 +322,7 @@ class UpdaterTest(unittest.TestCase):
             settings.setValue("language", "en")
             release = updater.Release(__version__, "", "x.exe", "https://x", "https://x.sha256", 1)
             window = MainWindow(settings=settings, probe_fn=None, download_fn=None, thumbnail_fetch=lambda u: None,
-                                update_fetch=lambda: release)
+                                update_fetch=lambda: release, data_dir_path=tmp)  # ne pravi red korisnika
             self.addCleanup(window.deleteLater)
             shown = threading.Event()
             with mock.patch("videodl.gui.QMessageBox.information", side_effect=lambda *a: shown.set()) as info:
