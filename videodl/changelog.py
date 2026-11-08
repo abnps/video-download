@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.8", "8.11.2026", {
+        "bs": ["Postavke na računaru imaju novi izgled: stranice lijevo, a svaka opcija ima kratko objašnjenje i prekidač.",
+               "Dodatak u browseru se odmah povezuje s programom i poslije naglog gašenja programa ili računara."],
+        "en": ["Settings on the computer have a new look: pages on the left, and every option has a short explanation and a switch.",
+               "The browser extension connects to the app right away, even after the app or computer was shut down abruptly."],
+        "de": ["Die Einstellungen am Computer haben ein neues Aussehen: Seiten links, und jede Option hat eine kurze Erklärung und einen Schalter.",
+               "Die Browser-Erweiterung verbindet sich sofort mit dem Programm, auch nachdem Programm oder Computer abrupt beendet wurden."],
+        "es": ["Los Ajustes del ordenador tienen un nuevo aspecto: páginas a la izquierda, y cada opción tiene una breve explicación y un interruptor.",
+               "La extensión del navegador se conecta al programa al instante, incluso después de que el programa o el ordenador se cerraran de golpe."],
+        "fr": ["Les Paramètres sur l’ordinateur ont un nouvel aspect : pages à gauche, et chaque option a une courte explication et un interrupteur.",
+               "L’extension du navigateur se connecte tout de suite au programme, même après un arrêt brutal du programme ou de l’ordinateur."],
+    }),
     ("1.0.7", "2.11.2026", {
         "bs": ["Zaštita od blokade: kad skidaš mnogo videa zaredom s istog velikog video sajta, program pravi kratke pauze da sajt ne bi privremeno blokirao preuzimanje. Može se isključiti u Postavkama.",
                "Ako sajt ipak blokira, program sam sačeka i nastavi — kartica pokazuje odbrojavanje, a možeš i „Nastaviti odmah“ ili „Nastaviti kasnije“; nedovršeno preuzimanje se nudi pri sljedećem pokretanju.",
