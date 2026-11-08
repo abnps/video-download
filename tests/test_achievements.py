@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from videodl import achievements, i18n  # noqa: E402
 from videodl.achievements import GB, AchievementState, Download  # noqa: E402
+from videodl.probe import ProbeResult  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 NOON = datetime(2026, 10, 19, 12, 0)
@@ -153,7 +154,7 @@ class WindowTest(unittest.TestCase):
     def window(self):
         from videodl.gui import MainWindow
 
-        window = MainWindow(settings=self.settings, probe_fn=lambda *a, **k: None, download_fn=lambda *a, **k: None,
+        window = MainWindow(settings=self.settings, probe_fn=lambda *a, **k: ProbeResult("", (), False), download_fn=lambda *a, **k: None,
                             thumbnail_fetch=lambda u: None, data_dir_path=self.tmp.name)
         self.addCleanup(window.deleteLater)
         return window

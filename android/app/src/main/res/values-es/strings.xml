@@ -303,6 +303,7 @@
     <string name="recap_setting">Resumen mensual</string>
     <string name="recap_setting_on">La primera vez que abres la app en un mes nuevo</string>
     <string name="recap_setting_off">Desactivado</string>
+    <string name="info_recap">Una vez al mes, la primera vez que abres la aplicación, un breve resumen del mes anterior: cuántos vídeos, cuánto espacio y tiempo y tu día más activo. Solo números, calculados en tu teléfono; no se envía nada a ninguna parte. Aparece solo con al menos 10 descargas, y en enero recibes todo el año anterior.</string>
     <string name="badge_patient">Paciente</string>
     <string name="badge_patient_desc">Esperas a que termine una pausa en lugar de saltártela.</string>
     <string name="recap_title_month">Tu %1$s 🎬</string>

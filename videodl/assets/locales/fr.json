@@ -362,7 +362,6 @@
  "success.title": "Terminé : {done}/{total} vidéos, {size} ✓",
  "success.text": "Tout a été téléchargé sans la moindre erreur.",
  "card.close": "Fermer",
- "settings.pacing": "Protection contre les blocages (courtes pauses entre téléchargements du même site)",
  "settings.pacing_tip": "YouTube, Instagram, TikTok, Facebook et X bloquent un moment quand beaucoup de vidéos sont téléchargées d’affilée. À partir de la 10e vidéo, le programme attend quelques secondes entre les téléchargements et fait une petite pause toutes les 25. Si un site bloque quand même, le programme attend toujours et reprend tout seul.",
  "settings.recap": "Bilan mensuel des téléchargements",
  "badge.patient": "Patient",

@@ -301,6 +301,7 @@
     <string name="recap_setting">Monthly recap</string>
     <string name="recap_setting_on">On the first day you open the app in a new month</string>
     <string name="recap_setting_off">Off</string>
+    <string name="info_recap">Once a month, the first time you open the app, a short recap of the previous month: how many videos, how much space and time, and your busiest day. Only numbers, calculated on your phone; nothing is sent anywhere. It appears only after at least 10 downloads, and in January you get the whole previous year.</string>
     <string name="badge_patient">Patient</string>
     <string name="badge_patient_desc">You wait for a break to finish instead of skipping it.</string>
     <string name="recap_title_month">Your %1$s 🎬</string>

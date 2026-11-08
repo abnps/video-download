@@ -20,6 +20,7 @@ from PySide6.QtWidgets import QApplication  # noqa: E402
 from videodl import __version__, release_signing, updater  # noqa: E402
 from videodl.gui import MainWindow  # noqa: E402
 from videodl.i18n import LANGUAGES, TEXTS, get_language, pick_language, set_language, tr  # noqa: E402
+from videodl.probe import ProbeResult  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 LATEST = "https://example.test/releases/latest"
@@ -56,7 +57,7 @@ class TranslationsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             settings = QSettings(os.path.join(tmp, "s.ini"), QSettings.Format.IniFormat)
             settings.setValue("language", "bs")
-            window = MainWindow(settings=settings, probe_fn=lambda url, **kw: None, download_fn=None,
+            window = MainWindow(settings=settings, probe_fn=lambda url, **kw: ProbeResult("", (), False), download_fn=None,
                                 thumbnail_fetch=lambda url: None)
             self.addCleanup(window.deleteLater)
             self.assertEqual(window.paste_button.text(), "Zalijepi")

@@ -300,6 +300,7 @@
     <string name="recap_setting">Monatsrückblick</string>
     <string name="recap_setting_on">Beim ersten Öffnen der App in einem neuen Monat</string>
     <string name="recap_setting_off">Aus</string>
+    <string name="info_recap">Einmal im Monat, beim ersten Öffnen der App, ein kurzer Rückblick auf den Vormonat: wie viele Videos, wie viel Speicher und Zeit und dein aktivster Tag. Nur Zahlen, auf deinem Handy berechnet; nichts wird irgendwohin gesendet. Er erscheint erst ab 10 Downloads, und im Januar bekommst du das ganze letzte Jahr.</string>
     <string name="badge_patient">Geduldig</string>
     <string name="badge_patient_desc">Du wartest eine Pause ab, statt sie abzubrechen.</string>
     <string name="recap_title_month">Dein %1$s 🎬</string>
