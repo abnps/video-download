@@ -3,10 +3,10 @@
 Este contrato rige entre tú y el autor de Video Download (el «autor»). Al instalar o usar el programa aceptas este contrato y las Condiciones de uso.
 
 1. Licencia
-El autor te concede una licencia gratuita y no exclusiva para instalar y usar el programa en tus propios ordenadores para uso personal. El programa es gratis; las aportaciones mediante «Apoyar el proyecto» son voluntarias y no otorgan derechos ni funciones adicionales.
+Video Download es software libre bajo la Licencia Pública General de GNU, versión 3 (GPL-3.0). Puedes usarlo gratis para cualquier fin, estudiarlo, modificarlo y compartirlo, según los términos de esa licencia. Su texto está en el archivo licenses/GPL-3.0.txt de la carpeta del programa y en https://www.gnu.org/licenses/gpl-3.0.html; el código fuente está en https://github.com/abnps/video-download. Las aportaciones mediante «Apoyar el proyecto» son voluntarias y no otorgan derechos ni funciones adicionales.
 
 2. Distribución
-Puedes compartir gratis el instalador sin modificar, junto con este contrato. No puedes vender ni alquilar el programa, ni compartir una versión modificada con el nombre Video Download.
+Puedes compartir el programa, modificado o no, según la GPL-3.0, junto con el código fuente y esa licencia. Según la sección 7 de la GPL-3.0, el nombre «Video Download» y el logotipo del programa no forman parte de la licencia: comparte una versión modificada con otro nombre y sin ese logotipo.
 
 3. Componentes de terceros
 El programa contiene componentes de otros autores (yt-dlp, FFmpeg, Qt/PySide6, Node.js y otros). A ellos se aplican sus propias licencias, que este contrato no limita. Los textos de las licencias están en la carpeta «licenses» y en THIRD-PARTY-NOTICES.txt en la carpeta del programa.
@@ -20,8 +20,8 @@ El programa se ofrece «tal cual». El autor no garantiza que funcione con todos
 6. Limitación de responsabilidad
 El autor no responde de los daños derivados del uso o de la imposibilidad de uso del programa, ni del contenido que descargues. Esto no se aplica cuando la ley no permita excluir la responsabilidad, por ejemplo en caso de dolo, negligencia grave o daños a la vida y la salud.
 
-7. Terminación
-Si incumples este contrato o las Condiciones de uso, la licencia termina y debes eliminar el programa.
+7. Condiciones de uso
+Lo que puedes descargar se rige por las Condiciones de uso y la ley. Los derechos de la GPL-3.0 solo terminan como prevé esa licencia.
 
 8. Contacto
 Preguntas e informes de errores: https://github.com/abnps/video-download/issues

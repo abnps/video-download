@@ -192,7 +192,7 @@
  "summary.waiting": "čeka: {count}",
  "summary.done": "završeno: {count}",
  "summary.failed": "neuspjelo: {count}",
- "about.text": "Video Download {version}\n\nLična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
+ "about.text": "Video Download {version}\n\nLična aplikacija za preuzimanje videa i zvuka (yt-dlp, ffmpeg).\n\nSlobodan softver pod licencom GPL-3.0 · izvorni kod: github.com/abnps/video-download\n\nyt-dlp {ytdlp}",
  "close.title": "Preuzimanje u toku",
  "close.text": "Preuzimanje je u toku. Prekinuti ga i zatvoriti program?",
  "startup.warning": "Upozorenje: {problems}",

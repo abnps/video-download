@@ -3,10 +3,10 @@
 Ovaj ugovor važi između tebe i autora programa Video Download (u daljem tekstu: autor). Instalacijom ili korištenjem programa prihvataš ovaj ugovor i Uslove korištenja.
 
 1. Licenca
-Autor ti daje besplatnu, neisključivu licencu da program instaliraš i koristiš na svojim računarima, za ličnu upotrebu. Program je besplatan; prilozi preko „Podrži projekat“ su dobrovoljni i ne daju nikakva dodatna prava ni funkcije.
+Video Download je slobodan softver pod licencom GNU General Public License, verzija 3 (GPL-3.0). Smiješ ga besplatno koristiti u bilo koju svrhu, proučavati, mijenjati i dijeliti, uz uslove te licence. Njen tekst je u fajlu licenses/GPL-3.0.txt u folderu programa i na https://www.gnu.org/licenses/gpl-3.0.html; izvorni kod je na https://github.com/abnps/video-download. Prilozi preko „Podrži projekat“ su dobrovoljni i ne daju nikakva dodatna prava ni funkcije.
 
 2. Dijeljenje
-Smiješ besplatno dijeliti neizmijenjen instaler, zajedno sa ovim ugovorom. Ne smiješ program prodavati ni iznajmljivati, niti dijeliti izmijenjenu verziju pod imenom Video Download.
+Program, izmijenjen ili ne, smiješ dijeliti prema GPL-3.0, zajedno s izvornim kodom i tom licencom. Prema članu 7 GPL-3.0, ime „Video Download“ i logo programa nisu dio licence: izmijenjenu verziju dijeli pod drugim imenom i bez tog logoa.
 
 3. Komponente trećih strana
 Program sadrži komponente drugih autora (yt-dlp, FFmpeg, Qt/PySide6, Node.js i druge). Za njih važe njihove licence, koje ovaj ugovor ne ograničava. Tekstovi licenci su u folderu „licenses" i u fajlu THIRD-PARTY-NOTICES.txt u folderu programa.
@@ -20,8 +20,8 @@ Program se daje „kakav jeste". Autor ne garantuje da će raditi sa svakim sajt
 6. Ograničenje odgovornosti
 Autor ne odgovara za štetu nastalu korištenjem ili nemogućnošću korištenja programa, niti za sadržaj koji preuzmeš. Ovo ne važi tamo gdje zakon ne dozvoljava isključenje odgovornosti, na primjer za namjeru, grubu nepažnju ili povredu života i zdravlja.
 
-7. Prestanak licence
-Ako prekršiš ovaj ugovor ili Uslove korištenja, licenca prestaje i program moraš ukloniti.
+7. Uslovi korištenja
+Šta smiješ preuzimati uređuju Uslovi korištenja i zakon. Prava iz GPL-3.0 prestaju samo onako kako ta licenca predviđa.
 
 8. Kontakt
 Pitanja i prijave grešaka: https://github.com/abnps/video-download/issues

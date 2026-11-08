@@ -26,6 +26,7 @@ def main() -> int:
     shutil.copyfile(ytdlp.locate(), TARGET / "yt-dlp-LICENSE")
     shutil.copyfile(legal.python_license_path(), TARGET / "Python-LICENSE.txt")
     shutil.copyfile(PROJECT / "android" / "app" / "src" / "main" / "cpp" / "lame" / "COPYING", TARGET / "LAME-COPYING.txt")
+    shutil.copyfile(PROJECT / "LICENSE", TARGET / "VideoDownload-GPL-3.0.txt")  # licenca same aplikacije
     print(f"Licence osvježene u {TARGET}")
     return 0
 

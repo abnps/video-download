@@ -192,7 +192,7 @@
  "summary.waiting": "waiting: {count}",
  "summary.done": "finished: {count}",
  "summary.failed": "failed: {count}",
- "about.text": "Video Download {version}\n\nPersonal app for downloading video and audio (yt-dlp, ffmpeg).\n\nyt-dlp {ytdlp}",
+ "about.text": "Video Download {version}\n\nPersonal app for downloading video and audio (yt-dlp, ffmpeg).\n\nFree software under the GPL-3.0 · source code: github.com/abnps/video-download\n\nyt-dlp {ytdlp}",
  "close.title": "Download in progress",
  "close.text": "A download is in progress. Stop it and close the app?",
  "startup.warning": "Warning: {problems}",
