@@ -8,8 +8,8 @@ PublisherSupportUrl: https://github.com/abnps/video-download/issues
 PrivacyUrl: https://abnps.github.io/video-download/privacy.html
 PackageName: Video Download
 PackageUrl: https://abnps.github.io/video-download/
-License: Freeware
-LicenseUrl: https://abnps.github.io/video-download/terms.html
+License: GPL-3.0
+LicenseUrl: https://github.com/abnps/video-download/blob/main/LICENSE
 ShortDescription: Free video and audio downloader with a download queue, MP3 conversion and a browser extension.
 Description: |-
   Video Download saves videos and audio from many websites using yt-dlp. Paste a link (or send it from the browser

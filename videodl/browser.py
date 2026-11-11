@@ -2,6 +2,7 @@
 
 import contextlib
 import os
+import re
 import shutil
 import tempfile
 from collections.abc import Iterator
@@ -172,6 +173,14 @@ def remove_stale_cookie_files(folder: str | None = None, now: float | None = Non
 # Browseri iz kojih yt-dlp sam čita kolačiće (Postavke → Prijava na sajtove, Ahmed 29.10.2026).
 COOKIE_BROWSERS = ("firefox", "edge", "chrome", "brave")
 COOKIE_BROWSER_NAMES = {"firefox": "Firefox", "edge": "Microsoft Edge", "chrome": "Google Chrome", "brave": "Brave"}
+# Kolačići izabranog browsera ili cookies.txt se ne mogu pročitati: Chrome i Edge zaključaju bazu dok rade, a Chrome
+# je od verzije 127 šifrira tako da je drugi programi ne mogu pročitati („app-bound encryption").
+COOKIE_READ_ERROR = re.compile(r"failed to decrypt with dpapi|could not copy .{0,40}cookie database|cookies? database"
+                               r"|could not find .{0,30}cookies|failed to load cookies|app.bound encryption", re.I)
+
+
+def is_cookie_read_error(message: str) -> bool:
+    return bool(COOKIE_READ_ERROR.search(message or ""))
 
 
 @contextlib.contextmanager

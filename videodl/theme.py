@@ -96,7 +96,7 @@ QComboBox#presetCombo {{
 QComboBox#presetCombo:hover {{ border-color: {k['combo_hover']}; }}
 QComboBox#presetCombo::drop-down {{ border: none; width: 28px; }}
 QComboBox#presetCombo::down-arrow {{ image: url("{chevron}"); width: 12px; height: 12px; }}
-QComboBox#presetCombo QAbstractItemView {{ border: 1px solid {k['combo_border']}; background: {k['bg']};
+QComboBox#presetCombo QAbstractItemView {{ border: 1px solid {k['combo_border']}; background: {k['card']};
     color: {k['text']}; selection-background-color: {k['selection']}; selection-color: {k['text']}; }}
 QCheckBox::indicator {{ width: 14px; height: 14px; border: 1px solid {k['check_border']}; border-radius: 3px;
     background: {k['bg']}; }}
@@ -138,6 +138,7 @@ QStatusBar {{ background: transparent; border-top: 1px solid {k['border']}; colo
 QLabel#shieldLabel {{ color: {k['shield']}; }}
 QLabel#shieldLabel[state="off"] {{ color: {k['warning_fg']}; }}
 QFrame#nowPanel {{ background: {k['card']}; border: 1px solid {k['border']}; border-radius: 14px; }}
+QLabel#queueHint {{ color: {k['muted']}; padding: 12px 24px; }}
 QLabel#nowChip {{ background: {k['tab_active_bg']}; color: {k['accent']}; border-radius: 8px; padding: 2px 10px;
     font-weight: 600; font-size: 11px; }}
 QLabel#nowTitle {{ color: {k['text']}; font-size: 12pt; font-weight: 600; }}

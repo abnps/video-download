@@ -259,7 +259,7 @@
  "error.friendly.unavailable": "Das Video ist nicht mehr verfügbar (entfernt oder falscher Link).",
  "error.friendly.forbidden": "Die Seite hat den Download abgelehnt. {help} → {update}, dann erneut versuchen.",
  "error.friendly.rate": "Die Seite begrenzt vorübergehend die Anfragen. In ein paar Minuten erneut versuchen.",
- "error.friendly.cookies": "Die Cookies des Browsers können nicht gelesen werden. Browser schließen und erneut versuchen oder in den Einstellungen Firefox oder eine Datei cookies.txt wählen.",
+ "error.friendly.cookies": "Cookies aus dem Browser lassen sich nicht lesen (Chrome und Edge sperren sie, solange sie laufen). Videos hinter einer Anmeldung schickst du aus der Browser-Erweiterung, oder wähle in den Einstellungen Firefox oder eine cookies.txt-Datei.",
  "error.friendly.network": "Keine Verbindung zur Seite. Internetverbindung prüfen und erneut versuchen.",
  "error.friendly.unsupported": "Dieser Link wird nicht unterstützt. Wenn es ein Video ist, über die Browser-Erweiterung senden, während es läuft.",
  "error.friendly.format": "Die gewählte Qualität gibt es für dieses Video nicht. Anderes Format wählen (z. B. beste Qualität).",
@@ -422,5 +422,7 @@
  "now.eta": "Noch",
  "status.pacing_on": "Schutz vor Sperren an",
  "status.pacing_off": "Schutz vor Sperren aus",
- "status.today": "Heute: {count} · {size}"
+ "status.today": "Heute: {count} · {size}",
+ "queue.next_empty": "Nichts wartet mehr. Füge einen neuen Link ein (Strg+V) oder ziehe ihn hierher.",
+ "cookies.fallback": "Cookies aus {browser} lassen sich nicht lesen (Chrome und Edge sperren sie, solange sie laufen), daher wird ohne Anmeldung geladen. Videos hinter einer Anmeldung schickst du aus der Browser-Erweiterung."
 }

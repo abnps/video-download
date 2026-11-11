@@ -67,6 +67,16 @@ object Pacing {
     fun setEnabled(context: Context, value: Boolean) {
         enabled = value
         prefs(context).edit().putBoolean("ukljuceno", value).apply()
+        if (!value) dropSoft()
+    }
+
+    /**
+     * Zaštita je isključena: razmaci i predasi prestaju odmah (kartica nestaje, pa nema dostignuća „Strpljivi");
+     * čekanje poslije stvarne blokade ostaje. Isto kao Pacer.drop_soft na računaru (pregled 9.11.2026).
+     */
+    @Synchronized fun dropSoft() {
+        states.values.forEach { if (it.last?.kind != "block") it.readyAt = 0 }
+        if (mutableCard.value?.pause?.kind.let { it != null && it != "block" }) mutableCard.value = null
     }
 
     fun familyOf(url: String): String? = FAMILIES[Achievements.siteOf(url)]
@@ -112,9 +122,16 @@ object Pacing {
             val (from, to) = GAPS[level]
             Pause(family, "gap", (random.nextDouble(from, to) * scale(family) * 1000).toLong())
         }
-        state.readyAt = maxOf(state.readyAt, now + pause.millis)
-        state.last = pause
+        hold(state, now, pause)
         return pause
+    }
+
+    /** Pauza važi samo ako produžava čekanje (kraća ne zamjenjuje dužu koja već teče, npr. blokadu). */
+    private fun hold(state: State, now: Long, pause: Pause) {
+        if (now + pause.millis >= state.readyAt) {
+            state.readyAt = now + pause.millis
+            state.last = pause
+        }
     }
 
     /** Sajt je blokirao posao `attempt`-ti put: čeka se i nastavlja; null = odustati (obična greška). */
@@ -126,8 +143,7 @@ object Pacing {
         val now = clock()
         state.lastSeen = now
         val pause = Pause(family, "block", BLOCK_WAITS[attempt - 1])
-        state.readyAt = maxOf(state.readyAt, now + pause.millis)
-        state.last = pause
+        hold(state, now, pause)
         return pause
     }
 

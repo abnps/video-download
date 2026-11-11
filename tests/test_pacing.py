@@ -158,6 +158,38 @@ class BlockTest(unittest.TestCase):
         pacer.skip()
         self.assertEqual(pacer.remaining("x"), 0)
 
+    def test_pending_tells_which_pause_holds_the_site(self):
+        pacer, clock, _wall = make()
+        self.assertIsNone(pacer.pending("youtube"))
+        self.assertEqual(pacer.deadline("youtube"), 0.0)
+        pauses = run(pacer, "youtube", 25)
+        self.assertEqual(pauses[-1].kind, "break")
+        pending = pacer.pending("youtube")
+        self.assertEqual((pending.kind, pending.seconds), ("break", pauses[-1].seconds))
+        self.assertEqual(pacer.deadline("youtube"), clock.now + pauses[-1].seconds)
+        clock.now += pauses[-1].seconds
+        self.assertIsNone(pacer.pending("youtube"))  # pauza je prošla
+
+    def test_shorter_pause_does_not_replace_a_running_block(self):
+        pacer, clock, _wall = make()
+        run(pacer, "youtube", 9)
+        pacer.blocked("youtube", 1)
+        pacer.started("youtube")
+        gap = pacer.finished("youtube")  # 10. zaredom: razmak od par sekundi dok blokada još teče
+        self.assertEqual(gap.kind, "gap")
+        self.assertEqual(pacer.pending("youtube").kind, "block")
+        self.assertAlmostEqual(pacer.remaining("youtube"), 300)
+
+    def test_turning_protection_off_ends_gaps_and_breaks_but_not_a_block(self):
+        pacer, _clock, _wall = make()
+        run(pacer, "youtube", 25)
+        pacer.blocked("x", 1)
+        self.assertGreater(pacer.remaining("youtube"), 0)
+        pacer.enabled = False
+        pacer.drop_soft()
+        self.assertEqual(pacer.remaining("youtube"), 0)  # predah prestaje odmah
+        self.assertEqual(pacer.remaining("x"), 300)  # stvarna blokada se i dalje čeka
+
     def test_learns_for_seven_days_after_a_block(self):
         pacer, clock, wall = make()
         pacer.blocked("youtube", 1)

@@ -151,7 +151,8 @@ TEXTS = {
             "only to reply to you and are never passed on or used for anything else.",
         ),
         "licenses_title": "Licenses",
-        "licenses_lead": "Video Download uses the following software by other authors. Their licenses apply to them; the "
+        "licenses_lead": "Video Download itself is free software under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPL-3.0</a>; its source code "
+                         "is on <a href=\"https://github.com/abnps/video-download\">GitHub</a>. It uses the following software by other authors. Their licenses apply to them; the "
                          "full license texts are in the <code>licenses</code> folder next to the installed app.",
         "licenses_desc": "Licenses of the components used by Video Download.",
         "licenses_cols": ("Component", "License"),
@@ -204,7 +205,8 @@ responding, click <b>Reload</b> next to it in <code>chrome://extensions</code>. 
             "odgovor tebi i nikad se ne prosljeđuju niti koriste za bilo šta drugo.",
         ),
         "licenses_title": "Licence",
-        "licenses_lead": "Video Download koristi sljedeći softver drugih autora. Njihove licence važe za njih; puni tekstovi "
+        "licenses_lead": "Sam Video Download je slobodan softver pod licencom <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPL-3.0</a>; izvorni kod je "
+                         "na <a href=\"https://github.com/abnps/video-download\">GitHubu</a>. Koristi sljedeći softver drugih autora. Njihove licence važe za njih; puni tekstovi "
                          "licenci su u folderu <code>licenses</code> pored instaliranog programa.",
         "licenses_desc": "Licence komponenti koje koristi Video Download.",
         "licenses_cols": ("Komponenta", "Licenca"),
@@ -258,7 +260,8 @@ reagovati, u <code>chrome://extensions</code> klikni <b>Reload</b> kod njega. Fi
             "werden nur genutzt, um dir zu antworten, und nie weitergegeben oder anders verwendet.",
         ),
         "licenses_title": "Lizenzen",
-        "licenses_lead": "Video Download nutzt die folgende Software anderer Autoren. Für sie gelten ihre eigenen Lizenzen; die "
+        "licenses_lead": "Video Download selbst ist freie Software unter der <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPL-3.0</a>; der Quellcode "
+                         "liegt auf <a href=\"https://github.com/abnps/video-download\">GitHub</a>. Es nutzt die folgende Software anderer Autoren. Für sie gelten ihre eigenen Lizenzen; die "
                          "vollständigen Lizenztexte liegen im Ordner <code>licenses</code> neben der installierten App.",
         "licenses_desc": "Lizenzen der Komponenten, die Video Download nutzt.",
         "licenses_cols": ("Komponente", "Lizenz"),
@@ -314,7 +317,8 @@ nicht mehr, klicke in <code>chrome://extensions</code> bei ihr auf <b>Neu laden<
             "se usan solo para responderte y nunca se comparten ni se usan para nada más.",
         ),
         "licenses_title": "Licencias",
-        "licenses_lead": "Video Download usa el siguiente software de otros autores. Se rige por sus propias licencias; los textos "
+        "licenses_lead": "Video Download es software libre bajo la <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPL-3.0</a>; su código fuente está "
+                         "en <a href=\"https://github.com/abnps/video-download\">GitHub</a>. Usa el siguiente software de otros autores. Se rige por sus propias licencias; los textos "
                          "completos están en la carpeta <code>licenses</code> junto a la aplicación instalada.",
         "licenses_desc": "Licencias de los componentes que usa Video Download.",
         "licenses_cols": ("Componente", "Licencia"),
@@ -372,7 +376,8 @@ responder, pulsa <b>Recargar</b> junto a ella en <code>chrome://extensions</code
             "Google) servent uniquement à vous répondre et ne sont jamais transmis ni utilisés à d'autres fins.",
         ),
         "licenses_title": "Licences",
-        "licenses_lead": "Video Download utilise les logiciels suivants d'autres auteurs. Leurs propres licences s'appliquent ; "
+        "licenses_lead": "Video Download est lui-même un logiciel libre sous <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU GPL-3.0</a> ; son code source "
+                         "est sur <a href=\"https://github.com/abnps/video-download\">GitHub</a>. Il utilise les logiciels suivants d'autres auteurs. Leurs propres licences s'appliquent ; "
                          "les textes complets se trouvent dans le dossier <code>licenses</code> à côté de l'application installée.",
         "licenses_desc": "Licences des composants utilisés par Video Download.",
         "licenses_cols": ("Composant", "Licence"),

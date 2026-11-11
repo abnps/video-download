@@ -259,7 +259,7 @@
  "error.friendly.unavailable": "El vídeo ya no está disponible (se eliminó o el enlace no es correcto).",
  "error.friendly.forbidden": "El sitio rechazó la descarga. {help} → {update} y vuelve a intentarlo.",
  "error.friendly.rate": "El sitio limita temporalmente las peticiones. Inténtalo de nuevo en unos minutos.",
- "error.friendly.cookies": "No se pueden leer las cookies del navegador. Cierra el navegador y vuelve a intentarlo, o elige Firefox o un archivo cookies.txt en Ajustes.",
+ "error.friendly.cookies": "No se pueden leer las cookies del navegador (Chrome y Edge las bloquean mientras están abiertos). Para vídeos que requieren sesión, envíalos desde la extensión del navegador, o elige Firefox o un archivo cookies.txt en Ajustes.",
  "error.friendly.network": "No se puede conectar con el sitio. Comprueba tu conexión a internet y vuelve a intentarlo.",
  "error.friendly.unsupported": "Este enlace no es compatible. Si es un vídeo, envíalo desde la extensión del navegador mientras se reproduce.",
  "error.friendly.format": "La calidad elegida no está disponible para este vídeo. Elige otro formato (p. ej. la mejor calidad).",
@@ -422,5 +422,7 @@
  "now.eta": "Queda",
  "status.pacing_on": "Protección contra bloqueos activada",
  "status.pacing_off": "Protección contra bloqueos desactivada",
- "status.today": "Hoy: {count} · {size}"
+ "status.today": "Hoy: {count} · {size}",
+ "queue.next_empty": "No hay nada más en espera. Pega un nuevo enlace (Ctrl+V) o arrástralo aquí.",
+ "cookies.fallback": "No se pueden leer las cookies de {browser} (Chrome y Edge las bloquean mientras están abiertos), así que se descarga sin iniciar sesión. Para vídeos que requieren sesión, envíalos desde la extensión del navegador."
 }

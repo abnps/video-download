@@ -19,15 +19,23 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
 - `00_plan/plan_projekta.md` je izvor istine za faze, Definition of Done i exit
   gate-ove. Faza se ne proglašava završenom bez dokaza ili Ahmedovog izuzetka.
 
-## Stanje 7.11.2026 (poslije izdanja 1.0.7) — čitati prije starijih zapisa ispod
+## Stanje 9.11.2026 (poslije izdanja 1.0.8) — čitati prije starijih zapisa ispod
 
 - Kanonski radni folder: `C:\Video Downloader\Projekat-podrska`, grana `main`. Glavni repo `Projekat\` stoji na
   staroj, već spojenoj grani `browser-host-novo-ime` i ne koristi se za novi rad. Nove izmjene idu u zasebnu
   granu i radnu kopiju `C:\Video Downloader\Build\wt-*`; commit, push i objava tek na Ahmedovu riječ.
-- 1.0.7 je objavljen 2.11.2026 na svim kanalima: GitHub Latest (Windows, Mac i Linux potpisani, Android
-  versionCode 19), sajt i Microsoft Store (Submission 7; `tools/check_store_browser_link.py` prolazi na 1.0.7.0,
-  provjereno 7.11.2026). Dodatak za browser je 1.0.4 (Edge i Firefox, provjereno 7.11.2026). winget: PR #456435
-  (nov paket, 1.0.4) prošao je validaciju i čeka moderatore; poslije spajanja ide PR za novu verziju i `LIVE = True`.
+- 1.0.8 je objavljen 8.11.2026 na svim kanalima: GitHub Latest (Windows, Mac i Linux potpisani, Android
+  versionCode 20), sajt i Microsoft Store (Submission 8 = paket 1.0.8.0; `tools/check_store_browser_link.py` prolazi
+  na 1.0.8.0, provjereno 9.11.2026). Store stranica je osvježena 8.11.2026 (Submission 9, bez novog paketa): opis i
+  12 mogućnosti na 5 jezika, 6 snimaka, licencni uslovi GPL-3.0, podrška abnpsdev@gmail.com; novi snimci su u
+  `Build\store-snimci-108`. Dodatak za browser je 1.0.4 (Edge i Firefox); njegov `version` se povećava samo kad se
+  dodatak mijenja. winget: PR #456435 (nov paket, 1.0.4) prošao je validaciju i čeka moderatore; poslije spajanja
+  ide PR za novu verziju i `LIVE = True` (`tools/winget` već navodi GPL-3.0).
+- Licenca (Ahmed 8.11.2026): Video Download je slobodan softver pod GNU GPL-3.0 (`LICENSE`). Licencni ugovor
+  (`videodl/assets/eula_*.txt`, tačke 1, 2 i 7) je usklađen s njom; ime „Video Download" i logo nisu dio licence
+  (GPL-3.0, član 7). README, „O programu", Android Licence, sajt (stranica licenci) i Store to navode. Korisnici
+  novi ugovor i „O programu" dobijaju od 1.0.9. Profil organizacije (`abnps/.github`): README s Linuxom, Storeom i
+  dodacima, `SECURITY.md`; Ahmed još treba zakačiti repozitorije i postaviti logo.
 - Novo u 1.0.7 (logika bez Qt-a, s testovima): `videodl/pacing.py` (razmaci i predasi za stroge sajtove; blokada
   429 / „nisi bot" → stavka čeka 5/10/15 min i sama nastavlja; poslije blokade 7 dana opreznije), `videodl/recap.py`
   (mjesečni pregled, samo brojke, lokalno) i pravila poruke o podršci u `videodl/support.py` (najviše jednom
@@ -36,9 +44,17 @@ ostaju tehnički (engleski). Izvor: vault `CLAUDE.md`, odjeljak „Jezik i stil"
   `Recap.kt`, `PauseUi.kt`. Isključivanje zaštite od blokade traži potvrdu s upozorenjem (Ahmed 2.11.2026).
 - Build: `tools/build_release.py` traži Node 24.14.1 (`tools/build-lock.json`), a globalni Node na računaru je
   noviji; prije builda staviti `C:\Video Downloader\Build\node-24.14.1\node-v24.14.1-win-x64` na početak PATH-a.
-- Za 1.0.8 spojeno u main 7.11.2026 (još nije objavljeno): novi izgled Postavki (grana `postavke-izgled`) i
-  ispravke iz pregleda 7.11.2026 (grana `pregled-1.0.8`). Grana `brojac-posjeta` (brojač posjeta
-  sajta, 28.10.2026) nije spojena i čeka Ahmedovu odluku.
+- Za 1.0.9 (u main, još nije objavljeno; plan i bilješke: `00_plan/plan_1.0.9.md`): izgled „Sada i sljedeće"
+  (Ahmed 8.11.2026) — boje sajta (`videodl/theme.py`), kartica „Sada preuzima" i pozadina (`videodl/now_panel.py`),
+  statusna traka sa stanjem zaštite i „Danas". Kartica ima puni i sažeti oblik (prozor niži od 600 px); najmanju
+  visinu prozora računa `MainWindow._sync_min_height` (Qt je ne računa tačno kad se tekst traka prelama).
+  Standardni prozor je 900×640. Poruku o pauzi zaštite daje `gui_pause._announce_pace` (jednom po pauzi, i za link
+  dodat usred pauze); isključivanje zaštite odmah prekida razmake i predahe (`Pacer.drop_soft`, Android
+  `Pacing.dropSoft`), čekanje poslije stvarne blokade ostaje.
+- Testovi koji prave `MainWindow` moraju proslijediti `data_dir_path` (privremeni folder): bez toga čitaju i pišu
+  korisnikov stvarni red preuzimanja (`%LOCALAPPDATA%\VideoDownload\queue.json`), kao što se desilo 8.11.2026.
+- Grana `brojac-posjeta` (brojač posjeta sajta, 28.10.2026) nije spojena i čeka Ahmedovu odluku. Spojene radne
+  kopije u `Build\wt-*` se ne brišu bez Ahmedovog pristanka.
 
 ## Nastavak rada 27.10.2026
 

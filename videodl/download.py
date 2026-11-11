@@ -8,10 +8,10 @@ import subprocess
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .browser import Cookie, cookie_options
+from .browser import Cookie, cookie_options, is_cookie_read_error
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
 from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA
@@ -64,6 +64,7 @@ class DownloadResult:
     message: str = ""
     already_existed: bool = False
     height: int | None = None  # stvarna visina preuzetog videa (oznaka „1080p" u redu); None za zvuk
+    cookie_warning: bool = False  # kolačići iz Postavki se nisu mogli pročitati: preuzeto bez prijave
 
 
 class RateBudget:
@@ -316,9 +317,19 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                               **more)
             if result.status == ItemStatus.DONE:
                 return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed,
-                                      result.height)
+                                      result.height, result.cookie_warning)
             return result
-        return DownloadResult(ItemStatus.FAILED, message=error_message(exc))
+        message = error_message(exc)
+        if not cookies and (cookie_browser or cookie_txt) and is_cookie_read_error(message):
+            # Kolačići izabranog browsera se ne mogu pročitati: isto preuzimanje bez prijave (javni video prolazi).
+            more.update(cookie_browser=None, cookie_txt=None)
+            result = download(url, preset, output_dir, subfolder, on_progress, cancel_event,
+                              http_headers=http_headers, filename_title=filename_title, cookies=cookies,
+                              section=section, subtitles=subtitles, subtitle_langs=subtitle_langs, thumbnail=thumbnail,
+                              chapters=chapters, sponsorblock=sponsorblock, ratelimit=ratelimit,
+                              name_template=name_template, _isolated=_isolated, **more)
+            return replace(result, cookie_warning=True)
+        return DownloadResult(ItemStatus.FAILED, message=message)
 
     filepath = _final_path(info)
     if not output_is_usable(filepath):
@@ -357,9 +368,11 @@ def _download_audio(url: str, preset: Preset, output_dir: str, subfolder: str | 
         final = target / Path(result.filepath).name
         if final.exists():
             # Isti zvučni fajl već postoji pored videa: ostaje taj, novi se odbacuje.
-            return DownloadResult(ItemStatus.DONE, str(final), result.message, already_existed=True)
+            return DownloadResult(ItemStatus.DONE, str(final), result.message, already_existed=True,
+                                  cookie_warning=result.cookie_warning)
         os.replace(result.filepath, final)
-        return DownloadResult(ItemStatus.DONE, str(final), result.message, result.already_existed)
+        return DownloadResult(ItemStatus.DONE, str(final), result.message, result.already_existed,
+                              cookie_warning=result.cookie_warning)
     finally:
         shutil.rmtree(work, ignore_errors=True)
 

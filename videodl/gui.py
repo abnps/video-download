@@ -16,18 +16,18 @@ import time
 import urllib.request
 from pathlib import Path
 
-from PySide6.QtCore import QLocale, QObject, QPoint, QRect, QSettings, QSize, Qt, QTimer, QUrl, Signal, Slot
+from PySide6.QtCore import QEvent, QLocale, QObject, QPoint, QRect, QSettings, QSize, Qt, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import (
     QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QImage, QKeySequence, QPainter, QPalette, QPixmap,
 )
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox,
-    QProgressDialog, QPushButton, QScrollArea, QStackedWidget, QSystemTrayIcon, QToolButton, QVBoxLayout, QWidget,
+    QProgressDialog, QPushButton, QScrollArea, QSizePolicy, QSystemTrayIcon, QToolButton, QVBoxLayout, QWidget,
 )
 
 from . import __version__
 from .bridge import BridgeServer
-from .browser import COOKIE_BROWSERS, BrowserRequest
+from .browser import COOKIE_BROWSER_NAMES, COOKIE_BROWSERS, BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, RateBudget, download
 from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_PAUSE, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
@@ -43,7 +43,7 @@ from .probe import ProbeResult, probe
 from . import achievements, convert, diagnostics, release_signing, runtime, scheduler, store, support, theme, winshell
 from . import updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, format_size, set_state
-from .now_panel import BloomBackground, NowPanel
+from .now_panel import COMPACT_BELOW, BloomBackground, NowPanel, PageStack
 from .desktop import play_file, reveal
 from .dialogs import (  # noqa: F401 - i dalje dostupno kao videodl.gui.*
     AUDIO_EXTENSIONS, DISCORD_URL, HISTORY_KINDS, SITE_URL, BrowserHelpDialog, HistoryDialog, LegalDialog,
@@ -78,7 +78,9 @@ def apply_theme(app: QApplication) -> None:
     app.setFont(QFont("Segoe UI", 9))
     palette = QPalette()
     k = theme.c
-    for role, color in ((QPalette.ColorRole.Window, k("bg")), (QPalette.ColorRole.Base, k("bg")),
+    # Base (polja za unos, liste, meniji) je boja kartice: u tamnoj temi se inače stapaju s pozadinom prozora,
+    # jer Fusion okvire crta tamnije od pozadine (pregled 9.11.2026).
+    for role, color in ((QPalette.ColorRole.Window, k("bg")), (QPalette.ColorRole.Base, k("card")),
                         (QPalette.ColorRole.AlternateBase, k("alt_base")), (QPalette.ColorRole.Text, k("text")),
                         (QPalette.ColorRole.WindowText, k("text")), (QPalette.ColorRole.Button, k("button")),
                         (QPalette.ColorRole.ButtonText, k("text")), (QPalette.ColorRole.Highlight, "#1e88e5"),
@@ -155,8 +157,10 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
 
         set_language(self._settings.value("language", "", type=str) or pick_language(QLocale.system().name()))
         self.setWindowTitle(f"Video Download {__version__}")
+        # Najmanju visinu računa _sync_min_height po onome što se trenutno vidi (kartice, trake, lista), pa se
+        # prozor ne može smanjiti toliko da se kartice preklope, a sam poraste kad zatreba (npr. kartica pauze).
         self.setMinimumSize(640, 380)
-        self.resize(820, 520)
+        self.resize(900, 640)  # puna kartica „Sada preuzima" i nekoliko redova liste ispod
         self.setAcceptDrops(True)
         self._theme = theme.DEFAULT_THEME
         self._follows_system = False
@@ -169,6 +173,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._split_chapters = False
         self._cookie_browser = ""  # „", firefox, edge, chrome, brave (Postavke → Prijava na sajtove)
         self._cookie_txt = ""  # putanja do korisnikovog cookies.txt (samo putanja, nikad sadržaj)
+        self._cookie_warned = False  # poruka „kolačići se ne mogu pročitati, preuzimam bez prijave" jednom po pokretanju
         self._rate_limit = 0
         self._rate_budget = None
         self._name_template = DEFAULT_NAME_TEMPLATE
@@ -381,6 +386,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.settings_button.setToolTip(tr("settings.title"))
 
         self.paste_button.setText(tr("toolbar.paste"))
+        self.paste_button.setIcon(icon("plus", theme.c("accent")))  # ovdje, da prati promjenu teme
         self.paste_button.setToolTip(tr("toolbar.paste_tip"))
         current = self.preset_combo.currentData()
         self.preset_combo.blockSignals(True)
@@ -394,6 +400,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.drop_zone.retranslate()
         self.filter_bar.retranslate()
         self.now_panel.retranslate()
+        self.queue_hint.setText(tr("queue.next_empty"))
         self._update_folder_label()
         for item in self._queue.items():
             self._refresh_row(item)
@@ -419,7 +426,6 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         bar.setSpacing(8)
         self.paste_button = QPushButton()
         self.paste_button.setObjectName("pasteButton")
-        self.paste_button.setIcon(icon("plus", theme.c("accent")))
         self.paste_button.setIconSize(QSize(14, 14))
         self.paste_button.clicked.connect(self._paste_from_clipboard)
         bar.addWidget(self.paste_button)
@@ -498,7 +504,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.filter_bar.hide()
         layout.addWidget(self.filter_bar)
 
-        self.stack = QStackedWidget()
+        self.stack = PageStack()  # najmanja visina po stranici koja se vidi
         self.drop_zone = DropZone()
         self.drop_zone.paste_requested.connect(self._paste_from_clipboard)
         self.stack.addWidget(self.drop_zone)
@@ -512,13 +518,23 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self.rows_layout.setSpacing(0)
         self.rows_layout.addStretch(1)
         self.scroll.setWidget(rows)
+        self.scroll.setMinimumHeight(96)  # bar jedan red liste ostaje vidljiv
         self.stack.addWidget(self.scroll)
+        # Jedini video je gore u kartici „Sada preuzima": umjesto prazne liste kratak poziv da se doda još.
+        self.queue_hint = QLabel()
+        self.queue_hint.setObjectName("queueHint")
+        self.queue_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Jedan red, bez prelamanja: tekst koji se prelama mijenja najmanju visinu prozora sa širinom.
+        self.queue_hint.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self.queue_hint.setMinimumHeight(96)
+        self.stack.addWidget(self.queue_hint)
         list_card = QFrame()  # „Sljedeće": red u kartici
         list_card.setObjectName("listCard")
         card_box = QVBoxLayout(list_card)
         card_box.setContentsMargins(1, 1, 1, 1)
         card_box.addWidget(self.stack)
         layout.addWidget(list_card, 1)
+        central.installEventFilter(self)  # promjena rasporeda → najmanja visina prozora (_sync_min_height)
         self.setCentralWidget(central)
 
         self.shield_label = QLabel()  # stanje zaštite od blokade (pacing.py)
@@ -693,7 +709,17 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
             return {"cookie_browser": self._cookie_browser}
         return {"cookie_txt": self._cookie_txt} if self._cookie_txt else {}
 
+    def _note_cookie_fallback(self) -> None:
+        """Kolačići iz Postavki se nisu mogli pročitati, pa je link pročitan i preuzet bez prijave (javni video
+        prolazi). Korisnik to vidi jednom po pokretanju, sa savjetom šta da uradi za video iza prijave."""
+        if self._cookie_warned:
+            return
+        self._cookie_warned = True
+        source = COOKIE_BROWSER_NAMES.get(self._cookie_browser) or "cookies.txt"
+        self._set_status(tr("cookies.fallback", browser=source))
+
     def set_cookie_source(self, browser: str = "", cookie_txt: str = "") -> None:
+        self._cookie_warned = False  # novi izvor: ako ni on ne radi, poruka se pokaže ponovo
         self._cookie_browser = browser if browser in COOKIE_BROWSERS else ""
         self._cookie_txt = "" if self._cookie_browser else cookie_txt
         self._save_settings()
@@ -894,6 +920,8 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
     @Slot(object, str, object, bool, object)
     def _on_probed(self, result: ProbeResult, output_dir: str, access: dict, auto_start: bool,
                    preset: str | None = None) -> None:
+        if result.cookie_warning:
+            QTimer.singleShot(0, self._note_cookie_fallback)  # poslije poruke „Dodano: …", da se vidi
         if not result.entries:
             self._set_status(tr("status.playlist_empty", title=result.title))
             return
@@ -1026,6 +1054,8 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         item = self._queue.get(item_id)
         if item_id in self._batch:
             self._batch[item_id] = 1.0
+        if result.cookie_warning:
+            QTimer.singleShot(0, self._note_cookie_fallback)
         if item is not None and self._pause_on_block(item, result):
             return  # sajt traži pauzu: stavka čeka i sama nastavlja (gui_pause.py)
         if item is not None and self._auto_retry(item, result):
@@ -1551,11 +1581,39 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
             self.now_panel.show_item(active, pixmap, waiting)
             if row is not None and self.filter_bar.current in ("all", "active"):
                 row.setVisible(False)  # isti video je gore u kartici; lista ispod je „Sljedeće"
+                if all(other.isHidden() for other in self._rows.values()):
+                    self.stack.setCurrentIndex(2)  # ništa drugo za prikaz: poziv umjesto prazne liste
         on = self._pacer.enabled
         self.shield_label.setText(("🛡 " if on else "⚠ ") + tr("status.pacing_on" if on else "status.pacing_off"))
         set_state(self.shield_label, "" if on else "off")
         count, size = self._recap.today(datetime.date.today())
         self.today_label.setText(tr("status.today", count=count, size=format_size(size)) if count else "")
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        if hasattr(self, "now_panel"):
+            self.now_panel.set_compact(self.height() < COMPACT_BELOW)  # nizak prozor: sažeta kartica
+            self._sync_min_height()
+
+    def eventFilter(self, watched, event) -> bool:
+        if event.type() == QEvent.Type.LayoutRequest and watched is self.centralWidget():
+            QTimer.singleShot(0, self._sync_min_height)  # pošto raspored obradi promjenu (traka, kartica…)
+        return super().eventFilter(watched, event)
+
+    def _sync_min_height(self) -> None:
+        """Najmanja visina prozora = ono što raspored zaista traži pri ovoj širini. Qt je sam računa bez prelamanja
+        teksta, pa traka s tekstom u dva reda ostane bez mjesta i raspored zgnječi najveću karticu."""
+        central = self.centralWidget()
+        if central is None or not self.isVisible() or self._closing:
+            return
+        layout = central.layout()
+        need = layout.minimumSize().height()
+        if layout.hasHeightForWidth():
+            need = max(need, layout.minimumHeightForWidth(central.width()))
+        chrome = self.height() - central.height()  # meni i statusna traka
+        height = max(380, need + chrome)
+        if height != self.minimumHeight():
+            self.setMinimumHeight(height)
 
     def _set_status(self, text: str) -> None:
         self.status_label.setText(text)

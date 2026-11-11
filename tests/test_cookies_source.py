@@ -5,13 +5,17 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QSettings  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from videodl.browser import COOKIE_BROWSERS, Cookie, cookie_options  # noqa: E402
+from videodl import download as download_module, probe as probe_module  # noqa: E402
+from videodl.browser import COOKIE_BROWSERS, Cookie, cookie_options, is_cookie_read_error  # noqa: E402
+from videodl.download import DownloadResult  # noqa: E402
+from videodl.jobs import ItemStatus  # noqa: E402
 from videodl.gui import MainWindow  # noqa: E402
 from videodl.i18n import get_language, set_language  # noqa: E402
 from videodl.presets import build_ydl_options, get_preset  # noqa: E402
@@ -54,6 +58,81 @@ class CookieOptionsTest(unittest.TestCase):
                 self.assertIn("Firefox", friendly_error(message) or "")
 
 
+class FakeYdl:
+    """yt-dlp zamjena: s kolačićima iz browsera pada kao Edge koji radi; bez njih pročita javni video."""
+
+    calls: list = []
+
+    def __init__(self, opts):
+        self.opts = opts
+        FakeYdl.calls.append(dict(opts))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def extract_info(self, url, download=False):
+        if "cookiesfrombrowser" in self.opts:
+            raise RuntimeError("ERROR: Could not copy Chrome cookie database. See "
+                               "https://github.com/yt-dlp/yt-dlp/issues/7271 for more info")
+        return {"id": "2128", "title": "Javni video", "duration": 12.0, "formats": [{"url": url, "vcodec": "h264"}],
+                "webpage_url": url}
+
+
+class CookieFallbackTest(unittest.TestCase):
+    """Ahmed 10.11.2026: u Postavkama izabran Edge, Edge radi, pa javni video sa x.com nije mogao ni da se pročita.
+    Prijava je dodatak: kad kolačići ne mogu da se pročitaju, link se čita (i preuzima) bez njih."""
+
+    def setUp(self):
+        FakeYdl.calls = []
+        patcher = mock.patch.object(probe_module, "_ydl", return_value=FakeYdl)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_recognizes_cookie_read_errors_only(self):
+        for message in ("Could not copy Chrome cookie database", "ERROR: Failed to decrypt with DPAPI",
+                        "could not find firefox cookies database in 'C:/Profiles'", "app-bound encryption"):
+            self.assertTrue(is_cookie_read_error(message), message)
+        for message in ("HTTP Error 403: Forbidden", "Sign in to confirm you're not a bot", ""):
+            self.assertFalse(is_cookie_read_error(message), message)
+
+    def test_reading_falls_back_to_no_cookies_and_says_so(self):
+        result = probe_module.probe("https://x.com/a/status/2128/video/1", cookie_browser="edge")
+        self.assertEqual(result.entries[0].title, "Javni video")
+        self.assertTrue(result.cookie_warning)
+        self.assertIn("cookiesfrombrowser", FakeYdl.calls[0])
+        self.assertNotIn("cookiesfrombrowser", FakeYdl.calls[1])
+
+    def test_no_fallback_without_a_chosen_source_or_with_extension_cookies(self):
+        result = probe_module.probe("https://x.com/a/status/2128/video/1")
+        self.assertFalse(result.cookie_warning)
+        self.assertEqual(len(FakeYdl.calls), 1)
+        # Kolačići iz dodatka imaju prednost i ne daju ovu grešku; nema drugog pokušaja.
+        cookie = Cookie(".x.com", "auth", "tajna", "/", True, 0, False)
+        result = probe_module.probe("https://x.com/a/status/2128/video/1", cookies=(cookie,), cookie_browser="edge")
+        self.assertFalse(result.cookie_warning)
+
+    def test_downloading_falls_back_to_no_cookies(self):
+        attempts = []
+        real = download_module.download
+
+        def fake_ydl(opts):
+            attempts.append("cookiesfrombrowser" in opts)
+            if "cookiesfrombrowser" in opts:
+                raise RuntimeError("ERROR: Failed to decrypt with DPAPI")
+            raise RuntimeError("ERROR: stigao do preuzimanja bez kolačića")
+
+        with mock.patch.object(download_module, "_load"),                 mock.patch.object(download_module, "YoutubeDL", side_effect=fake_ydl),                 mock.patch.object(download_module, "DownloadCancelled", type("Cancelled", (Exception,), {})),                 mock.patch.object(download_module, "_parts_recorder", return_value=lambda f: f),                 tempfile.TemporaryDirectory() as tmp:
+            result = real("https://x.com/a/status/2128/video/1", get_preset("best"), tmp, None, None, None,
+                          cookie_browser="chrome")
+        self.assertEqual(attempts, [True, False])  # drugi pokušaj bez kolačića iz browsera
+        self.assertEqual(result.status, ItemStatus.FAILED)
+        self.assertIn("bez kolačića", result.message)
+        self.assertTrue(result.cookie_warning)
+
+
 class SplitChaptersTest(unittest.TestCase):
     def test_chapters_go_to_a_folder_named_after_the_video(self):
         opts = build_ydl_options(get_preset("mp3"), os.path.join("C:", "P"), "Lista", split_chapters=True)
@@ -91,6 +170,24 @@ class WindowCookieSourceTest(unittest.TestCase):
                             data_dir_path=Path(self.tmp.name))
         self.addCleanup(window.close)
         return window
+
+    def test_window_tells_once_that_it_downloads_without_signing_in(self):
+        window = self.window()
+        window.set_cookie_source("edge")
+        window._on_probed(ProbeResult("V", (Entry("https://x.test/1", "V"),), False, cookie_warning=True), self.tmp.name,
+                          {}, False)
+        app.processEvents()
+        self.assertIn("Microsoft Edge", window.status_label.text())
+        self.assertIn("bez prijave", window.status_label.text())
+        window._set_status("")
+        window._on_probed(ProbeResult("W", (Entry("https://x.test/2", "W"),), False, cookie_warning=True), self.tmp.name,
+                          {}, False)
+        app.processEvents()
+        self.assertNotIn("bez prijave", window.status_label.text())  # jednom po pokretanju
+        window.set_cookie_source("chrome")  # drugi izvor: ako ni on ne radi, poruka opet
+        window._on_download_finished(window._queue.items()[0].id, DownloadResult(ItemStatus.DONE, cookie_warning=True))
+        app.processEvents()
+        self.assertIn("Google Chrome", window.status_label.text())
 
     def test_chosen_source_reaches_reading_and_downloading_and_is_remembered(self):
         window = self.window()

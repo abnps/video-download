@@ -72,6 +72,17 @@ class PacingTest {
     }
 
     @Test
+    fun turningOffEndsGapsAndBreaksButNotABlock() {
+        run("youtube", 25)
+        assertTrue(Pacing.remaining("youtube") > 0) // predah poslije 25.
+        Pacing.blocked("x", 1)
+        Pacing.enabled = false
+        Pacing.dropSoft()
+        assertEquals(0L, Pacing.remaining("youtube"))
+        assertEquals(5 * 60_000L, Pacing.remaining("x")) // stvarna blokada se i dalje čeka
+    }
+
+    @Test
     fun blockWaitsFiveTenFifteenThenGivesUpAndLearns() {
         assertEquals(5 * 60_000L, Pacing.blocked("youtube", 1)!!.millis)
         assertEquals(10 * 60_000L, Pacing.blocked("youtube", 2)!!.millis)

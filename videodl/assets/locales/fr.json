@@ -259,7 +259,7 @@
  "error.friendly.unavailable": "La vidéo n'est plus disponible (supprimée ou lien incorrect).",
  "error.friendly.forbidden": "Le site a refusé le téléchargement. {help} → {update}, puis réessayez.",
  "error.friendly.rate": "Le site limite temporairement les requêtes. Réessayez dans quelques minutes.",
- "error.friendly.cookies": "Impossible de lire les cookies du navigateur. Fermez le navigateur et réessayez, ou choisissez Firefox ou un fichier cookies.txt dans les paramètres.",
+ "error.friendly.cookies": "Impossible de lire les cookies du navigateur (Chrome et Edge les verrouillent pendant leur exécution). Pour une vidéo qui demande une connexion, envoie-la depuis l’extension du navigateur, ou choisis Firefox ou un fichier cookies.txt dans les Paramètres.",
  "error.friendly.network": "Impossible de joindre le site. Vérifiez votre connexion internet et réessayez.",
  "error.friendly.unsupported": "Ce lien n'est pas pris en charge. Si c'est une vidéo, envoyez-la depuis l'extension du navigateur pendant la lecture.",
  "error.friendly.format": "La qualité choisie n'est pas disponible pour cette vidéo. Choisissez un autre format (p. ex. la meilleure qualité).",
@@ -422,5 +422,7 @@
  "now.eta": "Reste",
  "status.pacing_on": "Protection contre les blocages activée",
  "status.pacing_off": "Protection contre les blocages désactivée",
- "status.today": "Aujourd’hui : {count} · {size}"
+ "status.today": "Aujourd’hui : {count} · {size}",
+ "queue.next_empty": "Plus rien n’attend. Colle un nouveau lien (Ctrl+V) ou fais-le glisser ici.",
+ "cookies.fallback": "Impossible de lire les cookies de {browser} (Chrome et Edge les verrouillent pendant leur exécution) : téléchargement sans connexion. Pour une vidéo qui demande une connexion, envoie-la depuis l’extension du navigateur."
 }
