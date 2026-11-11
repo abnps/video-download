@@ -4,7 +4,9 @@ grafikon brzine. Bez logike preuzimanja: prozor (gui.py) samo javlja šta trenut
 
 from PySide6.QtCore import QPointF, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPainterPath, QPen, QPixmap, QRadialGradient
-from PySide6.QtWidgets import QFrame, QGridLayout, QHBoxLayout, QLabel, QToolButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QFrame, QGridLayout, QHBoxLayout, QLabel, QStackedWidget, QToolButton, QVBoxLayout, QWidget,
+)
 
 from . import theme
 from .download import PROCESSING, Progress
@@ -16,6 +18,29 @@ from .presets import get_preset
 from .widgets import AnimatedProgress, ElidedLabel, Thumbnail, format_duration, set_state
 
 SPARK_POINTS = 40  # koliko posljednjih brzina grafikon pamti
+COMPACT_BELOW = 600  # visina prozora ispod koje kartica prelazi u sažeti oblik (bez reda s grafikonom)
+THUMB_FULL, THUMB_COMPACT = (144, 81), (120, 68)
+
+
+class PageStack(QStackedWidget):
+    """Stranice liste (prazan ekran, red, poruka „ništa više ne čeka"). Najmanja visina se računa po stranici
+    koja se vidi: inače veliki prazan ekran drži ~230 px i kad je sakriven, pa na manjem prozoru gnječi
+    karticu „Sada preuzima" (pregled 9.11.2026)."""
+
+    def __init__(self, parent: QWidget | None = None):
+        super().__init__(parent)
+        self.currentChanged.connect(lambda _index: self.updateGeometry())
+
+    def minimumSizeHint(self) -> QSize:
+        page = self.currentWidget()
+        if page is None:
+            return super().minimumSizeHint()
+        hint, explicit = page.minimumSizeHint(), page.minimumSize()  # zadata najmanja veličina stranice ima prednost
+        return QSize(explicit.width() or hint.width(), explicit.height() or hint.height())
+
+    def sizeHint(self) -> QSize:
+        page = self.currentWidget()
+        return page.sizeHint() if page is not None else super().sizeHint()
 
 
 class BloomBackground(QWidget):
@@ -87,7 +112,8 @@ class Sparkline(QWidget):
 
 
 class NowPanel(QFrame):
-    """Kartica iznad liste: video koji se upravo preuzima, velika traka s fazama, brzina, vrijeme i grafikon."""
+    """Kartica iznad liste: video koji se upravo preuzima, velika traka s fazama, brzina, vrijeme i grafikon.
+    Na niskom prozoru (set_compact) ostaje bez donjeg reda; brzina i vrijeme tada stoje uz procenat."""
 
     stop_clicked = Signal(int)  # isto kao dugme „zaustavi" u redu tog videa
 
@@ -95,6 +121,7 @@ class NowPanel(QFrame):
         super().__init__(parent)
         self.setObjectName("nowPanel")
         self.item_id: int | None = None
+        self.compact = False
         self._audio = False
         self._phase = ""
 
@@ -116,7 +143,7 @@ class NowPanel(QFrame):
         body.setHorizontalSpacing(16)
         body.setVerticalSpacing(4)
         self.thumbnail = Thumbnail()
-        self.thumbnail.setFixedSize(144, 81)
+        self.thumbnail.setFixedSize(*THUMB_FULL)
         body.addWidget(self.thumbnail, 0, 0, 4, 1, Qt.AlignmentFlag.AlignTop)
         self.title = ElidedLabel()
         self.title.setObjectName("nowTitle")
@@ -136,29 +163,39 @@ class NowPanel(QFrame):
             self.phase_labels[key] = label
             phases.addWidget(label)
         phases.addStretch(1)
+        self.inline = QLabel()  # sažeti oblik: brzina i preostalo vrijeme uz procenat
+        self.inline.setObjectName("nowMuted")
+        self.inline.hide()
+        phases.addWidget(self.inline)
         self.percent = QLabel()
         self.percent.setObjectName("nowPercent")
         phases.addWidget(self.percent)
         body.addLayout(phases, 3, 1)
+        # Zaustavi: desno, kao dugmad u redovima liste.
+        self.stop_button = QToolButton()
+        self.stop_button.setObjectName("rowAction")
+        self.stop_button.setIconSize(QSize(20, 20))
+        self.stop_button.setFixedSize(34, 34)
+        self.stop_button.clicked.connect(lambda: self.item_id is not None and self.stop_clicked.emit(self.item_id))
+        body.addWidget(self.stop_button, 0, 2, 4, 1, Qt.AlignmentFlag.AlignVCenter)
         body.setColumnStretch(1, 1)
         box.addLayout(body)
 
+        self.details = QWidget()  # donji red pune kartice: brzina, preostalo vrijeme, grafikon
+        details = QVBoxLayout(self.details)
+        details.setContentsMargins(0, 0, 0, 0)
+        details.setSpacing(10)
         line = QFrame()
         line.setObjectName("nowDivider")
-        box.addWidget(line)
+        details.addWidget(line)
         stats = QHBoxLayout()
         stats.setSpacing(18)
         self.speed_caption, self.speed = self._stat(stats)
         self.eta_caption, self.eta = self._stat(stats)
         self.spark = Sparkline()
         stats.addWidget(self.spark, 1)
-        self.stop_button = QToolButton()
-        self.stop_button.setObjectName("rowAction")
-        self.stop_button.setIconSize(QSize(20, 20))
-        self.stop_button.setFixedSize(34, 34)
-        self.stop_button.clicked.connect(lambda: self.item_id is not None and self.stop_clicked.emit(self.item_id))
-        stats.addWidget(self.stop_button, 0, Qt.AlignmentFlag.AlignVCenter)
-        box.addLayout(stats)
+        details.addLayout(stats)
+        box.addWidget(self.details)
 
         self.retranslate()
         self.hide()
@@ -184,6 +221,16 @@ class NowPanel(QFrame):
         self.eta_caption.setText(tr("now.eta"))
         self.stop_button.setIcon(icon("stop", theme.c("icon")))
         self.stop_button.setToolTip(tr("row.stop_tip"))
+        self.stop_button.setAccessibleName(tr("row.stop_tip"))  # čitač ekrana: dugme ima samo ikonu
+
+    def set_compact(self, compact: bool) -> None:
+        """Nizak prozor: bez donjeg reda i s manjom sličicom, da lista ispod ostane upotrebljiva."""
+        if compact == self.compact:
+            return
+        self.compact = compact
+        self.details.setVisible(not compact)
+        self.inline.setVisible(compact)
+        self.thumbnail.setFixedSize(*(THUMB_COMPACT if compact else THUMB_FULL))
 
     # ---------- podaci ----------
 
@@ -205,38 +252,50 @@ class NowPanel(QFrame):
             self.progress.reset()
             self.progress.set_fraction(None)
             self.percent.setText("")
+            self.inline.setText("")
             self.speed.setText("—")
             self.eta.setText("—")
             self.spark.clear()
             self.phase_labels["video"].setVisible(not self._audio)
             self.phase_labels["merge"].setVisible(not self._audio)
-            self.phase_labels["convert"].setVisible(self._audio)
+            self.phase_labels["convert"].setVisible(self._audio)  # za video tek kad obrada zaista krene
             self._set_phase("audio" if self._audio else "video")
         if pixmap is not None:
             self.thumbnail.set_pixmap(pixmap)
         self.show()
 
-    def set_pixmap(self, item_id: int, pixmap: QPixmap) -> None:
-        if item_id == self.item_id:
+    def set_pixmap(self, item_id: int, pixmap: QPixmap | None) -> None:
+        if item_id == self.item_id and pixmap is not None:
             self.thumbnail.set_pixmap(pixmap)
 
     def update_progress(self, item_id: int, progress: Progress) -> None:
         if item_id != self.item_id:
             return
         if progress.phase == PROCESSING:
-            self._set_phase("convert" if self._audio else "merge")
+            # Spajanje videa i zvuka je „Spajanje"; sve ostalo (npr. pretvaranje u AVI za auto) je „Obrada".
+            key = "merge" if progress.label == "pp.merge" and not self._audio else "convert"
+            self.phase_labels[key].setVisible(True)
+            self._set_phase(key)
             self.progress.set_fraction(None)
             self.percent.setText("")
+            self.inline.setText("")
             self.eta.setText("—")
             return
         audio = self._audio or progress.label == "progress.audio"
         self._set_phase("audio" if audio else "video")
         self.progress.set_fraction(progress.fraction, "audio" if audio else "video")
         self.percent.setText(f"{progress.fraction:.0%}" if progress.fraction is not None else "")
+        inline = []
         if progress.speed:
             self.speed.setText(format_speed(progress.speed))
             self.spark.add(progress.speed)
-        self.eta.setText(format_eta(progress.eta) if progress.eta is not None else "—")
+            inline.append(format_speed(progress.speed))
+        if progress.eta is not None:
+            self.eta.setText(format_eta(progress.eta))
+            inline.append(tr("progress.eta", time=format_eta(progress.eta)))
+        else:
+            self.eta.setText("—")
+        self.inline.setText(" · ".join(inline))
 
     def clear(self) -> None:
         self.item_id = None

@@ -259,7 +259,7 @@
  "error.friendly.unavailable": "The video is no longer available (it was removed or the link is wrong).",
  "error.friendly.forbidden": "The site refused the download. {help} → {update}, then try again.",
  "error.friendly.rate": "The site is temporarily limiting requests. Try again in a few minutes.",
- "error.friendly.cookies": "The browser's cookies can't be read. Close the browser and try again, or choose Firefox or a cookies.txt file in Settings.",
+ "error.friendly.cookies": "Cookies from the browser can't be read (Chrome and Edge lock them while running). For videos behind a sign-in, send them from the browser extension, or choose Firefox or a cookies.txt file in Settings.",
  "error.friendly.network": "Can't reach the site. Check your internet connection and try again.",
  "error.friendly.unsupported": "This link isn't supported. If it's a video, send it from the browser extension while it plays.",
  "error.friendly.format": "The chosen quality isn't available for this video. Pick another format (e.g. best quality).",
@@ -422,5 +422,7 @@
  "now.eta": "Time left",
  "status.pacing_on": "Block protection on",
  "status.pacing_off": "Block protection off",
- "status.today": "Today: {count} · {size}"
+ "status.today": "Today: {count} · {size}",
+ "queue.next_empty": "Nothing else is waiting. Paste a new link (Ctrl+V) or drag it here.",
+ "cookies.fallback": "Cookies from {browser} can't be read (Chrome and Edge lock them while running), so downloading without signing in. For videos behind a sign-in, send them from the browser extension."
 }

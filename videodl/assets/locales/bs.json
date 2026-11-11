@@ -259,7 +259,7 @@
  "error.friendly.unavailable": "Video više nije dostupan (uklonjen je ili link nije ispravan).",
  "error.friendly.forbidden": "Sajt je odbio preuzimanje. {help} → {update}, pa pokušaj ponovo.",
  "error.friendly.rate": "Sajt privremeno ograničava broj zahtjeva. Pokušaj ponovo za nekoliko minuta.",
- "error.friendly.cookies": "Kolačići iz browsera se ne mogu pročitati. Zatvori browser i pokušaj ponovo, ili u Postavkama izaberi Firefox ili fajl cookies.txt.",
+ "error.friendly.cookies": "Kolačići iz browsera se ne mogu pročitati (Chrome i Edge ih zaključaju dok rade). Za video iza prijave pošalji ga iz dodatka u browseru, ili u Postavkama izaberi Firefox ili fajl cookies.txt.",
  "error.friendly.network": "Nema veze sa sajtom. Provjeri internet i pokušaj ponovo.",
  "error.friendly.unsupported": "Ovaj link nije podržan. Ako je to video, pošalji ga iz dodatka za browser dok se pušta.",
  "error.friendly.format": "Izabrani kvalitet nije dostupan za ovaj video. Izaberi drugi format (npr. najbolji kvalitet).",
@@ -422,5 +422,7 @@
  "now.eta": "Još",
  "status.pacing_on": "Zaštita od blokade uključena",
  "status.pacing_off": "Zaštita od blokade isključena",
- "status.today": "Danas: {count} · {size}"
+ "status.today": "Danas: {count} · {size}",
+ "queue.next_empty": "Ništa više ne čeka. Zalijepi novi link (Ctrl+V) ili ga prevuci ovdje.",
+ "cookies.fallback": "Kolačići iz {browser} se ne mogu pročitati (Chrome i Edge ih zaključaju dok rade), pa preuzimam bez prijave. Za video iza prijave pošalji ga iz dodatka u browseru."
 }

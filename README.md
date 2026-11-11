@@ -44,7 +44,8 @@ iz stvarnih dijaloga s izmišljenim napretkom; ništa se ne preuzima.
 
 ## Izdavanje nove verzije
 
-1. Povećaj `__version__` u `videodl/__init__.py` i `version` u `extension/manifest.json`.
+1. Povećaj `__version__` u `videodl/__init__.py`. `version` u `extension/manifest.json` se povećava samo kad se
+   dodatak mijenja (nova verzija dodatka ide na provjeru u Edge i Firefox prodavnicu).
    Ako je Android APK izmijenjen, povećaj i `versionCode` u `android/app/build.gradle.kts`.
 2. `python tools/build_release.py` (build u folder `Build` pored projekta, npr. `C:\Video Downloader\Build`;
    gotovi instaler je u `Build\installer`;

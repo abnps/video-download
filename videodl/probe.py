@@ -4,9 +4,10 @@ from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-from .browser import Cookie, cookie_options
+from .browser import Cookie, cookie_options, is_cookie_read_error
 from .ytdl import (
-    LiveStreamError, NotMediaError, base_options, check_media, is_live, is_obviously_not_media, is_web_url,
+    LiveStreamError, NotMediaError, base_options, check_media, error_message, is_live, is_obviously_not_media,
+    is_web_url,
 )
 from .pacing import request_sleep
 from .ytdlp_update import ensure_ready
@@ -70,6 +71,7 @@ class ProbeResult:
     title: str
     entries: tuple[Entry, ...]
     is_playlist: bool
+    cookie_warning: bool = False  # kolačići iz Postavki se nisu mogli pročitati: pročitano bez prijave
 
 
 def probe(url: str, extract: Extractor | None = None, logger=None,
@@ -80,20 +82,32 @@ def probe(url: str, extract: Extractor | None = None, logger=None,
     `no_pacing`: Postavke → „Zaštita od blokade" isključena (bez razmaka pri čitanju plejliste)."""
     if is_obviously_not_media(url) or not is_web_url(url):
         raise NotMediaError(url)  # .exe, .zip, .pdf…, ili link koji nije http(s): ne treba ni pitati server
-    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist, cookie_browser, cookie_txt,
-                                         request_sleep(url, enabled=not no_pacing))
-    info = extract(url)
+    injected = extract is not None
+    sleep = request_sleep(url, enabled=not no_pacing)
+    extract = extract or _make_extractor(logger, http_headers, cookies, whole_playlist, cookie_browser, cookie_txt, sleep)
+    cookie_warning = False
+    try:
+        info = extract(url)
+    except Exception as exc:
+        # Prijava iz Postavki je dodatak, ne uslov: ako se kolačići browsera ne mogu pročitati (npr. Edge radi),
+        # link se čita bez njih, pa javni video prolazi (Ahmed 10.11.2026, x.com uz izabran Edge).
+        if injected or cookies or not (cookie_browser or cookie_txt) or not is_cookie_read_error(error_message(exc)):
+            raise
+        extract = _make_extractor(logger, http_headers, cookies, whole_playlist, None, None, sleep)
+        info = extract(url)
+        cookie_warning = True
     title = _title(info, url)
     if info.get("_type") not in _PLAYLIST_TYPES:
         if is_live(info):
             raise LiveStreamError("Live stream")
         check_media(info)
-        return ProbeResult(title, (_entry(info, info.get("webpage_url") or url),), is_playlist=False)
+        return ProbeResult(title, (_entry(info, info.get("webpage_url") or url),), is_playlist=False,
+                           cookie_warning=cookie_warning)
     skipped = []
     entries = tuple(_flatten(info, extract, depth=0, skipped=skipped))
     if skipped and not entries:
         raise LiveStreamError("Live stream")  # npr. tab „Live" kanala: sve stavke su prenosi uživo
-    return ProbeResult(title, entries, is_playlist=True)
+    return ProbeResult(title, entries, is_playlist=True, cookie_warning=cookie_warning)
 
 
 def _flatten(info: dict, extract: Extractor, depth: int, skipped: list) -> Iterator[Entry]:

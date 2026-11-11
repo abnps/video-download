@@ -213,6 +213,70 @@ class PauseWindowTest(unittest.TestCase):
         self.assertTrue(all(i.status == ItemStatus.DONE for i in window._queue.items()))
         self.assertEqual([pause.kind for pause in cards], ["break"])
 
+    def test_link_added_during_a_break_gets_the_pause_card(self):
+        # Predah je zadat poslije 25. videa dok ništa nije čekalo (bez kartice). Link koji stigne tek tada ne smije
+        # čekati bez ikakve poruke: kartica s odbrojavanjem se pojavi čim krene „Preuzmi".
+        window = self.window()
+        self.add(window, [yt(n) for n in range(25)])
+        window._start_all()
+        self.run_out(window)
+        self.assertGreater(window._pacer.remaining("youtube"), 20)
+        self.assertEqual(window._card_mode, "")
+        self.add(window, [yt(100)])
+        window._start_all()
+        late = window._queue.items()[-1]
+        self.assertEqual(late.status, ItemStatus.WAITING)
+        self.assertEqual(window._card_mode, "pause")
+        self.assertIn("YouTube", window.pause_title.text())
+        self.assertEqual(window._card_pause.kind, "break")
+        shown = window._tip_index
+        window._start_next()  # ista pauza se ne najavljuje dvaput
+        self.assertEqual(window._tip_index, shown)
+        self.run_out(window)
+        self.assertEqual(late.status, ItemStatus.DONE)
+
+    def test_link_added_during_a_short_gap_gets_the_status_message(self):
+        window = self.window()
+        self.add(window, [yt(n) for n in range(9)])
+        window._start_all()
+        self.assertTrue(wait_until(lambda: all(i.status == ItemStatus.DONE for i in window._queue.items())))
+        self.assertGreater(window._pacer.remaining("youtube"), 0)  # razmak prije 10. je zadat, a ništa ne čeka
+        self.add(window, [yt(50)])
+        window._start_all()
+        self.assertIn("Pauza", window.status_label.text())
+        self.assertIn("YouTube", window.status_label.text())
+        self.assertEqual(window._card_mode, "")
+        self.run_out(window)
+
+    def test_turning_protection_off_ends_the_break_without_the_badge(self):
+        window = self.window()
+        self.add(window, [yt(n) for n in range(27)])
+        window._start_all()
+        for _ in range(200):
+            self.idle(window)
+            if window._card_mode == "pause":
+                break
+            self.clock.now += window._pacer.remaining("youtube") + 0.01
+            window._start_next()
+        self.assertEqual(window._card_mode, "pause")
+        window.set_pacing(False)
+        self.assertEqual(window._card_mode, "")  # predah prestaje odmah
+        self.assertEqual(window._pacer.remaining("youtube"), 0)
+        self.assertTrue(wait_until(lambda: all(i.status == ItemStatus.DONE for i in window._queue.items())))
+        self.assertNotIn("patient", window._achievements.earned)
+        self.assertIn("isključena", window.shield_label.text())  # statusna traka se osvježi odmah
+
+    def test_turning_protection_off_keeps_waiting_for_a_real_block(self):
+        window = self.window()
+        self.failures[yt(1)] = 1
+        self.add(window, [yt(1)])
+        window._start_all()
+        self.assertTrue(wait_until(lambda: window._card_mode == "pause"))
+        window.set_pacing(False)
+        self.assertEqual(window._card_mode, "pause")
+        self.assertAlmostEqual(window._pacer.remaining("youtube"), 300, delta=1)
+        window._stop_all()
+
     def test_other_sites_go_at_full_speed(self):
         window = self.window()
         self.add(window, [f"https://vimeo.com/{n}" for n in range(15)])

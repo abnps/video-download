@@ -72,8 +72,14 @@ class NowPanelWindowTest(unittest.TestCase):
         self.assertEqual(panel.spark.values, [2_000_000.0])
         self.assertNotEqual(panel.speed.text(), "—")
         self.assertEqual(panel.phase_labels["video"].property("state"), "on")
-        self.window._on_download_progress(active.id, Progress(PROCESSING, None, label="progress.merging"))
+        self.assertTrue(panel.phase_labels["convert"].isHidden())  # „Obrada" se za video vidi tek kad krene
+        self.window._on_download_progress(active.id, Progress(PROCESSING, None, label="pp.merge"))
         self.assertEqual(panel.phase_labels["merge"].property("state"), "on")
+        # Sve što nije spajanje (npr. pretvaranje u AVI za auto) je „Obrada", ne „Spajanje".
+        self.window._on_download_progress(active.id, Progress(PROCESSING, None, label="pp.processing"))
+        self.assertEqual(panel.phase_labels["convert"].property("state"), "on")
+        self.assertEqual(panel.phase_labels["merge"].property("state"), "")
+        self.assertFalse(panel.phase_labels["convert"].isHidden())
 
         with mock.patch.object(self.window, "_cancel_active") as cancel:
             panel.stop_button.click()  # isto kao „zaustavi" u redu
@@ -85,12 +91,73 @@ class NowPanelWindowTest(unittest.TestCase):
         self.assertTrue(panel.isHidden())
         self.assertFalse(self.window._rows[active.id].isHidden())
 
+    def test_only_video_is_on_the_card_and_the_list_invites_more_links(self):
+        active = self.add("Jedini", ItemStatus.ACTIVE)
+        self.window._update_controls()
+        self.assertIs(self.window.stack.currentWidget(), self.window.queue_hint)  # ne prazna lista
+        self.assertIn("Ctrl+V", self.window.queue_hint.text())
+        waiting = self.add("Drugi", ItemStatus.WAITING)
+        self.window._update_controls()
+        self.assertIs(self.window.stack.currentWidget(), self.window.scroll)
+        self.assertFalse(self.window._rows[waiting.id].isHidden())
+        self.assertTrue(self.window._rows[active.id].isHidden())
+
+    def test_card_is_never_squeezed_and_turns_compact_on_a_low_window(self):
+        # Standardni prozor: puna kartica dobije visinu koju traži (ranije ju je gnječio sakriveni prazan ekran).
+        window, panel = self.window, self.window.now_panel
+        self.add("Prvi", ItemStatus.ACTIVE)
+        for number in range(4):
+            self.add(f"Čeka {number}", ItemStatus.WAITING)
+        window._update_controls()
+        window.show()
+        app.processEvents()
+        self.assertEqual((window.width(), window.height()), (900, 640))
+        self.assertFalse(panel.compact)
+        self.assertFalse(panel.details.isHidden())
+        self.assertGreaterEqual(panel.height(), panel.minimumSizeHint().height())
+        self.assertGreaterEqual(window.scroll.height(), 96)
+        self.assertLess(window.stack.minimumSizeHint().height(), window.drop_zone.minimumSizeHint().height())
+        full = panel.height()
+
+        # Nizak prozor: sažeta kartica (bez donjeg reda), brzina i vrijeme uz procenat.
+        window.resize(900, 520)
+        app.processEvents()
+        self.assertTrue(panel.compact)
+        self.assertTrue(panel.details.isHidden())
+        self.assertLess(panel.height(), full)
+        self.assertGreaterEqual(panel.height(), panel.minimumSizeHint().height())
+        window._on_download_progress(panel.item_id, Progress("download", 0.5, 3_000_000, 12, "progress.video"))
+        self.assertIn("još", panel.inline.text())
+        self.assertFalse(panel.inline.isHidden())
+
+        # Prozor se ne može smanjiti ispod onoga što raspored traži, pa se kartice ne preklapaju.
+        # I uz traku čiji se tekst na uskom prozoru prelama u više redova (Qt to sam ne uračuna u najmanju visinu).
+        window.support_banner.show()
+        for _ in range(3):
+            window.resize(640, 200)
+            app.processEvents()
+        self.assertGreater(window.height(), 380)
+        self.assertEqual(window.height(), window.minimumHeight())
+        layout = window.centralWidget().layout()
+        for index in range(layout.count()):
+            widget = layout.itemAt(index).widget()
+            if widget is not None and not widget.isHidden():
+                with self.subTest(widget=widget.objectName()):
+                    self.assertGreaterEqual(widget.height(), widget.minimumSizeHint().height())
+        self.assertEqual(panel.stop_button.accessibleName(), "Zaustavi ovaj video")
+
+    def test_paste_icon_follows_the_theme(self):
+        before = self.window.paste_button.icon().pixmap(14, 14).toImage()
+        self.window.set_theme("dark", save=False)
+        self.addCleanup(self.window.set_theme, "light", False)
+        after = self.window.paste_button.icon().pixmap(14, 14).toImage()
+        self.assertNotEqual(before, after)
+
     def test_status_bar_shows_block_protection_and_today(self):
         self.window._update_controls()
         self.assertIn("uključena", self.window.shield_label.text())
         self.assertEqual(self.window.today_label.text(), "")
-        self.window.set_pacing(False)
-        self.window._update_controls()
+        self.window.set_pacing(False)  # statusna traka se osvježi sama
         self.assertIn("isključena", self.window.shield_label.text())
         self.assertEqual(self.window.shield_label.property("state"), "off")
         self.window._recap.record("https://example.test/v", 5 * 1024 * 1024, 60)

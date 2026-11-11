@@ -74,6 +74,8 @@ class _State:
     breaks: int = 0  # koliko je predaha već bilo u ovom nizu
     last_seen: float | None = None
     ready_at: float = 0.0  # monotono: ništa s ove porodice ne kreće prije
+    kind: str = ""  # vrsta pauze koja važi do ready_at ("gap", "break" ili "block")
+    seconds: float = 0.0  # njeno puno trajanje (za poruku)
 
 
 class Pacer:
@@ -104,6 +106,17 @@ class Pacer:
         if family is None or family not in self._states:
             return 0.0
         return max(0.0, self._states[family].ready_at - self._clock())
+
+    def pending(self, family: str | None) -> Pause | None:
+        """Pauza koja trenutno drži porodicu (vrsta i puno trajanje); None = ništa ne čeka."""
+        if self.remaining(family) <= 0:
+            return None
+        state = self._states[family]
+        return Pause(family, state.kind or "gap", state.seconds)
+
+    def deadline(self, family: str | None) -> float:
+        """Monotoni trenutak do kad porodica čeka (0 = ne čeka); razlikuje jednu pauzu od sljedeće."""
+        return self._states[family].ready_at if family in self._states else 0.0
 
     def parallel_cap(self, family: str | None) -> int | None:
         """Najviše istovremenih preuzimanja s porodice; None = bez ograničenja."""
@@ -148,8 +161,14 @@ class Pacer:
             if level is None:
                 return None
             pause = Pause(family, "gap", round(self._rng.uniform(*GAPS[level]) * scale, 1))
-        state.ready_at = max(state.ready_at, now + pause.seconds)
+        self._hold(state, now, pause)
         return pause
+
+    @staticmethod
+    def _hold(state: _State, now: float, pause: Pause) -> None:
+        """Pauza važi samo ako produžava čekanje (kraća ne skraćuje dužu koja već teče, npr. blokadu)."""
+        if now + pause.seconds >= state.ready_at:
+            state.ready_at, state.kind, state.seconds = now + pause.seconds, pause.kind, pause.seconds
 
     def blocked(self, family: str, attempt: int) -> Pause | None:
         """Sajt je blokirao stavku `attempt`-ti put (1, 2, 3…): čeka se, pa nastavlja; None = odustati (greška).
@@ -161,8 +180,14 @@ class Pacer:
         now = self._clock()
         state.last_seen = now
         pause = Pause(family, "block", float(BLOCK_WAITS[attempt - 1]))
-        state.ready_at = max(state.ready_at, now + pause.seconds)
+        self._hold(state, now, pause)
         return pause
+
+    def drop_soft(self) -> None:
+        """Zaštita je isključena: razmaci i predasi prestaju odmah; čekanje poslije stvarne blokade ostaje."""
+        for state in self._states.values():
+            if state.kind != "block":
+                state.ready_at = 0.0
 
     def skip(self, family: str | None = None) -> None:
         """„Nastavi odmah" (jedna porodica) ili „Zaustavi" (sve): čekanje prestaje."""

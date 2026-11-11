@@ -4,6 +4,7 @@ Dio prozora MainWindow (gui.py). Pravila su bez Qt-a: razmaci i blokade u pacing
 pregled u recap.py; ovdje se samo prikazuje i povezuje s redom preuzimanja.
 """
 
+import dataclasses
 import time
 from datetime import date
 
@@ -36,6 +37,7 @@ class PauseMixin:
         self._card_pause: pacing.Pause | None = None
         self._card_patient = True  # pauza odbrojana do kraja (dostignuće „Strpljivi")
         self._tip_index = 0
+        self._pace_announced: dict[str, float] = {}  # porodica -> rok pauze za koju je poruka već prikazana
         self._recap_dialog = None
         self._pace_timer = QTimer(self)
         self._pace_timer.setSingleShot(True)
@@ -170,26 +172,39 @@ class PauseMixin:
         return any(self._pacer.remaining(family) > 0 for family in self._waiting_families())
 
     def _schedule_pace(self) -> None:
-        waits = [self._pacer.remaining(family) for family in self._waiting_families()]
-        waits = [wait for wait in waits if wait > 0]
-        if waits:
-            self._pace_timer.start(int(min(waits) * 1000) + 50)
-        else:
+        waits = {family: self._pacer.remaining(family) for family in self._waiting_families()}
+        waits = {family: wait for family, wait in waits.items() if wait > 0}
+        if not waits:
             self._pace_timer.stop()
+            return
+        self._pace_timer.start(int(min(waits.values()) * 1000) + 50)
+        for family in sorted(waits, key=waits.get, reverse=True):  # duža pauza prva: ona ide na karticu
+            self._announce_pace(family)
+
+    def _announce_pace(self, family: str) -> None:
+        """Poruka o pauzi, jednom po pauzi: razmak u statusnoj traci, predah i blokada na kartici. Zove se kad
+        god nešto s tog sajta čeka, pa i kad je pauza zadata dok ništa nije čekalo, a link stigne tek poslije
+        (ranije je takva stavka čekala i do minut bez ikakve poruke; pregled 9.11.2026)."""
+        if self._pace_announced.get(family) == self._pacer.deadline(family):
+            return
+        pause = self._pacer.pending(family)
+        if pause is None:
+            return
+        remaining = self._pacer.remaining(family)
+        if pause.card:
+            self._show_pause(dataclasses.replace(pause, seconds=remaining))  # sam bilježi da je prikazana
+            return
+        seconds = pause.seconds if pause.seconds - remaining < 1 else remaining
+        self._set_status(tr("pace.gap", seconds=f"{seconds:.0f}", site=self._site_name(family)))
+        self._pace_announced[family] = self._pacer.deadline(family)
 
     def _note_paced_start(self, item) -> None:
         self._pacer.started(pacing.family_of(item.url))
 
     def _note_paced_finish(self, item) -> None:
-        """Poslije preuzimanja sa strogog sajta: razmak (statusna traka) ili predah (kartica)."""
-        family = pacing.family_of(item.url)
-        pause = self._pacer.finished(family)
-        if pause is None or family not in self._waiting_families():
-            return  # ništa s tog sajta više ne čeka: nema šta najavljivati
-        if pause.card:
-            self._show_pause(pause)
-        else:
-            self._set_status(tr("pace.gap", seconds=f"{pause.seconds:.0f}", site=self._site_name(family)))
+        """Poslije preuzimanja sa strogog sajta: razmak ili predah prije sljedećeg. Poruku daje _schedule_pace
+        (iz _start_next, odmah poslije), i to samo dok nešto s tog sajta čeka."""
+        self._pacer.finished(pacing.family_of(item.url))
 
     def _pause_on_block(self, item, result) -> bool:
         """Sajt je blokirao (429, „nisi bot"): stavka čeka 5/10/15 min i sama nastavlja umjesto da padne."""
@@ -220,6 +235,7 @@ class PauseMixin:
         if self._card_mode == "pause" and current is not None and current.family != pause.family \
                 and self._pacer.remaining(current.family) >= pause.seconds:
             return  # duža pauza drugog sajta već je na kartici
+        self._pace_announced[pause.family] = self._pacer.deadline(pause.family)
         self._card_pause = pause
         self._card_patient = True
         tip = tr("pause.tip", tip=tr(TIPS[self._tip_index % len(TIPS)]))
@@ -267,6 +283,7 @@ class PauseMixin:
         self._hide_card()
         if pause is not None:
             self._pacer.skip(pause.family)
+            self._pace_announced.pop(pause.family, None)
         self._start_next()
 
     def _continue_later(self) -> None:
@@ -277,6 +294,7 @@ class PauseMixin:
         family = pause.family if pause else None
         if family is not None:
             self._pacer.skip(family)
+            self._pace_announced.pop(family, None)
         self._running = False
         self._manual = [item_id for item_id in self._manual
                         if (item := self._queue.get(item_id)) is None or pacing.family_of(item.url) != family]
@@ -296,6 +314,7 @@ class PauseMixin:
     def _stop_pauses(self) -> None:
         """„Zaustavi": čekanje prestaje (stavke ostaju u redu kao i do sada)."""
         self._pacer.skip()
+        self._pace_announced.clear()
         self._pace_timer.stop()
         if self._card_mode == "pause":
             self._card_patient = False
@@ -345,8 +364,17 @@ class PauseMixin:
     def set_pacing(self, enabled: bool) -> None:
         self._pacer.enabled = bool(enabled)
         self._settings.setValue("pacing/enabled", self._pacer.enabled)
+        if not self._pacer.enabled:
+            # Isključena zaštita: razmaci i predasi prestaju odmah (čekanje poslije stvarne blokade ostaje),
+            # a kartica predaha nestaje bez dostignuća „Strpljivi" (pregled 9.11.2026).
+            self._pacer.drop_soft()
+            pause = self._card_pause
+            if self._card_mode == "pause" and pause is not None and self._pacer.remaining(pause.family) <= 0:
+                self._card_patient = False
+                self._hide_card()
         if self._running or self._manual:
             self._start_next()
+        self._update_controls()  # statusna traka odmah pokazuje novo stanje zaštite
 
     def confirm_pacing_off(self) -> bool:
         """Upozorenje prije isključivanja zaštite (testovi ga zamjenjuju odgovorom bez prozora)."""
