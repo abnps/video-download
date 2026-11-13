@@ -29,6 +29,7 @@ data class Job(
     val playlistSize: Int = 0,
     val mute: Boolean = false, // video bez zvuka (kvačica na ekranu kvaliteta)
     val burnSubtitles: Boolean = false, // titl upisan u sliku umjesto fajla pored videa (SubtitleBurner)
+    val blockedOnRead: Boolean = false, // sajt je blokirao već čitanje linka; čekanje 5 min je već odbrojano
 ) {
     val hasClip get() = clipStart >= 0 && clipEnd > clipStart
 
@@ -38,7 +39,7 @@ data class Job(
         putBoolean("adult", adult); putBoolean("adult_ok", adultOk)
         putBoolean("subtitles", subtitles); putInt("clip_start", clipStart); putInt("clip_end", clipEnd)
         putString("playlist_key", playlistKey); putInt("playlist_size", playlistSize); putBoolean("mute", mute)
-        putBoolean("subtitles_burn", burnSubtitles)
+        putBoolean("subtitles_burn", burnSubtitles); putBoolean("blocked_on_read", blockedOnRead)
     }
 
     companion object {
@@ -48,7 +49,7 @@ data class Job(
             bundle.getInt("height"), bundle.getString("label").orEmpty(), bundle.getBoolean("adult"),
             bundle.getBoolean("adult_ok"), bundle.getBoolean("subtitles"), bundle.getInt("clip_start", -1),
             bundle.getInt("clip_end", -1), bundle.getString("playlist_key").orEmpty(), bundle.getInt("playlist_size"),
-            bundle.getBoolean("mute"), bundle.getBoolean("subtitles_burn"),
+            bundle.getBoolean("mute"), bundle.getBoolean("subtitles_burn"), bundle.getBoolean("blocked_on_read"),
         )
     }
 }
@@ -89,7 +90,8 @@ object Downloads {
                         value.optInt("height"), value.optString("label"), value.optBoolean("adult"),
                         subtitles = value.optBoolean("subtitles"), clipStart = value.optInt("clip_start", -1),
                         clipEnd = value.optInt("clip_end", -1), mute = value.optBoolean("mute"),
-                        burnSubtitles = value.optBoolean("subtitles_burn")), Phase.INTERRUPTED)
+                        burnSubtitles = value.optBoolean("subtitles_burn"),
+                        blockedOnRead = value.optBoolean("blocked_on_read")), Phase.INTERRUPTED)
                 }.getOrNull()
             }.distinctBy { it.job.id }
         }.getOrDefault(emptyList())
@@ -118,7 +120,8 @@ object Downloads {
                 .put("thumbnail", job.thumbnail).put("duration", job.duration).put("audio", job.isAudio)
                 .put("height", job.height).put("label", job.label).put("adult", job.adult) // adultOk nikad
                 .put("subtitles", job.subtitles).put("clip_start", job.clipStart).put("clip_end", job.clipEnd)
-                .put("mute", job.mute).put("subtitles_burn", job.burnSubtitles))
+                .put("mute", job.mute).put("subtitles_burn", job.burnSubtitles)
+                .put("blocked_on_read", job.blockedOnRead))
         }
         check(app.getSharedPreferences("pending_jobs", Context.MODE_PRIVATE).edit()
             .putString("jobs", array.toString()).commit()) { "Lista preuzimanja nije sačuvana" }

@@ -31,6 +31,8 @@
     <string name="audio_unavailable">Ce site n’a pas de piste audio séparée : le MP3 est créé à partir de la vidéo (le téléchargement est plus gros).</string>
     <string name="error_unsupported">Ce lien est incompatible.</string>
     <string name="error_login">Ce site demande une connexion ou une confirmation.</string>
+    <string name="error_bot">Le site demande de confirmer que tu n\'es pas un robot. Réessaie plus tard ou envoie la vidéo depuis le navigateur en étant connecté.</string>
+    <string name="read_blocked">%1$s demande une courte pause. Le lien est dans Téléchargements et démarre tout seul à la fin de la pause.</string>
     <string name="error_http">Le site a renvoyé HTTP %1$s.</string>
     <string name="error_network">La connexion a échoué. Réessaie.</string>
     <string name="error_generic">Impossible de lire ou de télécharger cette vidéo. Copie le rapport pour les détails.</string>

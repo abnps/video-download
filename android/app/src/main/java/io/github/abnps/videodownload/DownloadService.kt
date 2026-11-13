@@ -228,7 +228,7 @@ class DownloadService : Service() {
 
     /** Sajt blokira (429, „nisi bot"): čeka 5, 10 pa 15 min i pokušava ponovo; četvrti put je obična greška. */
     private fun downloadWithPauses(job: Job, family: String?, call: () -> List<PyObject>): List<PyObject> {
-        var attempt = 0
+        var attempt = if (job.blockedOnRead) 1 else 0 // prvo čekanje (5 min) je bilo već poslije čitanja linka
         while (true) {
             try {
                 return call()
@@ -453,6 +453,7 @@ class DownloadService : Service() {
             return when {
                 "audio_unavailable" in raw -> context.getString(R.string.audio_unavailable)
                 "unsupported url" in raw -> context.getString(R.string.error_unsupported)
+                Pacing.isBlockError(raw) -> context.getString(R.string.error_bot)
                 "sign in" in raw || "login" in raw || "log in" in raw || "cookies" in raw ||
                     "authentication" in raw || "nsfw" in raw -> context.getString(R.string.error_login)
                 else -> {

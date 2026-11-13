@@ -185,23 +185,50 @@ class MainActivity : ComponentActivity() {
         findUrl(text)?.let { screen.cancelProbe(); link.value = it }
     }
 
+    /** Sajt je blokirao već čitanje linka; link je predat preuzimanju koje čeka pauzu (poruka za početni ekran). */
+    private class ReadBlocked(val site: String) : Exception()
+
     private fun find(quick: Boolean = false) {
         val url = findUrl(link.value) ?: return
         val app = applicationContext
         screen.find(quick, load = {
-            val json = withContext(Dispatchers.IO) {
-                val cookies = SiteLogin.cookieFile(app.cacheDir, url)
-                try {
-                    Python.getInstance().getModule("vd_core").callAttr("probe", url, app.cacheDir.absolutePath, cookies)
-                        .toString()
-                } finally {
-                    if (cookies.isNotEmpty()) java.io.File(cookies).delete() // privremeni kolačići nikad ne ostaju
+            val json = try {
+                withContext(Dispatchers.IO) {
+                    val cookies = SiteLogin.cookieFile(app.cacheDir, url)
+                    try {
+                        Python.getInstance().getModule("vd_core").callAttr("probe", url, app.cacheDir.absolutePath, cookies)
+                            .toString()
+                    } finally {
+                        if (cookies.isNotEmpty()) java.io.File(cookies).delete() // privremeni kolačići nikad ne ostaju
+                    }
                 }
+            } catch (error: Exception) {
+                throw queueAfterBlock(url, error) ?: error
             }
             val list = PlaylistInfo.parseOrNull(json)
             val video = if (list == null) VideoInfo.parse(json) else null
             ProbeResult(video, list)
-        }, errorText = { DownloadService.cleanError(app, it.message) })
+        }, errorText = { if (it is ReadBlocked) getString(R.string.read_blocked, it.site) else DownloadService.cleanError(app, it.message) })
+    }
+
+    /**
+     * Prijava prijatelja 13.11.2026 (na računaru): YouTube traži „potvrdi da nisi robot" već pri čitanju linka.
+     * Umjesto greške link ide u Preuzimanja i čeka 5 min (kartica s odbrojavanjem, DownloadService.waitForPause),
+     * pa se sam preuzme u podrazumijevanom kvalitetu; ako sajt blokira i tada, slijede 10 pa 15 min.
+     * null = nije blokada strogog sajta (obična greška).
+     */
+    private fun queueAfterBlock(url: String, error: Exception): ReadBlocked? {
+        val family = Pacing.familyOf(url) ?: return null
+        if (!Pacing.isBlockError(error.message)) return null
+        Pacing.blocked(family, 1) ?: return null
+        val wanted = Settings.quality(this)
+        val label = if (wanted > 0) "${wanted}p" else "MP4"
+        DownloadService.start(this, Job(System.currentTimeMillis(), url, url, "", 0, false, wanted, label,
+            subtitles = Settings.subtitles(this), burnSubtitles = Settings.burnSubtitles(this), blockedOnRead = true))
+        val site = Pacing.NAMES[family] ?: family
+        Toast.makeText(this, getString(R.string.read_blocked, site), Toast.LENGTH_LONG).show()
+        tab.intValue = TAB_DOWNLOADS // tamo je kartica s odbrojavanjem
+        return ReadBlocked(site)
     }
 
     /** Kao „Preuzmi" na ekranu kvaliteta s podrazumijevanim kvalitetom; korisnik ostaje u aplikaciji iz koje je dijelio. */

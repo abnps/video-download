@@ -72,6 +72,14 @@ class PacingTest {
     }
 
     @Test
+    fun recognizesTheRobotCheckFromReadingALink() {
+        // Poruka YouTubea pri čitanju linka (prijava prijatelja 13.11.2026), i s „pravim" apostrofom.
+        assertTrue(Pacing.isBlockError("ERROR: [youtube] wM804ePU4tE: Sign in to confirm you're not a bot."))
+        assertTrue(Pacing.isBlockError("sign in to confirm you’re not a bot"))
+        assertTrue(!Pacing.isBlockError("Sign in to view this video"))
+    }
+
+    @Test
     fun turningOffEndsGapsAndBreaksButNotABlock() {
         run("youtube", 25)
         assertTrue(Pacing.remaining("youtube") > 0) // predah poslije 25.

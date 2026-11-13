@@ -32,6 +32,8 @@
     <string name="audio_unavailable">This site has no separate audio, so the MP3 is made from the video (the download is larger).</string>
     <string name="error_unsupported">This link is not supported.</string>
     <string name="error_login">This site requires a login or confirmation.</string>
+    <string name="error_bot">The site wants to confirm you\'re not a robot. Try again later, or send the video from the browser while signed in.</string>
+    <string name="read_blocked">%1$s wants a short pause. The link is in Downloads and starts by itself when the pause is over.</string>
     <string name="error_http">The site returned HTTP %1$s.</string>
     <string name="error_network">The connection failed. Try again.</string>
     <string name="error_generic">Could not read or download this video. Copy the report for details.</string>

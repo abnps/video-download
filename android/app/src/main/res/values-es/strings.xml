@@ -31,6 +31,8 @@
     <string name="audio_unavailable">Este sitio no tiene audio independiente, así que el MP3 se crea a partir del video (la descarga es mayor).</string>
     <string name="error_unsupported">Este enlace no es compatible.</string>
     <string name="error_login">Este sitio requiere iniciar sesión o confirmar.</string>
+    <string name="error_bot">El sitio pide confirmar que no eres un robot. Inténtalo más tarde o envía el vídeo desde el navegador con la sesión iniciada.</string>
+    <string name="read_blocked">%1$s pide una pausa corta. El enlace está en Descargas y empieza solo cuando termine la pausa.</string>
     <string name="error_http">El sitio devolvió HTTP %1$s.</string>
     <string name="error_network">Falló la conexión. Inténtalo de nuevo.</string>
     <string name="error_generic">No se pudo leer ni descargar este video. Copia el informe para más detalles.</string>

@@ -31,6 +31,8 @@
     <string name="audio_unavailable">Sajt nema poseban zvuk, pa se MP3 pravi iz videa (preuzimanje je veće).</string>
     <string name="error_unsupported">Ovaj link nije podržan.</string>
     <string name="error_login">Ovaj sajt traži prijavu ili potvrdu.</string>
+    <string name="error_bot">Sajt traži potvrdu da nisi robot. Pokušaj kasnije ili pošalji video iz pregledača dok si prijavljen.</string>
+    <string name="read_blocked">%1$s traži kratku pauzu. Link je u Preuzimanjima i sam kreće kad pauza prođe.</string>
     <string name="error_http">Sajt je vratio HTTP %1$s.</string>
     <string name="error_network">Veza nije uspela. Pokušaj ponovo.</string>
     <string name="error_generic">Video ne može da se pročita ili preuzme. Kopiraj izveštaj za detalje.</string>

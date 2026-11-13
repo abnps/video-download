@@ -31,6 +31,8 @@
     <string name="audio_unavailable">Diese Seite hat keine separate Tonspur, daher wird die MP3 aus dem Video erstellt (der Download ist größer).</string>
     <string name="error_unsupported">Dieser Link wird nicht unterstützt.</string>
     <string name="error_login">Diese Seite verlangt eine Anmeldung oder Bestätigung.</string>
+    <string name="error_bot">Die Seite möchte bestätigt haben, dass du kein Roboter bist. Versuche es später oder schicke das Video angemeldet aus dem Browser.</string>
+    <string name="read_blocked">%1$s verlangt eine kurze Pause. Der Link steht in den Downloads und startet von selbst, wenn die Pause vorbei ist.</string>
     <string name="error_http">Die Seite meldet HTTP %1$s.</string>
     <string name="error_network">Die Verbindung ist fehlgeschlagen. Versuche es erneut.</string>
     <string name="error_generic">Das Video konnte nicht gelesen oder heruntergeladen werden. Kopiere den Bericht für Details.</string>
