@@ -228,6 +228,32 @@ class PauseMixin:
         self._start_next()
         return True
 
+    def _pause_on_probe_block(self, url: str, message: str, output_dir: str, access: dict,
+                              preset: str | None = None) -> bool:
+        """Sajt je blokirao već ČITANJE linka (npr. YouTube: „potvrdi da nisi robot"): umjesto crvenog reda link
+        čeka 5 min i preuzima se sam, kao kad blokada stigne usred preuzimanja (Ahmed 13.11.2026, prijava
+        prijatelja). Ako sajt blokira i tada, slijede 10 pa 15 min (_pause_on_block), pa obična greška."""
+        family = pacing.family_of(url)
+        if family is None or not pacing.is_block_error(message or ""):
+            return False
+        pause = self._pacer.blocked(family, 1)
+        self._settings.setValue("pacing/learned_until", self._pacer.learned_until)
+        if pause is None:
+            return False
+        item = self._queue.add(url, url, preset or self.preset_combo.currentData(), output_dir, **access)
+        item.custom_format = bool(preset)
+        item.block_waits = 1
+        item.status = ItemStatus.WAITING
+        item.message = MESSAGE_PAUSE
+        if item.id not in self._manual:
+            self._manual.append(item.id)  # poslije pauze kreće sam (kartica kaže „nastavljam za …")
+        self._append_row(item)
+        self._refresh_row(item)
+        self._show_pause(pause)
+        self._save_queue()
+        self._start_next()
+        return True
+
     # ---------- pauza ----------
 
     def _show_pause(self, pause: pacing.Pause) -> None:

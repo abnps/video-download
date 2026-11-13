@@ -960,6 +960,8 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
             # nema šta da se preuzme, pa ni kartice; samo napomena u statusnoj traci.
             self._set_status(tr("status.not_media", url=url))
             return
+        if self._pause_on_probe_block(url, message, output_dir, access, preset):
+            return  # sajt traži pauzu: link čeka i sam se preuzima poslije nje (gui_pause.py)
         # Neuspio link ostaje vidljiv kao crveni red; „Pokušaj ponovo" ga daje yt-dlp-u direktno.
         item = self._queue.add(url, url, preset or self.preset_combo.currentData(), output_dir, **access)
         item.custom_format = bool(preset)

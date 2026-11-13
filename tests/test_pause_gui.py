@@ -61,6 +61,7 @@ class PauseWindowTest(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         self.failures = {}  # url -> koliko puta još vratiti blokadu
+        self.probe_failures = {}  # url -> koliko puta čitanje linka još javi „nisi robot"
         self.calls = []
 
     def window(self):
@@ -68,6 +69,9 @@ class PauseWindowTest(unittest.TestCase):
 
         def probe(url, http_headers=None, **options):
             self.probe_options = options
+            if self.probe_failures.get(url, 0) > 0:
+                self.probe_failures[url] -= 1
+                raise RuntimeError("ERROR: [youtube] abc: Sign in to confirm you're not a bot. Use --cookies-from-browser")
             return ProbeResult("V", (Entry(url, "V", None, 60),), False)
 
         def download(url, preset, output_dir, subfolder, on_progress, cancel_event, **extra):
@@ -138,6 +142,31 @@ class PauseWindowTest(unittest.TestCase):
         first = window._notifier.call_args_list[0].args
         self.assertEqual(first[0], "Nastavljam preuzimanje")
         self.assertIn("YouTube", first[1])
+
+    def test_block_while_reading_the_link_waits_and_downloads_by_itself(self):
+        # Prijava prijatelja 13.11.2026: YouTube je tražio „nisi robot" već pri čitanju linka, pa je ostao crveni
+        # red. Sada link čeka 5 minuta (kartica s odbrojavanjem) i sam se preuzima.
+        window = self.window()
+        self.probe_failures[yt(1)] = 1
+        window.add_links_from_text(yt(1))
+        self.assertTrue(wait_until(lambda: window._card_mode == "pause"))
+        item = window._queue.items()[0]
+        self.assertEqual((item.status, item.message, item.block_waits), (ItemStatus.WAITING, MESSAGE_PAUSE, 1))
+        self.assertIn("5:00", window.pause_title.text())
+        self.assertEqual(self.calls, [])  # ništa ne kreće prije roka
+        self.clock.now += 300
+        window._tick_pause()
+        self.assertTrue(wait_until(lambda: item.status == ItemStatus.DONE))
+        self.assertEqual(self.calls, [yt(1)])
+
+    def test_block_while_reading_on_other_sites_stays_an_error(self):
+        window = self.window()
+        url = "https://vimeo.com/1"
+        self.probe_failures[url] = 1
+        window.add_links_from_text(url)
+        self.assertTrue(wait_until(lambda: len(window._queue.items()) == 1))
+        self.assertEqual(window._queue.items()[0].status, ItemStatus.FAILED)
+        self.assertEqual(window._card_mode, "")
 
     def test_third_block_in_a_row_becomes_a_normal_error(self):
         window = self.window()
