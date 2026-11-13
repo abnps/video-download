@@ -111,6 +111,22 @@ class OptionsTest(unittest.TestCase):
         self.assertEqual(pick_subtitles({"automatic_captions": {"en-orig": []}}, ["en"]), ["en-orig"])
         self.assertEqual(pick_subtitles({}, ["bs", "hr", "sr", "en"]), [])
 
+    def test_original_language_when_neither_app_language_nor_english(self):
+        wanted = ["bs", "hr", "sr", "en"]
+        # Sajt javlja jezik videa: ručni titl na tom jeziku prije automatskog, samo jedan
+        info = {"language": "ja", "subtitles": {"fr": [], "ja": []}, "automatic_captions": {"ja-orig": []}}
+        self.assertEqual(pick_subtitles(info, wanted), ["ja"])
+        # YouTube: samo automatski titl izvornog govora
+        self.assertEqual(pick_subtitles({"automatic_captions": {"tr-orig": []}}, ["de", "en"]), ["tr-orig"])
+        self.assertEqual(pick_subtitles({"language": "pt-BR", "automatic_captions": {"pt-orig": []}}, wanted),
+                         ["pt-orig"])
+        # Jezik nepoznat: prvi ručni titl
+        self.assertEqual(pick_subtitles({"subtitles": {"fr": [], "it": []}}, wanted), ["fr"])
+        # Jezik poznat, a titla na njemu nema: strani titl se ne uzima
+        self.assertEqual(pick_subtitles({"language": "ja", "subtitles": {"fr": []}}, wanted), [])
+        # Jezik aplikacije ili engleski postoji: rezerva se ne dodaje
+        self.assertEqual(pick_subtitles({"language": "ja", "subtitles": {"ja": [], "en": []}}, wanted), ["en"])
+
 
 class WholePlaylistTest(unittest.TestCase):
     def test_flag_reaches_yt_dlp_options(self):

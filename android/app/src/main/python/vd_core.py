@@ -177,7 +177,7 @@ def is_adult(info: dict, url: str | None = None) -> bool:
 
 
 # Titlovi (isto kao videodl/presets.py na računaru, test poredi): jezik aplikacije (za bs i srodni hr, sr), pa
-# engleski; najviše dva, ručni imaju prednost pred automatskim. Bez ffmpeg-a se ne ugrađuju u video nego se
+# engleski; najviše dva, ručni imaju prednost pred automatskim; kad nema nijednog, jedan na izvornom jeziku videa. Bez ffmpeg-a se ne ugrađuju u video nego se
 # čuvaju kao zaseban .srt/.vtt pored videa (plejeri ga nađu po istom imenu).
 def subtitle_languages(language: str) -> list[str]:
     wanted = ["bs", "hr", "sr"] if language == "bs" else [language]
@@ -198,8 +198,18 @@ def pick_subtitles(info: dict, wanted: list[str]) -> list[str]:
         return None
 
     own = [code for code in wanted if code != "en"]
-    chosen = [first(own) if own else None, first(["en"]) if "en" in wanted else None]
-    return [key for key in chosen if key]
+    chosen = [key for key in (first(own) if own else None, first(["en"]) if "en" in wanted else None) if key]
+    if chosen:
+        return chosen
+    # Rezerva (Ahmed 13.11.2026): nema ni jezika aplikacije ni engleskog, pa jedan titl na jeziku na kojem se
+    # u videu govori. Redom: titl na jeziku videa (sajt ga javlja kao "language"), YouTubeov automatski titl
+    # izvornog govora ("xx-orig"), a kad sajt jezik ne javlja, prvi ručno napravljen titl.
+    spoken = str(info.get("language") or "").strip().lower()
+    original = first([spoken.split("-")[0]]) if spoken else None
+    original = original or next((key for key in auto if key.endswith("-orig")), None)
+    if not original and not spoken and manual:
+        original = manual[0]
+    return [original] if original else []
 
 
 def _thumbnail(entry: dict) -> str:

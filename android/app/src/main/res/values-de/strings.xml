@@ -138,11 +138,11 @@
     <string name="set_subtitles">Untertitel zum Video</string>
     <string name="subtitles_on">An: App-Sprache und Englisch, als eigene Datei neben dem Video</string>
     <string name="subtitles_off">Aus</string>
-    <string name="info_subtitles">Zu jedem Video speichert die App auch Untertitel in der App-Sprache und auf Englisch, wenn das Video welche hat. Sie werden als eigene Datei mit demselben Namen wie das Video gespeichert, damit Player sie selbst finden. Ein Video mit Untertiteln kommt in den Ordner Downloads (Android nimmt Untertiteldateien nur dort an), andere Videos dorthin, wo du gewählt hast. Audio-Downloads (MP3/M4A) haben keine Untertitel. Auf dem Qualitätsbildschirm kannst du sie für ein einzelnes Video abwählen.</string>
+    <string name="info_subtitles">Zu jedem Video speichert die App auch Untertitel in der App-Sprache und auf Englisch, wenn das Video welche hat; gibt es keine davon, in der Sprache, die im Video gesprochen wird. Sie werden als eigene Datei mit demselben Namen wie das Video gespeichert, damit Player sie selbst finden. Ein Video mit Untertiteln kommt in den Ordner Downloads (Android nimmt Untertiteldateien nur dort an), andere Videos dorthin, wo du gewählt hast. Audio-Downloads (MP3/M4A) haben keine Untertitel. Auf dem Qualitätsbildschirm kannst du sie für ein einzelnes Video abwählen.</string>
     <string name="set_burn">Untertitel ins Bild einbrennen</string>
     <string name="burn_on">An: der Untertitel ist Teil des Bildes</string>
     <string name="burn_off">Aus: Untertitel als eigene Datei</string>
-    <string name="info_burn">Der Untertitel wird Teil des Bildes und ist in jedem Player und beim Teilen zu sehen, lässt sich aber nicht ausschalten. Eine Sprache (die der App, sonst Englisch). Das Handy kodiert das Video neu, das dauert länger und braucht mehr Akku. Klappt es nicht, bleibt der Untertitel als eigene Datei. Funktioniert nur mit eingeschalteten Untertiteln zum Video.</string>
+    <string name="info_burn">Der Untertitel wird Teil des Bildes und ist in jedem Player und beim Teilen zu sehen, lässt sich aber nicht ausschalten. Eine Sprache (die der App, sonst Englisch, sonst die des Videos). Das Handy kodiert das Video neu, das dauert länger und braucht mehr Akku. Klappt es nicht, bleibt der Untertitel als eigene Datei. Funktioniert nur mit eingeschalteten Untertiteln zum Video.</string>
     <string name="status_burning">Untertitel wird eingebrannt</string>
     <string name="mute_option">Ohne Ton</string>
     <string name="mute_note">Nur das Bild, ohne Ton</string>

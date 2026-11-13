@@ -398,7 +398,7 @@
  "settings.desc.parallel": "Koliko se videa preuzima u isto vrijeme.",
  "settings.desc.rate": "Ostavi dio interneta za druge stvari dok program preuzima.",
  "settings.desc.name": "Kako se zove sačuvani fajl.",
- "settings.desc.subtitles": "Titlovi na jeziku programa i na engleskom, pored videa.",
+ "settings.desc.subtitles": "Titlovi na jeziku programa i na engleskom, pored videa. Kad ih nema, titl na jeziku videa.",
  "settings.desc.thumbnail": "Sličica videa postaje omot fajla u Exploreru i plejerima.",
  "settings.desc.chapters": "Poglavlja ostaju u fajlu, pa ih plejer prikazuje.",
  "settings.desc.sponsorblock": "Izrezuje reklame sponzora; za to pita servis SponsorBlock.",

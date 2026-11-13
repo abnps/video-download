@@ -75,7 +75,7 @@ object Subtitles {
         return ((hours * 3600 + minutes * 60) * 1_000_000L) + (seconds * 1_000_000).toLong()
     }
 
-    /** Titl za upis u sliku: prvi na jeziku aplikacije (bs: i hr, sr), inače prvi koji postoji (engleski). */
+    /** Titl za upis u sliku: prvi na jeziku aplikacije (bs: i hr, sr), inače prvi koji postoji (engleski ili izvorni). */
     fun pick(files: List<java.io.File>, language: String): java.io.File? {
         val own = if (language == "bs") listOf("bs", "hr", "sr") else listOf(language)
         fun code(file: java.io.File) = file.name.split('.').dropLast(1).lastOrNull().orEmpty()

@@ -398,7 +398,7 @@
  "settings.desc.parallel": "Wie viele Videos gleichzeitig geladen werden.",
  "settings.desc.rate": "Lässt beim Herunterladen etwas Bandbreite für anderes frei.",
  "settings.desc.name": "Wie die gespeicherte Datei heißt.",
- "settings.desc.subtitles": "Untertitel in der Sprache des Programms und auf Englisch, neben dem Video.",
+ "settings.desc.subtitles": "Untertitel in der Sprache des Programms und auf Englisch, neben dem Video. Gibt es keine, in der Sprache des Videos.",
  "settings.desc.thumbnail": "Das Vorschaubild wird zum Cover der Datei im Explorer und in Playern.",
  "settings.desc.chapters": "Kapitel bleiben in der Datei, damit Player sie anzeigen.",
  "settings.desc.sponsorblock": "Schneidet Sponsorenwerbung heraus; fragt dafür den Dienst SponsorBlock.",

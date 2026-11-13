@@ -200,6 +200,10 @@ class AndroidSubtitlesTest(unittest.TestCase):
             {"subtitles": {"en": [], "de": []}, "automatic_captions": {"bs": [], "en-orig": []}},
             {"subtitles": {}, "automatic_captions": {"en": [], "hr": [], "sr-orig": []}},
             {"subtitles": {"en-GB": [], "live_chat": []}},
+            {"language": "ja", "subtitles": {"fr": [], "ja": []}, "automatic_captions": {"ja-orig": []}},
+            {"automatic_captions": {"tr-orig": [], "tr": []}},
+            {"subtitles": {"fr": [], "it": []}},
+            {"language": "ja", "subtitles": {"fr": []}},
             {},
         ]
         for language in ("bs", "en", "de", "es", "fr"):

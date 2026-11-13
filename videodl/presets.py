@@ -142,7 +142,8 @@ def subtitle_languages(language: str) -> list[str]:
 
 
 def pick_subtitles(info: dict, wanted: list[str]) -> list[str]:
-    """Najviše dva titla: prvi dostupan na jeziku aplikacije (ili srodnom) i engleski.
+    """Najviše dva titla: prvi dostupan na jeziku aplikacije (ili srodnom) i engleski; kad nema nijednog,
+    jedan na izvornom jeziku videa.
 
     Ručno napravljeni imaju prednost; kad ih nema, uzimaju se automatski (YouTube ih ima za skoro
     svaki video, i prevedene). Ključevi su tačno onakvi kakve sajt nudi (npr. "en-GB")."""
@@ -159,8 +160,18 @@ def pick_subtitles(info: dict, wanted: list[str]) -> list[str]:
         return None
 
     own = [code for code in wanted if code != "en"]
-    chosen = [first(own) if own else None, first(["en"]) if "en" in wanted else None]
-    return [key for key in chosen if key]
+    chosen = [key for key in (first(own) if own else None, first(["en"]) if "en" in wanted else None) if key]
+    if chosen:
+        return chosen
+    # Rezerva (Ahmed 13.11.2026): nema ni jezika aplikacije ni engleskog, pa jedan titl na jeziku na kojem se
+    # u videu govori. Redom: titl na jeziku videa (sajt ga javlja kao "language"), YouTubeov automatski titl
+    # izvornog govora ("xx-orig"), a kad sajt jezik ne javlja, prvi ručno napravljen titl.
+    spoken = str(info.get("language") or "").strip().lower()
+    original = first([spoken.split("-")[0]]) if spoken else None
+    original = original or next((key for key in auto if key.endswith("-orig")), None)
+    if not original and not spoken and manual:
+        original = manual[0]
+    return [original] if original else []
 
 
 def _seconds(text: str) -> float:

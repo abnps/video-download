@@ -398,7 +398,7 @@
  "settings.desc.parallel": "Cuántos vídeos se descargan a la vez.",
  "settings.desc.rate": "Deja parte de la conexión para otras cosas mientras descarga.",
  "settings.desc.name": "Cómo se llama el archivo guardado.",
- "settings.desc.subtitles": "Subtítulos en el idioma del programa y en inglés, junto al vídeo.",
+ "settings.desc.subtitles": "Subtítulos en el idioma del programa y en inglés, junto al vídeo. Si no hay, en el idioma del vídeo.",
  "settings.desc.thumbnail": "La miniatura del vídeo se convierte en la portada del archivo en el Explorador y reproductores.",
  "settings.desc.chapters": "Los capítulos quedan en el archivo y los reproductores los muestran.",
  "settings.desc.sponsorblock": "Recorta los anuncios de patrocinadores; consulta para ello el servicio SponsorBlock.",

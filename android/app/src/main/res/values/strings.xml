@@ -139,11 +139,11 @@
     <string name="set_subtitles">Subtitles with the video</string>
     <string name="subtitles_on">On: app language and English, as a separate file next to the video</string>
     <string name="subtitles_off">Off</string>
-    <string name="info_subtitles">With every video the app also saves subtitles in the app\'s language and in English, when the video has them. They are saved as a separate file with the same name as the video, so players find them on their own. A video with subtitles goes to the Downloads folder (Android accepts subtitle files only there), other videos go where you chose. Audio downloads (MP3/M4A) have no subtitles. On the quality screen you can untick it for a single video.</string>
+    <string name="info_subtitles">With every video the app also saves subtitles in the app\'s language and in English, when the video has them; if it has neither, in the language spoken in the video. They are saved as a separate file with the same name as the video, so players find them on their own. A video with subtitles goes to the Downloads folder (Android accepts subtitle files only there), other videos go where you chose. Audio downloads (MP3/M4A) have no subtitles. On the quality screen you can untick it for a single video.</string>
     <string name="set_burn">Burn subtitles into the picture</string>
     <string name="burn_on">On: the subtitle is part of the picture</string>
     <string name="burn_off">Off: subtitle as a separate file</string>
-    <string name="info_burn">The subtitle becomes part of the picture, so it shows in every player and when you share the video, but it can\'t be turned off. One language (the app\'s, otherwise English). The phone encodes the video again, so it takes longer and uses more battery. If it doesn\'t work, the subtitle stays as a separate file. Works only when Subtitles with the video is on.</string>
+    <string name="info_burn">The subtitle becomes part of the picture, so it shows in every player and when you share the video, but it can\'t be turned off. One language (the app\'s, otherwise English, otherwise the video\'s own). The phone encodes the video again, so it takes longer and uses more battery. If it doesn\'t work, the subtitle stays as a separate file. Works only when Subtitles with the video is on.</string>
     <string name="status_burning">Adding subtitles</string>
     <string name="mute_option">Without sound</string>
     <string name="mute_note">Only the picture, without audio</string>
