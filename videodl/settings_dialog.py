@@ -148,6 +148,11 @@ class SettingsDialog(QDialog):
         card = self._card(page)
         self.subtitles = self._switch(card, _plain("menu.subtitles"), "settings.desc.subtitles", window._subtitles,
                                       lambda on: window._set_option("_subtitles", on))
+        # Titl u slici (Ahmed 12.11.2026): izbor uz titlove; bez titlova nema šta da se upiše.
+        self.burn = self._switch(card, tr("settings.burn"), "settings.desc.burn", window._subtitles_burn,
+                                 lambda on: window._set_option("_subtitles_burn", on))
+        self.burn.setEnabled(window._subtitles)
+        self.subtitles.toggled.connect(self.burn.setEnabled)
         self.thumbnail = self._switch(card, _plain("menu.thumbnail"), "settings.desc.thumbnail", window._thumbnail_cover,
                                       lambda on: window._set_option("_thumbnail_cover", on))
         self.chapters = self._switch(card, _plain("settings.chapters"), "settings.desc.chapters", window._chapters,

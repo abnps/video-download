@@ -91,6 +91,10 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2026.09.00")
     implementation(composeBom)
     implementation("androidx.core:core-ktx:1.19.1")
+    // Titl upisan u sliku (SubtitleBurner.kt): dekodiranje, crtanje teksta i kodiranje koderom telefona.
+    implementation("androidx.media3:media3-transformer:1.11.1")
+    implementation("androidx.media3:media3-effect:1.11.1")
+    implementation("androidx.media3:media3-common:1.11.1")
     testImplementation("junit:junit:4.13.2") // samo testovi (CI: testDebugUnitTest), ne ide u APK
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.compose.material3:material3")

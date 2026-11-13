@@ -136,6 +136,15 @@
     <string name="feedback_no_mail">Nema aplikacije za e-poštu. Adresa %1$s je kopirana.</string>
     <string name="subtitles_option">Titlovi</string>
     <string name="subtitles_note">Jezik aplikacije i engleski, kao poseban fajl pored videa (u Preuzimanjima)</string>
+    <string name="set_subtitles">Titlovi uz video</string>
+    <string name="subtitles_on">Uključeno: jezik aplikacije i engleski, kao poseban fajl pored videa</string>
+    <string name="subtitles_off">Isključeno</string>
+    <string name="info_subtitles">Uz svaki video aplikacija čuva i titlove na jeziku aplikacije i na engleskom, kad ih video ima. Čuvaju se kao poseban fajl istog imena kao video, pa ih plejeri sami nađu. Video s titlovima ide u folder Preuzimanja (Android samo tamo prima fajl s titlovima), a ostali tamo gdje si izabrao. Preuzimanje zvuka (MP3/M4A) nema titlove. Na ekranu kvaliteta možeš ih odčekirati za jedan video.</string>
+    <string name="set_burn">Titl upiši u sliku</string>
+    <string name="burn_on">Uključeno: titl je dio slike</string>
+    <string name="burn_off">Isključeno: titl kao poseban fajl</string>
+    <string name="info_burn">Titl postaje dio slike, pa se vidi u svakom plejeru i kad video podijeliš, ali se ne može isključiti. Jedan jezik (aplikacije, inače engleski). Telefon video kodira ponovo, pa traje duže i troši više baterije. Ako ne uspije, titl ostaje kao poseban fajl. Radi samo kad su uključeni Titlovi uz video.</string>
+    <string name="status_burning">Upisujem titl</string>
     <string name="mute_option">Bez zvuka</string>
     <string name="mute_note">Samo slika, bez zvuka</string>
     <string name="mute_short">bez zvuka</string>

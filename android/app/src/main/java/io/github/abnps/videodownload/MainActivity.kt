@@ -211,7 +211,8 @@ class MainActivity : ComponentActivity() {
         val chosen = options.firstOrNull { wanted == 0 || it.label <= wanted } ?: options.firstOrNull()
         val label = chosen?.label?.takeIf { it > 0 }?.let { "${it}p" } ?: "MP4"
         DownloadService.start(this, Job(System.currentTimeMillis(), video.url, video.title, video.thumbnail, video.duration,
-            false, chosen?.height ?: 0, label))
+            false, chosen?.height ?: 0, label, subtitles = Settings.subtitles(this),
+            burnSubtitles = Settings.burnSubtitles(this)))
         link.value = ""
         Toast.makeText(this, getString(R.string.quick_started, video.title), Toast.LENGTH_SHORT).show()
         moveTaskToBack(true)

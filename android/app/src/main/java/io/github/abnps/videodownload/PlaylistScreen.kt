@@ -77,6 +77,7 @@ import java.util.Calendar
 /** Spisak videa iz plejliste: izbor (sve ili neki), video ili zvuk, pa redom preuzimanje kao zasebni poslovi. */
 @Composable
 fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Unit, onDownload: (List<Job>) -> Unit) {
+    val context = LocalContext.current
     val allowed = playlist.entries.indices.toList()
     val signature = remember(playlist) { playlist.selectionKey() }
     val selected = rememberSaveable(playlist.url, saver = listSaver(
@@ -141,7 +142,8 @@ fun PlaylistScreen(playlist: PlaylistInfo, defaultHeight: Int, onBack: () -> Uni
             val jobs = selected.sorted().mapIndexed { order, index ->
                 val e = playlist.entries[index]
                 Job(now + order, e.url, e.title, e.thumbnail, e.duration, audio, if (audio) 0 else defaultHeight, label,
-                    adult = e.adult)
+                    adult = e.adult, subtitles = !audio && Settings.subtitles(context),
+                    burnSubtitles = Settings.burnSubtitles(context))
             }
             // Videe koje je sajt već u spisku označio kao 18+ potvrđuješ odmah, jednim prozorom; ostale
             // (oznaka se vidi tek pri čitanju) pita lista Preuzimanja.

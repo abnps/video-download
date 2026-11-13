@@ -276,8 +276,8 @@ class NowPanel(QFrame):
             key = "merge" if progress.label == "pp.merge" and not self._audio else "convert"
             self.phase_labels[key].setVisible(True)
             self._set_phase(key)
-            self.progress.set_fraction(None)
-            self.percent.setText("")
+            self.progress.set_fraction(progress.fraction, "audio")  # bez procenta traka klizi
+            self.percent.setText(f"{progress.fraction:.0%}" if progress.fraction is not None else "")
             self.inline.setText("")
             self.eta.setText("—")
             return

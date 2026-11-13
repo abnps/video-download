@@ -424,5 +424,9 @@
  "status.pacing_off": "Zaštita od blokade isključena",
  "status.today": "Danas: {count} · {size}",
  "queue.next_empty": "Ništa više ne čeka. Zalijepi novi link (Ctrl+V) ili ga prevuci ovdje.",
- "cookies.fallback": "Kolačići iz {browser} se ne mogu pročitati (Chrome i Edge ih zaključaju dok rade), pa preuzimam bez prijave. Za video iza prijave pošalji ga iz dodatka u browseru."
+ "cookies.fallback": "Kolačići iz {browser} se ne mogu pročitati (Chrome i Edge ih zaključaju dok rade), pa preuzimam bez prijave. Za video iza prijave pošalji ga iz dodatka u browseru.",
+ "settings.burn": "Titl upiši u sliku",
+ "settings.desc.burn": "Titl postaje dio slike i vidi se u svakom plejeru, ali se ne može isključiti. Jedan jezik; preuzimanje traje duže. Samo za MP4.",
+ "pp.burn": "Upisujem titl u sliku",
+ "row.burn_failed": "titl nije upisan u sliku (ostao je pored videa)"
 }

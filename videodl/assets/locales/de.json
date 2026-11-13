@@ -424,5 +424,9 @@
  "status.pacing_off": "Schutz vor Sperren aus",
  "status.today": "Heute: {count} · {size}",
  "queue.next_empty": "Nichts wartet mehr. Füge einen neuen Link ein (Strg+V) oder ziehe ihn hierher.",
- "cookies.fallback": "Cookies aus {browser} lassen sich nicht lesen (Chrome und Edge sperren sie, solange sie laufen), daher wird ohne Anmeldung geladen. Videos hinter einer Anmeldung schickst du aus der Browser-Erweiterung."
+ "cookies.fallback": "Cookies aus {browser} lassen sich nicht lesen (Chrome und Edge sperren sie, solange sie laufen), daher wird ohne Anmeldung geladen. Videos hinter einer Anmeldung schickst du aus der Browser-Erweiterung.",
+ "settings.burn": "Untertitel ins Bild einbrennen",
+ "settings.desc.burn": "Der Untertitel wird Teil des Bildes und ist in jedem Player zu sehen, lässt sich aber nicht ausschalten. Eine Sprache; das Herunterladen dauert länger. Nur MP4.",
+ "pp.burn": "Untertitel werden eingebrannt",
+ "row.burn_failed": "Untertitel nicht eingebrannt (liegen neben dem Video)"
 }

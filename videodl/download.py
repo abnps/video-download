@@ -12,9 +12,10 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from .browser import Cookie, cookie_options, is_cookie_read_error
+from .burn import BurnCancelled, BurnError, burn_subtitles as burn_into_picture, can_burn
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
-from .i18n import MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA
+from .i18n import MESSAGE_BURN_FAILED, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA
 from .ytdl import YdlLogger, error_message, is_web_url
 from .ytdlp_update import ensure_ready
 
@@ -241,9 +242,11 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              cookie_txt: str | None = None,
              split_chapters: bool = False,
              split_dir: str | None = None,
+             burn_subtitles: bool = False,
              _isolated: bool = False) -> DownloadResult:
+    """`burn_subtitles` (uz `subtitles`): titl se upisuje u sliku (burn.py) umjesto da stoji pored videa."""
     more = {"precise_cut": precise_cut, "number": number, "cookie_browser": cookie_browser, "cookie_txt": cookie_txt,
-            "split_chapters": split_chapters, "split_dir": split_dir}
+            "split_chapters": split_chapters, "split_dir": split_dir, "burn_subtitles": burn_subtitles}
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
@@ -279,7 +282,8 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                                      thumbnail=thumbnail, chapters=chapters, sponsorblock=sponsorblock,
                                      ratelimit=live.budget.share() if live else ratelimit,
                                      name_template=name_template, precise_cut=precise_cut, number=number,
-                                     split_chapters=split_chapters, split_dir=split_dir)
+                                     split_chapters=split_chapters, split_dir=split_dir,
+                                     embed_subtitles=not burn_subtitles)
             opts.update(cookie_opts)
             opts["progress_hooks"] = [attempt.progress_hook]
             if live:
@@ -335,10 +339,21 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
     if not output_is_usable(filepath):
         # yt-dlp je javio uspjeh, ali fajla nema, prazan je ili se ne može pročitati: nije „Završeno".
         return DownloadResult(ItemStatus.FAILED, filepath, MESSAGE_NO_OUTPUT)
+    message = MESSAGE_NO_SUBS if no_subtitles else ""
     if subtitles and not no_subtitles and filepath:
-        _plain_name_for_first_subtitle(filepath, (info or {}).get("requested_subtitles") or {})
+        requested = (info or {}).get("requested_subtitles") or {}
+        burned = False
+        # Samo za upravo preuzet MP4: fajl koji je već postojao možda već ima titl u slici (bio bi dupli).
+        if burn_subtitles and attempt.real_download and can_burn(filepath):
+            burned = _burn_first_subtitle(filepath, requested, (info or {}).get("duration"), on_progress, cancel_event)
+            if burned is None:
+                return DownloadResult(ItemStatus.CANCELLED)
+            if not burned:
+                message = MESSAGE_BURN_FAILED
+        if not burned:
+            _plain_name_for_first_subtitle(filepath, requested)
     height = (info or {}).get("height")
-    return DownloadResult(ItemStatus.DONE, filepath, MESSAGE_NO_SUBS if no_subtitles else "",
+    return DownloadResult(ItemStatus.DONE, filepath, message,
                           already_existed=not attempt.real_download,
                           height=height if isinstance(height, int) and height > 0 else None)
 
@@ -408,6 +423,30 @@ def output_is_usable(path: str | None, ffprobe: str | None = None, run=subproces
         return True  # ffprobe ne radi: ne proglašavamo ispravan fajl neispravnim
     kinds = {line.strip() for line in result.stdout.splitlines()}
     return result.returncode == 0 and bool(kinds & {"video", "audio"})
+
+
+def _burn_first_subtitle(video: str, requested: dict, duration, on_progress, cancel_event) -> bool | None:
+    """Prvi preuzeti titl (jezik programa, inače engleski) upisuje u sliku videa. True = upisan, pa fajlovi titla
+    pored videa više ne trebaju; False = titla nema ili upis nije uspio (titl ostaje pored videa); None = prekinuto."""
+    base = os.path.splitext(video)[0]
+    files = [path for path in (f"{base}.{language}.srt" for language in requested) if os.path.isfile(path)]
+    if not files:
+        return False
+    report = on_progress or (lambda progress: None)
+    report(Progress(PROCESSING, 0.0, label="pp.burn"))
+    try:
+        burn_into_picture(video, files[0], lambda fraction: report(Progress(PROCESSING, fraction, label="pp.burn")),
+                          cancel_event, duration if isinstance(duration, (int, float)) and duration > 0 else None)
+    except BurnCancelled:
+        return None
+    except BurnError:
+        return False
+    for path in files:
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+    return True
 
 
 def _plain_name_for_first_subtitle(video: str, requested: dict) -> None:
