@@ -28,6 +28,7 @@ data class Job(
     val playlistKey: String = "",
     val playlistSize: Int = 0,
     val mute: Boolean = false, // video bez zvuka (kvačica na ekranu kvaliteta)
+    val burnSubtitles: Boolean = false, // titl upisan u sliku umjesto fajla pored videa (SubtitleBurner)
 ) {
     val hasClip get() = clipStart >= 0 && clipEnd > clipStart
 
@@ -37,6 +38,7 @@ data class Job(
         putBoolean("adult", adult); putBoolean("adult_ok", adultOk)
         putBoolean("subtitles", subtitles); putInt("clip_start", clipStart); putInt("clip_end", clipEnd)
         putString("playlist_key", playlistKey); putInt("playlist_size", playlistSize); putBoolean("mute", mute)
+        putBoolean("subtitles_burn", burnSubtitles)
     }
 
     companion object {
@@ -46,7 +48,7 @@ data class Job(
             bundle.getInt("height"), bundle.getString("label").orEmpty(), bundle.getBoolean("adult"),
             bundle.getBoolean("adult_ok"), bundle.getBoolean("subtitles"), bundle.getInt("clip_start", -1),
             bundle.getInt("clip_end", -1), bundle.getString("playlist_key").orEmpty(), bundle.getInt("playlist_size"),
-            bundle.getBoolean("mute"),
+            bundle.getBoolean("mute"), bundle.getBoolean("subtitles_burn"),
         )
     }
 }
@@ -86,7 +88,8 @@ object Downloads {
                         value.optString("thumbnail"), value.optInt("duration"), value.getBoolean("audio"),
                         value.optInt("height"), value.optString("label"), value.optBoolean("adult"),
                         subtitles = value.optBoolean("subtitles"), clipStart = value.optInt("clip_start", -1),
-                        clipEnd = value.optInt("clip_end", -1), mute = value.optBoolean("mute")), Phase.INTERRUPTED)
+                        clipEnd = value.optInt("clip_end", -1), mute = value.optBoolean("mute"),
+                        burnSubtitles = value.optBoolean("subtitles_burn")), Phase.INTERRUPTED)
                 }.getOrNull()
             }.distinctBy { it.job.id }
         }.getOrDefault(emptyList())
@@ -115,7 +118,7 @@ object Downloads {
                 .put("thumbnail", job.thumbnail).put("duration", job.duration).put("audio", job.isAudio)
                 .put("height", job.height).put("label", job.label).put("adult", job.adult) // adultOk nikad
                 .put("subtitles", job.subtitles).put("clip_start", job.clipStart).put("clip_end", job.clipEnd)
-                .put("mute", job.mute))
+                .put("mute", job.mute).put("subtitles_burn", job.burnSubtitles))
         }
         check(app.getSharedPreferences("pending_jobs", Context.MODE_PRIVATE).edit()
             .putString("jobs", array.toString()).commit()) { "Lista preuzimanja nije sačuvana" }

@@ -88,8 +88,9 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
     val chosen = options.firstOrNull { it.height == chosenHeight } ?: options.first()
     var pickLocation by remember { mutableStateOf(false) }
     var askAdult by remember { mutableStateOf<Job?>(null) }
-    var subtitles by rememberSaveable(info.url) { mutableStateOf(false) }
     val context = LocalContext.current
+    // Uključeno ako je u Postavkama „Titlovi uz video"; ovdje se može promijeniti za ovaj video.
+    var subtitles by rememberSaveable(info.url) { mutableStateOf(Settings.subtitles(context)) }
     // Uključeno ako je u Postavkama „Sljedeći video bez zvuka"; ovdje se može i isključiti za ovaj video.
     var mute by rememberSaveable(info.url) { mutableStateOf(Settings.muteNext(context)) }
     var clip by rememberSaveable(info.url) { mutableStateOf(false) }
@@ -105,7 +106,9 @@ fun QualityScreen(info: VideoInfo, defaultHeight: Int, onBack: () -> Unit, onDow
         val range = if (clip) clipRange else null
         val job = Job(System.currentTimeMillis(), info.url, info.title, info.thumbnail, info.duration, asAudio,
             if (asAudio) 0 else chosen.height, if (silent) "$label · $mutedLabel" else label, adult = info.adult,
-            subtitles = subtitles && !asAudio, clipStart = range?.first ?: -1, clipEnd = range?.second ?: -1, mute = silent)
+            // Isječak ide bez titlova: titl je za cijeli video, pa se uz izrezani dio ne bi poklapao.
+            subtitles = subtitles && !asAudio && range == null, clipStart = range?.first ?: -1,
+            clipEnd = range?.second ?: -1, mute = silent, burnSubtitles = Settings.burnSubtitles(context))
         if (info.adult) askAdult = job else onDownload(job)
     }
     Column(Modifier.fillMaxSize()) {

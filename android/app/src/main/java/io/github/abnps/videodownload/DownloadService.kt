@@ -127,9 +127,41 @@ class DownloadService : Service() {
             if (job.id in cancelled) throw CancelledHere()
             val size = file.length()
             val height = if (job.isAudio) 0 else videoHeight(file) // stvarna visina (za dostignuće „4K")
-            // Titlovi su tekst: MediaStore ih prima samo u Download/, pa tada i video ide tamo (plejer ih nađe zajedno).
-            val subtitleFiles = result.getOrNull(4)?.toString().orEmpty().split("|").filter { it.isNotEmpty() }.map(::File)
+            var subtitleFiles = result.getOrNull(4)?.toString().orEmpty().split("|").filter { it.isNotEmpty() }.map(::File)
                 .filter { it.isFile }
+            if (job.burnSubtitles && subtitleFiles.isNotEmpty() && !job.isAudio) {
+                // Titl upisan u sliku (SubtitleBurner): jedan jezik, video se kodira ponovo. Ne uspije li, titl ostaje
+                // pored videa kao do sada.
+                val chosen = Subtitles.pick(subtitleFiles, Links.language())
+                if (chosen != null) {
+                    Downloads.update(job.id) { it.copy(phase = Phase.CONVERTING, fraction = 0f, done = 0, total = 0) }
+                    notify(progressNotification(getString(R.string.status_burning), null))
+                    val burned = File(work, "${file.nameWithoutExtension}.titl.mp4")
+                    var last = 0L
+                    val ok = try {
+                        SubtitleBurner.burn(this, file, chosen, burned, { job.id in cancelled }) { fraction ->
+                            val now = SystemClock.elapsedRealtime()
+                            if (now - last >= 400) {
+                                last = now
+                                Downloads.update(job.id) { it.copy(fraction = fraction) }
+                                notify(progressNotification("${job.title} · ${getString(R.string.status_burning)} · ${(fraction * 100).toInt()}%", fraction))
+                            }
+                        }
+                    } catch (_: SubtitleBurner.Cancelled) {
+                        throw CancelledHere()
+                    }
+                    if (ok) {
+                        file.delete()
+                        check(burned.renameTo(file)) { "Privremeni fajl nije premješten" }
+                        subtitleFiles.forEach { it.delete() }
+                        subtitleFiles = emptyList()
+                    }
+                    Downloads.update(job.id) { it.copy(phase = Phase.SAVING) }
+                    notify(progressNotification(getString(R.string.status_saving), null))
+                }
+            }
+            if (job.id in cancelled) throw CancelledHere()
+            // Titlovi su tekst: MediaStore ih prima samo u Download/, pa tada i video ide tamo (plejer ih nađe zajedno).
             val location = if (subtitleFiles.isNotEmpty()) SaveLocation.DOWNLOADS else Settings.location(this)
             val uri = MediaSaver.save(this, file, job.isAudio, location) { job.id in cancelled }
             subtitleFiles.forEach { sub ->

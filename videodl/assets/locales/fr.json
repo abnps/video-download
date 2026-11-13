@@ -424,5 +424,9 @@
  "status.pacing_off": "Protection contre les blocages désactivée",
  "status.today": "Aujourd’hui : {count} · {size}",
  "queue.next_empty": "Plus rien n’attend. Colle un nouveau lien (Ctrl+V) ou fais-le glisser ici.",
- "cookies.fallback": "Impossible de lire les cookies de {browser} (Chrome et Edge les verrouillent pendant leur exécution) : téléchargement sans connexion. Pour une vidéo qui demande une connexion, envoie-la depuis l’extension du navigateur."
+ "cookies.fallback": "Impossible de lire les cookies de {browser} (Chrome et Edge les verrouillent pendant leur exécution) : téléchargement sans connexion. Pour une vidéo qui demande une connexion, envoie-la depuis l’extension du navigateur.",
+ "settings.burn": "Incruster les sous-titres dans l’image",
+ "settings.desc.burn": "Le sous-titre fait partie de l’image et s’affiche dans tous les lecteurs, mais ne peut plus être désactivé. Une langue ; le téléchargement est plus long. MP4 uniquement.",
+ "pp.burn": "Incrustation des sous-titres",
+ "row.burn_failed": "sous-titres non incrustés (restés à côté de la vidéo)"
 }

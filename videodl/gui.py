@@ -169,6 +169,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._thumbnail_cover = False
         self._whole_playlist = False
         self._precise_cut = True
+        self._subtitles_burn = False  # titl upisan u sliku umjesto fajla pored videa (burn.py)
         self._number_playlist = False
         self._split_chapters = False
         self._cookie_browser = ""  # „", firefox, edge, chrome, brave (Postavke → Prijava na sajtove)
@@ -585,6 +586,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._sponsorblock = self._settings.value("sponsorblock", False, type=bool)
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
         self._precise_cut = self._settings.value("precise_cut", True, type=bool)
+        self._subtitles_burn = self._settings.value("subtitles_burn", False, type=bool)
         self._number_playlist = self._settings.value("number_playlist", False, type=bool)
         self._split_chapters = self._settings.value("split_chapters", False, type=bool)
         browser = self._settings.value("cookie_browser", "", type=str)
@@ -623,6 +625,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._settings.setValue("sponsorblock", self._sponsorblock)
         self._settings.setValue("whole_playlist", self._whole_playlist)
         self._settings.setValue("precise_cut", self._precise_cut)
+        self._settings.setValue("subtitles_burn", self._subtitles_burn)
         self._settings.setValue("number_playlist", self._number_playlist)
         self._settings.setValue("split_chapters", self._split_chapters)
         self._settings.setValue("cookie_browser", self._cookie_browser)
@@ -685,6 +688,8 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         if self._subtitles:
             options["subtitles"] = True
             options["subtitle_langs"] = subtitle_languages(get_language())
+            if self._subtitles_burn:
+                options["burn_subtitles"] = True
         if self._thumbnail_cover:
             options["thumbnail"] = True
         if self._chapters:

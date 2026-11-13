@@ -194,7 +194,7 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
                       name_template: str | None = None, chapters: bool = False,
                       sponsorblock: bool = False, precise_cut: bool = True,
                       number: str | None = None, split_chapters: bool = False,
-                      split_dir: str | None = None) -> dict:
+                      split_dir: str | None = None, embed_subtitles: bool = True) -> dict:
     target_dir = Path(output_dir)
     if subfolder:
         target_dir /= safe_folder_name(subfolder)
@@ -240,7 +240,8 @@ def build_ydl_options(preset: Preset, output_dir: str, subfolder: str | None = N
         opts["subtitleslangs"] = list(subtitle_langs or ["en"])
         opts["subtitlesformat"] = "srt/vtt/best"
         postprocessors.append({"key": "FFmpegSubtitlesConvertor", "format": "srt", "when": "before_dl"})
-        postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": True})
+        if embed_subtitles:  # kad se titl upisuje u sliku (burn.py), isključiv titl u fajlu bi bio dupli
+            postprocessors.append({"key": "FFmpegEmbedSubtitle", "already_have_subtitle": True})
     # Isječak (section) ima svoje vrijeme: poglavlja i SponsorBlock dijelovi cijelog videa ne bi se poklopili.
     if sponsorblock and not section:
         # SponsorBlock (Ahmed 5.10.2026, isključeno dok ga korisnik ne uključi): baza zajednice o reklamama

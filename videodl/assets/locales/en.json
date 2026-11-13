@@ -424,5 +424,9 @@
  "status.pacing_off": "Block protection off",
  "status.today": "Today: {count} · {size}",
  "queue.next_empty": "Nothing else is waiting. Paste a new link (Ctrl+V) or drag it here.",
- "cookies.fallback": "Cookies from {browser} can't be read (Chrome and Edge lock them while running), so downloading without signing in. For videos behind a sign-in, send them from the browser extension."
+ "cookies.fallback": "Cookies from {browser} can't be read (Chrome and Edge lock them while running), so downloading without signing in. For videos behind a sign-in, send them from the browser extension.",
+ "settings.burn": "Burn subtitles into the picture",
+ "settings.desc.burn": "The subtitle becomes part of the picture and shows in every player, but can’t be turned off. One language; downloading takes longer. MP4 only.",
+ "pp.burn": "Burning subtitles into the picture",
+ "row.burn_failed": "subtitles were not burned in (kept next to the video)"
 }

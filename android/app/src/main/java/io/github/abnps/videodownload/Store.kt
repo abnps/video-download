@@ -38,6 +38,18 @@ object Settings {
 
     fun setQuickShare(context: Context, value: Boolean) = prefs(context).edit().putBoolean("quick_share", value).apply()
 
+    /** „Titlovi uz video" (Ahmed 12.11.2026), kao Postavke → Uz video na računaru: važi za svako preuzimanje videa
+     *  (ekran kvaliteta, brzo preuzimanje iz „Podijeli", plejlista); na ekranu kvaliteta se može odčekirati. */
+    fun subtitles(context: Context): Boolean = prefs(context).getBoolean("subtitles", false)
+
+    fun setSubtitles(context: Context, value: Boolean) = prefs(context).edit().putBoolean("subtitles", value).apply()
+
+    /** „Titl upiši u sliku" (Ahmed 12.11.2026): titl postaje dio slike umjesto fajla pored videa (SubtitleBurner). */
+    fun burnSubtitles(context: Context): Boolean = prefs(context).getBoolean("subtitles_burn", false)
+
+    fun setBurnSubtitles(context: Context, value: Boolean) =
+        prefs(context).edit().putBoolean("subtitles_burn", value).apply()
+
     /** „Sljedeći video bez zvuka" (Ahmed 25.10.2026): važi za JEDAN sljedeći video, pa se samo isključi. */
     fun muteNext(context: Context): Boolean = prefs(context).getBoolean("mute_next", false)
 

@@ -82,6 +82,8 @@ def format_eta(seconds: int) -> str:
 
 def format_progress(progress: Progress) -> str:
     if progress.phase == PROCESSING:
+        if progress.fraction is not None:  # npr. upisivanje titla u sliku: zna se dokle je stiglo
+            return f"{tr(progress.label)}… {progress.fraction:.0%}"
         return f"{tr(progress.label)}…"
     parts = [tr("progress.downloading") + (f" ({tr(progress.label)})" if progress.label else "")]
     if progress.fraction is not None:

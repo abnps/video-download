@@ -136,6 +136,15 @@
     <string name="feedback_no_mail">No hay app de correo. Se copió la dirección %1$s.</string>
     <string name="subtitles_option">Subtítulos</string>
     <string name="subtitles_note">Idioma de la app e inglés, como archivo aparte junto al vídeo (en Descargas)</string>
+    <string name="set_subtitles">Subtítulos con el vídeo</string>
+    <string name="subtitles_on">Activado: idioma de la app e inglés, como archivo aparte junto al vídeo</string>
+    <string name="subtitles_off">Desactivado</string>
+    <string name="info_subtitles">Con cada vídeo la app guarda también los subtítulos en el idioma de la app y en inglés, cuando el vídeo los tiene. Se guardan como un archivo aparte con el mismo nombre que el vídeo, para que los reproductores los encuentren solos. Un vídeo con subtítulos va a la carpeta Descargas (Android solo acepta ahí los archivos de subtítulos); los demás, donde hayas elegido. Las descargas de audio (MP3/M4A) no tienen subtítulos. En la pantalla de calidad puedes desmarcarlos para un solo vídeo.</string>
+    <string name="set_burn">Grabar los subtítulos en la imagen</string>
+    <string name="burn_on">Activado: el subtítulo forma parte de la imagen</string>
+    <string name="burn_off">Desactivado: subtítulo como archivo aparte</string>
+    <string name="info_burn">El subtítulo pasa a formar parte de la imagen: se ve en cualquier reproductor y al compartir el vídeo, pero no se puede desactivar. Un idioma (el de la app, si no, inglés). El teléfono vuelve a codificar el vídeo, así que tarda más y gasta más batería. Si no funciona, el subtítulo queda como archivo aparte. Solo funciona con Subtítulos con el vídeo activado.</string>
+    <string name="status_burning">Grabando subtítulos</string>
     <string name="mute_option">Sin sonido</string>
     <string name="mute_note">Solo la imagen, sin audio</string>
     <string name="mute_short">sin sonido</string>

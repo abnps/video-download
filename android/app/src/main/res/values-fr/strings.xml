@@ -136,6 +136,15 @@
     <string name="feedback_no_mail">Aucune app de messagerie. L\'adresse %1$s a été copiée.</string>
     <string name="subtitles_option">Sous-titres</string>
     <string name="subtitles_note">Langue de l\'application et anglais, en fichier séparé à côté de la vidéo (dans Téléchargements)</string>
+    <string name="set_subtitles">Sous-titres avec la vidéo</string>
+    <string name="subtitles_on">Activé : langue de l\'application et anglais, en fichier séparé à côté de la vidéo</string>
+    <string name="subtitles_off">Désactivé</string>
+    <string name="info_subtitles">Avec chaque vidéo, l\'application enregistre aussi les sous-titres dans la langue de l\'application et en anglais, quand la vidéo en a. Ils sont enregistrés dans un fichier séparé portant le même nom que la vidéo, pour que les lecteurs les trouvent tout seuls. Une vidéo avec sous-titres va dans le dossier Téléchargements (Android n\'accepte les fichiers de sous-titres que là), les autres là où tu as choisi. Les téléchargements audio (MP3/M4A) n\'ont pas de sous-titres. Sur l\'écran de qualité, tu peux les décocher pour une seule vidéo.</string>
+    <string name="set_burn">Incruster les sous-titres dans l\'image</string>
+    <string name="burn_on">Activé : le sous-titre fait partie de l\'image</string>
+    <string name="burn_off">Désactivé : sous-titre en fichier séparé</string>
+    <string name="info_burn">Le sous-titre fait partie de l\'image : il s\'affiche dans tous les lecteurs et quand tu partages la vidéo, mais ne peut plus être désactivé. Une langue (celle de l\'application, sinon l\'anglais). Le téléphone réencode la vidéo, c\'est donc plus long et consomme plus de batterie. En cas d\'échec, le sous-titre reste en fichier séparé. Fonctionne seulement avec Sous-titres avec la vidéo activé.</string>
+    <string name="status_burning">Incrustation des sous-titres</string>
     <string name="mute_option">Sans son</string>
     <string name="mute_note">Seulement l’image, sans le son</string>
     <string name="mute_short">sans son</string>

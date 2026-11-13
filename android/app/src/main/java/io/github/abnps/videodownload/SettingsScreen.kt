@@ -116,6 +116,23 @@ fun SettingsScreen(quality: Int, onQuality: (Int) -> Unit, location: SaveLocatio
                 Switch(checked = quick, onCheckedChange = { toggleQuick() })
             }
             GroupDivider()
+            // Titlovi uz video kao na računaru (Ahmed 12.11.2026): stalna postavka, važi za svako preuzimanje videa.
+            var subtitles by remember { mutableStateOf(Settings.subtitles(context)) }
+            val toggleSubtitles = { subtitles = !subtitles; Settings.setSubtitles(context, subtitles) }
+            GroupRow(OneUi.Blue, R.drawable.ic_language, stringResource(R.string.set_subtitles),
+                stringResource(if (subtitles) R.string.subtitles_on else R.string.subtitles_off), onClick = toggleSubtitles,
+                info = stringResource(R.string.info_subtitles)) {
+                Switch(checked = subtitles, onCheckedChange = { toggleSubtitles() })
+            }
+            GroupDivider()
+            var burn by remember { mutableStateOf(Settings.burnSubtitles(context)) }
+            val toggleBurn = { if (subtitles) { burn = !burn; Settings.setBurnSubtitles(context, burn) } }
+            GroupRow(OneUi.Purple, R.drawable.ic_videocam, stringResource(R.string.set_burn),
+                stringResource(if (burn) R.string.burn_on else R.string.burn_off), onClick = toggleBurn,
+                info = stringResource(R.string.info_burn)) {
+                Switch(checked = burn, onCheckedChange = { toggleBurn() }, enabled = subtitles)
+            }
+            GroupDivider()
             // Jednokratno: poslije jednog videa se samo isključi (Settings.takeMuteNext); pri povratku se čita ponovo.
             var muteNext by remember { mutableStateOf(Settings.muteNext(context)) }
             LifecycleResumeEffect(Unit) {

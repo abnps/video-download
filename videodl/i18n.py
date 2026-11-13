@@ -16,6 +16,7 @@ MESSAGE_RETRY = "@retry"
 MESSAGE_PAUSE = "@pause"  # čeka: sajt traži pauzu (zaštita od blokade, pacing.py)
 MESSAGE_NOT_MEDIA = "@not_media"
 MESSAGE_NO_SUBS = "@no_subs"  # gotovo, ali video nema titlove (ili ih sajt nije dao)
+MESSAGE_BURN_FAILED = "@burn_failed"  # gotovo, ali titl nije upisan u sliku (ostao je pored videa)
 MESSAGE_NO_OUTPUT = "@no_output"  # yt-dlp javio uspjeh, a gotovog fajla nema ili je neispravan
 
 _current = FALLBACK

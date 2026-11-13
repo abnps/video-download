@@ -424,5 +424,9 @@
  "status.pacing_off": "Protección contra bloqueos desactivada",
  "status.today": "Hoy: {count} · {size}",
  "queue.next_empty": "No hay nada más en espera. Pega un nuevo enlace (Ctrl+V) o arrástralo aquí.",
- "cookies.fallback": "No se pueden leer las cookies de {browser} (Chrome y Edge las bloquean mientras están abiertos), así que se descarga sin iniciar sesión. Para vídeos que requieren sesión, envíalos desde la extensión del navegador."
+ "cookies.fallback": "No se pueden leer las cookies de {browser} (Chrome y Edge las bloquean mientras están abiertos), así que se descarga sin iniciar sesión. Para vídeos que requieren sesión, envíalos desde la extensión del navegador.",
+ "settings.burn": "Grabar los subtítulos en la imagen",
+ "settings.desc.burn": "El subtítulo pasa a formar parte de la imagen y se ve en cualquier reproductor, pero no se puede desactivar. Un idioma; la descarga tarda más. Solo MP4.",
+ "pp.burn": "Grabando los subtítulos en la imagen",
+ "row.burn_failed": "los subtítulos no se grabaron (quedan junto al vídeo)"
 }
