@@ -40,6 +40,7 @@ def shoot(window, app, lang: str, theme: str, out: Path) -> Path:
     for row in list(window._rows.values()):
         row.setParent(None)
     window._rows.clear()
+    window.now_panel.clear()  # nova lista počinje s istim brojevima stavki: kartica bi ostala na starom jeziku
     window._queue = DownloadQueue()  # aktivne stavke se ne daju ukloniti, pa nova prazna lista za svaki snimak
     titles = HOME[lang]["demo_titles"]
     states = (ItemStatus.ACTIVE, ItemStatus.ACTIVE, ItemStatus.DONE, ItemStatus.DONE)
@@ -56,12 +57,35 @@ def shoot(window, app, lang: str, theme: str, out: Path) -> Path:
             window._rows[item.id].show_progress(gui.format_progress(progress), fraction)
     window.preset_combo.setCurrentIndex(window.preset_combo.findData("best"))
     window._running = True  # dugme „Stop", kao dok preuzimanje traje
-    window._update_controls()
+    window._update_controls()  # kartica „Sada i sljedeće" preuzima prvi aktivni video
+    _feed_now_panel(window, window._queue.items()[0].id)
     window.resize(*SIZE)
-    app.processEvents()
+    _settle(app)
     path = out / f"store-{lang}-{theme}.png"
     window.grab().save(str(path))
     return path
+
+
+def _settle(app, seconds: float = 1.0) -> None:
+    """Trake napretka klize do vrijednosti (0,6 s); snimak tek kad stignu."""
+    import time
+
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        app.processEvents()
+        time.sleep(0.02)
+
+
+def _feed_now_panel(window, item_id: int) -> None:
+    """Kartica „Sada i sljedeće": niz izmišljenih javljanja napretka (brzina se malo mijenja, kao stvarno),
+    da se vide traka, procenat i grafikon brzine; završava na istih 62 % kao red u listi."""
+    import math
+
+    steps = 30
+    for step in range(1, steps + 1):
+        speed = 6.4e6 * (1 + 0.18 * math.sin(step * 0.7) + 0.07 * math.cos(step * 1.9))
+        fraction = 0.62 * step / steps
+        window.now_panel.update_progress(item_id, Progress("download", fraction, speed, 9, "progress.video"))
 
 
 def main() -> int:
