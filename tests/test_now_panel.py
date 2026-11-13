@@ -95,7 +95,8 @@ class NowPanelWindowTest(unittest.TestCase):
         active = self.add("Jedini", ItemStatus.ACTIVE)
         self.window._update_controls()
         self.assertIs(self.window.stack.currentWidget(), self.window.queue_hint)  # ne prazna lista
-        self.assertIn("Ctrl+V", self.window.queue_hint.text())
+        hint = self.window.queue_hint.text()
+        self.assertTrue("Ctrl+V" in hint or "⌘V" in hint, hint)  # Mac pokazuje Cmd tipku (i18n.py)
         waiting = self.add("Drugi", ItemStatus.WAITING)
         self.window._update_controls()
         self.assertIs(self.window.stack.currentWidget(), self.window.scroll)

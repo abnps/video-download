@@ -214,12 +214,15 @@ def make_dmg() -> None:
 def main() -> int:
     lock = build_release.load_lock()
     check_environment(lock)
-    build_release.run_checks()
     for folder in (STAGE, DIST, WORK / "work"):
         shutil.rmtree(folder, ignore_errors=True)
     STAGE.mkdir(parents=True)
 
     tools = fetch_tools(lock)
+    # Testovi koriste ffmpeg koji ide u paket (ne Homebrewov): npr. titl upisan u sliku traži libass i libx264,
+    # a Homebrewov ffmpeg to ne mora imati (Mac paket je od 9.11.2026 padao baš na tom testu).
+    os.environ["PATH"] = f"{tools}{os.pathsep}{os.environ.get('PATH', '')}"
+    build_release.run_checks()
     shutil.copytree(PROJECT / "extension", STAGE / "extension", ignore=shutil.ignore_patterns("package.json"))
     build_release.write_legal(STAGE, installer_documents=False)
     write_manifest(lock, tools)
