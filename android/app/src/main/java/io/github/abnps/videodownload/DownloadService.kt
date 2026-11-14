@@ -134,7 +134,7 @@ class DownloadService : Service() {
                 // pored videa kao do sada.
                 val chosen = Subtitles.pick(subtitleFiles, Links.language())
                 if (chosen != null) {
-                    Downloads.update(job.id) { it.copy(phase = Phase.CONVERTING, fraction = 0f, done = 0, total = 0) }
+                    Downloads.update(job.id) { it.copy(phase = Phase.BURNING, fraction = 0f, done = 0, total = 0) }
                     notify(progressNotification(getString(R.string.status_burning), null))
                     val burned = File(work, "${file.nameWithoutExtension}.titl.mp4")
                     var last = 0L

@@ -158,6 +158,11 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
                     AppProgressBar(fraction, BarPhase.WORK)
                     Text("MP3 · ${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else if (active.phase == Phase.BURNING && fraction != null) {
+                    // Upis titla u sliku: ista ljubičasta traka obrade, tekst ispod kaže „Upisujem titl"
+                    AppProgressBar(fraction, BarPhase.WORK)
+                    Text("${(fraction * 100).toInt()}%", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else if (active.phase == Phase.DOWNLOADING && fraction != null) {
                     AppProgressBar(fraction, if (active.job.isAudio || active.audioPart) BarPhase.AUDIO else BarPhase.VIDEO)
                     Row {
@@ -179,6 +184,7 @@ internal fun ActiveCard(active: ActiveJob, onCancel: (Long) -> Unit, onRetry: (J
                     Phase.READING -> R.string.status_reading
                     Phase.DOWNLOADING -> R.string.phase_downloading
                     Phase.CONVERTING -> R.string.status_converting
+                    Phase.BURNING -> R.string.status_burning
                     Phase.SAVING -> R.string.status_saving
                     Phase.DONE -> R.string.phase_done
                     Phase.INTERRUPTED -> R.string.phase_interrupted

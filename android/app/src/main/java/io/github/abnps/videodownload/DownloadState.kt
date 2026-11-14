@@ -54,7 +54,7 @@ data class Job(
     }
 }
 
-enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, SAVING, DONE, INTERRUPTED, NEEDS_ADULT, PAUSED }
+enum class Phase { QUEUED, READING, DOWNLOADING, CONVERTING, BURNING, SAVING, DONE, INTERRUPTED, NEEDS_ADULT, PAUSED }
 
 data class ActiveJob(val job: Job, val phase: Phase, val fraction: Float? = null, val done: Long = 0, val total: Long = 0,
                      val speed: Double = 0.0, val eta: Long = -1, val audioPart: Boolean = false,
