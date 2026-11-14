@@ -15,6 +15,11 @@ Verzija NIJE povećana (`videodl/__init__.py` ostaje 1.0.8 do Ahmedovog „objav
 - Android: stalna postavka „Titlovi uz video" kao na računaru (Ahmed 12.11.2026): važi za ekran kvaliteta (kvačica
   kreće uključena), brzo preuzimanje iz „Podijeli" i plejliste; isječak ide bez titlova (ne bi se poklapali).
 
+- Titl iz govora (Ahmed 14.11.2026, plan `plan_titl_iz_govora.md`): kad video nema nijedan titl, program ga
+  napravi iz govora na računaru (faster-whisper, Whisper large-v3-turbo). Model (1,5 GB) se preuzima tek kad
+  korisnik uključi postavku, uz traku napretka i nastavak prekinutog preuzimanja; prije upisa u sliku titl se
+  pregleda i ispravi; svuda piše da može imati grešaka. Biblioteke su u paketu (~130 MB raspakovano).
+
 ## Bilješke za „Šta je novo" (prepisati u `videodl/changelog.py` pri izdanju, s datumom objave)
 Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
 
@@ -25,6 +30,8 @@ Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
     prekida odmah."
   - „Video Download je sada slobodan softver otvorenog koda (GNU GPL-3.0)."
   - „Android: nova postavka „Titlovi uz video" — titlovi na jeziku aplikacije i na engleskom uz svaki video, kao na računaru."
+  - „Titl iz govora: kad video nema titl, program ga može napraviti sam iz govora, na tvom računaru. Model se
+    preuzima jednom (1,5 GB), a titl prije upisa u sliku možeš pregledati i ispraviti, jer može imati grešaka."
 - en:
   - "A new look for the main window in the colours of the site: the “Downloading now” card shows the video being
     downloaded, with a big progress bar, speed, time left and a speed graph; below is the queue of what comes next."
@@ -32,6 +39,9 @@ Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
     off ends the pause immediately."
   - "Video Download is now free, open-source software (GNU GPL-3.0)."
   - "Android: a new “Subtitles with the video” setting — subtitles in the app's language and in English with every video, as on the computer."
+  - "Subtitles from speech: if a video has no subtitles, the app can create them from speech, on your computer. The
+    model is downloaded once (1.5 GB), and you can review and fix the subtitles before they're added to the
+    picture, because they may contain mistakes."
 - de:
   - „Neues Aussehen des Hauptfensters in den Farben der Website: Die Karte „Wird gerade geladen“ zeigt das Video,
     das gerade geladen wird, mit großem Fortschrittsbalken, Geschwindigkeit, Restzeit und Geschwindigkeitsgrafik;
@@ -40,6 +50,9 @@ Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
     und das Ausschalten des Schutzes beendet die Pause sofort."
   - „Video Download ist jetzt freie Open-Source-Software (GNU GPL-3.0)."
   - „Android: neue Einstellung „Untertitel zum Video“ — Untertitel in der App-Sprache und auf Englisch zu jedem Video, wie am Computer."
+  - „Untertitel aus der Sprache: Hat ein Video keine Untertitel, kann das Programm sie auf deinem Computer aus der
+    Sprache erstellen. Das Modell wird einmal heruntergeladen (1,5 GB); vor dem Einfügen ins Bild kannst du die
+    Untertitel prüfen und korrigieren, denn sie können Fehler enthalten."
 - es:
   - «Nuevo aspecto de la ventana principal con los colores del sitio: la tarjeta «Descargando ahora» muestra el
     vídeo que se está descargando, con una barra grande, velocidad, tiempo restante y un gráfico de velocidad;
@@ -48,6 +61,9 @@ Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
     la protección termina la pausa al instante.»
   - «Video Download es ahora software libre de código abierto (GNU GPL-3.0).»
   - «Android: nuevo ajuste «Subtítulos con el vídeo»: subtítulos en el idioma de la app y en inglés con cada vídeo, como en el ordenador.»
+  - «Subtítulos a partir del habla: si un vídeo no tiene subtítulos, el programa puede crearlos a partir del habla,
+    en tu ordenador. El modelo se descarga una vez (1,5 GB) y puedes revisar y corregir los subtítulos antes de
+    añadirlos a la imagen, porque pueden tener errores.»
 - fr:
   - « Nouvel aspect de la fenêtre principale aux couleurs du site : la carte « En cours de téléchargement » montre
     la vidéo en cours, avec une grande barre, la vitesse, le temps restant et un graphique de vitesse ; en dessous,
@@ -56,6 +72,9 @@ Bez imena video sajtova (FORBIDDEN u `tools/build_site.py`).
     désactiver la protection met fin à la pause immédiatement. »
   - « Video Download est désormais un logiciel libre et open source (GNU GPL-3.0). »
   - « Android : nouveau réglage « Sous-titres avec la vidéo » — sous-titres dans la langue de l’application et en anglais avec chaque vidéo, comme sur l’ordinateur. »
+  - « Sous-titres à partir de la parole : si une vidéo n’a pas de sous-titres, le programme peut les créer à partir
+    de la parole, sur ton ordinateur. Le modèle est téléchargé une fois (1,5 Go) et tu peux vérifier et corriger
+    les sous-titres avant de les ajouter à l’image, car ils peuvent contenir des erreurs. »
 
 ## Pri izdanju 1.0.9 (pored koraka iz README-ja)
 - Novi snimci glavnog prozora za sajt (`tools/site_screenshots.py`) i za Store (`tools/store_screenshots.py`): sada

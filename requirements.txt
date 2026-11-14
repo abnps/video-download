@@ -1,3 +1,5 @@
 PySide6>=6.11
 # curl-cffi: yt-dlp se serveru predstavlja kao pravi browser (TikTok i slični sajtovi to traže)
 yt-dlp[default,curl-cffi]>=2026.8.19
+# Titl iz govora (1.0.9): prepoznavanje na računaru; model (1,6 GB) se preuzima tek kad ga korisnik uključi
+faster-whisper>=1.2.1

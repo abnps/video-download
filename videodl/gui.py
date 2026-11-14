@@ -29,7 +29,7 @@ from . import __version__
 from .bridge import BridgeServer
 from .browser import COOKIE_BROWSER_NAMES, COOKIE_BROWSERS, BrowserRequest
 from .download import PROCESSING, DownloadResult, Progress, RateBudget, download
-from .i18n import LANGUAGES, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_PAUSE, MESSAGE_RETRY, get_language, pick_language, set_language, tr
+from .i18n import LANGUAGES, MESSAGE_BURN_FAILED, MESSAGE_EXISTS, decimal, MESSAGE_NOT_MEDIA, MESSAGE_PAUSE, MESSAGE_RETRY, get_language, pick_language, set_language, tr
 from .icons import icon
 from .jobs import DownloadQueue, ItemStatus, QueueItem
 from .native_host import call_app, data_dir, find_running_app
@@ -41,7 +41,7 @@ from .presets import (
 )
 from .probe import ProbeResult, probe
 from . import achievements, convert, diagnostics, release_signing, runtime, scheduler, store, support, theme, winshell
-from . import updater, ytdlp_update
+from . import speech, updater, ytdlp_update
 from .widgets import FILTERS, DropZone, FilterBar, QueueRow, display_message, filter_matches, format_size, set_state
 from .now_panel import COMPACT_BELOW, BloomBackground, NowPanel, PageStack
 from .desktop import play_file, reveal
@@ -170,6 +170,9 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._whole_playlist = False
         self._precise_cut = True
         self._subtitles_burn = False  # titl upisan u sliku umjesto fajla pored videa (burn.py)
+        self._subtitles_speech = False  # video bez titla: titl iz govora (speech.py), model se preuzima naknadno
+        self._speech_reviews: list[tuple[int, str]] = []  # (stavka, titl iz govora) čekaju pregled prije upisa
+        self._speech_reviewing = False
         self._number_playlist = False
         self._split_chapters = False
         self._cookie_browser = ""  # „", firefox, edge, chrome, brave (Postavke → Prijava na sajtove)
@@ -587,6 +590,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._whole_playlist = self._settings.value("whole_playlist", False, type=bool)
         self._precise_cut = self._settings.value("precise_cut", True, type=bool)
         self._subtitles_burn = self._settings.value("subtitles_burn", False, type=bool)
+        self._subtitles_speech = self._settings.value("subtitles_speech", False, type=bool)
         self._number_playlist = self._settings.value("number_playlist", False, type=bool)
         self._split_chapters = self._settings.value("split_chapters", False, type=bool)
         browser = self._settings.value("cookie_browser", "", type=str)
@@ -626,6 +630,7 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
         self._settings.setValue("whole_playlist", self._whole_playlist)
         self._settings.setValue("precise_cut", self._precise_cut)
         self._settings.setValue("subtitles_burn", self._subtitles_burn)
+        self._settings.setValue("subtitles_speech", self._subtitles_speech)
         self._settings.setValue("number_playlist", self._number_playlist)
         self._settings.setValue("split_chapters", self._split_chapters)
         self._settings.setValue("cookie_browser", self._cookie_browser)
@@ -690,6 +695,8 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
             options["subtitle_langs"] = subtitle_languages(get_language())
             if self._subtitles_burn:
                 options["burn_subtitles"] = True
+            if self._subtitles_speech and speech.model_ready():
+                options["speech_subtitles"] = True  # samo kad video nema titl (download.py)
         if self._thumbnail_cover:
             options["thumbnail"] = True
         if self._chapters:
@@ -1092,12 +1099,42 @@ class MainWindow(PauseMixin, SupportMixin, ClipboardMixin, UpdatesMixin, QMainWi
                 self._remove_item(item_id)
             else:
                 self._refresh_row(item)
+                if result.speech_subtitle and self._subtitles_burn and result.status == ItemStatus.DONE:
+                    # Titl iz govora se upisuje u sliku tek kad ga korisnik pregleda (može imati grešaka).
+                    self._speech_reviews.append((item_id, result.speech_subtitle))
+                    QTimer.singleShot(0, self._next_speech_review)
             if result.status != ItemStatus.CANCELLED:
                 self._note_paced_finish(item)  # razmak ili predah prije sljedećeg sa istog sajta
         self._save_queue()
         self._start_next()
         self._check_batch_done()
         self._maybe_remind_support()
+
+    def _next_speech_review(self) -> None:
+        """Jedan po jedan pregled titla iz govora; preuzimanja za to vrijeme rade dalje."""
+        if self._speech_reviewing or not self._speech_reviews:
+            return
+        item_id, subtitle = self._speech_reviews.pop(0)
+        item = self._queue.get(item_id)
+        if item is None or not item.filepath or not os.path.isfile(item.filepath):
+            QTimer.singleShot(0, self._next_speech_review)
+            return
+        from .speech_dialogs import review_and_burn
+
+        self._speech_reviewing = True
+        try:
+            outcome = review_and_burn(self, item.filepath, subtitle, item.duration)
+        finally:
+            self._speech_reviewing = False
+        item = self._queue.get(item_id)
+        if item is not None:
+            if outcome == "failed":
+                item.message = MESSAGE_BURN_FAILED
+            if item.filepath and os.path.isfile(item.filepath):
+                self._sizes[item_id] = os.path.getsize(item.filepath)
+            self._refresh_row(item)
+            self._save_queue()
+        QTimer.singleShot(0, self._next_speech_review)
 
     def _batch_fraction(self) -> float:
         waiting = 0
@@ -1718,6 +1755,22 @@ def _signing_works() -> bool:
         return False
 
 
+def _speech_works() -> bool:
+    """Titl iz govora: biblioteke (faster-whisper, CTranslate2, ONNX Runtime) i silero VAD model su u paketu."""
+    try:
+        from . import speech
+
+        speech._import_engine()
+        from faster_whisper.vad import get_vad_model
+
+        get_vad_model()
+        import ctranslate2
+
+        return ctranslate2.get_cuda_device_count() >= 0
+    except Exception:  # noqa: BLE001 - self-test samo javlja da ne radi
+        return False
+
+
 def _window_works() -> bool:
     """Pravi Qt prozor (platforma, stil, ikone, slike) se može napraviti i prikazati: paket nije previše očišćen."""
     try:
@@ -1750,13 +1803,14 @@ def self_test(report_path: str) -> int:
         "node": find_tool("node"),
         "yt_dlp_ejs": importlib.util.find_spec("yt_dlp_ejs") is not None,
         "curl_cffi": importlib.util.find_spec("curl_cffi") is not None,
+        "speech": _speech_works(),
         "extension_manifest": (extension_dir() / "manifest.json").is_file(),
         "languages": sorted(LANGUAGES),
         "update_signing": _signing_works(),
         "window": _window_works(),
     }
-    ok = all(checks[key] for key in ("ffmpeg", "ffprobe", "node", "yt_dlp_ejs", "curl_cffi", "extension_manifest",
-                                     "update_signing", "window"))
+    ok = all(checks[key] for key in ("ffmpeg", "ffprobe", "node", "yt_dlp_ejs", "curl_cffi", "speech",
+                                     "extension_manifest", "update_signing", "window"))
     checks["ok"] = ok
     Path(report_path).write_text(json.dumps(checks, indent=2), encoding="utf-8")
     return 0 if ok else 1

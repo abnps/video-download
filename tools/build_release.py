@@ -211,7 +211,7 @@ def write_legal(target: Path | None = None, installer_documents: bool = True) ->
         files = importlib.metadata.distribution(distribution).files or []
         for entry in files:
             name = Path(str(entry)).name
-            if ".dist-info" in str(entry) and name.upper().startswith(("LICENSE", "NOTICE", "COPYING")):
+            if _license_entry(entry):
                 shutil.copy2(entry.locate(), licenses / f"{distribution}-{name}")
     shutil.copy2(legal.python_license_path(), licenses / "Python-LICENSE.txt")
     missing = [component.name for component in legal.COMPONENTS if not legal.license_files(component, licenses)]
@@ -241,7 +241,24 @@ UNUSED_QT = (
     "PySide6/translations",
 )
 # Python paketi koje neki paket opciono uvozi, a u programu se nikad ne učitaju (yt-dlp koristi Cryptodome).
-UNUSED_MODULES = ("cryptography", "Crypto")
+# faster-whisper uvozi PyAV i huggingface_hub, ali zvuk čita ffmpeg, a model preuzima speech.py (−80 MB).
+UNUSED_MODULES = ("cryptography", "Crypto", "av", "huggingface_hub", "hf_xet", "httpx",
+                  # ONNX Runtime-ovi alati za modele (crtanje, mjerenje) vuku matplotlib, Pillow i psutil (−27 MB)
+                  "onnxruntime.transformers", "onnxruntime.tools", "onnxruntime.quantization", "matplotlib", "PIL",
+                  "contourpy", "kiwisolver", "dateutil", "psutil")
+# Titl iz govora (speech.py uvozi faster_whisper tek kad zatreba): kod i silero VAD model (onnx).
+SPEECH_ARGS = ("--hidden-import", "faster_whisper", "--collect-data", "faster_whisper",
+               "--collect-binaries", "ctranslate2", "--collect-binaries", "onnxruntime")
+
+
+def _license_entry(entry) -> bool:
+    """Tekst licence paketa: u *.dist-info (i njegovom „licenses") ili u korijenu paketa (onnxruntime ga drži
+    tamo, s ThirdPartyNotices.txt). Dublje licence (npr. numpy/…/LICENSE.md) su već sažete u glavnoj."""
+    parts = Path(str(entry)).parts
+    name = parts[-1].upper()
+    if not name.startswith(("LICENSE", "LICENCE", "NOTICE", "COPYING", "THIRDPARTYNOTICES")):
+        return False
+    return (parts[0].endswith(".dist-info") and len(parts) <= 3) or len(parts) == 2
 
 
 def trim_package() -> int:
@@ -318,7 +335,7 @@ def main(argv: list[str] | None = None) -> int:
 
     pyinstaller("--windowed", "--name", "VideoDownload", "--icon", str(icon),
                 "--add-data", f"{PROJECT / 'videodl' / 'assets'}{os.pathsep}videodl/assets",
-                "--collect-data", "yt_dlp_ejs", "--collect-all", "curl_cffi",
+                "--collect-data", "yt_dlp_ejs", "--collect-all", "curl_cffi", *SPEECH_ARGS,
                 *[arg for module in UNUSED_MODULES for arg in ("--exclude-module", module)],
                 str(PROJECT / "pokreni.pyw"))
     print(f"Uklonjeno nekorištenih Qt dijelova: {trim_package() / 1_048_576:.1f} MB")

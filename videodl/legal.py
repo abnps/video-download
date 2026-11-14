@@ -40,7 +40,9 @@ class Component:
 
 # Python paketi čije licence build kopira iz *.dist-info (ime distribucije → prefiks fajla)
 PYTHON_DISTRIBUTIONS = ("yt-dlp", "yt-dlp-ejs", "curl_cffi", "certifi", "brotli", "requests", "urllib3",
-                        "pycryptodomex")
+                        "pycryptodomex", "faster-whisper", "ctranslate2", "onnxruntime", "tokenizers", "numpy", "tqdm",
+                        "pyyaml")
+# ctranslate2 i tokenizers nemaju tekst licence u paketu: on je u installer/licenses (CTranslate2-, tokenizers-LICENSE.txt)
 
 # FFmpeg u paketu zavisi od sistema: Windows koristi gyan.dev build, Mac i Linux (beta) build Martina Riedla.
 FFMPEG_WINDOWS = Component(
@@ -80,6 +82,22 @@ COMPONENTS = (
     Component("urllib3", "MIT", "https://github.com/urllib3/urllib3", ("urllib3-LICENSE",)),
     Component("PyCryptodome (pycryptodomex)", "BSD-2-Clause, Public Domain", "https://www.pycryptodome.org/",
               ("pycryptodomex-LICENSE",)),
+    # Titl iz govora (1.0.9): prepoznavanje radi na računaru korisnika.
+    Component("faster-whisper", "MIT", "https://github.com/SYSTRAN/faster-whisper", ("faster-whisper-LICENSE",)),
+    Component("CTranslate2", "MIT", "https://github.com/OpenNMT/CTranslate2", ("CTranslate2-LICENSE.txt",)),
+    Component("ONNX Runtime", "MIT and the licenses in ThirdPartyNotices", "https://github.com/microsoft/onnxruntime",
+              ("onnxruntime-LICENSE", "onnxruntime-ThirdPartyNotices.txt")),
+    Component("Tokenizers (Hugging Face)", "Apache-2.0", "https://github.com/huggingface/tokenizers",
+              ("tokenizers-LICENSE.txt",)),
+    Component("NumPy", "BSD-3-Clause and others", "https://numpy.org/", ("numpy-LICENSE",)),
+    Component("tqdm", "MPL-2.0 AND MIT", "https://github.com/tqdm/tqdm", ("tqdm-LICENCE",)),
+    Component("PyYAML", "MIT", "https://github.com/yaml/pyyaml", ("pyyaml-LICENSE",)),
+    Component("Silero VAD (model in faster-whisper)", "MIT", "https://github.com/snakers4/silero-vad",
+              ("Silero-VAD-LICENSE.txt",)),
+    Component("Whisper large-v3-turbo (model, downloaded only on request)", "MIT", "https://github.com/openai/whisper",
+              ("Whisper-LICENSE.txt",),
+              "Not included in the installer. CTranslate2 conversion: "
+              "https://huggingface.co/dropbox-dash/faster-whisper-large-v3-turbo (MIT)."),
     Component("Python", "PSF-2.0", "https://www.python.org/", ("Python-LICENSE.txt",)),
 )
 

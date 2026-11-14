@@ -15,7 +15,9 @@ from .browser import Cookie, cookie_options, is_cookie_read_error
 from .burn import BurnCancelled, BurnError, burn_subtitles as burn_into_picture, can_burn
 from .jobs import ItemStatus
 from .presets import Preset, build_ydl_options, pick_subtitles, safe_folder_name
-from .i18n import MESSAGE_BURN_FAILED, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA
+from .i18n import (
+    MESSAGE_BURN_FAILED, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA, MESSAGE_SPEECH, MESSAGE_SPEECH_FAILED,
+)
 from .ytdl import YdlLogger, error_message, is_web_url
 from .ytdlp_update import ensure_ready
 
@@ -66,6 +68,7 @@ class DownloadResult:
     already_existed: bool = False
     height: int | None = None  # stvarna visina preuzetog videa (oznaka „1080p" u redu); None za zvuk
     cookie_warning: bool = False  # kolačići iz Postavki se nisu mogli pročitati: preuzeto bez prijave
+    speech_subtitle: str | None = None  # titl napravljen iz govora (speech.py), pored videa; još nije u slici
 
 
 class RateBudget:
@@ -243,10 +246,14 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
              split_chapters: bool = False,
              split_dir: str | None = None,
              burn_subtitles: bool = False,
+             speech_subtitles: bool = False,
              _isolated: bool = False) -> DownloadResult:
-    """`burn_subtitles` (uz `subtitles`): titl se upisuje u sliku (burn.py) umjesto da stoji pored videa."""
+    """`burn_subtitles` (uz `subtitles`): titl se upisuje u sliku (burn.py) umjesto da stoji pored videa.
+    `speech_subtitles` (uz `subtitles`): kad video nema nijedan titl, napravi se iz govora (speech.py). Takav titl
+    se ne upisuje u sliku ovdje: program ga prvo pokaže korisniku na pregled (speech_dialogs.py)."""
     more = {"precise_cut": precise_cut, "number": number, "cookie_browser": cookie_browser, "cookie_txt": cookie_txt,
-            "split_chapters": split_chapters, "split_dir": split_dir, "burn_subtitles": burn_subtitles}
+            "split_chapters": split_chapters, "split_dir": split_dir, "burn_subtitles": burn_subtitles,
+            "speech_subtitles": speech_subtitles}
     cancel_event = cancel_event or threading.Event()
     if cancel_event.is_set():
         return DownloadResult(ItemStatus.CANCELLED)
@@ -318,7 +325,7 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
                               http_headers=http_headers, filename_title=filename_title, cookies=cookies,
                               section=section, subtitles=False, thumbnail=thumbnail, chapters=chapters,
                               sponsorblock=sponsorblock, ratelimit=ratelimit, name_template=name_template,
-                              **more)
+                              **{**more, "speech_subtitles": False})
             if result.status == ItemStatus.DONE:
                 return DownloadResult(ItemStatus.DONE, result.filepath, MESSAGE_NO_SUBS, result.already_existed,
                                       result.height, result.cookie_warning)
@@ -340,6 +347,13 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
         # yt-dlp je javio uspjeh, ali fajla nema, prazan je ili se ne može pročitati: nije „Završeno".
         return DownloadResult(ItemStatus.FAILED, filepath, MESSAGE_NO_OUTPUT)
     message = MESSAGE_NO_SUBS if no_subtitles else ""
+    speech_file = None
+    # Samo upravo preuzet video: fajl koji je već postojao možda već ima titl (iz govora ili upisan u sliku).
+    if no_subtitles and speech_subtitles and not preset.is_audio and attempt.real_download:
+        speech_file = _speech_subtitle(filepath, (info or {}).get("language"), on_progress, cancel_event)
+        if speech_file is None:
+            return DownloadResult(ItemStatus.CANCELLED)
+        message = MESSAGE_SPEECH if speech_file else MESSAGE_SPEECH_FAILED
     if subtitles and not no_subtitles and filepath:
         requested = (info or {}).get("requested_subtitles") or {}
         burned = False
@@ -355,7 +369,26 @@ def download(url: str, preset: Preset, output_dir: str, subfolder: str | None = 
     height = (info or {}).get("height")
     return DownloadResult(ItemStatus.DONE, filepath, message,
                           already_existed=not attempt.real_download,
-                          height=height if isinstance(height, int) and height > 0 else None)
+                          height=height if isinstance(height, int) and height > 0 else None,
+                          speech_subtitle=speech_file or None)
+
+
+def _speech_subtitle(video: str, site_language, on_progress, cancel_event) -> str | None:
+    """Titl iz govora pored videa. Putanja = napravljen; "" = nije (nema modela, govora ili greška);
+    None = korisnik je prekinuo. Video ostaje kakav jeste u svakom slučaju."""
+    from . import speech
+
+    if not speech.engine_available() or not speech.model_ready():
+        return ""
+    report = on_progress or (lambda progress: None)
+    try:
+        return speech.transcribe(video, site_language=site_language if isinstance(site_language, str) else None,
+                                 on_progress=lambda fraction: report(Progress(PROCESSING, fraction, label="pp.speech")),
+                                 cancel=cancel_event)
+    except speech.SpeechCancelled:
+        return None
+    except Exception:  # granica: video je preuzet, titl iz govora je dodatak
+        return ""
 
 
 def _download_audio(url: str, preset: Preset, output_dir: str, subfolder: str | None, on_progress, cancel_event,

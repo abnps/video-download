@@ -160,7 +160,8 @@ def main() -> int:
             "--add-data", f"{STAGE / 'licenses'}{separator}licenses",
             "--add-data", f"{STAGE / 'THIRD-PARTY-NOTICES.txt'}{separator}.",
             "--add-data", f"{STAGE / 'BUILD-MANIFEST.json'}{separator}.",
-            "--collect-data", "yt_dlp_ejs", "--collect-all", "curl_cffi"]
+            "--collect-data", "yt_dlp_ejs", "--collect-all", "curl_cffi", *build_release.SPEECH_ARGS,
+            *[arg for module in build_release.UNUSED_MODULES for arg in ("--exclude-module", module)]]
     for name in build_macos.TOOL_FILES:
         args += ["--add-binary", f"{tools / name}{separator}tools"]
     run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--log-level", "WARN",

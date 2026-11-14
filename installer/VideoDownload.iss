@@ -148,6 +148,8 @@ begin
     DeleteFile(ExpandConstant('{localappdata}\VideoDownload\bridge.json'));
     // Preuzeti yt-dlp je dio programa, ne korisnikovi podaci (red i istorija ostaju).
     DelTree(ExpandConstant('{localappdata}\VideoDownload\yt-dlp'), True, True, True);
+    // Model za titl iz govora (1,5 GB) je isto dio programa: preuzet je na zahtjev, a bez programa ne služi ničemu.
+    DelTree(ExpandConstant('{localappdata}\VideoDownload\modeli'), True, True, True);
   end;
 end;
 

@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 from . import theme
 from .i18n import (
     MESSAGE_BURN_FAILED, MESSAGE_DRM, MESSAGE_EXISTS, MESSAGE_LIVE, MESSAGE_NO_OUTPUT, MESSAGE_NO_SUBS, MESSAGE_NOT_MEDIA,
-    MESSAGE_PAUSE, MESSAGE_RETRY,
+    MESSAGE_PAUSE, MESSAGE_RETRY, MESSAGE_SPEECH, MESSAGE_SPEECH_FAILED,
     decimal, tr,
 )
 from .icons import icon
@@ -91,6 +91,10 @@ def display_message(message: str, friendly: bool = True) -> str:
         return tr("row.no_subs")
     if message == MESSAGE_BURN_FAILED:
         return tr("row.burn_failed")
+    if message == MESSAGE_SPEECH:
+        return tr("row.speech")
+    if message == MESSAGE_SPEECH_FAILED:
+        return tr("row.speech_failed")
     if message == MESSAGE_NO_OUTPUT:
         return tr("error.no_output")
     if message == MESSAGE_RETRY:
@@ -593,6 +597,10 @@ class QueueRow(QFrame):
                 text += f" · {tr('row.no_subs')}"
             elif item.message == MESSAGE_BURN_FAILED:
                 text += f" · {tr('row.burn_failed')}"
+            elif item.message == MESSAGE_SPEECH:
+                text += f" · {tr('row.speech')}"
+            elif item.message == MESSAGE_SPEECH_FAILED:
+                text += f" · {tr('row.speech_failed')}"
             state = "done"
             if item.convert_state == "running":
                 text, state = tr("row.converting"), "muted"

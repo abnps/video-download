@@ -17,9 +17,10 @@ from PySide6.QtWidgets import (
     QListWidgetItem, QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
 )
 
-from . import theme
+from . import speech, theme
 from .browser import COOKIE_BROWSER_NAMES, COOKIE_BROWSERS
 from .i18n import LANGUAGES, get_language, tr
+from .speech_dialogs import ensure_model, offer_model_removal
 from .widgets import ElidedLabel
 
 ACCENT = "#1e88e5"
@@ -153,6 +154,13 @@ class SettingsDialog(QDialog):
                                  lambda on: window._set_option("_subtitles_burn", on))
         self.burn.setEnabled(window._subtitles)
         self.subtitles.toggled.connect(self.burn.setEnabled)
+        # Titl iz govora (Ahmed 14.11.2026): samo kad su biblioteke u paketu; model se preuzima pri uključivanju.
+        self.speech = None
+        if speech.engine_available():
+            self.speech = self._switch(card, tr("settings.speech"), "settings.desc.speech",
+                                       window._subtitles_speech and speech.model_ready(), self._change_speech)
+            self.speech.setEnabled(window._subtitles)
+            self.subtitles.toggled.connect(self.speech.setEnabled)
         self.thumbnail = self._switch(card, _plain("menu.thumbnail"), "settings.desc.thumbnail", window._thumbnail_cover,
                                       lambda on: window._set_option("_thumbnail_cover", on))
         self.chapters = self._switch(card, _plain("settings.chapters"), "settings.desc.chapters", window._chapters,
@@ -372,6 +380,21 @@ class SettingsDialog(QDialog):
             return
         self._window.set_pacing(on)
         self.pacing_note.setVisible(not on)
+
+    def _change_speech(self, on: bool) -> None:
+        """Uključivanje prvo preuzme model (pitanje s veličinom, pa traka napretka); bez modela ostaje isključeno."""
+        if on and not ensure_model(self):
+            # Odustao od preuzimanja ili veza pukla: prekidač ostaje isključen, a već preuzeti dio ostaje
+            # (sljedeći pokušaj nastavlja), pa se brisanje modela ovdje ne nudi.
+            self.speech.blockSignals(True)
+            self.speech.setChecked(False)
+            self.speech.blockSignals(False)
+            self.speech.update()
+            self._window._set_option("_subtitles_speech", False)
+            return
+        self._window._set_option("_subtitles_speech", on)
+        if not on:
+            offer_model_removal(self)  # korisnik je isključio: model (1,5 GB) može ostati ili se obrisati
 
     def _change_theme(self, _index: int) -> None:
         self._window.set_theme(self.theme.currentData())
