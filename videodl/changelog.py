@@ -8,7 +8,7 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
-    ("1.0.9", "14.11.2026", {
+    ("1.0.9", "15.11.2026", {
         "bs": ["Novi izgled glavnog prozora u bojama sajta: kartica „Sada preuzima“ pokazuje video koji se upravo preuzima, s velikom trakom, brzinom, preostalim vremenom i grafikonom brzine; ispod je red onoga što slijedi.",
                "Titl iz govora: kad video nema titl, program ga može napraviti sam iz govora, na tvom računaru. Model se preuzima jednom (1,5 GB), a titl prije upisa u sliku možeš pregledati i ispraviti, jer može imati grešaka.",
                "Titlovi: novi izbor „Titl upiši u sliku“ (titl postaje dio slike i vidi se u svakom plejeru), a kad nema titla na jeziku programa ni na engleskom, uzima se titl na jeziku videa.",
