@@ -1,5 +1,51 @@
 [
  {
+  "version": "1.0.9",
+  "date": "14.11.2026",
+  "notes": {
+   "bs": [
+    "Novi izgled glavnog prozora u bojama sajta: kartica „Sada preuzima“ pokazuje video koji se upravo preuzima, s velikom trakom, brzinom, preostalim vremenom i grafikonom brzine; ispod je red onoga što slijedi.",
+    "Titl iz govora: kad video nema titl, program ga može napraviti sam iz govora, na tvom računaru. Model se preuzima jednom (1,5 GB), a titl prije upisa u sliku možeš pregledati i ispraviti, jer može imati grešaka.",
+    "Titlovi: novi izbor „Titl upiši u sliku“ (titl postaje dio slike i vidi se u svakom plejeru), a kad nema titla na jeziku programa ni na engleskom, uzima se titl na jeziku videa.",
+    "Zaštita od blokade: link dodat usred pauze odmah pokaže koliko se još čeka, isključivanje zaštite pauzu prekida odmah, a kad sajt pri čitanju linka traži potvrdu da nisi robot, link sačeka i sam se preuzme.",
+    "Video Download je sada slobodan softver otvorenog koda (GNU GPL-3.0).",
+    "Android: nova postavka „Titlovi uz video“ — titlovi na jeziku aplikacije i na engleskom uz svaki video, kao na računaru, i titl upisan u sliku."
+   ],
+   "en": [
+    "A new look for the main window in the colours of the site: the “Downloading now” card shows the video being downloaded, with a big progress bar, speed, time left and a speed graph; below is the queue of what comes next.",
+    "Subtitles from speech: if a video has no subtitles, the app can create them from speech, on your computer. The model is downloaded once (1.5 GB), and you can review and fix the subtitles before they're added to the picture, because they may contain mistakes.",
+    "Subtitles: a new “Burn subtitles into the picture” option (the subtitles become part of the picture and show in every player), and if there are none in the app's language or in English, subtitles in the video's own language are used.",
+    "Block protection: a link added during a pause shows right away how long the wait is, turning protection off ends the pause immediately, and when a site asks you to confirm you're not a robot while reading a link, the link waits and downloads on its own.",
+    "Video Download is now free, open-source software (GNU GPL-3.0).",
+    "Android: a new “Subtitles with the video” setting — subtitles in the app's language and in English with every video, as on the computer, and subtitles burned into the picture."
+   ],
+   "de": [
+    "Neues Aussehen des Hauptfensters in den Farben der Website: Die Karte „Wird gerade geladen“ zeigt das Video, das gerade geladen wird, mit großem Fortschrittsbalken, Geschwindigkeit, Restzeit und Geschwindigkeitsgrafik; darunter steht die Warteschlange.",
+    "Untertitel aus der Sprache: Hat ein Video keine Untertitel, kann das Programm sie auf deinem Computer aus der Sprache erstellen. Das Modell wird einmal heruntergeladen (1,5 GB); vor dem Einfügen ins Bild kannst du die Untertitel prüfen und korrigieren, denn sie können Fehler enthalten.",
+    "Untertitel: neue Option „Untertitel ins Bild einbrennen“ (sie werden Teil des Bildes und erscheinen in jedem Player), und gibt es keine in der Programmsprache oder auf Englisch, werden Untertitel in der Sprache des Videos verwendet.",
+    "Schutz vor Sperren: Ein Link, der während einer Pause hinzukommt, zeigt sofort, wie lange noch gewartet wird, das Ausschalten des Schutzes beendet die Pause sofort, und verlangt eine Website beim Lesen eines Links eine Bestätigung, dass du kein Roboter bist, wartet der Link und wird von selbst geladen.",
+    "Video Download ist jetzt freie Open-Source-Software (GNU GPL-3.0).",
+    "Android: neue Einstellung „Untertitel zum Video“ — Untertitel in der App-Sprache und auf Englisch zu jedem Video, wie am Computer, und ins Bild eingebrannte Untertitel."
+   ],
+   "es": [
+    "Nuevo aspecto de la ventana principal con los colores del sitio: la tarjeta «Descargando ahora» muestra el vídeo que se está descargando, con una barra grande, velocidad, tiempo restante y un gráfico de velocidad; debajo está la cola de lo que sigue.",
+    "Subtítulos a partir del habla: si un vídeo no tiene subtítulos, el programa puede crearlos a partir del habla, en tu ordenador. El modelo se descarga una vez (1,5 GB) y puedes revisar y corregir los subtítulos antes de añadirlos a la imagen, porque pueden tener errores.",
+    "Subtítulos: nueva opción «Grabar los subtítulos en la imagen» (pasan a formar parte de la imagen y se ven en cualquier reproductor), y si no los hay en el idioma del programa ni en inglés, se usan los del idioma del vídeo.",
+    "Protección contra bloqueos: un enlace añadido durante una pausa muestra enseguida cuánto falta, desactivar la protección termina la pausa al instante y, si un sitio pide confirmar que no eres un robot al leer un enlace, el enlace espera y se descarga solo.",
+    "Video Download es ahora software libre de código abierto (GNU GPL-3.0).",
+    "Android: nuevo ajuste «Subtítulos con el vídeo»: subtítulos en el idioma de la app y en inglés con cada vídeo, como en el ordenador, y subtítulos grabados en la imagen."
+   ],
+   "fr": [
+    "Nouvel aspect de la fenêtre principale aux couleurs du site : la carte « En cours de téléchargement » montre la vidéo en cours, avec une grande barre, la vitesse, le temps restant et un graphique de vitesse ; en dessous, la file de ce qui suit.",
+    "Sous-titres à partir de la parole : si une vidéo n’a pas de sous-titres, le programme peut les créer à partir de la parole, sur ton ordinateur. Le modèle est téléchargé une fois (1,5 Go) et tu peux vérifier et corriger les sous-titres avant de les ajouter à l’image, car ils peuvent contenir des erreurs.",
+    "Sous-titres : nouvelle option « Incruster les sous-titres dans l’image » (ils font partie de l’image et s’affichent dans tous les lecteurs), et s’il n’y en a ni dans la langue du programme ni en anglais, ceux de la langue de la vidéo sont utilisés.",
+    "Protection contre les blocages : un lien ajouté pendant une pause affiche tout de suite l’attente restante, désactiver la protection met fin à la pause immédiatement, et quand un site demande de confirmer que tu n’es pas un robot à la lecture d’un lien, le lien attend et se télécharge tout seul.",
+    "Video Download est désormais un logiciel libre et open source (GNU GPL-3.0).",
+    "Android : nouveau réglage « Sous-titres avec la vidéo » — sous-titres dans la langue de l’application et en anglais avec chaque vidéo, comme sur l’ordinateur, et sous-titres incrustés dans l’image."
+   ]
+  }
+ },
+ {
   "version": "1.0.8",
   "date": "8.11.2026",
   "notes": {
@@ -130,37 +176,6 @@
     "Nouveau : Video Download pour Linux (bêta) — un seul fichier AppImage pour Ubuntu 22.04 et plus récent (et systèmes similaires), sans installation ; il se met à jour tout seul, s’ajoute au menu des applications et fonctionne avec l’extension pour Chrome, Edge et Firefox.",
     "Aide → Télécharger depuis le navigateur : l’extension pour Edge et Firefox s’installe en un clic depuis leur boutique, et celle de Chrome en trois étapes claires.",
     "Petites corrections de mise en page (p. ex. le lien d’ouverture du dossier en allemand)."
-   ]
-  }
- },
- {
-  "version": "1.0.4",
-  "date": "27.10.2026",
-  "notes": {
-   "bs": [
-    "Android: video bez zvuka — kvačica „Bez zvuka“ na ekranu kvaliteta i „Sljedeći video bez zvuka“ u Postavkama (važi za jedan video, pa se samo isključi).",
-    "Android: svaka postavka ima ⓘ s detaljnim objašnjenjem, a u Preuzimanjima dugi pritisak na dugme kaže šta radi; ekran ostaje isti pri okretanju telefona i promjeni jezika, a otvaranje iz „Nedavnih“ ne ponavlja isto preuzimanje.",
-    "Dodatak za browser se sam oporavi kad veza s programom pukne; izvještaj o problemu više ne prikazuje putanje foldera na tvom računaru."
-   ],
-   "en": [
-    "Android: video without sound — a “Without sound” checkbox on the quality screen and “Next video without sound” in Settings (applies to one video, then switches off by itself).",
-    "Android: every setting has an ⓘ with a detailed explanation, and in Downloads a long press on a button tells what it does; the screen stays the same when you rotate the phone or change the language, and opening the app from Recents no longer repeats the same download.",
-    "The browser extension recovers by itself when the connection to the app breaks; the problem report no longer shows folder paths on your computer."
-   ],
-   "de": [
-    "Android: Video ohne Ton — ein Häkchen „Ohne Ton“ auf dem Qualitätsbildschirm und „Nächstes Video ohne Ton“ in den Einstellungen (gilt für ein Video und schaltet sich dann selbst aus).",
-    "Android: Jede Einstellung hat ein ⓘ mit ausführlicher Erklärung, und unter Downloads zeigt langes Drücken auf eine Schaltfläche, was sie tut; der Bildschirm bleibt beim Drehen des Handys und beim Sprachwechsel erhalten, und das Öffnen aus „Zuletzt verwendet“ wiederholt denselben Download nicht mehr.",
-    "Die Browser-Erweiterung erholt sich selbst, wenn die Verbindung zum Programm abbricht; der Problembericht zeigt keine Ordnerpfade deines Computers mehr."
-   ],
-   "es": [
-    "Android: vídeo sin sonido — una casilla «Sin sonido» en la pantalla de calidad y «Próximo vídeo sin sonido» en Ajustes (vale para un vídeo y luego se desactiva sola).",
-    "Android: cada ajuste tiene un ⓘ con una explicación detallada, y en Descargas una pulsación larga en un botón indica qué hace; la pantalla se mantiene al girar el teléfono o cambiar el idioma, y abrir la app desde Recientes ya no repite la misma descarga.",
-    "La extensión del navegador se recupera sola cuando se corta la conexión con la aplicación; el informe de problemas ya no muestra rutas de carpetas de tu ordenador."
-   ],
-   "fr": [
-    "Android : vidéo sans son — une case « Sans son » sur l’écran de qualité et « Prochaine vidéo sans son » dans les réglages (vaut pour une vidéo, puis se désactive toute seule).",
-    "Android : chaque réglage a un ⓘ avec une explication détaillée, et dans Téléchargements un appui long sur un bouton indique ce qu’il fait ; l’écran reste identique quand tu tournes le téléphone ou changes de langue, et ouvrir l’appli depuis Récents ne répète plus le même téléchargement.",
-    "L’extension du navigateur se rétablit seule quand la connexion avec l’application est coupée ; le rapport de problème n’affiche plus les chemins de dossiers de ton ordinateur."
    ]
   }
  }
