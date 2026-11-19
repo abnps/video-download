@@ -27,7 +27,7 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
       - name: Build folder (van repoa)
@@ -44,7 +44,7 @@ jobs:
           $found = @(gh api "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" | ConvertFrom-Json |
                      Where-Object { $_.tag_name -eq $env:TAG })
           if ($found.Count -ne 1 -or -not $found[0].draft) { throw "Izdanje $env:TAG mora postojati kao nacrt" }
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Zavisnosti (zaključane verzije)
@@ -63,7 +63,7 @@ jobs:
           python tools/build_msix.py
       - name: Rezultat
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VideoDownload-windows-x64
           path: |
