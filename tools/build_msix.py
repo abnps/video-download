@@ -11,6 +11,7 @@ Veza s browserom upisuje se u HKCU i %LOCALAPPDATA%, pa paket isključuje virtua
 """
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -22,7 +23,8 @@ sys.path.insert(0, str(PROJECT))
 from videodl import __version__  # noqa: E402
 from videodl.native_messaging import FIREFOX_REGISTRY_PATHS, REGISTRY_PATHS, STORE_HOST_ALIAS  # noqa: E402
 
-BUILD = PROJECT.parent / "Build"
+# Isti folder kao build_release.py: VIDEODL_BUILD_DIR ima prednost (GitHub Actions gradi u $RUNNER_TEMP).
+BUILD = Path(os.environ.get("VIDEODL_BUILD_DIR") or PROJECT.parent / "Build")
 IDENTITY_NAME = "abnps.VideoDownloadbyabnps"
 PUBLISHER = "CN=71819F50-D4A6-44BF-A0BC-D68768718275"
 PUBLISHER_DISPLAY = "abnps"
