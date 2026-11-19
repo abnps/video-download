@@ -81,6 +81,12 @@ TEXT = {
              "Next to the video you get an .srt file with the same name, and the subtitles are also inside the MP4."),
             ("If a video has no hand-made subtitles, automatic ones are used when the site offers them.",
              "If the subtitles can't be downloaded, the video is still saved.",
+             "If there are no subtitles in the program's language or in English, subtitles in the video's own language are used.",
+             "{file} → {settings} → {with_video} → {burn}: the subtitles become part of the picture and show in every "
+             "player, but can't be turned off.",
+             "{file} → {settings} → {with_video} → {speech}: if a video has no subtitles, the program creates them from "
+             "speech, on your computer. The first time, a model (1.5 GB) is downloaded. Before the subtitles are "
+             "added you can review and fix them, because they may contain mistakes.",
              "{downloads} → {thumbnail} saves the video's picture as the file cover.")),
         "not-downloading": (
             "Video won't download? What to do",
@@ -140,6 +146,12 @@ TEXT = {
              "Pored videa dobiješ .srt fajl istog imena, a titlovi su i unutar MP4 fajla."),
             ("Ako video nema ručno napravljene titlove, koriste se automatski, kad ih sajt nudi.",
              "Ako se titlovi ne mogu preuzeti, video se svejedno sačuva.",
+             "Kad nema titla na jeziku programa ni na engleskom, uzima se titl na jeziku videa.",
+             "{file} → {settings} → {with_video} → {burn}: titl postaje dio slike i vidi se u svakom plejeru, ali se "
+             "ne može isključiti.",
+             "{file} → {settings} → {with_video} → {speech}: kad video nema titl, program ga napravi iz govora, na "
+             "tvom računaru. Prvi put se preuzme model (1,5 GB). Prije upisa titl možeš pregledati i ispraviti, "
+             "jer može imati grešaka.",
              "{downloads} → {thumbnail} čuva sličicu videa kao omot fajla.")),
         "not-downloading": (
             "Video se ne preuzima? Šta uraditi",
@@ -199,6 +211,13 @@ TEXT = {
              "Neben dem Video liegt eine .srt-Datei mit gleichem Namen, und die Untertitel stecken auch in der MP4."),
             ("Hat ein Video keine von Hand erstellten Untertitel, werden automatische verwendet, wenn die Seite sie anbietet.",
              "Lassen sich die Untertitel nicht laden, wird das Video trotzdem gespeichert.",
+             "Gibt es keine Untertitel in der Programmsprache oder auf Englisch, werden Untertitel in der Sprache des "
+             "Videos verwendet.",
+             "{file} → {settings} → {with_video} → {burn}: Die Untertitel werden Teil des Bildes und erscheinen in "
+             "jedem Player, lassen sich aber nicht ausschalten.",
+             "{file} → {settings} → {with_video} → {speech}: Hat ein Video keine Untertitel, erstellt das Programm "
+             "sie auf deinem Computer aus der Sprache. Beim ersten Mal wird ein Modell (1,5 GB) heruntergeladen. "
+             "Vor dem Einfügen kannst du die Untertitel prüfen und korrigieren, denn sie können Fehler enthalten.",
              "{downloads} → {thumbnail} speichert das Vorschaubild als Cover der Datei.")),
         "not-downloading": (
             "Video lädt nicht? Was tun",
@@ -258,6 +277,12 @@ TEXT = {
              "Junto al vídeo tendrás un archivo .srt con el mismo nombre, y los subtítulos también van dentro del MP4."),
             ("Si el vídeo no tiene subtítulos hechos a mano, se usan los automáticos cuando el sitio los ofrece.",
              "Si no se pueden descargar los subtítulos, el vídeo se guarda igualmente.",
+             "Si no hay subtítulos en el idioma del programa ni en inglés, se usan los del idioma del vídeo.",
+             "{file} → {settings} → {with_video} → {burn}: los subtítulos pasan a formar parte de la imagen y se ven "
+             "en cualquier reproductor, pero no se pueden desactivar.",
+             "{file} → {settings} → {with_video} → {speech}: si el vídeo no tiene subtítulos, el programa los crea a "
+             "partir del habla, en tu ordenador. La primera vez se descarga un modelo (1,5 GB). Antes de añadirlos "
+             "puedes revisarlos y corregirlos, porque pueden tener errores.",
              "{downloads} → {thumbnail} guarda la miniatura del vídeo como portada del archivo.")),
         "not-downloading": (
             "¿El vídeo no se descarga? Qué hacer",
@@ -317,6 +342,14 @@ TEXT = {
              "À côté de la vidéo, vous obtenez un fichier .srt du même nom, et les sous-titres sont aussi dans le MP4."),
             ("Si la vidéo n'a pas de sous-titres faits à la main, les automatiques sont utilisés quand le site les propose.",
              "Si les sous-titres ne peuvent pas être téléchargés, la vidéo est quand même enregistrée.",
+             "S'il n'y a pas de sous-titres dans la langue du programme ni en anglais, ceux de la langue de la vidéo "
+             "sont utilisés.",
+             "{file} → {settings} → {with_video} → {burn} : les sous-titres font partie de l'image et s'affichent "
+             "dans tous les lecteurs, mais ne peuvent pas être désactivés.",
+             "{file} → {settings} → {with_video} → {speech} : si la vidéo n'a pas de sous-titres, le programme les "
+             "crée à partir de la parole, sur votre ordinateur. La première fois, un modèle (1,5 Go) est "
+             "téléchargé. Avant de les ajouter, vous pouvez les vérifier et les corriger, car ils peuvent "
+             "contenir des erreurs.",
              "{downloads} → {thumbnail} enregistre la miniature de la vidéo comme pochette du fichier.")),
         "not-downloading": (
             "La vidéo ne se télécharge pas ? Que faire",
@@ -343,6 +376,8 @@ def labels(lang: str, issue_url: str) -> dict[str, str]:
 
     keys = {"paste": "toolbar.paste", "download": "toolbar.download", "downloads": "menu.downloads",
             "help": "menu.help", "subtitles": "menu.subtitles", "thumbnail": "menu.thumbnail",
+            "file": "menu.file", "settings": "menu.settings", "with_video": "settings.group_content",
+            "burn": "settings.burn", "speech": "settings.speech",
             "whole_playlist": "menu.whole_playlist", "parallel": "menu.parallel", "update_ytdlp": "menu.update_ytdlp",
             "report": "menu.report", "section": "row.section", "whole": "row.section_remove", "mp3": "preset.mp3",
             "m4a": "preset.m4a", "best": "preset.best", "convert": "row.convert"}
