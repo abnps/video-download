@@ -47,6 +47,8 @@ def shoot_desktop(out: Path) -> list[Path]:
     gui.apply_theme(app)
     app.setStyleSheet(theme.stylesheet())
     window = gui.MainWindow()
+    # Savjet o kopiranim linkovima se vidi samo pri prvom pokretanju (svježa CI mašina), kao i na Windows snimku: skriven.
+    window.clipboard_notice.hide()
     window.show()
     out.mkdir(parents=True, exist_ok=True)
     shots = []
