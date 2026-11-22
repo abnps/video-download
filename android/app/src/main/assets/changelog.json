@@ -1,5 +1,31 @@
 [
  {
+  "version": "1.0.10",
+  "date": "22.11.2026",
+  "notes": {
+   "bs": [
+    "Sigurnost: ažurirane biblioteke za sigurne veze i raspakivanje podataka (certifi, urllib3, brotli), s ispravkama ozbiljnih propusta. Zato ovo ažuriranje preporučujemo svima.",
+    "Politika privatnosti u programu i instaleru sada navodi i preuzimanje modela za titl iz govora (Hugging Face, samo kad ga uključiš) i gdje se model čuva."
+   ],
+   "en": [
+    "Security: updated libraries for secure connections and data decompression (certifi, urllib3, brotli), with fixes for serious vulnerabilities. We recommend this update to everyone.",
+    "The privacy policy in the app and installer now also covers downloading the model for subtitles from speech (Hugging Face, only when you turn it on) and where the model is stored."
+   ],
+   "de": [
+    "Sicherheit: aktualisierte Bibliotheken für sichere Verbindungen und das Entpacken von Daten (certifi, urllib3, brotli) mit Korrekturen für schwerwiegende Lücken. Wir empfehlen dieses Update allen.",
+    "Die Datenschutzerklärung im Programm und im Installer nennt jetzt auch den Download des Modells für Untertitel aus der Sprache (Hugging Face, nur wenn du sie einschaltest) und wo das Modell gespeichert wird."
+   ],
+   "es": [
+    "Seguridad: bibliotecas actualizadas para conexiones seguras y descompresión de datos (certifi, urllib3, brotli), con correcciones de vulnerabilidades graves. Recomendamos esta actualización a todos.",
+    "La política de privacidad del programa y del instalador ahora también cubre la descarga del modelo para los subtítulos a partir del habla (Hugging Face, solo si los activas) y dónde se guarda el modelo."
+   ],
+   "fr": [
+    "Sécurité : bibliothèques mises à jour pour les connexions sécurisées et la décompression des données (certifi, urllib3, brotli), avec des corrections de failles graves. Nous recommandons cette mise à jour à tous.",
+    "La politique de confidentialité du programme et de l’installateur couvre désormais aussi le téléchargement du modèle pour les sous-titres à partir de la parole (Hugging Face, seulement si tu les actives) et l’endroit où le modèle est enregistré."
+   ]
+  }
+ },
+ {
   "version": "1.0.9",
   "date": "15.11.2026",
   "notes": {
@@ -145,37 +171,6 @@
     "Chapitres de la vidéo en fichiers séparés si tu veux, extraits précis ou rapides, numéros devant les fichiers des playlists (désactivé jusqu’à ce que tu l’actives) et un interrupteur « Suivre les copies » dans la barre.",
     "L’extension du navigateur se connecte plus vite à l’application, et les Réglages défilent sur les petits écrans.",
     "Le contrôle parental a été supprimé (sur l’ordinateur et sur Android)."
-   ]
-  }
- },
- {
-  "version": "1.0.5",
-  "date": "29.10.2026",
-  "notes": {
-   "bs": [
-    "Novo: Video Download za Linux (beta) — jedan AppImage fajl za Ubuntu 22.04 i novije (i slične sisteme), bez instalacije; sam se ažurira, dodaje se u meni aplikacija i radi s dodatkom za Chrome, Edge i Firefox.",
-    "Pomoć → Preuzimanje iz browsera: dodatak za Edge i Firefox se instalira jednim klikom iz njihove prodavnice, a Chrome u tri jasna koraka.",
-    "Sitne ispravke izgleda (npr. link za otvaranje foldera na njemačkom)."
-   ],
-   "en": [
-    "New: Video Download for Linux (beta) — a single AppImage file for Ubuntu 22.04 and newer (and similar systems), nothing to install; it updates itself, adds itself to the app menu and works with the extension for Chrome, Edge and Firefox.",
-    "Help → Download from the browser: the extension for Edge and Firefox installs with one click from their store, and Chrome in three clear steps.",
-    "Small layout fixes (e.g. the open-folder link in German)."
-   ],
-   "de": [
-    "Neu: Video Download für Linux (Beta) — eine einzige AppImage-Datei für Ubuntu 22.04 und neuer (und ähnliche Systeme), ohne Installation; sie aktualisiert sich selbst, erscheint im Anwendungsmenü und funktioniert mit der Erweiterung für Chrome, Edge und Firefox.",
-    "Hilfe → Herunterladen aus dem Browser: Die Erweiterung für Edge und Firefox wird mit einem Klick aus deren Store installiert, für Chrome in drei klaren Schritten.",
-    "Kleine Korrekturen am Layout (z. B. der Link „Ordner öffnen“)."
-   ],
-   "es": [
-    "Novedad: Video Download para Linux (beta) — un solo archivo AppImage para Ubuntu 22.04 o posterior (y sistemas similares), sin instalación; se actualiza solo, aparece en el menú de aplicaciones y funciona con la extensión para Chrome, Edge y Firefox.",
-    "Ayuda → Descargar desde el navegador: la extensión para Edge y Firefox se instala con un clic desde su tienda, y la de Chrome en tres pasos claros.",
-    "Pequeñas correcciones de diseño (p. ej. el enlace para abrir la carpeta en alemán)."
-   ],
-   "fr": [
-    "Nouveau : Video Download pour Linux (bêta) — un seul fichier AppImage pour Ubuntu 22.04 et plus récent (et systèmes similaires), sans installation ; il se met à jour tout seul, s’ajoute au menu des applications et fonctionne avec l’extension pour Chrome, Edge et Firefox.",
-    "Aide → Télécharger depuis le navigateur : l’extension pour Edge et Firefox s’installe en un clic depuis leur boutique, et celle de Chrome en trois étapes claires.",
-    "Petites corrections de mise en page (p. ex. le lien d’ouverture du dossier en allemand)."
    ]
   }
  }

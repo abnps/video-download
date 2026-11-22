@@ -17,8 +17,8 @@ android {
         // Android 10+: čuvanje u Galeriju/Muziku preko MediaStore bez dozvole za pisanje (~95 % telefona).
         minSdk = 29
         targetSdk = 36
-        versionCode = 21
-        versionName = "1.0.9"
+        versionCode = 22
+        versionName = "1.0.10"
         ndk {
             // Samo telefoni (arm64). x86_64 (emulator, rijetki Chromebookovi) izbačen 8.10.2026: APK −13 MB.
             abiFilters += listOf("arm64-v8a")

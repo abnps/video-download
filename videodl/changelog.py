@@ -8,6 +8,18 @@ from html import escape
 
 # (verzija, datum, {jezik: [stavke]})
 CHANGES = [
+    ("1.0.10", "22.11.2026", {
+        "bs": ["Sigurnost: ažurirane biblioteke za sigurne veze i raspakivanje podataka (certifi, urllib3, brotli), s ispravkama ozbiljnih propusta. Zato ovo ažuriranje preporučujemo svima.",
+               "Politika privatnosti u programu i instaleru sada navodi i preuzimanje modela za titl iz govora (Hugging Face, samo kad ga uključiš) i gdje se model čuva."],
+        "en": ["Security: updated libraries for secure connections and data decompression (certifi, urllib3, brotli), with fixes for serious vulnerabilities. We recommend this update to everyone.",
+               "The privacy policy in the app and installer now also covers downloading the model for subtitles from speech (Hugging Face, only when you turn it on) and where the model is stored."],
+        "de": ["Sicherheit: aktualisierte Bibliotheken für sichere Verbindungen und das Entpacken von Daten (certifi, urllib3, brotli) mit Korrekturen für schwerwiegende Lücken. Wir empfehlen dieses Update allen.",
+               "Die Datenschutzerklärung im Programm und im Installer nennt jetzt auch den Download des Modells für Untertitel aus der Sprache (Hugging Face, nur wenn du sie einschaltest) und wo das Modell gespeichert wird."],
+        "es": ["Seguridad: bibliotecas actualizadas para conexiones seguras y descompresión de datos (certifi, urllib3, brotli), con correcciones de vulnerabilidades graves. Recomendamos esta actualización a todos.",
+               "La política de privacidad del programa y del instalador ahora también cubre la descarga del modelo para los subtítulos a partir del habla (Hugging Face, solo si los activas) y dónde se guarda el modelo."],
+        "fr": ["Sécurité : bibliothèques mises à jour pour les connexions sécurisées et la décompression des données (certifi, urllib3, brotli), avec des corrections de failles graves. Nous recommandons cette mise à jour à tous.",
+               "La politique de confidentialité du programme et de l’installateur couvre désormais aussi le téléchargement du modèle pour les sous-titres à partir de la parole (Hugging Face, seulement si tu les actives) et l’endroit où le modèle est enregistré."],
+    }),
     ("1.0.9", "15.11.2026", {
         "bs": ["Novi izgled glavnog prozora u bojama sajta: kartica „Sada preuzima“ pokazuje video koji se upravo preuzima, s velikom trakom, brzinom, preostalim vremenom i grafikonom brzine; ispod je red onoga što slijedi.",
                "Titl iz govora: kad video nema titl, program ga može napraviti sam iz govora, na tvom računaru. Model se preuzima jednom (1,5 GB), a titl prije upisa u sliku možeš pregledati i ispraviti, jer može imati grešaka.",

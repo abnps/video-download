@@ -26,7 +26,7 @@
  "inLanguage": "fr",
  "applicationCategory": "MultimediaApplication",
  "operatingSystem": "Windows 10, Windows 11, macOS 13, Android 10",
- "softwareVersion": "1.0.9",
+ "softwareVersion": "1.0.10",
  "downloadUrl": "https://github.com/abnps/video-download/releases/latest/download/VideoDownload-Setup.exe",
  "isAccessibleForFree": true,
  "offers": {
@@ -111,10 +111,10 @@
           <a class="btn" href="https://github.com/abnps/video-download/releases/latest/download/VideoDownload-linux-x86_64.AppImage" data-platform-download="linux" data-linux><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>Télécharger pour Linux</a>
         </div>
         <ul class="promise"><li>Sans compte</li><li>Sans limite quotidienne</li><li>Vos liens ne nous parviennent pas</li></ul>
-        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.9 · 144 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
-          <span data-platform-requirements="mac" hidden>Version 1.0.9 · macOS 13+ · Apple M1 ou plus récent · Bêta</span>
-          <span data-platform-requirements="android" hidden>Version 1.0.9 · Android 10+ · ARM64 · Bêta</span>
-          <span data-platform-requirements="linux" hidden>Version 1.0.9 · Ubuntu 22.04+ ou similaire · x86_64 · Bêta</span>
+        <div class="meta"><span data-platform-requirements="win"><!-- version -->Version 1.0.10 · 144 MB<!-- /version --> · Windows 10 et 11 (64 bits)</span>
+          <span data-platform-requirements="mac" hidden>Version 1.0.10 · macOS 13+ · Apple M1 ou plus récent · Bêta</span>
+          <span data-platform-requirements="android" hidden>Version 1.0.10 · Android 10+ · ARM64 · Bêta</span>
+          <span data-platform-requirements="linux" hidden>Version 1.0.10 · Ubuntu 22.04+ ou similaire · x86_64 · Bêta</span>
           · <a href="#install" data-install-help>aide à l'installation</a></div>
         <p class="note">L'application est destinée à vos propres vidéos, aux contenus pour lesquels vous avez l'autorisation de l'auteur et aux contenus sous licence libre. En téléchargeant, vous acceptez les <a href="terms.html">Conditions d'utilisation</a>. Les contenus protégés par DRM ne sont pas téléchargés.</p>
       </div>
@@ -334,21 +334,19 @@
       <h2 data-reveal>Meilleur chaque semaine.</h2>
       <p class="sub" data-reveal>La même liste que dans l'application (Aide → Nouveautés).</p>
       <div class="news">
-        <div class="card" data-reveal><h3>1.0.9 <span>15.11.2026</span></h3><ul>
+        <div class="card" data-reveal><h3>1.0.10 <span>22.11.2026</span></h3><ul>
+          <li>Sécurité : bibliothèques mises à jour pour les connexions sécurisées et la décompression des données (certifi, urllib3, brotli), avec des corrections de failles graves. Nous recommandons cette mise à jour à tous.</li>
+          <li>La politique de confidentialité du programme et de l’installateur couvre désormais aussi le téléchargement du modèle pour les sous-titres à partir de la parole (Hugging Face, seulement si tu les actives) et l’endroit où le modèle est enregistré.</li></ul></div>
+        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.9 <span>15.11.2026</span></h3><ul>
           <li>Nouvel aspect de la fenêtre principale aux couleurs du site : la carte « En cours de téléchargement » montre la vidéo en cours, avec une grande barre, la vitesse, le temps restant et un graphique de vitesse ; en dessous, la file de ce qui suit.</li>
           <li>Sous-titres à partir de la parole : si une vidéo n’a pas de sous-titres, le programme peut les créer à partir de la parole, sur ton ordinateur. Le modèle est téléchargé une fois (1,5 Go) et tu peux vérifier et corriger les sous-titres avant de les ajouter à l’image, car ils peuvent contenir des erreurs.</li>
           <li>Sous-titres : nouvelle option « Incruster les sous-titres dans l’image » (ils font partie de l’image et s’affichent dans tous les lecteurs), et s’il n’y en a ni dans la langue du programme ni en anglais, ceux de la langue de la vidéo sont utilisés.</li>
           <li>Protection contre les blocages : un lien ajouté pendant une pause affiche tout de suite l’attente restante, désactiver la protection met fin à la pause immédiatement, et quand un site demande de confirmer que tu n’es pas un robot à la lecture d’un lien, le lien attend et se télécharge tout seul.</li>
           <li>Video Download est désormais un logiciel libre et open source (GNU GPL-3.0).</li>
           <li>Android : nouveau réglage « Sous-titres avec la vidéo » — sous-titres dans la langue de l’application et en anglais avec chaque vidéo, comme sur l’ordinateur, et sous-titres incrustés dans l’image.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.05s"><h3>1.0.8 <span>8.11.2026</span></h3><ul>
+        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.8 <span>8.11.2026</span></h3><ul>
           <li>Les Paramètres sur l’ordinateur ont un nouvel aspect : pages à gauche, et chaque option a une courte explication et un interrupteur.</li>
           <li>L’extension du navigateur se connecte tout de suite au programme, même après un arrêt brutal du programme ou de l’ordinateur.</li></ul></div>
-        <div class="card" data-reveal style="--d:0.10s"><h3>1.0.7 <span>2.11.2026</span></h3><ul>
-          <li>Protection contre les blocages : quand tu télécharges beaucoup de vidéos d’affilée depuis le même grand site vidéo, l’application fait de courtes pauses pour que le site ne bloque pas temporairement les téléchargements. Désactivable dans les Paramètres.</li>
-          <li>Si un site bloque quand même, l’application attend et reprend toute seule — une carte affiche le compte à rebours, et tu peux « Reprendre maintenant » ou « Reprendre plus tard » ; les téléchargements non terminés sont proposés au prochain démarrage.</li>
-          <li>Nouveau : « Terminé : 50/50 vidéos » après une grande liste sans erreur, un bilan mensuel des téléchargements (uniquement des chiffres, calculés sur ton appareil) et le succès « Patient ».</li>
-          <li>Sur l’ordinateur, les Paramètres sont répartis en onglets. Les pauses, « Terminé : 50/50 », le bilan mensuel et le succès arrivent aussi sur Android.</li></ul></div>
       </div>
       <p class="more" data-reveal><a href="changelog.html">Toutes les versions →</a></p>
     </div>
