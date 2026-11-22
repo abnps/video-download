@@ -123,7 +123,7 @@ def render(lang: str, h: dict, up: str) -> str:
     t = TEXT[lang]
     esc = html.escape
     tabs = "".join(
-        f'<button type="button" role="tab" data-platform-tab="{p}" aria-selected="{"true" if i == 0 else "false"}">'
+        f'<button type="button" data-platform-tab="{p}" aria-pressed="{"true" if i == 0 else "false"}">'
         f'{NAMES[p]}</button>' for i, p in enumerate(PLATFORMS))
     stage = "".join(_device(up, p, lang, t["alt"].format(name=NAMES[p]), active=(i == 0))
                     for i, p in enumerate(PLATFORMS))
@@ -144,7 +144,7 @@ def render(lang: str, h: dict, up: str) -> str:
         <div class="kicker" data-reveal>{t["kicker"]}</div>
         <h2 data-reveal>{t["heading"]}</h2>
         <p class="sub" data-reveal>{t["sub"]}</p>
-        <div class="platform-tabs" role="tablist" aria-label="{esc(t["label"])}">{tabs}<span class="platform-tab-glow" aria-hidden="true"></span></div>
+        <div class="platform-tabs" role="group" aria-label="{esc(t["label"])}">{tabs}<span class="platform-tab-glow" aria-hidden="true"></span></div>
         <div class="platform-scroll">
           <div class="platform-steps">
 {steps_html}

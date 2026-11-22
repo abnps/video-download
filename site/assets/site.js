@@ -325,7 +325,7 @@
       if (!name || name === current) return;
       current = name;
       plat.dataset.current = name;
-      pTabs.forEach((t) => t.setAttribute("aria-selected", t.dataset.platformTab === name));
+      pTabs.forEach((t) => t.setAttribute("aria-pressed", t.dataset.platformTab === name));
       pDevices.forEach((d) => d.classList.toggle("is-active", d.dataset.device === name));
       pSteps.forEach((s) => s.classList.toggle("is-current", s.dataset.platformStep === name));
       moveGlow();

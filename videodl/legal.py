@@ -85,7 +85,7 @@ COMPONENTS = (
     # Titl iz govora (1.0.9): prepoznavanje radi na računaru korisnika.
     Component("faster-whisper", "MIT", "https://github.com/SYSTRAN/faster-whisper", ("faster-whisper-LICENSE",)),
     Component("CTranslate2", "MIT", "https://github.com/OpenNMT/CTranslate2", ("CTranslate2-LICENSE.txt",)),
-    Component("ONNX Runtime", "MIT and the licenses in ThirdPartyNotices", "https://github.com/microsoft/onnxruntime",
+    Component("ONNX Runtime", "MIT and the licenses in ThirdPartyNotices", "https://onnxruntime.ai/",
               ("onnxruntime-LICENSE", "onnxruntime-ThirdPartyNotices.txt")),
     Component("Tokenizers (Hugging Face)", "Apache-2.0", "https://github.com/huggingface/tokenizers",
               ("tokenizers-LICENSE.txt",)),

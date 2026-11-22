@@ -507,9 +507,9 @@ nav.mobile-nav { display: none; }
   position: relative; z-index: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 15px;
   font-weight: 600; padding: 9px 18px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: color .3s;
 }
-.platform-tabs button:hover, .platform-tabs button[aria-selected="true"] { color: var(--text); }
+.platform-tabs button:hover, .platform-tabs button[aria-pressed="true"] { color: var(--text); }
 .platform-tabs button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-html:not(.js) .platform-tabs button[aria-selected="true"] { background: var(--card-solid); }
+html:not(.js) .platform-tabs button[aria-pressed="true"] { background: var(--card-solid); }
 .platform-tab-glow {
   position: absolute; top: 5px; bottom: 5px; left: 0; width: 0; border-radius: 999px; background: var(--card-solid);
   box-shadow: var(--shadow-1); transition: transform .5s var(--ease), width .5s var(--ease);
