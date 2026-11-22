@@ -311,4 +311,50 @@
   const choice = $(".platform-choice");
   if (choice && tabs.length && downloads.length) choice.hidden = false;
   addEventListener("hashchange", selectHash);
+  // Platforme u Funkcijama (Ahmed 22.11.2026): pri skrolu se smjenjuju u okviru koji stoji, dugmad biraju odmah.
+  const plat = $("[data-platforms]");
+  if (plat) {
+    const pTabs = $$("[data-platform-tab]", plat), pDevices = $$("[data-device]", plat);
+    const pSteps = $$("[data-platform-step]", plat), glow = $(".platform-tab-glow", plat);
+    let current = "", quietUntil = 0;
+    const moveGlow = () => {
+      const tab = pTabs.find((t) => t.dataset.platformTab === current);
+      if (tab && glow) { glow.style.width = tab.offsetWidth + "px"; glow.style.transform = `translateX(${tab.offsetLeft}px)`; }
+    };
+    const show = (name) => {
+      if (!name || name === current) return;
+      current = name;
+      plat.dataset.current = name;
+      pTabs.forEach((t) => t.setAttribute("aria-selected", t.dataset.platformTab === name));
+      pDevices.forEach((d) => d.classList.toggle("is-active", d.dataset.device === name));
+      pSteps.forEach((s) => s.classList.toggle("is-current", s.dataset.platformStep === name));
+      moveGlow();
+    };
+    show(pTabs[0] && pTabs[0].dataset.platformTab);
+    addEventListener("resize", moveGlow, { passive: true });
+    pTabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => {
+        const name = tab.dataset.platformTab, step = pSteps.find((s) => s.dataset.platformStep === name);
+        show(name);
+        quietUntil = performance.now() + (calm ? 100 : 1100);  // dok klizi do teksta, izbor se ne mijenja usput
+        const wide = matchMedia("(min-width: 900px)").matches;
+        if (step) step.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: wide ? "center" : "start" });
+      });
+      tab.addEventListener("keydown", (e) => {
+        const move = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        if (!move) return;
+        e.preventDefault();
+        const next = pTabs[(i + move + pTabs.length) % pTabs.length];
+        next.focus();
+        next.click();
+      });
+    });
+    if ("IntersectionObserver" in window) {
+      const watch = new IntersectionObserver((entries) => {
+        if (performance.now() < quietUntil) return;
+        for (const e of entries) if (e.isIntersecting) show(e.target.dataset.platformStep);
+      }, { rootMargin: "-45% 0px -45% 0px" });
+      pSteps.forEach((s) => watch.observe(s));
+    }
+  }
 })();

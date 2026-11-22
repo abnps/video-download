@@ -49,7 +49,7 @@
 <link rel="apple-touch-icon" href="../assets/icon.png">
 <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="../assets/site.css?v=68bef20dc0">
+<link rel="stylesheet" href="../assets/site.css?v=e0d7bf22a4">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/">
 <link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/">
@@ -190,16 +190,53 @@
           <p>Oder wie das System. Fortschritt in der Taskleiste und eine Benachrichtigung am Ende.</p>
         </div>
         <div class="tile full" data-reveal>
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M6 18h6M9 14v4"/><rect x="17" y="8" width="5" height="11" rx="1"/></svg></div>
-          <h3>Läuft fast überall</h3>
-          <p>Windows 10 und 11, macOS (Apple-Chip), Linux und Android, dazu die Browser-Erweiterung für Chrome, Edge und Firefox. Mac, Linux und Android sind in der Beta.</p>
-          <div class="chips"><span>Windows</span><span>macOS</span><span>Linux</span><span>Android</span><span>Chrome</span><span>Edge</span><span>Firefox</span></div>
-        </div>
-        <div class="tile full" data-reveal>
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
           <h3>Immer aktuell – und sicher</h3>
           <p>Die App sucht selbst nach neuen Versionen, aktualisiert den Teil, der Webseiten liest, ohne Neuinstallation. Unter Windows, auf dem Mac und unter Linux installiert sie nur Updates, die wir digital signiert haben.</p>
           <div class="chips"><span>5 Sprachen</span><span>Kein Konto</span><span>Keine Werbung</span><span>Kein Tracking</span><span>Signierte Updates</span></div>
+        </div>
+      </div>
+      <div class="platforms" data-platforms>
+        <div class="kicker" data-reveal>Auf jeder Plattform</div>
+        <h2 data-reveal>Ein Programm.<br>Dein System.</h2>
+        <p class="sub" data-reveal>Überall dieselbe Warteschlange, MP3 und Untertitel. Scrolle oder wähle eine Plattform.</p>
+        <div class="platform-tabs" role="tablist" aria-label="Plattform wählen"><button type="button" role="tab" data-platform-tab="windows" aria-selected="true">Windows</button><button type="button" role="tab" data-platform-tab="macos" aria-selected="false">macOS</button><button type="button" role="tab" data-platform-tab="linux" aria-selected="false">Linux</button><button type="button" role="tab" data-platform-tab="android" aria-selected="false">Android</button><span class="platform-tab-glow" aria-hidden="true"></span></div>
+        <div class="platform-scroll">
+          <div class="platform-steps">
+        <article class="platform-step" data-platform-step="windows" id="platform-windows">
+          <span class="platform-name">Windows</span>
+          <h3>Zu Hause unter Windows</h3>
+          <p>Installiere es aus dem Microsoft Store oder mit dem Installer. Es aktualisiert sich selbst, nur mit von uns signierten Updates, und die Browser-Erweiterung schickt ein Video mit einem Klick.</p>
+          <p class="platform-req">Windows 10 und 11 (64 Bit)</p>
+          <a class="platform-link" href="#panel-win">Für Windows herunterladen →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-windows" data-device="windows"><div class="win-bar"><b>Video Download</b><span class="caption-btns"><i>–</i><i>□</i><i>×</i></span></div><picture><source srcset="../assets/platform-windows-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-windows-light-de.webp" alt="Video Download unter Windows mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="macos" id="platform-macos">
+          <span class="platform-name">macOS</span>
+          <h3>macOS mit Apple-Chip</h3>
+          <p>Ein echtes Mac-Programm: Das Menü sitzt in der oberen Leiste, das Design folgt deinem Mac. Dieselbe Warteschlange, MP3 und Untertitel wie unter Windows.</p>
+          <p class="platform-req">macOS 13+ · Apple M1 oder neuer · Beta</p>
+          <a class="platform-link" href="#panel-mac">Für macOS herunterladen →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-macos" data-device="macos"><div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><b>Video Download</b></div><picture><source srcset="../assets/platform-macos-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-macos-light-de.webp" alt="Video Download unter macOS mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="linux" id="platform-linux">
+          <span class="platform-name">Linux</span>
+          <h3>Linux als AppImage</h3>
+          <p>Eine Datei, ohne Installation: herunterladen, Ausführen erlauben, öffnen. Auch hier funktioniert die Erweiterung für Chrome, Edge und Firefox.</p>
+          <p class="platform-req">Ubuntu 22.04+ oder ähnlich · x86_64 · Beta</p>
+          <a class="platform-link" href="#panel-linux">Für Linux herunterladen →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-linux" data-device="linux"><div class="win-bar"><b>Video Download</b><span class="gnome-x">×</span></div><picture><source srcset="../assets/platform-linux-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-linux-light-de.webp" alt="Video Download unter Linux mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="android" id="platform-android">
+          <span class="platform-name">Android</span>
+          <h3>Android für unterwegs</h3>
+          <p>Füge einen Link ein oder teile ihn aus einer anderen App. Videos landen in der Galerie, Audio in Musik, und Downloads laufen auch bei ausgeschaltetem Bildschirm weiter.</p>
+          <p class="platform-req">Android 10+ · ARM64 · Beta</p>
+          <a class="platform-link" href="#panel-android">Für Android herunterladen →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-android" data-device="android"><div class="phone-bar"><span>9:41</span><i></i></div><picture><source srcset="../assets/platform-android-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-android-light-de.webp" alt="Video Download unter Android mit laufenden Downloads (Beispieltitel)" width="411" height="891" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+          </div>
+          <div class="platform-stage" aria-hidden="true"><figure class="device device-windows is-active" data-device="windows"><div class="win-bar"><b>Video Download</b><span class="caption-btns"><i>–</i><i>□</i><i>×</i></span></div><picture><source srcset="../assets/platform-windows-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-windows-light-de.webp" alt="Video Download unter Windows mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-macos" data-device="macos"><div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><b>Video Download</b></div><picture><source srcset="../assets/platform-macos-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-macos-light-de.webp" alt="Video Download unter macOS mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-linux" data-device="linux"><div class="win-bar"><b>Video Download</b><span class="gnome-x">×</span></div><picture><source srcset="../assets/platform-linux-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-linux-light-de.webp" alt="Video Download unter Linux mit laufenden Downloads (Beispieltitel)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-android" data-device="android"><div class="phone-bar"><span>9:41</span><i></i></div><picture><source srcset="../assets/platform-android-dark-de.webp" media="(prefers-color-scheme: dark)"><img src="../assets/platform-android-light-de.webp" alt="Video Download unter Android mit laufenden Downloads (Beispieltitel)" width="411" height="891" loading="lazy" decoding="async"></picture></figure></div>
         </div>
       </div>
       <div class="achievement-feature">
@@ -421,6 +458,6 @@
 </footer>
 
 <script>window.VD_TEXT = {"progress": "Herunterladen · {p}% · {v} MB/s · noch {s} s", "done": "Fertig · {m} MB", "decimal": ",", "finished": [{"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Bergwanderung – Prokoško-See (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 beste", "audio": false}, {"title": "Mein Live-Konzert – aus dem Publikum gefilmt", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Vortrag: Grundlagen der Fotografie", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – ein Gespräch übers Reisen", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Hinzugefügt: {t}", "ended": "Fertig: {t}", "filters": {"all": "Alle ({count})", "active": "Läuft ({count})", "waiting": "Wartend ({count})", "done": "Fertig ({count})", "failed": "Fehlgeschlagen ({count})"}, "summary_done": "fertig: {count}"};</script>
-<script src="../assets/site.js?v=72033c1e06" defer></script>
+<script src="../assets/site.js?v=6b36b048e2" defer></script>
 </body>
 </html>

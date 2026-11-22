@@ -57,6 +57,10 @@ android {
     buildFeatures {
         compose = true
     }
+    // Snimci ekrana za sajt (SiteScreenshotTest, tools/site_platform_shots.py) trebaju resurse aplikacije.
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
@@ -96,7 +100,20 @@ dependencies {
     implementation("androidx.media3:media3-effect:1.11.1")
     implementation("androidx.media3:media3-common:1.11.1")
     testImplementation("junit:junit:4.13.2") // samo testovi (CI: testDebugUnitTest), ne ide u APK
+    // Snimci ekrana za sajt: Robolectric iscrta pravi Compose ekran bez telefona i emulatora (ne ide u APK).
+    testImplementation("org.robolectric:robolectric:4.16")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui")
+}
+
+// Svojstva za SiteScreenshotTest (samo kad ga pokrene tools/site_platform_shots.py; inače se test preskače).
+// Bez njih se test i ne pokreće (inače bi Robolectric u svakom CI-ju preuzimao Android od 200 MB).
+tasks.withType<Test>().configureEach {
+    val shots = project.findProperty("siteShots") as String?
+    if (shots == null) exclude("**/SiteScreenshotTest*")
+    shots?.let { systemProperty("videodl.shots", it) }
+    (project.findProperty("siteTitles") as String?)?.let { systemProperty("videodl.titles", it) }
 }

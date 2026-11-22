@@ -27,8 +27,10 @@ html, body { overflow-x: clip; }  /* pozadinski oblaci ne smiju nikad pomjeriti 
 body {
   margin: 0; background: var(--bg); color: var(--text);
   font: 16px/1.6 "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+/* Stari preglednici bez overflow: clip; „hidden" na body bi pokvario sticky (zaglavlje, platforme). */
+@supports not (overflow: clip) { body { overflow-x: hidden; } }
 h1, h2, h3 { font-family: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
 a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -493,6 +495,89 @@ nav.mobile-nav { display: none; }
   .hero { padding-top: 40px; }
   .wrap { padding: 0 16px; }
 }
+
+/* ---------- platforme u Funkcijama: pri skrolu se smjenjuju, dugmad biraju odmah ---------- */
+.platforms { margin-top: 104px; }
+.platform-tabs {
+  position: sticky; top: 76px; z-index: 5; display: inline-flex; gap: 4px; padding: 5px; margin-bottom: 8px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--glass); backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px); box-shadow: var(--shadow-1); max-width: 100%; overflow-x: auto; scrollbar-width: none;
+}
+.platform-tabs button {
+  position: relative; z-index: 1; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 15px;
+  font-weight: 600; padding: 9px 18px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: color .3s;
+}
+.platform-tabs button:hover, .platform-tabs button[aria-selected="true"] { color: var(--text); }
+.platform-tabs button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+html:not(.js) .platform-tabs button[aria-selected="true"] { background: var(--card-solid); }
+.platform-tab-glow {
+  position: absolute; top: 5px; bottom: 5px; left: 0; width: 0; border-radius: 999px; background: var(--card-solid);
+  box-shadow: var(--shadow-1); transition: transform .5s var(--ease), width .5s var(--ease);
+}
+.platform-scroll { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; }
+.platform-step { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; padding: 32px 0;
+  transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.js .platform-step:not(.is-current) { opacity: .28; transform: scale(.98); }
+.platform-name { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start;
+  background: linear-gradient(90deg, var(--blue), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.platform-step h3 { font-size: clamp(26px, 3vw, 36px); line-height: 1.15; letter-spacing: -.02em; margin: 10px 0 14px; }
+.platform-step p { color: var(--muted); font-size: 17px; margin: 0 0 14px; max-width: 470px; }
+.platform-step .platform-req { font-size: 14px; }
+.platform-link { font-weight: 600; align-self: flex-start; }
+.platform-inline { display: none; }
+.platform-stage {
+  position: sticky; top: calc(50vh - 230px); align-self: start; height: 520px; display: grid; place-items: center;
+  grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr);
+  perspective: 1400px; margin-top: 8vh;
+}
+.platform-stage::before {  /* meko svjetlo iza uređaja, boja prati izabranu platformu */
+  content: ""; position: absolute; inset: 10% 6%; border-radius: 50%; filter: blur(60px); opacity: .45; z-index: -1;
+  background: radial-gradient(closest-side, var(--glow, var(--bloom-1)), transparent); transition: background .8s;
+}
+[data-current="macos"] .platform-stage { --glow: var(--bloom-2); }
+[data-current="linux"] .platform-stage { --glow: var(--bloom-4); }
+[data-current="android"] .platform-stage { --glow: var(--bloom-3); }
+.device { grid-area: 1 / 1; margin: 0; width: 100%; overflow: hidden; background: var(--card-solid); border: 1px solid var(--line);
+  box-shadow: var(--shadow-2); transition: opacity .7s var(--ease), transform .9s var(--ease), visibility .7s; }
+.js .platform-stage .device:not(.is-active) { opacity: 0; visibility: hidden; transform: translateY(48px) scale(.92) rotateX(10deg); }
+.device img { display: block; width: 100%; height: auto; }
+.win-bar { position: relative; display: flex; align-items: center; height: 34px; padding: 0 14px; font-size: 12.5px;
+  color: var(--muted); background: var(--bg-2); border-bottom: 1px solid var(--line); }
+.win-bar b { font-weight: 500; }
+.device-windows { border-radius: 8px; }
+.device-windows .win-bar { justify-content: space-between; padding-right: 0; }
+.caption-btns { display: flex; height: 100%; }
+.caption-btns i { font-style: normal; width: 44px; display: grid; place-items: center; font-size: 13px; }
+.device-macos { border-radius: 12px; }
+.device-macos .win-bar { justify-content: center; height: 30px; }
+.lights { position: absolute; left: 12px; display: flex; gap: 8px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.lights i:nth-child(2) { background: #febc2e; }
+.lights i:nth-child(3) { background: #28c840; }
+.device-linux { border-radius: 14px 14px 10px 10px; }
+.device-linux .win-bar { justify-content: center; height: 40px; }
+.device-linux .win-bar b { font-weight: 700; color: var(--text); }
+.gnome-x { position: absolute; right: 10px; width: 24px; height: 24px; border-radius: 50%; background: var(--line);
+  display: grid; place-items: center; font-size: 15px; color: var(--text); }
+.device-android { --screen: #f7f9fc; width: 252px; padding: 9px; border-radius: 44px; background: #0d1017; border: 0;
+  box-shadow: var(--shadow-2), inset 0 0 0 1.5px rgba(255, 255, 255, .12); }
+.device-android .phone-bar { position: relative; display: flex; align-items: center; height: 30px; padding: 0 24px;
+  border-radius: 35px 35px 0 0; background: var(--screen); color: var(--text); font-size: 12px; font-weight: 600; }
+.device-android .phone-bar i { position: absolute; left: 50%; top: 10px; width: 11px; height: 11px; margin-left: -5px;
+  border-radius: 50%; background: #05070b; }
+.device-android img { border-radius: 0 0 35px 35px; }
+@media (prefers-color-scheme: dark) { .device-android { --screen: #0b0e14; } }
+@media (max-width: 899px) {
+  .platforms { margin-top: 72px; }
+  .platform-tabs { top: 70px; }
+  .platform-scroll { display: block; }
+  .platform-stage { display: none; }
+  .platform-step { min-height: 0; padding: 30px 0 10px; }
+  .js .platform-step:not(.is-current) { opacity: 1; transform: none; }
+  .platform-inline { display: block; margin-top: 22px; }
+  .platform-inline .device-android { width: min(250px, 72%); margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { .js .platform-stage .device:not(.is-active) { transform: none; } }
 
 /* ---------- ko ne želi animacije ---------- */
 @media (prefers-reduced-motion: reduce) {

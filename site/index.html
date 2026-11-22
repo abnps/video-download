@@ -49,7 +49,7 @@
 <link rel="apple-touch-icon" href="assets/icon.png">
 <meta name="theme-color" content="#f7f9fc" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
-<link rel="stylesheet" href="assets/site.css?v=68bef20dc0">
+<link rel="stylesheet" href="assets/site.css?v=e0d7bf22a4">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="alternate" hreflang="en" href="https://abnps.github.io/video-download/">
 <link rel="alternate" hreflang="bs" href="https://abnps.github.io/video-download/bs/">
@@ -190,16 +190,53 @@
           <p>Or same as your system. Progress on the taskbar and a notification at the end.</p>
         </div>
         <div class="tile full" data-reveal>
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M6 18h6M9 14v4"/><rect x="17" y="8" width="5" height="11" rx="1"/></svg></div>
-          <h3>Works almost everywhere</h3>
-          <p>Windows 10 and 11, macOS (Apple chip), Linux and Android, plus the browser extension for Chrome, Edge and Firefox. Mac, Linux and Android are in beta.</p>
-          <div class="chips"><span>Windows</span><span>macOS</span><span>Linux</span><span>Android</span><span>Chrome</span><span>Edge</span><span>Firefox</span></div>
-        </div>
-        <div class="tile full" data-reveal>
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
           <h3>Always up to date, and safe</h3>
           <p>The app checks for new versions itself, updates the part that reads websites without reinstalling. On Windows, Mac and Linux it installs only updates digitally signed by us.</p>
           <div class="chips"><span>5 languages</span><span>No account</span><span>No ads</span><span>No tracking</span><span>Signed updates</span></div>
+        </div>
+      </div>
+      <div class="platforms" data-platforms>
+        <div class="kicker" data-reveal>On every platform</div>
+        <h2 data-reveal>One app.<br>Your system.</h2>
+        <p class="sub" data-reveal>The same queue, MP3 and subtitles everywhere. Scroll or pick a platform.</p>
+        <div class="platform-tabs" role="tablist" aria-label="Choose a platform"><button type="button" role="tab" data-platform-tab="windows" aria-selected="true">Windows</button><button type="button" role="tab" data-platform-tab="macos" aria-selected="false">macOS</button><button type="button" role="tab" data-platform-tab="linux" aria-selected="false">Linux</button><button type="button" role="tab" data-platform-tab="android" aria-selected="false">Android</button><span class="platform-tab-glow" aria-hidden="true"></span></div>
+        <div class="platform-scroll">
+          <div class="platform-steps">
+        <article class="platform-step" data-platform-step="windows" id="platform-windows">
+          <span class="platform-name">Windows</span>
+          <h3>At home on Windows</h3>
+          <p>Install it from the Microsoft Store or with the installer. It updates itself, only with updates signed by us, and the browser extension sends a video in one click.</p>
+          <p class="platform-req">Windows 10 and 11 (64-bit)</p>
+          <a class="platform-link" href="#panel-win">Download for Windows →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-windows" data-device="windows"><div class="win-bar"><b>Video Download</b><span class="caption-btns"><i>–</i><i>□</i><i>×</i></span></div><picture><source srcset="assets/platform-windows-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-windows-light-en.webp" alt="Video Download on Windows with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="macos" id="platform-macos">
+          <span class="platform-name">macOS</span>
+          <h3>macOS on Apple chips</h3>
+          <p>A real Mac app: the menu sits in the top bar, the theme follows your Mac. Same queue, MP3 and subtitles as on Windows.</p>
+          <p class="platform-req">macOS 13+ · Apple M1 or newer · Beta</p>
+          <a class="platform-link" href="#panel-mac">Download for macOS →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-macos" data-device="macos"><div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><b>Video Download</b></div><picture><source srcset="assets/platform-macos-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-macos-light-en.webp" alt="Video Download on macOS with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="linux" id="platform-linux">
+          <span class="platform-name">Linux</span>
+          <h3>Linux as an AppImage</h3>
+          <p>One file, no installation needed: download it, allow it to run and open it. The extension for Chrome, Edge and Firefox works here too.</p>
+          <p class="platform-req">Ubuntu 22.04+ or similar · x86_64 · Beta</p>
+          <a class="platform-link" href="#panel-linux">Download for Linux →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-linux" data-device="linux"><div class="win-bar"><b>Video Download</b><span class="gnome-x">×</span></div><picture><source srcset="assets/platform-linux-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-linux-light-en.webp" alt="Video Download on Linux with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+        <article class="platform-step" data-platform-step="android" id="platform-android">
+          <span class="platform-name">Android</span>
+          <h3>Android in your pocket</h3>
+          <p>Paste a link or share it from another app. Videos go to the Gallery, audio to Music, and downloads keep going with the screen off.</p>
+          <p class="platform-req">Android 10+ · ARM64 · Beta</p>
+          <a class="platform-link" href="#panel-android">Download for Android →</a>
+          <div class="platform-inline" data-reveal><figure class="device device-android" data-device="android"><div class="phone-bar"><span>9:41</span><i></i></div><picture><source srcset="assets/platform-android-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-android-light-en.webp" alt="Video Download on Android with downloads in progress (example titles)" width="411" height="891" loading="lazy" decoding="async"></picture></figure></div>
+        </article>
+          </div>
+          <div class="platform-stage" aria-hidden="true"><figure class="device device-windows is-active" data-device="windows"><div class="win-bar"><b>Video Download</b><span class="caption-btns"><i>–</i><i>□</i><i>×</i></span></div><picture><source srcset="assets/platform-windows-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-windows-light-en.webp" alt="Video Download on Windows with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-macos" data-device="macos"><div class="win-bar"><span class="lights"><i></i><i></i><i></i></span><b>Video Download</b></div><picture><source srcset="assets/platform-macos-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-macos-light-en.webp" alt="Video Download on macOS with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-linux" data-device="linux"><div class="win-bar"><b>Video Download</b><span class="gnome-x">×</span></div><picture><source srcset="assets/platform-linux-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-linux-light-en.webp" alt="Video Download on Linux with downloads in progress (example titles)" width="860" height="470" loading="lazy" decoding="async"></picture></figure><figure class="device device-android" data-device="android"><div class="phone-bar"><span>9:41</span><i></i></div><picture><source srcset="assets/platform-android-dark-en.webp" media="(prefers-color-scheme: dark)"><img src="assets/platform-android-light-en.webp" alt="Video Download on Android with downloads in progress (example titles)" width="411" height="891" loading="lazy" decoding="async"></picture></figure></div>
         </div>
       </div>
       <div class="achievement-feature">
@@ -421,6 +458,6 @@
 </footer>
 
 <script>window.VD_TEXT = {"progress": "Downloading · {p}% · {v} MB/s · {s} s left", "done": "Finished · {m} MB", "decimal": ".", "finished": [{"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "demos": [{"title": "Mountain hike – Prokosko lake (4K)", "len": "12:34", "mb": 46.0, "speed": 9.6, "c1": "#3d7a5a", "c2": "#2b5a82", "fmt": "MP4 best", "audio": false}, {"title": "My live concert – filmed from the crowd", "len": "52:01", "mb": 38.2, "speed": 11.2, "c1": "#7a3d5c", "c2": "#a0306d", "fmt": "MP4 1080p", "audio": false}, {"title": "Lecture: photography basics", "len": "45:10", "mb": 28.4, "speed": 8.1, "c1": "#3d5c7a", "c2": "#5b3fd1", "fmt": "MP4 720p", "audio": false}, {"title": "Podcast #12 – a talk about travel", "len": "1:13:08", "mb": 7.1, "speed": 2.8, "c1": "#7a6a3d", "c2": "#7a3d5c", "fmt": "MP3", "audio": true}], "added": "Added: {t}", "ended": "Finished: {t}", "filters": {"all": "All ({count})", "active": "Downloading ({count})", "waiting": "Waiting ({count})", "done": "Finished ({count})", "failed": "Failed ({count})"}, "summary_done": "finished: {count}"};</script>
-<script src="assets/site.js?v=72033c1e06" defer></script>
+<script src="assets/site.js?v=6b36b048e2" defer></script>
 </body>
 </html>

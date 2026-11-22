@@ -7,6 +7,8 @@ programu). Sajt nema kolačiće ni tuđe skripte: animacije su CSS + assets/site
 
 import html
 
+import site_platforms  # odjeljak „Na svakoj platformi" u Funkcijama
+
 import site_winget
 
 # Ikona u zaglavlju (Ahmed 2.10.2026: „animiraj ikonicu kao simulacija downloada"): isti oblik i boja kao
@@ -811,18 +813,13 @@ def render(lang: str, *, up: str, switcher: str, alternates: str, footer: str, n
         </div>
 {small_html}
         <div class="tile full" data-reveal>
-          {_icon("platforms")}
-          <h3>{tiles["platforms"][0]}</h3>
-          <p>{tiles["platforms"][1]}</p>
-          <div class="chips">{"".join(f"<span>{name}</span>" for name in PLATFORM_NAMES)}</div>
-        </div>
-        <div class="tile full" data-reveal>
           {_icon("safe")}
           <h3>{tiles["safe"][0]}</h3>
           <p>{tiles["safe"][1]}</p>
           <div class="chips">{chips}</div>
         </div>
       </div>
+{site_platforms.render(lang, h, up)}
       <div class="achievement-feature">
         <div class="kicker" data-reveal>{esc(ach_kicker)}</div>
         <h2 data-reveal>{esc(ach_heading)}</h2>
